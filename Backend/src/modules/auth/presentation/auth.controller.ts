@@ -10,7 +10,9 @@ export class AuthController {
   ){}
   async signup(req: Request, res: Response): Promise<Response> {
     try {
-      const { name, email, password } = req.body;
+
+      console.log("rjfjrf",req.body)
+      const { name, email, password,role } = req.body;
 
       // manually wiring dependencies (later we use DI container)
 
@@ -20,7 +22,7 @@ export class AuthController {
 
       // const signupUseCase = new SignupUsecase(userRepository, hashService);
 
-      const user = await this.SignupUsecase.execute({ name, email, password });
+      const user = await this.SignupUsecase.execute({ name, email, password,role });
 
       return res.status(201).json({
         message: "User created successfully",

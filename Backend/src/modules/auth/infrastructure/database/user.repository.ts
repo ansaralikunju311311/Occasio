@@ -22,6 +22,7 @@ export class UserRepository implements IUserRepository{
 
 
     async create(user: User): Promise<User> {
+        console.log('user',user.role)
           const created = await UserModel.create({
       name: user.name,
       email: user.email,

@@ -22,8 +22,8 @@ export class User {
     public readonly name: string,
     public readonly email: string,
     public password: string,
-    public role: UserRole = UserRole.USER,
-    public status: UserStatus = UserStatus.ACTIVE
+    public role: UserRole,
+    public status: UserStatus
   ) {}
 
   isAdmin(): boolean {
