@@ -20,6 +20,11 @@ export class SignupUsecase{
         if(existingUser){
             throw new Error('user already exists')
         }
+        
+        if(data.confirmpassword != data.password){
+            throw new Error('password is not matching')
+        }
+
 
         const hashpassword = await this.hashService.hash(data.password)
         let role: UserRole = UserRole.USER;
