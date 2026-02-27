@@ -28,6 +28,7 @@ export class SignupUsecase{
     role = UserRole.EVENT_MANAGER;
   }
         const newUser = new User(
+            null,
             data.name,
             data.email,
             hashpassword,

@@ -12,6 +12,7 @@ export class UserRepository implements IUserRepository{
         if(!doc) return null;
 
         return new User(
+            doc._id.toString(),
             doc.name,
             doc.email,
             doc.password,
@@ -32,6 +33,7 @@ export class UserRepository implements IUserRepository{
     });
 
     return new User(
+        created._id.toString(),
       created.name,
       created.email,
       created.password,
