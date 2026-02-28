@@ -5,8 +5,8 @@ import { signupDTO } from "../dtos/signup.dto.js";
 import { User } from "../../domain/entites/user.entity.js";
 import { UserRole } from "../../../../common/enums/user-role.enum.js";
 import { UserStatus } from "../../../../common/enums/user-status.enum.js";
-
-
+import { UserOtp } from "../../../../common/enums/user-otp.enum.js";
+import { generateOTP } from "../../../../common/utils/generate-otp.js";
 export class SignupUsecase{
     constructor(
         private userRepository:IUserRepository,
@@ -29,7 +29,8 @@ export class SignupUsecase{
         const hashpassword = await this.hashService.hash(data.password)
         let role: UserRole = UserRole.USER;
         let isVerified = false 
-
+        let otp = generateOTP();
+        const otpExpires = new Date(Date.now() + 1 * 60 * 1000)
          if (data.role && data.role === "EVENT_MANAGER") {
     role = UserRole.EVENT_MANAGER;
   }
@@ -40,7 +41,10 @@ export class SignupUsecase{
             hashpassword,
             role,
             UserStatus.ACTIVE,
-            isVerified
+            isVerified,
+            otp,
+            otpExpires,
+            UserOtp.SIGNUP
             
         );
 

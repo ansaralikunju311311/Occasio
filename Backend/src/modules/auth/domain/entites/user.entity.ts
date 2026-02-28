@@ -16,7 +16,7 @@
 // }
 import { UserRole } from "../../../../common/enums/user-role.enum.js";
 import { UserStatus } from "../../../../common/enums/user-status.enum.js";
-
+import { UserOtp } from "../../../../common/enums/user-otp.enum.js";
 export class User {
   constructor(
     public readonly id :string | null,
@@ -25,7 +25,10 @@ export class User {
     public password: string,
     public role: UserRole,
     public status: UserStatus,
-    public isVerfied: boolean
+    public isVerfied: boolean,
+    public otp : string,
+    public otpExpires : Date,
+    public otpType : UserOtp
   ) {}
 
   isAdmin(): boolean {

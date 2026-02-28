@@ -1,7 +1,8 @@
 import mongoose, { Document, Schema } from "mongoose";
 import { UserRole } from "../../../../common/enums/user-role.enum.js";
 import { UserStatus } from "../../../../common/enums/user-status.enum.js";
-
+import { UserOtp } from "../../../../common/enums/user-otp.enum.js";
+// import { devNull } from "node:os";
 
 export interface IUserDocument extends Document{
     name:string,
@@ -9,7 +10,10 @@ export interface IUserDocument extends Document{
     password:string,
     role:UserRole,
     status:UserStatus,
-    isVerfiled: boolean
+    isVerfiled: boolean,
+    otp:string,
+    otpExpires:Date,
+    otpType: UserOtp
 }
 
 const userSchema = new Schema<IUserDocument>(
@@ -45,6 +49,17 @@ const userSchema = new Schema<IUserDocument>(
         type:Boolean,
         default :false
 
+    },
+    otp:{
+        type:String
+    },
+    otpExpires:{
+        type:Date
+    },
+    otpType:{
+        type:String,
+        enum:Object.values(UserOtp) as string[],
+        default : null
     }
 },
 {timestamps:true}

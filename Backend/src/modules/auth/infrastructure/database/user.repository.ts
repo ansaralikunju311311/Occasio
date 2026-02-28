@@ -19,6 +19,9 @@ export class UserRepository implements IUserRepository{
             doc.role,
             doc.status,
             doc.isVerfiled,
+            doc.otp,
+            doc.otpExpires,
+            doc.otpType
         )
     }
 
@@ -31,7 +34,10 @@ export class UserRepository implements IUserRepository{
       password: user.password,
       role: user.role,
       status: user.status,
-      isVerfiled:user.isVerfied
+      isVerfiled:user.isVerfied,
+      otp:user.otp,
+      otpExpires:user.otpExpires,
+      otpType:user.otpType
     });
 
     return new User(
@@ -41,7 +47,10 @@ export class UserRepository implements IUserRepository{
       created.password,
       created.role,
       created.status,
-      created.isVerfiled
+      created.isVerfiled,
+      created.otp,
+      created.otpExpires,
+      created.otpType
     );
     }
 }
