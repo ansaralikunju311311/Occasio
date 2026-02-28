@@ -28,8 +28,10 @@ export class SignupUsecase{
 
         const hashpassword = await this.hashService.hash(data.password)
         let role: UserRole = UserRole.USER;
-        let isVerified = false 
+        let isVerified = false ;
+        let otpSendAt = new Date()
         let otp = generateOTP();
+        
         const otpExpires = new Date(Date.now() + 1 * 60 * 1000)
          if (data.role && data.role === "EVENT_MANAGER") {
     role = UserRole.EVENT_MANAGER;
@@ -44,11 +46,14 @@ export class SignupUsecase{
             isVerified,
             otp,
             otpExpires,
-            UserOtp.SIGNUP
+            UserOtp.SIGNUP,
+            otpSendAt
             
         );
 
-        console.log("newUser",newUser)
+        // console.log("newUser",newUser)
         return this.userRepository.create(newUser)
+        // console.log("sdfghj",value)
+        // return value
     }
 }

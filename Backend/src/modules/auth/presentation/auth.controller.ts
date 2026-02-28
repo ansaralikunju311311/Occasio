@@ -1,12 +1,16 @@
 import { Request, Response } from "express";
 import { SignupUsecase } from "../application/use-cases/signup.usecase.js";
 import { LoginUseCase } from "../application/use-cases/login.usecase.js";
+import { VerifyUseCase } from "../application/use-cases/verify-otp.usecase.js";
+import { ResendotpUseCase } from "../application/use-cases/resend-otp.usecase.js";
 // import { UserRepository } from "../infrastructure/database/user.repository.js";
 // import { BcryptHashService } from "../infrastructure/services/bcrypt-hash.service.js";
 
 export class AuthController {
   constructor(private SignupUsecase :SignupUsecase,
-       private LoginUseCase:LoginUseCase
+       private LoginUseCase:LoginUseCase,
+       private VerifyUseCase:VerifyUseCase,
+       private ResendotpUseCase: ResendotpUseCase
   ){}
   async signup(req: Request, res: Response): Promise<Response> {
     try {
@@ -30,8 +34,10 @@ export class AuthController {
       });
 
     } catch (error: any) {
+       console.log(error.message)
       return res.status(400).json({
         message: error.message
+        
       });
     }
   }
@@ -57,6 +63,38 @@ export class AuthController {
         message: error.message
       });
     }
+    }
+
+
+    async verify(req:Request,res:Response):Promise<Response>{
+      try{
+        const {email,otp} = req.body;
+        const verify = await this.VerifyUseCase.execute({email,otp});
+        return res.status(200).json({
+          message:'the otp verification completed',data:verify
+        })
+      }
+      catch(error:any){
+        return res.status(400).json({
+          message:error.message
+        })
+      }
+    }
+
+    async resnedVerify(req:Request,res:Response):Promise<Response>{
+        try {
+             const {email} = req.body;
+
+             const verifyOtp = await this.ResendotpUseCase.execute(email);
+             return res.status(200).json({
+              message: "otp resned successfully",data:verifyOtp
+             })
+        } catch (error:any) {
+             console.log(error);
+             return res.status(400).json({
+              message:error.message
+             })
+        }
     }
 
 

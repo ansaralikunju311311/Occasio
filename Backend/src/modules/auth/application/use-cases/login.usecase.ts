@@ -30,7 +30,7 @@ export class LoginUseCase{
      throw new Error('the user is not permitted because your blocked')
    }
     
-     console.log("for the login setup",user)
+    //  console.log("for the login setup",user)
 
      return user
    }

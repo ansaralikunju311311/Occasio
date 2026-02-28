@@ -11,9 +11,10 @@ export interface IUserDocument extends Document{
     role:UserRole,
     status:UserStatus,
     isVerfiled: boolean,
-    otp:string,
-    otpExpires:Date,
-    otpType: UserOtp
+    otp:string | null,
+    otpExpires:Date | null,
+    otpType: UserOtp | null,
+    otpSentAt : Date | null
 }
 
 const userSchema = new Schema<IUserDocument>(
@@ -60,6 +61,9 @@ const userSchema = new Schema<IUserDocument>(
         type:String,
         enum:Object.values(UserOtp) as string[],
         default : null
+    },
+    otpSentAt:{
+        type:Date
     }
 },
 {timestamps:true}

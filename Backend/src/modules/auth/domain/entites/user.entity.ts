@@ -26,9 +26,10 @@ export class User {
     public role: UserRole,
     public status: UserStatus,
     public isVerfied: boolean,
-    public otp : string,
-    public otpExpires : Date,
-    public otpType : UserOtp
+    public otp : string | null,
+    public otpExpires : Date | null,
+    public otpType : UserOtp | null,
+    public otpSendAt : Date | null
   ) {}
 
   isAdmin(): boolean {
