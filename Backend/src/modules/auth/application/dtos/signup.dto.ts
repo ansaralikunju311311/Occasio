@@ -3,5 +3,6 @@ export interface signupDTO{
     email:string,
     password:string,
     confirmpassword:string,
-    role?:string
+    role?:string,
+    isVerified:string
 }

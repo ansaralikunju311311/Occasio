@@ -2,8 +2,8 @@ import { IHashServive } from "../../domain/services/hash.service.interface.js";
 import { IUserRepository } from "../../domain/repositories/user.repository.interface.js";
 import { LoginDto } from "../dtos/login.dto.js";
 import { User } from "../../domain/entites/user.entity.js";
-
-
+import { UserStatus } from "../../../../common/enums/user-status.enum.js";
+import { UserRole } from "../../../../common/enums/user-role.enum.js";
 export class LoginUseCase{
     constructor(
         private userRepository:IUserRepository,
@@ -22,6 +22,15 @@ export class LoginUseCase{
     throw new Error('the passowrd is not matching')
    }
 
+   if(user.isVerfied === false){
+    throw new Error('verifiy user account correctly')
+   }
+
+   if(user.status === UserStatus.BLOCK){
+     throw new Error('the user is not permitted because your blocked')
+   }
+    
+     console.log("for the login setup",user)
 
      return user
    }

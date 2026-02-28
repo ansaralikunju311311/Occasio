@@ -12,7 +12,7 @@ export class AuthController {
     try {
 
       console.log("rjfjrf",req.body)
-      const { name, email, password,role,confirmpassword } = req.body;
+      const { name, email, password,role,confirmpassword,isVerified } = req.body;
 
       // manually wiring dependencies (later we use DI container)
 
@@ -22,7 +22,7 @@ export class AuthController {
 
       // const signupUseCase = new SignupUsecase(userRepository, hashService);
 
-      const user = await this.SignupUsecase.execute({ name, email, password,role,confirmpassword});
+      const user = await this.SignupUsecase.execute({ name, email, password,role,confirmpassword,isVerified});
 
       return res.status(201).json({
         message: "User created successfully",

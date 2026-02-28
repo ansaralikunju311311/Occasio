@@ -28,6 +28,7 @@ export class SignupUsecase{
 
         const hashpassword = await this.hashService.hash(data.password)
         let role: UserRole = UserRole.USER;
+        let isVerified = false 
 
          if (data.role && data.role === "EVENT_MANAGER") {
     role = UserRole.EVENT_MANAGER;
@@ -38,8 +39,12 @@ export class SignupUsecase{
             data.email,
             hashpassword,
             role,
-            UserStatus.ACTIVE
+            UserStatus.ACTIVE,
+            isVerified
+            
         );
+
+        console.log("newUser",newUser)
         return this.userRepository.create(newUser)
     }
 }
