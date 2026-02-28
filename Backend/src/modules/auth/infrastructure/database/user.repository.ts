@@ -17,7 +17,8 @@ export class UserRepository implements IUserRepository{
             doc.email,
             doc.password,
             doc.role,
-            doc.status
+            doc.status,
+            doc.isVerfiled,
         )
     }
 
@@ -29,7 +30,8 @@ export class UserRepository implements IUserRepository{
       email: user.email,
       password: user.password,
       role: user.role,
-      status: user.status
+      status: user.status,
+      isVerfiled:user.isVerfied
     });
 
     return new User(
@@ -38,7 +40,8 @@ export class UserRepository implements IUserRepository{
       created.email,
       created.password,
       created.role,
-      created.status
+      created.status,
+      created.isVerfiled
     );
     }
 }

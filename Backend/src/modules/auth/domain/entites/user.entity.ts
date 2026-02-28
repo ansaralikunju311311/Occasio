@@ -24,7 +24,8 @@ export class User {
     public readonly email: string,
     public password: string,
     public role: UserRole,
-    public status: UserStatus
+    public status: UserStatus,
+    public isVerfied: boolean
   ) {}
 
   isAdmin(): boolean {

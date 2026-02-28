@@ -8,7 +8,8 @@ export interface IUserDocument extends Document{
     email:string,
     password:string,
     role:UserRole,
-    status:UserStatus
+    status:UserStatus,
+    isVerfiled: boolean
 }
 
 const userSchema = new Schema<IUserDocument>(
@@ -39,6 +40,11 @@ const userSchema = new Schema<IUserDocument>(
         type:String,
         enum:Object.values(UserStatus) as string[],
         default :UserStatus.ACTIVE
+    },
+    isVerfiled:{
+        type:Boolean,
+        default :false
+
     }
 },
 {timestamps:true}
