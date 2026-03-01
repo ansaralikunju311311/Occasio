@@ -10,6 +10,6 @@ router.post("/signup",controller.signup.bind(controller))        //  after we us
 router.post("/login",controller.login.bind(controller))
 router.post("/verify-otp",controller.verify.bind(controller))
 router.post("/resend-otp",controller.resnedVerify.bind(controller))
-
+router.post("/forgot-password",controller.forgotPassword.bind(controller))
 // router.post("/signup",controller.signup)
 export default router;

@@ -26,7 +26,7 @@ export class VerifyUseCase{
             throw new Error('time expired')
         }
 
-
+        
         user.isVerfied = true,
         user.otp = null,
         user.otpExpires = null,

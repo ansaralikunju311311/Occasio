@@ -13,10 +13,13 @@ export class ResendotpUseCase{
 
     async execute (email:string):Promise<User>{
         const user = await this.userRepository.findByEmail(email);
+
+
+        console.log('user',user)
         if(!user){
             throw new Error('user is not exist register first')
         }
-        if(user.isVerfied === true){
+        if(user.isVerfied === true && user.otpType === UserOtp.SIGNUP){
             throw new Error('user is already verified')
         }
        const now = new Date();
@@ -37,7 +40,7 @@ export class ResendotpUseCase{
        console.log('generated',newOtp)
        user.otp = newOtp;
        user.otpExpires = new Date(now.getTime() + 1 * 60 * 1000);
-       user.otpType = UserOtp.SIGNUP,
+       user.otpType = user.otpType,
        user.otpSendAt= now
 
         return this.userRepository.update(user)
