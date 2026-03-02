@@ -1,13 +1,7 @@
-import React from 'react'
+import { RouterWrapper } from "./app/router";
 
-const App = () => {
-  return (
-    <div>
-      <h1 className="text-4xl font-bold text-blue-600">
-      Occasio Frontend Ready 🚀
-    </h1>
-    </div>
-  )
+function App() {
+  return <RouterWrapper />;
 }
 
-export default App
+export default App;
