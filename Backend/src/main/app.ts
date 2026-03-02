@@ -1,5 +1,6 @@
 import express from 'express';
 import authRoutes from "../modules/auth/presentation/auth.routes.js";
+import { errorMiddleware } from '../middleware/error.middleware.js';
 const app = express();
 
 app.use(express.json())
@@ -10,5 +11,6 @@ app.get('/',(req,res)=>{
 app.use("/api/auth", authRoutes);
 app.use((_req,res)=>{
     res.status(404).json({message:'the page not found'})
-})
+});
+app.use(errorMiddleware)
 export default app

@@ -7,6 +7,8 @@ import { UserRole } from "../../../../common/enums/user-role.enum.js";
 import { UserStatus } from "../../../../common/enums/user-status.enum.js";
 import { UserOtp } from "../../../../common/enums/user-otp.enum.js";
 import { generateOTP } from "../../../../common/utils/generate-otp.js";
+import { AppError } from "../../../../common/errors/app-error.js";
+import { HttpStatus } from "../../../../common/constants/http-stattus.js";
 export class SignupUsecase{
     constructor(
         private userRepository:IUserRepository,
@@ -18,11 +20,11 @@ export class SignupUsecase{
         console.log("Incoming signup data:", data);
         const existingUser = await this.userRepository.findByEmail(data.email);
         if(existingUser){
-            throw new Error('user already exists')
+            throw new AppError('user already exists',HttpStatus.CONFLICT)
         }
         
         if(data.confirmpassword != data.password){
-            throw new Error('password is not matching')
+            throw new AppError('password is not matching',HttpStatus.BAD_REQUEST)
         }
 
 

@@ -3,6 +3,8 @@ import { IUserRepository } from "../../domain/repositories/user.repository.inter
 import { IHashServive } from "../../domain/services/hash.service.interface.js";
 import { ResetPasswordDTO } from "../dtos/reset-password.dto.js";
 import { User } from "../../domain/entites/user.entity.js";
+import { AppError } from "../../../../common/errors/app-error.js";
+import { HttpStatus } from "../../../../common/constants/http-stattus.js";
 export class ResetPasswordUseCase{
 
      constructor(
@@ -13,24 +15,24 @@ export class ResetPasswordUseCase{
      async execute(data:ResetPasswordDTO):Promise<User>{
 
         const user = await this.userRespository.findByEmail(data.email);
-        if(!user) throw new Error('the user is not found');
+        if(!user) throw new AppError('the user is not found',HttpStatus.NOT_FOUND);
 
         if(user.otpType != UserOtp.FORGOT_PASSWORD){
-            throw new Error('invalid password reset');
+            throw new AppError('invalid password reset',HttpStatus.BAD_REQUEST);
         }
 
         if(!user.otp || !user.otpExpires){
-            throw new Error('otp not found')
+            throw new AppError('otp not found',HttpStatus.BAD_REQUEST)
         }
 
         if(user.otp != data.otp){
-            throw new Error('incorrect otp')
+            throw new AppError('incorrect otp',HttpStatus.UNAUTHORIZED)
         }
         if(user.otpExpires < new Date()){
-            throw new Error('the time expire')
+            throw new AppError('the time expire',HttpStatus.GONE)
         }
         if(data.password != data.confirmpassword){
-            throw new Error("passoword is not match")
+            throw new AppError("passoword is not match",HttpStatus.BAD_REQUEST)
         }
         console.log('the password',data.password)
         const hashedpassword = await this.hashService.hash(data.password);

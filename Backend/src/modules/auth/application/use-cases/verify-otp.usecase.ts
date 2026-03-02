@@ -1,6 +1,8 @@
 import { IUserRepository } from "../../domain/repositories/user.repository.interface.js";
 import { VerfiyOtpDto } from "../dtos/verify-otp.dto.js";
 import { User } from "../../domain/entites/user.entity.js";
+import { AppError } from "../../../../common/errors/app-error.js";
+import { HttpStatus } from "../../../../common/constants/http-stattus.js";
 export class VerifyUseCase{
     constructor(
         private userRepository :IUserRepository
@@ -12,18 +14,18 @@ export class VerifyUseCase{
 
         const user = await this.userRepository.findByEmail(data.email);
         if(!user){
-            throw new Error('the user is not exist their')
+            throw new AppError('the user is not exist their',HttpStatus.NOT_FOUND)
         }
         console.log("fjnjfnvfj",user)
 
         if(!user.otp || !user.otpExpires){
-               throw new Error('no otp here')
+               throw new AppError('no otp here',HttpStatus.BAD_REQUEST)
         }
         if(user.otp != data.otp){
-            throw new Error('incorrect otp')
+            throw new AppError('incorrect otp',HttpStatus.UNAUTHORIZED)
         }
         if(user.otpExpires < new Date() ){
-            throw new Error('time expired')
+            throw new AppError('time expired',HttpStatus.GONE)
         }
 
         

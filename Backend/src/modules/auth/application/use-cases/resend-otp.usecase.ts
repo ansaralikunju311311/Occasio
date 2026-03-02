@@ -2,6 +2,8 @@ import { UserOtp } from "../../../../common/enums/user-otp.enum.js";
 import { generateOTP } from "../../../../common/utils/generate-otp.js";
 import { User } from "../../domain/entites/user.entity.js";
 import { IUserRepository } from "../../domain/repositories/user.repository.interface.js";
+import { AppError } from "../../../../common/errors/app-error.js";
+import { HttpStatus } from "../../../../common/constants/http-stattus.js";
 
 export class ResendotpUseCase{
     constructor(
@@ -17,10 +19,10 @@ export class ResendotpUseCase{
 
         console.log('user',user)
         if(!user){
-            throw new Error('user is not exist register first')
+            throw new AppError('user is not exist register first',HttpStatus.UNAUTHORIZED)
         }
         if(user.isVerfied === true && user.otpType === UserOtp.SIGNUP){
-            throw new Error('user is already verified')
+            throw new AppError('user is already verified',HttpStatus.CONFLICT)
         }
        const now = new Date();
       console.log("the time now ",now);
@@ -32,7 +34,7 @@ export class ResendotpUseCase{
          console.log("the diff",diff)
 
          if(diff < 60){
-            throw new Error('please wait')
+            throw new AppError('please wait',HttpStatus.MANY_REQUEST)
          }
        }
 

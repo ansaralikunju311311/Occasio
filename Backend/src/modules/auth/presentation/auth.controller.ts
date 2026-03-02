@@ -1,12 +1,11 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { SignupUsecase } from "../application/use-cases/signup.usecase.js";
 import { LoginUseCase } from "../application/use-cases/login.usecase.js";
 import { VerifyUseCase } from "../application/use-cases/verify-otp.usecase.js";
 import { ResendotpUseCase } from "../application/use-cases/resend-otp.usecase.js";
 import { ForgotpasswordUsecase } from "../application/use-cases/forgotpassword.usecase.js";
-// import { UserRepository } from "../infrastructure/database/user.repository.js";
-// import { BcryptHashService } from "../infrastructure/services/bcrypt-hash.service.js";
 import { ResetPasswordUseCase } from "../application/use-cases/resetpassword.usecase.js";
+import { HttpStatus } from "../../../common/constants/http-stattus.js";
 export class AuthController {
   constructor(private SignupUsecase :SignupUsecase,
        private LoginUseCase:LoginUseCase,
@@ -16,7 +15,7 @@ export class AuthController {
        private ResetPasswordUseCase : ResetPasswordUseCase
        
   ){}
-  async signup(req: Request, res: Response): Promise<Response> {
+  async signup(req: Request, res: Response,next:NextFunction): Promise<void> {
     try {
 
       console.log("rjfjrf",req.body)
@@ -32,24 +31,21 @@ export class AuthController {
 
       const user = await this.SignupUsecase.execute({ name, email, password,role,confirmpassword,isVerified});
 
-      return res.status(201).json({
+       res.status(HttpStatus.CREATED).json({
         message: "User created successfully",
         data: user
       });
 
     } catch (error: any) {
        console.log(error.message)
-      return res.status(400).json({
-        message: error.message
-        
-      });
+      next(error)
     }
   }
 
 
 
 
-    async login(req:Request,res:Response):Promise<Response>
+    async login(req:Request,res:Response,next:NextFunction):Promise<void>
 
     {
          
@@ -59,83 +55,71 @@ export class AuthController {
       const {email,password} = req.body;
 
       const user = await this.LoginUseCase.execute({email,password});
-      return res.status(200).json({message:'user login correctly'
+       res.status(HttpStatus.OK).json({message:'user login correctly'
         ,
         data:user})
     } catch (error:any) {
-       return res.status(400).json({
-        message: error.message
-      });
+      next(error)
     }
     }
 
 
-    async verify(req:Request,res:Response):Promise<Response>{
+    async verify(req:Request,res:Response,next:NextFunction):Promise<void>{
       try{
         const {email,otp} = req.body;
         const verify = await this.VerifyUseCase.execute({email,otp});
 
 
-      
-        return res.status(200).json({
+      res.status(HttpStatus.OK).json({
           message:'the otp verification completed',data:verify
         })
       }
       catch(error:any){
-        return res.status(400).json({
-          message:error.message
-        })
+        next(error)
       }
     }
 
-    async resnedVerify(req:Request,res:Response):Promise<Response>{
+    async resnedVerify(req:Request,res:Response,next:NextFunction):Promise<void>{
         try {
              const {email} = req.body;
 
              const verifyOtp = await this.ResendotpUseCase.execute(email);
-             return res.status(200).json({
+              res.status(HttpStatus.OK).json({
               message: "otp resned successfully",data:verifyOtp
              })
         } catch (error:any) {
              console.log(error);
-             return res.status(400).json({
-              message:error.message
-             })
+            next(error)
         }
     }
 
 
-    async forgotPassword(req:Request,res:Response):Promise<Response>{
+    async forgotPassword(req:Request,res:Response,next:NextFunction):Promise<void>{
       try {
           const {email} = req.body;
           const user  = await this.ForgotpasswordUsecase.execute(email);
-            return res.status(200).json({
+             res.status(HttpStatus.OK).json({
               message:"otp sened succesfully",data:user
             })
           }
       catch (error:any) {
          console.log('error')
-          return res.status(400).json({
-           
-            message:error.message
-          })
+         next(error)
       }
     
     }
 
 
 
-    async resetpassword(req:Request,res:Response):Promise<Response>{
+    async resetpassword(req:Request,res:Response,next:NextFunction):Promise<void>{
       try {
           const{email,otp,password,confirmpassword} = req.body;
           const user = await this.ResetPasswordUseCase.execute({email,otp,password,confirmpassword});
-          return res.status(200).json({
+           res.status(HttpStatus.OK).json({
             message:"reset success fully passowrd",data:user
           })
       } catch (error:any) {
-        res.status(400).json({
-          message:error.message
-        })
+       next(error)
       }
     }
 

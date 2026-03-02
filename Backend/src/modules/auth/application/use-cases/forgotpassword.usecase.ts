@@ -1,4 +1,5 @@
-import { throwDeprecation } from "node:process";
+import { AppError } from "../../../../common/errors/app-error.js";
+import { HttpStatus } from "../../../../common/constants/http-stattus.js";
 import { UserStatus } from "../../../../common/enums/user-status.enum.js";
 import { IUserRepository } from "../../domain/repositories/user.repository.interface.js";
 import { generateOTP } from "../../../../common/utils/generate-otp.js";
@@ -19,14 +20,14 @@ export class ForgotpasswordUsecase {
 
 
             if(!data){
-                throw new Error('the register the first')
+                throw new AppError('the register the first',HttpStatus.NOT_FOUND)
             }
 
             if(data.isVerfied  == false){
-                throw new Error('the useer is verifeid first')
+                throw new AppError('Please verify your account first',HttpStatus.FORBIDDEN)
             }
             if(data.status == UserStatus.BLOCK){
-                 throw new Error(' this is the bloced user')
+                 throw new AppError(' this is the bloced user',HttpStatus.FORBIDDEN)
             }
 
 

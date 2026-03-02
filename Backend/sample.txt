@@ -1,0 +1,10 @@
+Case	Code
+Invalid login	401
+Wrong OTP	401
+User not found	404
+Already exists	409
+Not verified	403
+Blocked	403
+Validation fail	400
+OTP expired	410
+OTP spam	429
