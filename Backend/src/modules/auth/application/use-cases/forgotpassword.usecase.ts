@@ -5,9 +5,11 @@ import { IUserRepository } from "../../domain/repositories/user.repository.inter
 import { generateOTP } from "../../../../common/utils/generate-otp.js";
 import { User } from "../../domain/entites/user.entity.js";
 import { UserOtp } from "../../../../common/enums/user-otp.enum.js";
+import { EmailSerive } from "../../../../common/service/email.service.js";
 export class ForgotpasswordUsecase {
     constructor(
-        private userRepository :IUserRepository
+        private userRepository :IUserRepository,
+        private emailService :EmailSerive
     ){}
 
 
@@ -34,7 +36,8 @@ export class ForgotpasswordUsecase {
              let otpSendAt = new Date()
            let otp = generateOTP();
         
-            const otpExpires = new Date(Date.now() + 1 * 60 * 1000)
+            const otpExpires = new Date(Date.now() + 1 * 60 * 1000);
+            await this.emailService.sendOtpEmail(data.email,otp)
      const newUser = new User(
                         data.id,
                         data.name,

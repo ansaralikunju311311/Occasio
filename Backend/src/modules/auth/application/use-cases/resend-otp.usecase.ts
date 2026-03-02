@@ -4,10 +4,12 @@ import { User } from "../../domain/entites/user.entity.js";
 import { IUserRepository } from "../../domain/repositories/user.repository.interface.js";
 import { AppError } from "../../../../common/errors/app-error.js";
 import { HttpStatus } from "../../../../common/constants/http-stattus.js";
+import { EmailSerive } from "../../../../common/service/email.service.js";
 
 export class ResendotpUseCase{
     constructor(
-        private  userRepository :IUserRepository
+        private  userRepository :IUserRepository,
+        private emailService : EmailSerive
     ){}
 
 
@@ -44,7 +46,7 @@ export class ResendotpUseCase{
        user.otpExpires = new Date(now.getTime() + 1 * 60 * 1000);
        user.otpType = user.otpType,
        user.otpSendAt= now
-
+          await this.emailService.sendOtpEmail(user.email,newOtp)
         return this.userRepository.update(user)
     }
 }

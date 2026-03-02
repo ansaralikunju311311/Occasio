@@ -1,7 +1,9 @@
-import app from '../main/app.js'
-import dotenv from 'dotenv'
+// import dotenv from 'dotenv'
+// dotenv.config()
 
-dotenv.config()
+import "../shared/config/env.js"
+import app from '../main/app.js'
+
 import { initializaApp } from '../shared/loaders/index.js'
 const startServer = async () : Promise<void>=>{
     

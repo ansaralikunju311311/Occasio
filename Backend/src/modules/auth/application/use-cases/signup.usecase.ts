@@ -9,10 +9,12 @@ import { UserOtp } from "../../../../common/enums/user-otp.enum.js";
 import { generateOTP } from "../../../../common/utils/generate-otp.js";
 import { AppError } from "../../../../common/errors/app-error.js";
 import { HttpStatus } from "../../../../common/constants/http-stattus.js";
+import { EmailSerive } from "../../../../common/service/email.service.js";
 export class SignupUsecase{
     constructor(
         private userRepository:IUserRepository,
-        private hashService :IHashServive
+        private hashService :IHashServive,
+        private emailService:EmailSerive
     ){}
 
 
@@ -34,7 +36,10 @@ export class SignupUsecase{
         let otpSendAt = new Date()
         let otp = generateOTP();
         
-        const otpExpires = new Date(Date.now() + 1 * 60 * 1000)
+        const otpExpires = new Date(Date.now() + 1 * 60 * 1000);
+        console.log("evde ethyoooo")
+        const checkig = await this.emailService.sendOtpEmail(data.email,otp);
+        console.log("reched here",checkig)
          if (data.role && data.role === "EVENT_MANAGER") {
     role = UserRole.EVENT_MANAGER;
   }
@@ -52,6 +57,8 @@ export class SignupUsecase{
             otpSendAt
             
         );
+
+        console.log("reached here")
 
         // console.log("newUser",newUser)
         return this.userRepository.create(newUser)
