@@ -58,10 +58,16 @@ export class UserRepository implements IUserRepository{
     }
 
     async update(user:User):Promise<User>{
+
+        console.log("the user details",user)
         // console.log('the user coming here for the upation',user)
          await UserModel.updateOne(
             {email:user.email},
-            {isVerfiled:user.isVerfied,
+
+
+            {
+            password:user.password,
+            isVerfiled:user.isVerfied,
              otp:user.otp,
              otpExpires:user.otpExpires,
              otpType:user.otpType,

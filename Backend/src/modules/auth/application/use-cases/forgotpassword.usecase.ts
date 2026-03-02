@@ -34,12 +34,7 @@ export class ForgotpasswordUsecase {
            let otp = generateOTP();
         
             const otpExpires = new Date(Date.now() + 1 * 60 * 1000)
-            
-
-
-
-
-            const newUser = new User(
+     const newUser = new User(
                         data.id,
                         data.name,
                         data.email,
@@ -59,7 +54,4 @@ export class ForgotpasswordUsecase {
                     return this.userRepository.update(newUser)
             
     }
-
-
-
 }

@@ -6,6 +6,7 @@ import { LoginUseCase } from "../modules/auth/application/use-cases/login.usecas
 import { VerifyUseCase } from "../modules/auth/application/use-cases/verify-otp.usecase.js";
 import { ResendotpUseCase } from "../modules/auth/application/use-cases/resend-otp.usecase.js";
 import { ForgotpasswordUsecase } from "../modules/auth/application/use-cases/forgotpassword.usecase.js";
+import { ResetPasswordUseCase } from "../modules/auth/application/use-cases/resetpassword.usecase.js";
 export const makeAuthController = () => {
   const userRepository = new UserRepository();
   const hashService = new BcryptHashService();
@@ -14,6 +15,7 @@ export const makeAuthController = () => {
   const loginUseCase = new LoginUseCase(userRepository,hashService);
   const verifyUseCase = new VerifyUseCase(userRepository);
   const   resendotpUseCase   = new  ResendotpUseCase(userRepository)
-  const   forgotPasswordUsecase   = new ForgotpasswordUsecase(userRepository)
-  return new AuthController(signupUsecase,loginUseCase,verifyUseCase,resendotpUseCase,forgotPasswordUsecase);
+  const   forgotPasswordUsecase   = new ForgotpasswordUsecase(userRepository);
+  const resetPasswordUseCase = new ResetPasswordUseCase(userRepository,hashService)
+  return new AuthController(signupUsecase,loginUseCase,verifyUseCase,resendotpUseCase,forgotPasswordUsecase,resetPasswordUseCase);
 };

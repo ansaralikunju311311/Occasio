@@ -6,13 +6,14 @@ import { ResendotpUseCase } from "../application/use-cases/resend-otp.usecase.js
 import { ForgotpasswordUsecase } from "../application/use-cases/forgotpassword.usecase.js";
 // import { UserRepository } from "../infrastructure/database/user.repository.js";
 // import { BcryptHashService } from "../infrastructure/services/bcrypt-hash.service.js";
-
+import { ResetPasswordUseCase } from "../application/use-cases/resetpassword.usecase.js";
 export class AuthController {
   constructor(private SignupUsecase :SignupUsecase,
        private LoginUseCase:LoginUseCase,
        private VerifyUseCase:VerifyUseCase,
        private ResendotpUseCase: ResendotpUseCase,
-       private ForgotpasswordUsecase : ForgotpasswordUsecase
+       private ForgotpasswordUsecase : ForgotpasswordUsecase,
+       private ResetPasswordUseCase : ResetPasswordUseCase
        
   ){}
   async signup(req: Request, res: Response): Promise<Response> {
@@ -120,6 +121,22 @@ export class AuthController {
           })
       }
     
+    }
+
+
+
+    async resetpassword(req:Request,res:Response):Promise<Response>{
+      try {
+          const{email,otp,password,confirmpassword} = req.body;
+          const user = await this.ResetPasswordUseCase.execute({email,otp,password,confirmpassword});
+          return res.status(200).json({
+            message:"reset success fully passowrd",data:user
+          })
+      } catch (error:any) {
+        res.status(400).json({
+          message:error.message
+        })
+      }
     }
 
 }
