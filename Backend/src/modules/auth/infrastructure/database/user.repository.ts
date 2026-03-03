@@ -67,7 +67,7 @@ export class UserRepository implements IUserRepository{
 
             {
             password:user.password,
-            isVerfiled:user.isVerfied,
+            isVerfied:user.isVerfied,
              otp:user.otp,
              otpExpires:user.otpExpires,
              otpType:user.otpType,

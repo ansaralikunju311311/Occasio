@@ -16,6 +16,8 @@ export class AuthController {
        
   ){}
   async signup(req: Request, res: Response,next:NextFunction): Promise<void> {
+
+    console.log("bkjbhjbchjb")
     try {
 
       console.log("rjfjrf",req.body)
@@ -30,8 +32,9 @@ export class AuthController {
       // const signupUseCase = new SignupUsecase(userRepository, hashService);
 
       const user = await this.SignupUsecase.execute({ name, email, password,role,confirmpassword,isVerified});
-
+      console.log(user)
        res.status(HttpStatus.CREATED).json({
+        
         message: "User created successfully",
         data: user
       });
@@ -48,13 +51,17 @@ export class AuthController {
     async login(req:Request,res:Response,next:NextFunction):Promise<void>
 
     {
+
+      console.log('jnjnfdjnfkdjnfljnfljdnfdljfnd')
          
       try {
       
 
       const {email,password} = req.body;
-
+      console.log(req.body)
       const user = await this.LoginUseCase.execute({email,password});
+
+        console.log("onnn check,",user)
        res.status(HttpStatus.OK).json({message:'user login correctly'
         ,
         data:user})
