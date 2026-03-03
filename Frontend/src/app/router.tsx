@@ -1,8 +1,10 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import MainLayout from "../layouts/MainLayout";
-
 const LandingPage = lazy(() => import("../pages/LandingPage"));
+
+const LoginPage = lazy(()=>import("../pages/LoginPage"));
+const SignPage =lazy(()=>import("../pages/SignupPage"))
 
 export const router = createBrowserRouter([
   {
@@ -10,8 +12,21 @@ export const router = createBrowserRouter([
     element: <MainLayout />,
     children: [
       { index: true, element: <LandingPage /> },
+      //  { path: "/login", element: <LoginPage /> },
     ],
   },
+
+ {
+    path: "/login",
+    element: <LoginPage />,
+  },
+
+  {
+    path:"/signup",
+    element:<SignPage/>,
+  }
+
+
 ]);
 
 export const RouterWrapper = () => (
