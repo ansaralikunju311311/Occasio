@@ -2,8 +2,10 @@ import React, { useState } from 'react'
 import SideImage from '../../src/assets/SideImage.jpg'
 import { useForm } from 'react-hook-form'
 import type { SignDataType } from '../types/auth.type'
-
+import{ useNavigate } from 'react-router-dom'
+ import {api} from '../services/api'
 const SignupPage = () => {
+  const navigate = useNavigate()
   const [value, setValue] = useState<SignDataType | null>(null);
 
   const {
@@ -16,12 +18,27 @@ const SignupPage = () => {
   })
   const password = watch("password");
 
-  const onSubmit = (data: SignDataType) => {
+  const onSubmit = async(data: SignDataType) => {
 
-
-    
-    console.log('Submitted Data:', data)
+  try {
+     console.log("bvuvhjgyjttffyjttfyjtfyr")
+     const response = await api.post("/auth/signup",{
+       name:data.name,
+       email:data.email,
+       password:data.password,
+       confirmpassword:data.confirmpassword
+   })
+   
+   navigate("/")
+    console.log('Submitted Data:', response)
     setValue(data)
+  } catch (error:any) {
+     if (error.response) {
+      alert(error.response.data.message);
+    } else {
+      alert("Something went wrong");
+    }
+  }
   }
 
   return (
@@ -166,7 +183,7 @@ const SignupPage = () => {
           </form>
 
           {/* Submitted Data Display */}
-          {value && (
+          {/* {value && (
             <div className="mt-6 text-sm text-gray-600">
               <p><strong>Name:</strong> {value.name}</p>
               <p><strong>Email:</strong> {value.email}</p>
@@ -175,7 +192,7 @@ const SignupPage = () => {
                 {value.remember ? "eventManager" : "user"}
               </p>
             </div>
-          )}
+          )} */}
         </div>
       </div>
     </div>

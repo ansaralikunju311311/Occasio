@@ -22,7 +22,7 @@ export class AuthController {
 
       console.log("rjfjrf",req.body)
       const { name, email, password,role,confirmpassword,isVerified } = req.body;
-
+     console.log("dejbdhbhbhshbh samoe")
       // manually wiring dependencies (later we use DI container)
 
 
