@@ -13,3 +13,8 @@ export interface SignDataType{
     remember:boolean
 
 }
+
+export interface OtpData{
+  email:string,
+  otp:string
+}

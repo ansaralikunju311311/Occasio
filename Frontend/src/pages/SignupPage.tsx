@@ -29,7 +29,7 @@ const SignupPage = () => {
        confirmpassword:data.confirmpassword
    })
    
-   navigate("/")
+   navigate("/otpverification")
     console.log('Submitted Data:', response)
     setValue(data)
   } catch (error:any) {

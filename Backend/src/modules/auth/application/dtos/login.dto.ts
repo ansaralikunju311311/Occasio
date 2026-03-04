@@ -5,6 +5,3 @@ export interface LoginDto{
 
 
 
-export interface checking{
-   d:string
-}
