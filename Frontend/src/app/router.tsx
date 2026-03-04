@@ -5,7 +5,8 @@ const LandingPage = lazy(() => import("../pages/LandingPage"));
 
 const LoginPage = lazy(()=>import("../pages/LoginPage"));
 const SignPage =lazy(()=>import("../pages/SignupPage"))
-const OtpVerification = lazy(()=>import("../pages/OtpVerification.tsx"))
+const OtpVerification = lazy(()=>import("../pages/OtpVerification.tsx"));
+const ForgotPassword  = lazy(()=>import("../pages/Forgotpassword.tsx"))
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -30,8 +31,12 @@ export const router = createBrowserRouter([
   {
     path:"/otpverification",
     element:<OtpVerification/>
-  }
-
+  },
+  
+   {
+         path:"/forgotpassword",
+         element:<ForgotPassword/>
+   }
 
 ]);
 

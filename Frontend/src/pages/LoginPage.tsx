@@ -60,6 +60,8 @@ const LoginPage = () => {
     
   };
 
+
+    
   return (
     <div className="min-h-screen flex">
       {/* Left Side Image Section */}
@@ -146,6 +148,8 @@ const LoginPage = () => {
               <label className="ml-2 text-sm text-gray-900">
                 Login As a EventManager
               </label>
+
+              <p><Link to="/forgotpassword">forgot password</Link></p>
             </div>
 
             {/* SUBMIT BUTTON */}
