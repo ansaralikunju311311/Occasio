@@ -24,7 +24,7 @@ export class LoginUseCase{
     throw new AppError('the passowrd is not matching',HttpStatus.UNAUTHORIZED)
    }
 
-   if(user.isVerfied === false){
+   if(user.isVerified === false){
     throw new AppError('verifiy user account correctly',HttpStatus.FORBIDDEN)
    }
 

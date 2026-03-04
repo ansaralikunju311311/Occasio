@@ -10,7 +10,7 @@ export interface IUserDocument extends Document{
     password:string,
     role:UserRole,
     status:UserStatus,
-    isVerfiled: boolean,
+    isVerified: boolean,
     otp:string | null,
     otpExpires:Date | null,
     otpType: UserOtp | null,
@@ -46,7 +46,7 @@ const userSchema = new Schema<IUserDocument>(
         enum:Object.values(UserStatus) as string[],
         default :UserStatus.ACTIVE
     },
-    isVerfiled:{
+    isVerified:{
         type:Boolean,
         default :false
 

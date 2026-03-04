@@ -23,7 +23,7 @@ export class ResendotpUseCase{
         if(!user){
             throw new AppError('user is not exist register first',HttpStatus.UNAUTHORIZED)
         }
-        if(user.isVerfied === true && user.otpType === UserOtp.SIGNUP){
+        if(user.isVerified === true && user.otpType === UserOtp.SIGNUP){
             throw new AppError('user is already verified',HttpStatus.CONFLICT)
         }
        const now = new Date();

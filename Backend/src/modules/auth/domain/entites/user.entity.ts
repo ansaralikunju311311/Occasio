@@ -25,7 +25,7 @@ export class User {
     public password: string,
     public role: UserRole,
     public status: UserStatus,
-    public isVerfied: boolean,
+    public isVerified: boolean,
     public otp : string | null,
     public otpExpires : Date | null,
     public otpType : UserOtp | null,

@@ -25,7 +25,7 @@ export class ForgotpasswordUsecase {
                 throw new AppError('the register the first',HttpStatus.NOT_FOUND)
             }
 
-            if(data.isVerfied  == false){
+            if(data.isVerified  == false){
                 throw new AppError('Please verify your account first',HttpStatus.FORBIDDEN)
             }
             if(data.status == UserStatus.BLOCK){
@@ -45,7 +45,7 @@ export class ForgotpasswordUsecase {
                         data.password,
                         data.role,
                         data.status,
-                        data.isVerfied,
+                        data.isVerified,
                         otp,
                         otpExpires,
                         UserOtp.FORGOT_PASSWORD,

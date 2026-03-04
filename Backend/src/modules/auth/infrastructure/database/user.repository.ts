@@ -18,7 +18,7 @@ export class UserRepository implements IUserRepository{
             doc.password,
             doc.role,
             doc.status,
-            doc.isVerfiled,
+            doc.isVerified,
             doc.otp,
             doc.otpExpires,
             doc.otpType,
@@ -28,14 +28,14 @@ export class UserRepository implements IUserRepository{
 
 
     async create(user: User): Promise<User> {
-        // console.log('user',user.role)
+        // console.log('user',user.role);
           const created = await UserModel.create({
       name: user.name,
       email: user.email,
       password: user.password,
       role: user.role,
       status: user.status,
-      isVerfiled:user.isVerfied,
+      isVerified:user.isVerified,
       otp:user.otp,
       otpExpires:user.otpExpires,
       otpType:user.otpType,
@@ -49,7 +49,7 @@ export class UserRepository implements IUserRepository{
       created.password,
       created.role,
       created.status,
-      created.isVerfiled,
+      created.isVerified,
       created.otp,
       created.otpExpires,
       created.otpType,
@@ -59,7 +59,7 @@ export class UserRepository implements IUserRepository{
 
     async update(user:User):Promise<User>{
 
-        console.log("the user details",user)
+        console.log("the user details",user.isVerified)
         // console.log('the user coming here for the upation',user)
          await UserModel.updateOne(
             {email:user.email},
@@ -67,13 +67,15 @@ export class UserRepository implements IUserRepository{
 
             {
             password:user.password,
-            isVerfied:user.isVerfied,
+            isVerified:user.isVerified,
              otp:user.otp,
              otpExpires:user.otpExpires,
              otpType:user.otpType,
              otpSentAt:user.otpSendAt
             }
          )
+
+         console.log('after the updation the values',user)
         //  console.log('the user after the u[dation',user);
         //   return new User()
         return user

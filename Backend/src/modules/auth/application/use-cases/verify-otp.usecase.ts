@@ -31,13 +31,16 @@ export class VerifyUseCase{
         }
 
         
-        user.isVerfied = true,
+        user.isVerified = true,
         user.otp = null,
         user.otpExpires = null,
         user.otpType = null,
         user.otpSendAt = null
 
-    
+        
+
+        console.log("the passing value for the updation after the otp",user);
+        console.log(user.isVerified)
         return  this.userRepository.update(user)
     }
 }
