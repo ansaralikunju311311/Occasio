@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import type { SignDataType } from '../types/auth.type'
 import{ useNavigate } from 'react-router-dom'
  import {api} from '../services/api'
+ import { Link } from 'react-router-dom'
 const SignupPage = () => {
   const navigate = useNavigate()
   const [value, setValue] = useState<SignDataType | null>(null);
@@ -184,6 +185,8 @@ const SignupPage = () => {
               Sign Up
             </button>
           </form>
+
+          <p>Already Registered User <Link to="/login">SignIn</Link></p>
 
           {/* Submitted Data Display */}
           {/* {value && (

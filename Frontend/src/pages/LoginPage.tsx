@@ -2,11 +2,13 @@ import { useState } from "react";
 import SideImage from '../../src/assets/SideImage.jpg'
 import { useForm } from "react-hook-form";
 import type { LoginDataType } from "../types/auth.type";
-
+import {api} from '../services/api'
+import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const LoginPage = () => {
   const [value, setValue] = useState<LoginDataType | null>(null);
-
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -15,9 +17,42 @@ const LoginPage = () => {
     mode: "onBlur", // validation triggers when leaving input
   });
 
-  const onSubmit = (data: LoginDataType) => {
+  const onSubmit = async(data: LoginDataType) => {
+   
+
+    
+      try {
+          
+        const response = await api.post("/auth/login",{
+          email:data.email,
+           password:data.password,
+
+
+        })
+        console.log(response);
+
+        navigate("/");
+
+        
+      } catch (error:any) {
+        
+     if (error.response) {
+      alert(error.response.data.message);
+    } else {
+      alert("Something went wrong");
+    }
+
+
+      }
+   
+   
+   
+   
+   
+   
     console.log("Submitted Data:", data);
     setValue(data);
+    navigate("/")
   };
 
   return (
@@ -116,9 +151,10 @@ const LoginPage = () => {
               Log In
             </button>
           </form>
+          <p>Not register Please<Link to="/signup">Signup</Link> </p>
 
           {/* Submitted Data Display */}
-          {value && (
+          {/* {value && (
             <div className="mt-6 text-sm text-gray-600">
               <p><strong>Email:</strong> {value.email}</p>
               <p><strong>Password:</strong> {value.password}</p>
@@ -127,7 +163,7 @@ const LoginPage = () => {
                 {value.remember ? "eventManager" : "user"}
               </p>
             </div>
-          )}
+          )} */}
         </div>
       </div>
     </div>
