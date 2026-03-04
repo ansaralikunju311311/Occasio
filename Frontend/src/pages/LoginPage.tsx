@@ -17,6 +17,8 @@ const LoginPage = () => {
     mode: "onBlur", // validation triggers when leaving input
   });
 
+
+  console.log(value)
   const onSubmit = async(data: LoginDataType) => {
    
 

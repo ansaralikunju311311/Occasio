@@ -17,6 +17,8 @@ const SignupPage = () => {
   } = useForm<SignDataType>({
     mode: "onBlur"
   })
+
+  console.log(value)
   const password = watch("password");
 
   const onSubmit = async(data: SignDataType) => {
@@ -187,18 +189,6 @@ const SignupPage = () => {
           </form>
 
           <p>Already Registered User <Link to="/login">SignIn</Link></p>
-
-          {/* Submitted Data Display */}
-          {/* {value && (
-            <div className="mt-6 text-sm text-gray-600">
-              <p><strong>Name:</strong> {value.name}</p>
-              <p><strong>Email:</strong> {value.email}</p>
-              <p>
-                <strong>Role:</strong>{" "}
-                {value.remember ? "eventManager" : "user"}
-              </p>
-            </div>
-          )} */}
         </div>
       </div>
     </div>
