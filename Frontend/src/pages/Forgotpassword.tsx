@@ -1,12 +1,15 @@
 import React from 'react'
 import SideImage from '../../src/assets/SideImage.jpg'
 import { useForm } from 'react-hook-form'
-
+import {api} from '../services/api'
+import { useNavigate } from 'react-router-dom'
 type ForgotPasswordForm = {
   email: string
 }
 
 const Forgotpassword = () => {
+
+    const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -15,9 +18,34 @@ const Forgotpassword = () => {
     mode: 'onBlur',
   })
 
-  const onSubmit = (data: ForgotPasswordForm) => {
+  const onSubmit = async(data: ForgotPasswordForm) => {
     // For now we just log; integrate API to send OTP here later
     console.log('Forgot password email:', data.email)
+
+
+
+       try {
+        console.log("requessssss")
+          const response = await api.post("/auth/forgot-password",{
+        email:data.email
+    })
+   
+    console.log(response)
+
+
+           localStorage.setItem("user", JSON.stringify(response.data.data));
+           
+          navigate("/resetpassword")
+       console.log(response)
+       } catch (error:any) {
+            if (error.response) {
+      alert(error.response.data.message);
+    } else {
+      alert("Something went wrong");
+    }
+       }
+    
+
   }
 
   return (

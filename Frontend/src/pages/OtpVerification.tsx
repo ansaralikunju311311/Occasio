@@ -83,8 +83,10 @@ const OtpVerification = () => {
             otp:data.otp
           })
           console.log(response);
+          localStorage.removeItem("user");
           navigate("/")
       } catch (error:any) {
+        // localStorage.removeItem("user");
          if (error.response) {
       alert(error.response.data.message);
     } else {

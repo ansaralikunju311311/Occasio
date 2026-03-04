@@ -105,9 +105,16 @@ export class AuthController {
 
 
     async forgotPassword(req:Request,res:Response,next:NextFunction):Promise<void>{
+      console.log("vjfncjfjv")
       try {
           const {email} = req.body;
+
+
+           console.log("fjvndfjvfhd")
+
           const user  = await this.ForgotpasswordUsecase.execute(email);
+
+          console.log("th user here",user)
              res.status(HttpStatus.OK).json({
               message:"otp sened succesfully",data:user
             })
@@ -124,6 +131,9 @@ export class AuthController {
     async resetpassword(req:Request,res:Response,next:NextFunction):Promise<void>{
       try {
           const{email,otp,password,confirmpassword} = req.body;
+
+
+          console.log(req.body)
           const user = await this.ResetPasswordUseCase.execute({email,otp,password,confirmpassword});
            res.status(HttpStatus.OK).json({
             message:"reset success fully passowrd",data:user
