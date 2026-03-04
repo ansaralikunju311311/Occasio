@@ -1,11 +1,15 @@
-import React from "react";
+
 import SideImage from "../../src/assets/SideImage.jpg";
 import type { OtpData } from "../types/auth.type";
 import { useForm } from "react-hook-form";
 import {api} from '../services/api'
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 const OtpVerification = () => {
+
+
+  const [timeleft,setTimeLeft] = useState(60)
   const navigate = useNavigate();
     const {
        register,
@@ -20,6 +24,35 @@ const OtpVerification = () => {
 
 // console.log(user.email);
 
+
+
+
+   useEffect(() => {
+
+  if(!user?.otpSendAt) return;
+
+  const sentTime = new Date(user.otpSendAt).getTime()
+
+  const resendTime = sentTime + 60 * 1000
+
+  const timer = setInterval(()=>{
+
+     const now = new Date().getTime()
+
+     const remaining = Math.floor((resendTime - now) / 1000)
+
+     if(remaining <= 0){
+        setTimeLeft(0)
+        clearInterval(timer)
+     }else{
+        setTimeLeft(remaining)
+     }
+
+  },1000)
+
+  return ()=> clearInterval(timer)
+
+},[])
 
    const resendOtp = async ()=>{
         
@@ -119,7 +152,7 @@ const OtpVerification = () => {
                   {errors.otp.message}
                 </p>
               )}
-              <p className="mt-2 text-xs text-gray-500">
+              {/* <p className="mt-2 text-xs text-gray-500">
                 Didn&apos;t receive the code?{" "}
                 <button
                   type="button"
@@ -127,7 +160,24 @@ const OtpVerification = () => {
                   onClick={resendOtp}  >
                   Resend OTP
                 </button>
-              </p>
+              </p> */}
+              <p className="mt-2 text-xs text-gray-500">
+  Didn’t receive the code?{" "}
+
+  {timeleft > 0 ? (
+    <span className="text-gray-400">
+      Resend in {timeleft}s
+    </span>
+  ) : (
+    <button
+      type="button"
+      className="text-indigo-600 hover:text-indigo-700 font-medium"
+      onClick={resendOtp}
+    >
+      Resend OTP
+    </button>
+  )}
+</p>
             </div>
 
             {/* SUBMIT BUTTON */}

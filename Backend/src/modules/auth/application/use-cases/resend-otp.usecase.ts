@@ -39,7 +39,6 @@ export class ResendotpUseCase{
             throw new AppError('please wait',HttpStatus.MANY_REQUEST)
          }
        }
-
        const  newOtp = generateOTP();
        console.log('generated',newOtp)
        user.otp = newOtp;
