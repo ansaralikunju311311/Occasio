@@ -17,6 +17,9 @@ const SignupPage = () => {
   const password = watch("password");
 
   const onSubmit = (data: SignDataType) => {
+
+
+    
     console.log('Submitted Data:', data)
     setValue(data)
   }
