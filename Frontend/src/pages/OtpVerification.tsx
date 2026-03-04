@@ -1,7 +1,43 @@
 import React from "react";
 import SideImage from "../../src/assets/SideImage.jpg";
+import type { OtpData } from "../types/auth.type";
+import { useForm } from "react-hook-form";
+import {api} from '../services/api'
+import { useNavigate } from "react-router-dom";
 
 const OtpVerification = () => {
+  const navigate = useNavigate();
+    const {
+       register,
+       handleSubmit,
+       formState: { errors },
+     } = useForm<OtpData>({
+       mode: "onBlur", // validation triggers when leaving input
+     });
+      
+
+     const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+// console.log(user.email);
+
+     const onSubmit =async (data:OtpData)=>{
+      console.log(data)
+
+      try {
+          const  response =  await api.post("/auth/verify-otp",{
+            email:user.email,
+            otp:data.otp
+          })
+          console.log(response);
+          navigate("/")
+      } catch (error:any) {
+         if (error.response) {
+      alert(error.response.data.message);
+    } else {
+      alert("Something went wrong");
+    }
+      }
+     }
   return (
     <div className="min-h-screen flex">
       {/* Left Side Image Section */}
@@ -32,7 +68,7 @@ const OtpVerification = () => {
             We have sent a 6-digit verification code to your email.
           </p>
 
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             {/* OTP INPUT */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -45,8 +81,23 @@ const OtpVerification = () => {
                 maxLength={6}
                 placeholder="Enter 6-digit code"
                 className="mt-1 block w-full tracking-widest text-center text-lg px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              />
+               
+                 {...register("otp", {
+                  required: "otp is required",
+                  minLength: {
+                    value: 6,
+                    message: "otp must be at is 6 number"
+                  }
+                })}
 
+
+
+             />
+            {errors.otp && (
+                <p className="text-red-500 text-sm">
+                  {errors.otp.message}
+                </p>
+              )}
               <p className="mt-2 text-xs text-gray-500">
                 Didn&apos;t receive the code?{" "}
                 <button

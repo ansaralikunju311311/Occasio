@@ -28,7 +28,10 @@ const SignupPage = () => {
        password:data.password,
        confirmpassword:data.confirmpassword
    })
-   
+
+     
+   localStorage.setItem("user", JSON.stringify(response.data.data));
+     
    navigate("/otpverification")
     console.log('Submitted Data:', response)
     setValue(data)
