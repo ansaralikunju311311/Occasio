@@ -20,6 +20,27 @@ const OtpVerification = () => {
 
 // console.log(user.email);
 
+
+   const resendOtp = async ()=>{
+        
+      try {
+         const details = await api.post("/auth/resend-otp",{
+          email:user.email
+         })
+
+       console.log(details)
+      } catch (error:any) {
+        
+
+           
+          if (error.response) {
+      alert(error.response.data.message);
+    } else {
+      alert("Something went wrong");
+    }
+      }
+
+   }
      const onSubmit =async (data:OtpData)=>{
       console.log(data)
 
@@ -103,7 +124,7 @@ const OtpVerification = () => {
                 <button
                   type="button"
                   className="text-indigo-600 hover:text-indigo-700 font-medium"
-                >
+                  onClick={resendOtp}  >
                   Resend OTP
                 </button>
               </p>
