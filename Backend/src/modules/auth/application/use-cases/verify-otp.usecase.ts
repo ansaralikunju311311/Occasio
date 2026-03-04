@@ -12,6 +12,8 @@ export class VerifyUseCase{
     async execute(data:VerfiyOtpDto):Promise<User>{
 
 
+        console.log("body daata for the otp verifction",data)
+
         const user = await this.userRepository.findByEmail(data.email);
         if(!user){
             throw new AppError('the user is not exist their',HttpStatus.NOT_FOUND)

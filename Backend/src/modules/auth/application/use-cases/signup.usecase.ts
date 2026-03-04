@@ -37,7 +37,7 @@ export class SignupUsecase{
         let otp = generateOTP();
         
         const otpExpires = new Date(Date.now() + 1 * 60 * 1000);
-        console.log("evde ethyoooo")
+        // console.log("evde ethyoooo")
         const checkig = await this.emailService.sendOtpEmail(data.email,otp);
         console.log("reched here",checkig)
          if (data.role && data.role === "EVENT_MANAGER") {
@@ -58,7 +58,7 @@ export class SignupUsecase{
             
         );
 
-        console.log("reached here")
+        // console.log("reached here")
 
         // console.log("newUser",newUser)
         return this.userRepository.create(newUser)

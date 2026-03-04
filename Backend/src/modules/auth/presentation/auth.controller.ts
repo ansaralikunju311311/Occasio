@@ -74,6 +74,9 @@ export class AuthController {
     async verify(req:Request,res:Response,next:NextFunction):Promise<void>{
       try{
         const {email,otp} = req.body;
+
+
+        console.log('opt verification come data',req.body)
         const verify = await this.VerifyUseCase.execute({email,otp});
 
 

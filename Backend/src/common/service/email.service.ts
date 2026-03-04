@@ -30,9 +30,9 @@ export class EmailSerive{
     //     });
     // }
      async sendOtpEmail(to: string, otp: string): Promise<void> {
-        console.log("evdem ethyyyy")
+        // console.log("evdem ethyyyy")
         console.log(process.env.MAIL_PASS   ,  process.env.MAIL_USER)
-    const value = await this.transporter.sendMail({
+     await this.transporter.sendMail({
       
       from: `"Occasio" <${process.env.MAIL_USER}>`,
       to,
@@ -44,7 +44,7 @@ export class EmailSerive{
         <p>This OTP expires in 5 minutes.</p>
       `
     });
-     console.log("for the checking",value)
+    //  console.log("for the checking",value)
   }
  
 }
