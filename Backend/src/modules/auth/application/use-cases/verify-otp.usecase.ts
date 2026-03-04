@@ -27,6 +27,11 @@ export class VerifyUseCase{
             throw new AppError('incorrect otp',HttpStatus.UNAUTHORIZED)
         }
         if(user.otpExpires < new Date() ){
+             user.otp = null,
+        user.otpExpires = null,
+        user.otpType = null,
+        user.otpSendAt = null
+           await this.userRepository.update(user)
             throw new AppError('time expired',HttpStatus.GONE)
         }
 
