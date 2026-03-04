@@ -20,6 +20,8 @@ const LoginPage = () => {
 
   console.log(value)
   const onSubmit = async(data: LoginDataType) => {
+        const roleValue = data.remember ? "EVENT_MANAGER":"USER"
+
    
 
     
@@ -28,6 +30,7 @@ const LoginPage = () => {
         const response = await api.post("/auth/login",{
           email:data.email,
            password:data.password,
+          role:roleValue
 
 
         })
@@ -54,7 +57,7 @@ const LoginPage = () => {
    
     console.log("Submitted Data:", data);
     setValue(data);
-    navigate("/")
+    
   };
 
   return (

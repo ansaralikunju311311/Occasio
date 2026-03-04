@@ -21,15 +21,19 @@ const SignupPage = () => {
   console.log(value)
   const password = watch("password");
 
-  const onSubmit = async(data: SignDataType) => {
 
+
+
+  const onSubmit = async(data: SignDataType) => {
+    const roleValue = data.remember ? "EVENT_MANAGER":"USER"
   try {
      console.log("bvuvhjgyjttffyjttfyjtfyr")
      const response = await api.post("/auth/signup",{
        name:data.name,
        email:data.email,
        password:data.password,
-       confirmpassword:data.confirmpassword
+       confirmpassword:data.confirmpassword,
+       role:roleValue
    })
 
      

@@ -15,9 +15,10 @@ export class LoginUseCase{
    async execute(data:LoginDto):Promise<User>{
     const user = await this.userRepository.findByEmail(data.email)
 
-    if(!user){
+    if(!user || user.role != data.role){
      throw new AppError('user not exist',HttpStatus.NOT_FOUND)
     }
+
     const isMatch = await this.compareService.comapre(data.password,user.password)
 
     if(!isMatch){

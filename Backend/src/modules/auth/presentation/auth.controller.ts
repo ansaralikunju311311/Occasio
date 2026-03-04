@@ -57,9 +57,9 @@ export class AuthController {
       try {
       
 
-      const {email,password} = req.body;
+      const {email,password,role} = req.body;
       console.log(req.body)
-      const user = await this.LoginUseCase.execute({email,password});
+      const user = await this.LoginUseCase.execute({email,password,role});
 
         console.log("onnn check,",user)
        res.status(HttpStatus.OK).json({message:'user login correctly'
