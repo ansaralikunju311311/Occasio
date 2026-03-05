@@ -11,6 +11,8 @@ router.post("/login",controller.login.bind(controller))
 router.post("/verify-otp",controller.verify.bind(controller))
 router.post("/resend-otp",controller.resnedVerify.bind(controller))
 router.post("/forgot-password",controller.forgotPassword.bind(controller));
-router.post("/reset-password",controller.resetpassword.bind(controller))
+router.post("/reset-password",controller.resetpassword.bind(controller));
+
+router.post("/admin/login",controller.adminlogin.bind(controller))
 // router.post("/signup",controller.signup)
 export default router;

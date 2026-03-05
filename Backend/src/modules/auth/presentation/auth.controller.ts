@@ -6,13 +6,15 @@ import { ResendotpUseCase } from "../application/use-cases/resend-otp.usecase.js
 import { ForgotpasswordUsecase } from "../application/use-cases/forgotpassword.usecase.js";
 import { ResetPasswordUseCase } from "../application/use-cases/resetpassword.usecase.js";
 import { HttpStatus } from "../../../common/constants/http-stattus.js";
+import { AdminLoginUseCase } from "../application/use-cases/adminlogin.use.js";
 export class AuthController {
   constructor(private SignupUsecase :SignupUsecase,
        private LoginUseCase:LoginUseCase,
        private VerifyUseCase:VerifyUseCase,
        private ResendotpUseCase: ResendotpUseCase,
        private ForgotpasswordUsecase : ForgotpasswordUsecase,
-       private ResetPasswordUseCase : ResetPasswordUseCase
+       private ResetPasswordUseCase : ResetPasswordUseCase,
+       private AdminLoginUseCase  :AdminLoginUseCase
        
   ){}
   async signup(req: Request, res: Response,next:NextFunction): Promise<void> {
@@ -125,7 +127,7 @@ export class AuthController {
       }
     
     }
-
+   
 
 
     async resetpassword(req:Request,res:Response,next:NextFunction):Promise<void>{
@@ -143,4 +145,37 @@ export class AuthController {
       }
     }
 
+
+
+
+
+
+
+
+     async adminlogin(req:Request,res:Response,next:NextFunction):Promise<void>
+
+    {
+
+      console.log('jnjnfdjnfkdjnfljnfljdnfdljfnd')
+         
+      try {
+      
+
+      const {email,password} = req.body;
+      console.log(req.body)
+      const user = await this.AdminLoginUseCase.execute({email,password});
+         
+        console.log("onnn check,",user)
+       res.status(HttpStatus.OK).json({message:'user login correctly'
+        ,
+        data:user})
+    } catch (error:any) {
+      next(error)
+    }
+    }
+
 }
+
+
+
+ 

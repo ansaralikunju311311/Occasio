@@ -8,6 +8,7 @@ import { ResendotpUseCase } from "../modules/auth/application/use-cases/resend-o
 import { ForgotpasswordUsecase } from "../modules/auth/application/use-cases/forgotpassword.usecase.js";
 import { ResetPasswordUseCase } from "../modules/auth/application/use-cases/resetpassword.usecase.js";
 import { EmailSerive } from "../common/service/email.service.js";
+import { AdminLoginUseCase } from "../modules/auth/application/use-cases/adminlogin.use.js";
 export const makeAuthController = () => {
   const userRepository = new UserRepository();
   const hashService = new BcryptHashService();
@@ -19,6 +20,7 @@ export const makeAuthController = () => {
   const verifyUseCase = new VerifyUseCase(userRepository);
   const   resendotpUseCase   = new  ResendotpUseCase(userRepository,emailService)
   const   forgotPasswordUsecase   = new ForgotpasswordUsecase(userRepository,emailService);
-  const resetPasswordUseCase = new ResetPasswordUseCase(userRepository,hashService)
-  return new AuthController(signupUsecase,loginUseCase,verifyUseCase,resendotpUseCase,forgotPasswordUsecase,resetPasswordUseCase);
+  const resetPasswordUseCase = new ResetPasswordUseCase(userRepository,hashService);
+  const adminLoginUseCase  = new AdminLoginUseCase(userRepository,hashService)
+  return new AuthController(signupUsecase,loginUseCase,verifyUseCase,resendotpUseCase,forgotPasswordUsecase,resetPasswordUseCase,adminLoginUseCase);
 };

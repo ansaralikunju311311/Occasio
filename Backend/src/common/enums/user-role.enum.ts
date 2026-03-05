@@ -1,6 +1,6 @@
 export  enum UserRole {
     USER="USER",
-     ADMIN="ADMIn",
+     ADMIN="ADMIN",
       
      EVENT_MANAGER =  "EVENT_MANAGER"
 };
