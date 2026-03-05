@@ -7,7 +7,8 @@ const LoginPage = lazy(()=>import("../pages/LoginPage"));
 const SignPage =lazy(()=>import("../pages/SignupPage"))
 const OtpVerification = lazy(()=>import("../pages/OtpVerification.tsx"));
 const ForgotPassword  = lazy(()=>import("../pages/Forgotpassword.tsx"));
-const ResetPassword = lazy(()=>import("../pages/ResetPassword.tsx"))
+const ResetPassword = lazy(()=>import("../pages/ResetPassword.tsx"));
+const AdminLogin  = lazy(()=>import("../pages/AdminLogin.tsx"))
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -42,8 +43,11 @@ export const router = createBrowserRouter([
    {
       path:"/resetpassword",
       element:<ResetPassword/>
+   },
+   {
+    path:"/admin/login",
+    element:<AdminLogin/>
    }
-
 ]);
 
 export const RouterWrapper = () => (

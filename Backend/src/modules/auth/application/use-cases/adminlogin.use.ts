@@ -5,7 +5,7 @@ import { HttpStatus } from "../../../../common/constants/http-stattus.js";
 import { AppError } from "../../../../common/errors/app-error.js";
 import { UserStatus } from "../../../../common/enums/user-status.enum.js";
 import { UserRole } from "../../../../common/enums/user-role.enum.js";
-import { AdminLoginDto } from "../dtos/adminlogin.dto.js";
+import type { AdminLoginDto } from "../dtos/adminlogin.dto.js";
 export class AdminLoginUseCase{
 
 
