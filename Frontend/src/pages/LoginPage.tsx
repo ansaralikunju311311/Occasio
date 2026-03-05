@@ -2,7 +2,7 @@ import { useState } from "react";
 import SideImage from '../../src/assets/SideImage.jpg'
 import { useForm } from "react-hook-form";
 import type { LoginDataType } from "../types/auth.type";
-import {api} from '../services/api'
+import { api } from '../services/api'
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
@@ -19,78 +19,84 @@ const LoginPage = () => {
 
 
   console.log(value)
-  const onSubmit = async(data: LoginDataType) => {
-        const roleValue = data.remember ? "EVENT_MANAGER":"USER"
-
-   
-
-    
-      try {
-          
-        const response = await api.post("/auth/login",{
-          email:data.email,
-           password:data.password,
-          role:roleValue
+  const onSubmit = async (data: LoginDataType) => {
+    const roleValue = data.remember ? "EVENT_MANAGER" : "USER"
 
 
-        })
-        console.log(response);
 
-        navigate("/");
 
-        
-      } catch (error:any) {
-        
-     if (error.response) {
-      alert(error.response.data.message);
-    } else {
-      alert("Something went wrong");
+    try {
+
+      const response = await api.post("/auth/login", {
+        email: data.email,
+        password: data.password,
+        role: roleValue
+
+
+      })
+      console.log(response);
+
+      navigate("/");
+
+
+    } catch (error: any) {
+
+      if (error.response) {
+        alert(error.response.data.message);
+      } else {
+        alert("Something went wrong");
+      }
+
+
     }
 
 
-      }
-   
-   
-   
-   
-   
-   
+
+
+
+
     console.log("Submitted Data:", data);
     setValue(data);
-    
+
   };
 
 
-    
+
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex bg-gray-50">
       {/* Left Side Image Section */}
-      <div className="relative hidden md:block w-1/2">
+      <div className="relative hidden md:block w-1/2 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/90 to-purple-900/90 mix-blend-multiply z-10"></div>
         <img
           src={SideImage}
           alt="background"
-          className="object-cover w-full h-full"
+          className="object-cover w-full h-full scale-105 hover:scale-100 transition-transform duration-1000"
         />
-        <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-white p-6">
-          {/* <img src="/logo.png" alt="Logo" className="h-16 mb-4" /> */}
-          <h2 className="text-3xl font-bold text-center">
-            Your Tagline Goes Here
+        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-white p-12 text-center">
+          <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4 text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-300">
+            Welcome Back to Occasio
           </h2>
+          <p className="text-lg text-gray-200 font-light max-w-md">
+            Your gateway to the best premium event experiences. Let's get you back in.
+          </p>
         </div>
       </div>
 
       {/* Right Side Login Card */}
-      <div className="flex flex-1 items-center justify-center bg-gray-50">
-        <div className="bg-white bg-opacity-90 backdrop-blur-sm p-10 rounded-lg shadow-lg w-full max-w-md">
-          <h1 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
-            Welcome Back
-          </h1>
+      <div className="flex flex-1 items-center justify-center p-6 md:p-12">
+        <div className="bg-white p-8 md:p-12 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-100 w-full max-w-md transition-all">
+          <div className="text-center mb-10">
+            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
+              Log In
+            </h1>
+            <p className="mt-2 text-sm text-gray-500">Welcome back! Please enter your details.</p>
+          </div>
 
-          <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-            
+          <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+
             {/* EMAIL */}
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Email
               </label>
               <input
@@ -103,10 +109,10 @@ const LoginPage = () => {
                     message: "Enter a valid email address",
                   },
                 })}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                className="block w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
               />
               {errors.email && (
-                <p className="text-red-500 text-sm">
+                <p className="text-red-500 text-sm mt-1">
                   {errors.email.message}
                 </p>
               )}
@@ -114,7 +120,7 @@ const LoginPage = () => {
 
             {/* PASSWORD */}
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Password
               </label>
               <input
@@ -129,50 +135,49 @@ const LoginPage = () => {
                       "Min 8 chars, include uppercase, lowercase, number & special character",
                   },
                 })}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                className="block w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
               />
               {errors.password && (
-                <p className="text-red-500 text-sm">
+                <p className="text-red-500 text-sm mt-1">
                   {errors.password.message}
                 </p>
               )}
             </div>
 
-            {/* REMEMBER */}
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                {...register("remember")}
-                className="h-4 w-4"
-              />
-              <label className="ml-2 text-sm text-gray-900">
-                Login As a EventManager
-              </label>
+            {/* REMEMBER & FORGOT */}
+            <div className="flex items-center justify-between mt-2">
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="remember"
+                  {...register("remember")}
+                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded cursor-pointer"
+                />
+                <label htmlFor="remember" className="ml-2 block text-sm text-gray-700 cursor-pointer">
+                  Login as Event Manager
+                </label>
+              </div>
 
-              <p><Link to="/forgotpassword">forgot password</Link></p>
+              <Link to="/forgotpassword" className="text-sm font-medium text-indigo-600 hover:text-indigo-500 transition-colors">
+                Forgot password?
+              </Link>
             </div>
 
             {/* SUBMIT BUTTON */}
             <button
               type="submit"
-              className="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md"
+              className="w-full py-3.5 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl font-semibold shadow-[0_4px_14px_0_rgb(79,70,229,0.39)] hover:shadow-[0_6px_20px_rgba(79,70,229,0.23)] hover:-translate-y-0.5 transition-all duration-200"
             >
               Log In
             </button>
           </form>
-          <p>Not register Please<Link to="/signup">Signup</Link> </p>
 
-          {/* Submitted Data Display */}
-          {/* {value && (
-            <div className="mt-6 text-sm text-gray-600">
-              <p><strong>Email:</strong> {value.email}</p>
-              <p><strong>Password:</strong> {value.password}</p>
-              <p>
-                <strong>Role:</strong>{" "}
-                {value.remember ? "eventManager" : "user"}
-              </p>
-            </div>
-          )} */}
+          <p className="mt-8 text-center text-sm text-gray-600">
+            Don't have an account?{" "}
+            <Link to="/signup" className="font-semibold text-indigo-600 hover:text-indigo-500 transition-colors">
+              Sign up
+            </Link>
+          </p>
         </div>
       </div>
     </div>

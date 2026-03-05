@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import SideImage from '../../src/assets/SideImage.jpg'
 import { useForm } from 'react-hook-form'
 import type { SignDataType } from '../types/auth.type'
-import{ useNavigate } from 'react-router-dom'
- import {api} from '../services/api'
- import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import { api } from '../services/api'
+import { Link } from 'react-router-dom'
 const SignupPage = () => {
   const navigate = useNavigate()
   const [value, setValue] = useState<SignDataType | null>(null);
@@ -24,60 +24,67 @@ const SignupPage = () => {
 
 
 
-  const onSubmit = async(data: SignDataType) => {
-    const roleValue = data.remember ? "EVENT_MANAGER":"USER"
-  try {
-     console.log("bvuvhjgyjttffyjttfyjtfyr")
-     const response = await api.post("/auth/signup",{
-       name:data.name,
-       email:data.email,
-       password:data.password,
-       confirmpassword:data.confirmpassword,
-       role:roleValue
-   })
+  const onSubmit = async (data: SignDataType) => {
+    const roleValue = data.remember ? "EVENT_MANAGER" : "USER"
+    try {
+      console.log("bvuvhjgyjttffyjttfyjtfyr")
+      const response = await api.post("/auth/signup", {
+        name: data.name,
+        email: data.email,
+        password: data.password,
+        confirmpassword: data.confirmpassword,
+        role: roleValue
+      })
 
-     
-   localStorage.setItem("user", JSON.stringify(response.data.data));
-     
-   navigate("/otpverification")
-    console.log('Submitted Data:', response)
-    setValue(data)
-  } catch (error:any) {
-     if (error.response) {
-      alert(error.response.data.message);
-    } else {
-      alert("Something went wrong");
+
+      localStorage.setItem("user", JSON.stringify(response.data.data));
+
+      navigate("/otpverification")
+      console.log('Submitted Data:', response)
+      setValue(data)
+    } catch (error: any) {
+      if (error.response) {
+        alert(error.response.data.message);
+      } else {
+        alert("Something went wrong");
+      }
     }
-  }
   }
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex bg-gray-50">
       {/* Left Side Image Section */}
-      <div className="relative hidden md:block w-1/2">
+      <div className="relative hidden md:block w-1/2 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/90 to-purple-900/90 mix-blend-multiply z-10"></div>
         <img
           src={SideImage}
           alt="background"
-          className="object-cover w-full h-full"
+          className="object-cover w-full h-full scale-105 hover:scale-100 transition-transform duration-1000"
         />
-        <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-white p-6">
-          <h2 className="text-3xl font-bold text-center">
-            Join Us Today
+        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-white p-12 text-center">
+          <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4 text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-300">
+            Join Occasio Today
           </h2>
+          <p className="text-lg text-gray-200 font-light max-w-md">
+            Start your journey to unforgettable events and seamless management.
+          </p>
         </div>
       </div>
 
       {/* Right Side Signup Card */}
-      <div className="flex flex-1 items-center justify-center bg-gray-50">
-        <div className="bg-white bg-opacity-90 backdrop-blur-sm p-10 rounded-lg shadow-lg w-full max-w-md">
-          <h1 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
-            Create Account
-          </h1>
+      <div className="flex flex-1 items-center justify-center p-6 md:p-12">
+        <div className="bg-white p-8 md:p-12 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-100 w-full max-w-md transition-all h-full max-h-screen overflow-y-auto custom-scrollbar">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
+              Create Account
+            </h1>
+            <p className="mt-2 text-sm text-gray-500">Sign up to get started with Occasio.</p>
+          </div>
 
-          <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+          <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
             {/* NAME */}
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">
                 Name
               </label>
               <input
@@ -90,10 +97,10 @@ const SignupPage = () => {
                     message: "Name must be at least 3 characters"
                   }
                 })}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                className="block w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
               />
               {errors.name && (
-                <p className="text-red-500 text-sm">
+                <p className="text-red-500 text-sm mt-1">
                   {errors.name.message}
                 </p>
               )}
@@ -101,7 +108,7 @@ const SignupPage = () => {
 
             {/* EMAIL */}
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">
                 Email
               </label>
               <input
@@ -114,10 +121,10 @@ const SignupPage = () => {
                     message: "Enter a valid email address",
                   },
                 })}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                className="block w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
               />
               {errors.email && (
-                <p className="text-red-500 text-sm">
+                <p className="text-red-500 text-sm mt-1">
                   {errors.email.message}
                 </p>
               )}
@@ -125,7 +132,7 @@ const SignupPage = () => {
 
             {/* PASSWORD */}
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">
                 Password
               </label>
               <input
@@ -140,10 +147,10 @@ const SignupPage = () => {
                       "Min 8 chars, include uppercase, lowercase, number & special character",
                   },
                 })}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                className="block w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
               />
               {errors.password && (
-                <p className="text-red-500 text-sm">
+                <p className="text-red-500 text-sm mt-1">
                   {errors.password.message}
                 </p>
               )}
@@ -151,7 +158,7 @@ const SignupPage = () => {
 
             {/* CONFIRM PASSWORD */}
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">
                 Confirm Password
               </label>
               <input
@@ -162,23 +169,24 @@ const SignupPage = () => {
                   validate: (value) =>
                     value === password || "Passwords do not match"
                 })}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                className="block w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
               />
               {errors.confirmpassword && (
-                <p className="text-red-500 text-sm">
+                <p className="text-red-500 text-sm mt-1">
                   {errors.confirmpassword.message}
                 </p>
               )}
             </div>
 
             {/* EVENT MANAGER CHECK */}
-            <div className="flex items-center">
+            <div className="flex items-center pt-2">
               <input
                 type="checkbox"
+                id="managerCheck"
                 {...register("remember")}
-                className="h-4 w-4"
+                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded cursor-pointer"
               />
-              <label className="ml-2 text-sm text-gray-900">
+              <label htmlFor="managerCheck" className="ml-2 block text-sm text-gray-700 cursor-pointer">
                 Sign up as an Event Manager
               </label>
             </div>
@@ -186,17 +194,22 @@ const SignupPage = () => {
             {/* SUBMIT BUTTON */}
             <button
               type="submit"
-              className="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md"
+              className="w-full mt-4 py-3.5 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl font-semibold shadow-[0_4px_14px_0_rgb(79,70,229,0.39)] hover:shadow-[0_6px_20px_rgba(79,70,229,0.23)] hover:-translate-y-0.5 transition-all duration-200"
             >
               Sign Up
             </button>
           </form>
 
-          <p>Already Registered User <Link to="/login">SignIn</Link></p>
+          <p className="mt-8 text-center text-sm text-gray-600">
+            Already have an account?{" "}
+            <Link to="/login" className="font-semibold text-indigo-600 hover:text-indigo-500 transition-colors">
+              Sign In
+            </Link>
+          </p>
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export default SignupPage

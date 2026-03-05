@@ -1,9 +1,9 @@
 import React from 'react'
 import SideImage from '../../src/assets/SideImage.jpg'
 import { useForm } from 'react-hook-form'
-import {api} from '../services/api'
+import { api } from '../services/api'
 import { useNavigate } from 'react-router-dom'
-import { useState,useEffect } from 'react'
+import { useState, useEffect } from 'react'
 type ResetPasswordForm = {
   otp: string
   password: string
@@ -13,8 +13,8 @@ type ResetPasswordForm = {
 const ResetPassword: React.FC = () => {
 
 
-  const [timeleft,setTimeleft] = useState(60)
-   const navigate = useNavigate();
+  const [timeleft, setTimeleft] = useState(60)
+  const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const {
     register,
@@ -27,133 +27,140 @@ const ResetPassword: React.FC = () => {
 
 
 
-   useEffect(() => {
-  
-    if(!user?.otpSendAt) return;
-  
+  useEffect(() => {
+
+    if (!user?.otpSendAt) return;
+
     const sentTime = new Date(user.otpSendAt).getTime()
-  
+
     const resendTime = sentTime + 60 * 1000
-  
-    const timer = setInterval(()=>{
-  
-       const now = new Date().getTime()
-  
-       const remaining = Math.floor((resendTime - now) / 1000)
-  
-       if(remaining <= 0){
-          setTimeleft(0)
-          clearInterval(timer)
-       }else{
-          setTimeleft(remaining)
-       }
-  
-    },1000)
-  
-    return ()=> clearInterval(timer)
-  
-  },[])
-     
-  const onSubmit = async(data: ResetPasswordForm) => {
+
+    const timer = setInterval(() => {
+
+      const now = new Date().getTime()
+
+      const remaining = Math.floor((resendTime - now) / 1000)
+
+      if (remaining <= 0) {
+        setTimeleft(0)
+        clearInterval(timer)
+      } else {
+        setTimeleft(remaining)
+      }
+
+    }, 1000)
+
+    return () => clearInterval(timer)
+
+  }, [])
+
+  const onSubmit = async (data: ResetPasswordForm) => {
 
 
-     try {
-      
-
-          const response = await api.post("/auth/reset-password",{
-       
-      otp:data.otp,
-      password:data.password,
-      confirmpassword:data.confirmpassword,
-      email:user.email
-
-    })
+    try {
 
 
-    console.log("re",response);
+      const response = await api.post("/auth/reset-password", {
+
+        otp: data.otp,
+        password: data.password,
+        confirmpassword: data.confirmpassword,
+        email: user.email
+
+      })
+
+
+      console.log("re", response);
 
 
 
-      
-    // For now we just log; integrate API to verify OTP & reset password here later
-    console.log('Reset password data:', data);
-    localStorage.removeItem("user");
-    navigate("/login")
-     } catch (error:any) {
 
-    // localStorage.removeItem("user");
+      // For now we just log; integrate API to verify OTP & reset password here later
+      console.log('Reset password data:', data);
+      localStorage.removeItem("user");
+      navigate("/login")
+    } catch (error: any) {
 
-          if (error.response) {
-      alert(error.response.data.message);
-    } else {
-      alert("Something went wrong");
+      // localStorage.removeItem("user");
+
+      if (error.response) {
+        alert(error.response.data.message);
+      } else {
+        alert("Something went wrong");
+      }
+
     }
-      
-     }
 
   }
 
-  const resendOtp =async ()=>{
+  const resendOtp = async () => {
 
 
-       try {
-          const data = await api.post("/auth/resend-otp",{
-        email:user.email
-       })
-      
-       console.log(data)
+    try {
+      const response = await api.post("/auth/resend-otp", {
+        email: user.email
+      })
 
-       } catch (error:any) {
-        
+      console.log(response)
 
-              if (error.response) {
-      alert(error.response.data.message);
-    } else {
-      alert("Something went wrong");
+    } catch (error: any) {
+
+
+      if (error.response) {
+        alert(error.response.data.message);
+      } else {
+        alert("Something went wrong");
+      }
+
     }
-      
-       }
-       
 
-
-       console.log(data)
   }
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left Side Image Section (same style as Signup / Forgotpassword) */}
-      <div className="relative hidden md:block w-1/2">
+    <div className="min-h-screen flex bg-gray-50">
+      {/* Left Side Image Section */}
+      <div className="relative hidden md:block w-1/2 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/90 to-purple-900/90 mix-blend-multiply z-10"></div>
         <img
           src={SideImage}
           alt="background"
-          className="object-cover w-full h-full"
+          className="object-cover w-full h-full scale-105 hover:scale-100 transition-transform duration-1000"
         />
-        <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-white p-6">
-          <h2 className="text-3xl font-bold text-center">
-            Reset Your Password
+        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-white p-12 text-center">
+          <div className="w-16 h-16 bg-white/10 rounded-2xl backdrop-blur-md flex items-center justify-center mb-6 shadow-xl border border-white/20">
+            <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+          </div>
+          <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4 text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-300">
+            Secure Your Account
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-200">
-            Enter the OTP sent to your email and choose a new password
+          <p className="text-lg text-gray-200 font-light max-w-md">
+            Enter the OTP sent to your email and choose a strong new password.
           </p>
         </div>
       </div>
 
       {/* Right Side Card */}
-      <div className="flex flex-1 items-center justify-center bg-gray-50">
-        <div className="bg-white bg-opacity-90 backdrop-blur-sm p-10 rounded-lg shadow-lg w-full max-w-md">
-          <h1 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
-            Reset Password
-          </h1>
+      <div className="flex flex-1 items-center justify-center p-6 md:p-12">
+        <div className="bg-white p-8 md:p-12 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-100 w-full max-w-md transition-all h-full max-h-screen overflow-y-auto custom-scrollbar">
 
-          <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+          <div className="text-center mb-10">
+            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
+              Reset Password
+            </h1>
+            <p className="mt-2 text-sm text-gray-500">Please enter your verification code and new password.</p>
+          </div>
+
+          <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             {/* OTP */}
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                OTP
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Verification OTP
               </label>
               <input
                 type="text"
-                placeholder="Enter OTP"
+                placeholder="Enter 4-digit OTP minimum"
                 {...register('otp', {
                   required: 'OTP is required',
                   minLength: {
@@ -161,10 +168,10 @@ const ResetPassword: React.FC = () => {
                     message: 'OTP must be at least 4 digits',
                   },
                 })}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                className="block w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all tracking-widest font-mono text-center"
               />
               {errors.otp && (
-                <p className="text-red-500 text-sm">
+                <p className="text-red-500 text-sm mt-1">
                   {errors.otp.message}
                 </p>
               )}
@@ -172,7 +179,7 @@ const ResetPassword: React.FC = () => {
 
             {/* New Password */}
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
                 New Password
               </label>
               <input
@@ -187,10 +194,10 @@ const ResetPassword: React.FC = () => {
                       'Min 8 chars, include uppercase, lowercase, number & special character',
                   },
                 })}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                className="block w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
               />
               {errors.password && (
-                <p className="text-red-500 text-sm">
+                <p className="text-red-500 text-sm mt-1">
                   {errors.password.message}
                 </p>
               )}
@@ -198,7 +205,7 @@ const ResetPassword: React.FC = () => {
 
             {/* Confirm Password */}
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Confirm Password
               </label>
               <input
@@ -210,48 +217,40 @@ const ResetPassword: React.FC = () => {
                     value === getValues('password') ||
                     'Passwords do not match',
                 })}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                className="block w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
               />
               {errors.confirmpassword && (
-                <p className="text-red-500 text-sm">
+                <p className="text-red-500 text-sm mt-1">
                   {errors.confirmpassword.message}
                 </p>
               )}
 
-
-
-
-              <p className="mt-2 text-xs text-gray-500">
-  Didn’t receive the code?{" "}
-
-  {timeleft > 0 ? (
-    <span className="text-gray-400">
-      Resend in {timeleft}s
-    </span>
-  ) : (
-    <button
-      type="button"
-      className="text-indigo-600 hover:text-indigo-700 font-medium"
-      onClick={resendOtp}
-    >
-      Resend OTP
-    </button>
-  )}
-</p>
+              <div className="mt-4 text-sm flex justify-between items-center">
+                <span className="text-gray-500">Didn’t receive the code?</span>
+                {timeleft > 0 ? (
+                  <span className="text-gray-400 font-medium">
+                    Resend in <span className="text-indigo-500">{timeleft}s</span>
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    className="text-indigo-600 hover:text-indigo-700 font-semibold transition-colors"
+                    onClick={resendOtp}
+                  >
+                    Resend OTP
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* SUBMIT BUTTON */}
             <button
               type="submit"
-              className="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md"
+              className="w-full py-3.5 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl font-semibold shadow-[0_4px_14px_0_rgb(79,70,229,0.39)] hover:shadow-[0_6px_20px_rgba(79,70,229,0.23)] hover:-translate-y-0.5 transition-all duration-200"
             >
               Update Password
             </button>
-
-
-             
           </form>
-          
         </div>
       </div>
     </div>
