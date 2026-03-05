@@ -14,6 +14,10 @@ const AdminLayout = lazy(() => import("../layouts/AdminLayout.tsx"));
 const AdminDashboard = lazy(() => import("../pages/admin/AdminDashboard.tsx"));
 const AdminPlaceholder = lazy(() => import("../pages/admin/AdminPlaceholder.tsx"));
 
+const EventManagerLayout = lazy(() => import("../layouts/EventManagerLayout.tsx"));
+const EventManagerDashboard = lazy(() => import("../pages/eventManager/EventManagerDashboard.tsx"));
+const EventManagerPlaceholder = lazy(() => import("../pages/eventManager/EventManagerPlaceholder.tsx"));
+
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -60,6 +64,18 @@ export const router = createBrowserRouter([
       { path: "eventmanagers", element: <AdminPlaceholder /> },
       { path: "categories", element: <AdminPlaceholder /> },
       { path: "wallet", element: <AdminPlaceholder /> },
+    ]
+  },
+
+  {
+    path: "/eventmanager",
+    element: <EventManagerLayout />,
+    children: [
+      { path: "dashboard", element: <EventManagerDashboard /> },
+      { path: "create-event", element: <EventManagerPlaceholder /> },
+      { path: "my-events", element: <EventManagerPlaceholder /> },
+      { path: "bookings", element: <EventManagerPlaceholder /> },
+      { path: "wallet", element: <EventManagerPlaceholder /> },
     ]
   },
 
