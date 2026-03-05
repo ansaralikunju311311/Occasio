@@ -19,7 +19,7 @@ export const clearExpiredOtpJob = () => {
              
        otpExpires:null,
        otpType:null,
-      otpSendAt:null
+      otpSentAt:null
           }
         }
       );
