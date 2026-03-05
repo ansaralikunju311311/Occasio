@@ -3,6 +3,7 @@ import SideImage from '../../src/assets/SideImage.jpg'
 import { useForm } from 'react-hook-form'
 import {api} from '../services/api'
 import { useNavigate } from 'react-router-dom'
+import { useState,useEffect } from 'react'
 type ResetPasswordForm = {
   otp: string
   password: string
@@ -11,6 +12,8 @@ type ResetPasswordForm = {
 
 const ResetPassword: React.FC = () => {
 
+
+  const [timeleft,setTimeleft] = useState(60)
    const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const {
@@ -22,6 +25,34 @@ const ResetPassword: React.FC = () => {
     mode: 'onBlur',
   })
 
+
+
+   useEffect(() => {
+  
+    if(!user?.otpSendAt) return;
+  
+    const sentTime = new Date(user.otpSendAt).getTime()
+  
+    const resendTime = sentTime + 60 * 1000
+  
+    const timer = setInterval(()=>{
+  
+       const now = new Date().getTime()
+  
+       const remaining = Math.floor((resendTime - now) / 1000)
+  
+       if(remaining <= 0){
+          setTimeleft(0)
+          clearInterval(timer)
+       }else{
+          setTimeleft(remaining)
+       }
+  
+    },1000)
+  
+    return ()=> clearInterval(timer)
+  
+  },[])
      
   const onSubmit = async(data: ResetPasswordForm) => {
 
@@ -60,22 +91,32 @@ const ResetPassword: React.FC = () => {
       
      }
 
+  }
+
+  const resendOtp =async ()=>{
 
 
+       try {
+          const data = await api.post("/auth/resend-otp",{
+        email:user.email
+       })
+      
+       console.log(data)
+
+       } catch (error:any) {
+        
+
+              if (error.response) {
+      alert(error.response.data.message);
+    } else {
+      alert("Something went wrong");
+    }
+      
+       }
+       
 
 
-
-
-
-
-
-
-
-
-
-
-
-   
+       console.log(data)
   }
 
   return (
@@ -176,6 +217,27 @@ const ResetPassword: React.FC = () => {
                   {errors.confirmpassword.message}
                 </p>
               )}
+
+
+
+
+              <p className="mt-2 text-xs text-gray-500">
+  Didn’t receive the code?{" "}
+
+  {timeleft > 0 ? (
+    <span className="text-gray-400">
+      Resend in {timeleft}s
+    </span>
+  ) : (
+    <button
+      type="button"
+      className="text-indigo-600 hover:text-indigo-700 font-medium"
+      onClick={resendOtp}
+    >
+      Resend OTP
+    </button>
+  )}
+</p>
             </div>
 
             {/* SUBMIT BUTTON */}
@@ -185,7 +247,11 @@ const ResetPassword: React.FC = () => {
             >
               Update Password
             </button>
+
+
+             
           </form>
+          
         </div>
       </div>
     </div>
