@@ -18,7 +18,7 @@ const AdminLogin = () => {
     const onSubmit = async (data: LoginDataType) => {
         setIsLoading(true);
         try {
-            const response = await api.post("/auth/login", {
+            const response = await api.post("/auth/admin/login", {
                 email: data.email,
                 password: data.password,
                 role: "ADMIN"

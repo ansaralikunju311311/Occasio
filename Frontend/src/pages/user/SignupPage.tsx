@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import SideImage from '../../src/assets/SideImage.jpg'
+import SideImage from '../../assets/SideImage.jpg'
 import { useForm } from 'react-hook-form'
 import type { SignDataType } from '../../types/auth.type'
 import { useNavigate } from 'react-router-dom'
@@ -12,14 +12,13 @@ const SignupPage = () => {
   const {
     register,
     handleSubmit,
-    watch,
+    getValues,
     formState: { errors }
   } = useForm<SignDataType>({
     mode: "onBlur"
   })
 
   console.log(value)
-  const password = watch("password");
 
 
 
@@ -167,7 +166,7 @@ const SignupPage = () => {
                 {...register("confirmpassword", {
                   required: "Confirm password is required",
                   validate: (value) =>
-                    value === password || "Passwords do not match"
+                    value === getValues("password") || "Passwords do not match"
                 })}
                 className="block w-full px-4 py-2.5 bg-slate-950/50 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
               />

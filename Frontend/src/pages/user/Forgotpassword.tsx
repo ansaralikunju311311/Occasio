@@ -52,7 +52,7 @@ const Forgotpassword = () => {
     <div className="min-h-screen flex bg-slate-950">
       {/* Left Side Image Section */}
       <div className="relative hidden md:block w-1/2 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/90 to-purple-900/90 mix-blend-multiply z-10"></div>
+        <div className="absolute inset-0 bg-linear-to-br from-indigo-900/90 to-purple-900/90 mix-blend-multiply z-10"></div>
         <img
           src={SideImage}
           alt="background"
@@ -75,7 +75,7 @@ const Forgotpassword = () => {
 
       {/* Right Side Card */}
       <div className="flex flex-1 items-center justify-center p-6 md:p-12">
-        <div className="bg-slate-900/60 backdrop-blur-xl p-8 md:p-12 rounded-[2rem] shadow-2xl shadow-indigo-500/10 border border-slate-800 w-full max-w-md transition-all">
+        <div className="bg-slate-900/60 backdrop-blur-xl p-8 md:p-12 rounded-4xl shadow-2xl shadow-indigo-500/10 border border-slate-800 w-full max-w-md transition-all">
 
           <button onClick={() => navigate('/login')} className="flex items-center text-sm font-medium text-slate-400 hover:text-indigo-400 transition-colors mb-8 group">
             <svg className="w-4 h-4 mr-1 group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -121,7 +121,7 @@ const Forgotpassword = () => {
             {/* SUBMIT BUTTON */}
             <button
               type="submit"
-              className="w-full py-3.5 px-4 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 text-white rounded-xl font-semibold shadow-[0_0_20px_rgb(99,102,241,0.3)] hover:shadow-[0_0_25px_rgb(99,102,241,0.5)] hover:-translate-y-0.5 transition-all duration-200 border border-white/10"
+              className="w-full py-3.5 px-4 bg-linear-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 text-white rounded-xl font-semibold shadow-[0_0_20px_rgb(99,102,241,0.3)] hover:shadow-[0_0_25px_rgb(99,102,241,0.5)] hover:-translate-y-0.5 transition-all duration-200 border border-white/10"
             >
               Send Recovery OTP
             </button>

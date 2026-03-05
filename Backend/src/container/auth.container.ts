@@ -20,10 +20,10 @@ export const makeAuthController = () => {
 
   const signupUsecase = new SignupUsecase(userRepository, hashService,emailService);
   const loginUseCase = new LoginUseCase(userRepository,hashService,createToken);
-  const verifyUseCase = new VerifyUseCase(userRepository);
+  const verifyUseCase = new VerifyUseCase(userRepository,createToken);
   const   resendotpUseCase   = new  ResendotpUseCase(userRepository,emailService)
   const   forgotPasswordUsecase   = new ForgotpasswordUsecase(userRepository,emailService);
   const resetPasswordUseCase = new ResetPasswordUseCase(userRepository,hashService);
-  const adminLoginUseCase  = new AdminLoginUseCase(userRepository,hashService)
+  const adminLoginUseCase  = new AdminLoginUseCase(userRepository,hashService,createToken)
   return new AuthController(signupUsecase,loginUseCase,verifyUseCase,resendotpUseCase,forgotPasswordUsecase,resetPasswordUseCase,adminLoginUseCase);
 };

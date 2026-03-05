@@ -87,11 +87,18 @@ export class AuthController {
 
 
         console.log('opt verification come data',req.body)
-        const verify = await this.VerifyUseCase.execute({email,otp});
+        const {user,refreshToken,accessToken} = await this.VerifyUseCase.execute({email,otp});
 
+            res.cookie("refreshToken",refreshToken,{
+          httpOnly:true,
+          secure:false,
+          sameSite:"strict",
+          maxAge:7*24*60*60*1000
+         })
 
+         console.log("checking",user,refreshToken,accessToken)
       res.status(HttpStatus.OK).json({
-          message:'the otp verification completed',data:verify
+          message:'the otp verification completed',user,accessToken
         })
       }
       catch(error:any){
@@ -169,14 +176,22 @@ export class AuthController {
       try {
       
 
-      const {email,password} = req.body;
+      const {email,password,role} = req.body;
       console.log(req.body)
-      const user = await this.AdminLoginUseCase.execute({email,password});
+      const {user,refreshToken,accessToken} = await this.AdminLoginUseCase.execute({email,password,role});
+
+          res.cookie("refreshToken",refreshToken,{
+          httpOnly:true,
+          secure:false,
+          sameSite:"strict",
+          maxAge:7*24*60*60*1000
+         })
          
-        console.log("onnn check,",user)
+         
+        console.log("onnn check,",user,refreshToken,accessToken)
        res.status(HttpStatus.OK).json({message:'user login correctly'
         ,
-        data:user})
+        user,accessToken})
     } catch (error:any) {
       next(error)
     }
