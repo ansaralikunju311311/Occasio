@@ -1,5 +1,5 @@
 import { useState } from "react";
-import SideImage from '../../src/assets/SideImage.jpg'
+import SideImage from "../../assets/SideImage.jpg"
 import { useForm } from "react-hook-form";
 import type { LoginDataType } from "../../types/auth.type";
 import { api } from '../../services/api'

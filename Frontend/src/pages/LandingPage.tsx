@@ -8,7 +8,7 @@ const LandingPage = () => {
       {/* HERO SECTION */}
       <section className="relative overflow-hidden flex items-center justify-center min-h-[80vh] px-6 text-center">
         <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black opacity-90"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black opacity-90"></div>
           <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500/20 rounded-full mix-blend-screen filter blur-3xl opacity-40 animate-blob"></div>
           <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full mix-blend-screen filter blur-3xl opacity-40 animate-blob animation-delay-2000"></div>
         </div>
@@ -19,7 +19,7 @@ const LandingPage = () => {
           </span>
           <h1 className="text-5xl md:text-7xl font-extrabold leading-tight tracking-tight mb-8 text-white">
             Discover & Book <br />
-            <span className="bg-gradient-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent">Amazing Events</span>
+            <span className="bg-linear-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent">Amazing Events</span>
           </h1>
 
           <p className="text-xl md:text-2xl text-slate-400 max-w-2xl mx-auto mb-10 font-light leading-relaxed">
@@ -30,7 +30,7 @@ const LandingPage = () => {
           <div className="flex flex-col sm:flex-row justify-center gap-4 items-center">
             <button
               onClick={() => navigate("/signup")}
-              className="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold text-lg shadow-[0_0_40px_-5px_rgb(99,102,241,0.4)] hover:shadow-[0_0_60px_-10px_rgb(99,102,241,0.5)] hover:-translate-y-1 transition-all duration-300 border border-white/10"
+              className="w-full sm:w-auto px-8 py-4 rounded-xl bg-linear-to-r from-indigo-500 to-purple-600 text-white font-semibold text-lg shadow-[0_0_40px_-5px_rgb(99,102,241,0.4)] hover:shadow-[0_0_60px_-10px_rgb(99,102,241,0.5)] hover:-translate-y-1 transition-all duration-300 border border-white/10"
             >
               Get Started
             </button>
@@ -105,7 +105,7 @@ const LandingPage = () => {
       {/* CTA SECTION */}
       <section className="py-32 px-6">
         <div className="max-w-5xl mx-auto bg-slate-900/60 backdrop-blur-lg border border-slate-800 rounded-[3rem] p-12 md:p-20 text-center relative overflow-hidden shadow-[0_0_50px_-15px_rgb(99,102,241,0.3)]">
-          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-transparent to-purple-500/10 opacity-100"></div>
+          <div className="absolute inset-0 bg-linear-to-br from-indigo-500/10 via-transparent to-purple-500/10 opacity-100"></div>
           <div className="relative z-10">
             <h2 className="text-4xl md:text-5xl font-bold mb-8 text-white tracking-tight">
               Ready to step into the future of events?
