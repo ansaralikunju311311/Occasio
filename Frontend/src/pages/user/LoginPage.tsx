@@ -1,8 +1,8 @@
 import { useState } from "react";
 import SideImage from '../../src/assets/SideImage.jpg'
 import { useForm } from "react-hook-form";
-import type { LoginDataType } from "../types/auth.type";
-import { api } from '../services/api'
+import type { LoginDataType } from "../../types/auth.type";
+import { api } from '../../services/api'
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 

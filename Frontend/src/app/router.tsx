@@ -3,11 +3,11 @@ import { lazy, Suspense } from "react";
 import MainLayout from "../layouts/MainLayout";
 const LandingPage = lazy(() => import("../pages/LandingPage"));
 
-const LoginPage = lazy(() => import("../pages/LoginPage"));
-const SignPage = lazy(() => import("../pages/SignupPage"))
-const OtpVerification = lazy(() => import("../pages/OtpVerification.tsx"));
-const ForgotPassword = lazy(() => import("../pages/Forgotpassword.tsx"));
-const ResetPassword = lazy(() => import("../pages/ResetPassword.tsx"))
+const LoginPage = lazy(() => import("../pages/user/LoginPage.tsx"));
+const SignPage = lazy(() => import("../pages/user/SignupPage.tsx"))
+const OtpVerification = lazy(() => import("../pages/user/OtpVerification.tsx"));
+const ForgotPassword = lazy(() => import("../pages/user/Forgotpassword.tsx"));
+const ResetPassword = lazy(() => import("../pages/user/ResetPassword.tsx"))
 
 const AdminLogin = lazy(() => import("../pages/admin/AdminLogin.tsx"));
 const AdminLayout = lazy(() => import("../layouts/AdminLayout.tsx"));

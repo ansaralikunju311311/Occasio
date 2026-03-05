@@ -1,8 +1,8 @@
 
 import SideImage from "../../src/assets/SideImage.jpg";
-import type { OtpData } from "../types/auth.type";
+import type { OtpData } from "../../types/auth.type";
 import { useForm } from "react-hook-form";
-import { api } from '../services/api'
+import { api } from '../../services/api'
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 

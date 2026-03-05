@@ -1,7 +1,7 @@
 import React from 'react'
 import SideImage from '../../src/assets/SideImage.jpg'
 import { useForm } from 'react-hook-form'
-import { api } from '../services/api'
+import { api } from '../../services/api'
 import { useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 type ResetPasswordForm = {

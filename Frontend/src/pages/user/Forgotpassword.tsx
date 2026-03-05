@@ -1,7 +1,7 @@
 
 import SideImage from '../../src/assets/SideImage.jpg'
 import { useForm } from 'react-hook-form'
-import { api } from '../services/api'
+import { api } from '../../services/api'
 import { useNavigate } from 'react-router-dom'
 type ForgotPasswordForm = {
   email: string

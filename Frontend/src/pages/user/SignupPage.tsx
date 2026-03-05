@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import SideImage from '../../src/assets/SideImage.jpg'
 import { useForm } from 'react-hook-form'
-import type { SignDataType } from '../types/auth.type'
+import type { SignDataType } from '../../types/auth.type'
 import { useNavigate } from 'react-router-dom'
-import { api } from '../services/api'
+import { api } from '../../services/api'
 import { Link } from 'react-router-dom'
 const SignupPage = () => {
   const navigate = useNavigate()
