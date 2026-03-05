@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import type { LoginDataType } from "../types/auth.type";
-import { api } from '../services/api';
+import type { LoginDataType } from "../../types/auth.type";
+import { api } from '../../services/api';
 import { useNavigate } from "react-router-dom";
 
 const AdminLogin = () => {

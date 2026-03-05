@@ -9,7 +9,7 @@ const OtpVerification = lazy(() => import("../pages/OtpVerification.tsx"));
 const ForgotPassword = lazy(() => import("../pages/Forgotpassword.tsx"));
 const ResetPassword = lazy(() => import("../pages/ResetPassword.tsx"))
 
-const AdminLogin = lazy(() => import("../pages/AdminLogin.tsx"));
+const AdminLogin = lazy(() => import("../pages/admin/AdminLogin.tsx"));
 const AdminLayout = lazy(() => import("../layouts/AdminLayout.tsx"));
 const AdminDashboard = lazy(() => import("../pages/admin/AdminDashboard.tsx"));
 const AdminPlaceholder = lazy(() => import("../pages/admin/AdminPlaceholder.tsx"));
