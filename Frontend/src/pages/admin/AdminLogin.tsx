@@ -44,7 +44,7 @@ const AdminLogin = () => {
             <div className="absolute inset-0 z-0 pointer-events-none">
                 <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-emerald-600/20 rounded-full mix-blend-screen filter blur-[100px] animate-pulse"></div>
                 <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-teal-600/20 rounded-full mix-blend-screen filter blur-[100px] animate-pulse" style={{ animationDelay: "2s" }}></div>
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-[#070b14]/80 to-[#070b14] z-0"></div>
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(ellipse_at_center,var(--tw-gradient-stops))] from-transparent via-[#070b14]/80 to-[#070b14] z-0"></div>
             </div>
 
             <div className="w-full max-w-md p-6 relative z-10 animate-fade-in-up">
@@ -66,9 +66,9 @@ const AdminLogin = () => {
                 </div>
 
                 {/* Login Card */}
-                <div className="bg-slate-900/40 backdrop-blur-2xl rounded-[2rem] p-8 md:p-10 shadow-2xl shadow-black/50 border border-slate-800/60 relative overflow-hidden group hover:border-emerald-500/30 transition-colors duration-500">
+                <div className="bg-slate-900/40 backdrop-blur-2xl rounded-4xl p-8 md:p-10 shadow-2xl shadow-black/50 border border-slate-800/60 relative overflow-hidden group hover:border-emerald-500/30 transition-colors duration-500">
 
-                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+                    <div className="absolute inset-0 bg-linear-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
 
                     <form className="space-y-7 relative z-10" onSubmit={handleSubmit(onSubmit)}>
 
@@ -136,7 +136,7 @@ const AdminLogin = () => {
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="w-full py-4 px-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white rounded-xl font-bold shadow-[0_0_20px_rgb(16,185,129,0.2)] hover:shadow-[0_0_30px_rgb(16,185,129,0.4)] hover:-translate-y-0.5 transition-all duration-300 border border-emerald-400/20 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none flex justify-center items-center"
+                                className="w-full py-4 px-4 bg-linear-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white rounded-xl font-bold shadow-[0_0_20px_rgb(16,185,129,0.2)] hover:shadow-[0_0_30px_rgb(16,185,129,0.4)] hover:-translate-y-0.5 transition-all duration-300 border border-emerald-400/20 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none flex justify-center items-center"
                             >
                                 {isLoading ? (
                                     <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
