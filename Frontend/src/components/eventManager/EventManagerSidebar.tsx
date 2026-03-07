@@ -1,7 +1,19 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAppDispatch } from "../../redux/hook";
+import { logout } from "../../redux/slices/authSlice";
 
 const EventManagerSidebar = () => {
+    const navigate = useNavigate()
     const location = useLocation();
+    const dispatch = useAppDispatch();
+
+
+    const handlelogout =()=>{
+        dispatch(
+            logout()
+        )
+        navigate("/login")
+    }
 
     const navLinks = [
         {
@@ -77,7 +89,7 @@ const EventManagerSidebar = () => {
                             key={link.name}
                             to={link.path}
                             className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-semibold transition-all duration-200 group relative ${isActive
-                                ? "bg-gradient-to-r from-teal-500/10 to-emerald-600/10 text-teal-400 border border-teal-500/20 shadow-[0_0_15px_rgb(20,184,166,0.05)]"
+                                ? "bg-linear-to-r from-teal-500/10 to-emerald-600/10 text-teal-400 border border-teal-500/20 shadow-[0_0_15px_rgb(20,184,166,0.05)]"
                                 : "text-slate-400 hover:bg-slate-800/50 hover:text-white border border-transparent"
                                 }`}
                         >
@@ -105,7 +117,8 @@ const EventManagerSidebar = () => {
 
             {/* Account / Logout */}
             <div className="p-4 border-t border-slate-800/60">
-                <button className="flex w-full items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-semibold text-slate-400 hover:bg-red-500/10 hover:text-red-400 border border-transparent hover:border-red-500/20 transition-all duration-200 group">
+                <button className="flex w-full items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-semibold text-slate-400 hover:bg-red-500/10 hover:text-red-400 border border-transparent hover:border-red-500/20 transition-all duration-200 group"
+                onClick={handlelogout}>
                     <svg className="w-5 h-5 text-slate-500 group-hover:text-red-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                     </svg>

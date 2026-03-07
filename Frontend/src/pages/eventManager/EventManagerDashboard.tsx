@@ -1,3 +1,5 @@
+import { useAppSelector } from "../../redux/hook";
+
 const EventManagerDashboard = () => {
     const stats = [
         { title: "Total Events", value: "12", icon: "🎟️", trend: "+2" },
@@ -6,11 +8,15 @@ const EventManagerDashboard = () => {
         { title: "Total Revenue", value: "$12,450", icon: "💰", trend: "+5%" }
     ];
 
+
+  const user = useAppSelector((state)=>state.auth.user)
+     
     return (
         <div className="animate-fade-in-up">
             <div className="mb-8">
                 <h1 className="text-3xl font-bold text-white tracking-tight">
                     Manager <span className="text-teal-400">Dashboard</span>
+                    {user?.email}
                 </h1>
                 <p className="text-slate-400 mt-2">Overview of your events and earnings on Occasio.</p>
             </div>
@@ -35,8 +41,8 @@ const EventManagerDashboard = () => {
             </div>
 
             {/* Additional space for charts or recent activity */}
-            <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-2xl p-8 shadow-xl min-h-[400px] flex items-center justify-center relative overflow-hidden group">
-                <div className="absolute inset-0 bg-gradient-to-br from-teal-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-2xl p-8 shadow-xl min-h-100 flex items-center justify-center relative overflow-hidden group">
+                <div className="absolute inset-0 bg-linear-to-br from-teal-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
                 <div className="text-center relative z-10">
                     <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-slate-800 border border-slate-700 mb-4 shadow-inner">

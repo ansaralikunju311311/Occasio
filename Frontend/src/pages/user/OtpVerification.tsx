@@ -5,12 +5,14 @@ import { useForm } from "react-hook-form";
 import { api } from '../../services/api'
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-
+import { useAppDispatch } from '../../redux/hook';
+import { setAuth } from '../../redux/slices/authSlice';
 const OtpVerification = () => {
 
 
   const [timeleft, setTimeLeft] = useState(60)
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const {
     register,
     handleSubmit,
@@ -84,7 +86,22 @@ const OtpVerification = () => {
       })
       console.log(response);
       localStorage.removeItem("user");
-      navigate("/")
+
+      dispatch(
+        setAuth({
+            token:response.data.accessToken,
+            user:response.data.user
+        })
+      )
+
+
+      if(response.data.user.role === "EVENT_MANAGER"){
+       navigate("/eventmanager")
+      }
+      else if(response.data.user.role === "USER"){
+           navigate("/")
+      }
+      
     } catch (error: any) {
       // localStorage.removeItem("user");
       if (error.response) {
