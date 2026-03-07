@@ -6,11 +6,15 @@ export const api = axios.create({
   withCredentials: true
 });
 
-
+let count = 0;
 api.interceptors.request.use((config)=>{
   const state = store.getState();
-  console.log("state",state);
+  console.log("state ",state , count);
+ count ++;
   const token = state.auth.accessToken;
+
+
+   console.log("token will token",token)
   if(token){
     config.headers.Authorization = `Bearer ${token}`;
     console.log("checking anneeee",config.headers.Authorization)

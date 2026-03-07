@@ -21,7 +21,7 @@ const LoginPage = () => {
   });
 
 
-  console.log(value)
+  // console.log(value)
   const onSubmit = async (data: LoginDataType) => {
     const roleValue = data.remember ? "EVENT_MANAGER" : "USER"
 
@@ -37,18 +37,18 @@ const LoginPage = () => {
 
 
       })
-
+         console.log("response",response.data.accessToken)
 
       dispatch(
         setAuth({
-            token:response.data.acccesToken,
+            token:response.data.accessToken,
             user:response.data.user
         })
       )
-      console.log("resonse",response);
+      // console.log("resonse",response);
 
 
-      console.log("the login respose are cming from the backend",response.data)
+      // console.log("the login respose are cming from the backend",response.data)
    
 
 
@@ -77,7 +77,7 @@ const LoginPage = () => {
 
 
 
-    console.log("Submitted Data:", data);
+    // console.log("Submitted Data:", data);
     setValue(data);
 
   };

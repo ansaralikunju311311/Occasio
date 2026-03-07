@@ -27,6 +27,26 @@ export class UserRepository implements IUserRepository{
     }
 
 
+
+     async findById(id: string): Promise<User | null> {
+         const user = await UserModel.findById(id)
+         if(!user) return null;
+            return new User(
+            user._id.toString(),
+            user.name,
+            user.email,
+            user.password,
+            user.role,
+            user.status,
+            user.isVerified,
+            user.otp,
+            user.otpExpires,
+            user.otpType,
+            user.otpSentAt
+        )
+
+     }
+
     async create(user: User): Promise<User> {
         // console.log('user',user.role);
           const created = await UserModel.create({

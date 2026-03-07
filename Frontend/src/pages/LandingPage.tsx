@@ -1,17 +1,39 @@
 import { useNavigate } from "react-router-dom";
-import { useAppSelector } from "../redux/hook";
-
+import { useAppSelector,useAppDispatch } from "../redux/hook";
+import { useEffect } from "react";
+import {api} from '../services/api'
+import { setAuth } from "../redux/slices/authSlice";
 const LandingPage = () => {
 
 
 
 
   const navigate = useNavigate();
-
+  const dispatch = useAppDispatch();
 
   const user = useAppSelector((state) => state.auth.user);
 
 
+
+   console.log("dat from the redux",user)
+
+  useEffect(()=>{
+    const restoreSession = async()=>{
+      try {
+        const response = await api.get("/auth/me");
+        dispatch(
+          setAuth({
+            token: response.data.accessToken,
+            user: response.data.user
+          })
+        );
+        console.log(response);
+      } catch (error) {
+        console.error("error  where the    erorooorororo",error);
+      }
+    };
+    restoreSession();
+  },[dispatch]);
 
 
   return (
@@ -26,7 +48,7 @@ const LandingPage = () => {
 
         <div className="relative z-10 max-w-4xl mx-auto">
           <span className="inline-block py-1 px-3 rounded-full bg-indigo-500/10 text-indigo-400 text-sm font-semibold mb-6 shadow-sm border border-indigo-500/20">
-            {user ? "Welcome Back to Occasio" : "The New Standard for Events"}
+            {user ?    `Welcome Back to Occasio${user.email}` : "The New Standard for Events"   }
           </span>
 
           <h1 className="text-5xl md:text-7xl font-extrabold leading-tight tracking-tight mb-8 text-white">

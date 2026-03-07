@@ -7,6 +7,9 @@ import { ForgotpasswordUsecase } from "../application/use-cases/forgotpassword.u
 import { ResetPasswordUseCase } from "../application/use-cases/resetpassword.usecase.js";
 import { HttpStatus } from "../../../common/constants/http-stattus.js";
 import { AdminLoginUseCase } from "../application/use-cases/adminlogin.use.js";
+import { GetmeUseCase } from "../application/use-cases/getme.usecase.js";
+import { CreateToken } from "../../../common/service/token.service.js";
+import { ITokenService } from "../domain/services/token.service.interface.js";
 export class AuthController {
   constructor(private SignupUsecase :SignupUsecase,
        private LoginUseCase:LoginUseCase,
@@ -14,7 +17,9 @@ export class AuthController {
        private ResendotpUseCase: ResendotpUseCase,
        private ForgotpasswordUsecase : ForgotpasswordUsecase,
        private ResetPasswordUseCase : ResetPasswordUseCase,
-       private AdminLoginUseCase  :AdminLoginUseCase
+       private AdminLoginUseCase  :AdminLoginUseCase,
+       private GetmeUseCase : GetmeUseCase,
+       private tokenService:ITokenService
        
   ){}
   async signup(req: Request, res: Response,next:NextFunction): Promise<void> {
@@ -66,7 +71,7 @@ export class AuthController {
 
          res.cookie("refreshToken",refreshToken,{
           httpOnly:true,
-          secure:false,
+          secure:true,
           sameSite:"strict",
           maxAge:7*24*60*60*1000
          })
@@ -91,7 +96,7 @@ export class AuthController {
 
             res.cookie("refreshToken",refreshToken,{
           httpOnly:true,
-          secure:false,
+          secure:true,
           sameSite:"strict",
           maxAge:7*24*60*60*1000
          })
@@ -182,7 +187,7 @@ export class AuthController {
 
           res.cookie("refreshToken",refreshToken,{
           httpOnly:true,
-          secure:false,
+          secure:true,
           sameSite:"strict",
           maxAge:7*24*60*60*1000
          })
@@ -196,6 +201,56 @@ export class AuthController {
       next(error)
     }
     }
+
+
+
+
+    // async getMe(req:Request,res:Response){
+    //   const decode = (req as any).user;
+
+    //   console.log("decoded ",decode)
+    //     const user = await this.GetmeUseCase.execute(decode.userId)
+    //   res.status(HttpStatus.OK).json({
+    //      user
+    //   })
+    // }
+
+
+
+
+
+
+
+    async getMe(req: Request, res: Response, next: NextFunction) {
+  try {
+
+    const refreshToken = req.cookies.refreshToken;
+     console.log(req.cookies)
+     console.log(req.cookies.refreshToken)
+    if (!refreshToken) {
+      return res.status(HttpStatus.UNAUTHORIZED).json({
+        message: "Not authenticated"
+      });
+    }
+
+    const decoded = this.tokenService.verifyRefreshToken(refreshToken) as any;
+
+    const user = await this.GetmeUseCase.execute(decoded.userId);
+
+    const accessToken = this.tokenService.generateAccessToken({
+      userId: user.id,
+      role: user.role
+    });
+
+    return res.status(HttpStatus.OK).json({
+      user,
+      accessToken
+    });
+
+  } catch (error) {
+    next(error);
+  }
+}
 
 }
 
