@@ -5,10 +5,13 @@ import type { LoginDataType } from "../../types/auth.type";
 import { api } from '../../services/api'
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-
+import { useAppDispatch } from "../../redux/hook";
+import { setAuth } from "../../redux/slices/authSlice";
+// import { useDispatch } from "react-redux";
 const LoginPage = () => {
   const [value, setValue] = useState<LoginDataType | null>(null);
   const navigate = useNavigate();
+  const dispatch = useAppDispatch()
   const {
     register,
     handleSubmit,
@@ -34,10 +37,29 @@ const LoginPage = () => {
 
 
       })
-      console.log(response);
 
-      navigate("/");
 
+      dispatch(
+        setAuth({
+            token:response.data.acccesToken,
+            user:response.data.user
+        })
+      )
+      console.log("resonse",response);
+
+
+      console.log("the login respose are cming from the backend",response.data)
+   
+
+
+      if(response.data.user.role === "EVENT_MANAGER"){
+         navigate("/eventmanager")
+      }
+      else if(response.data.user.role=== "USER"){
+              navigate("/");
+      }
+      
+  
 
     } catch (error: any) {
 
@@ -66,7 +88,7 @@ const LoginPage = () => {
     <div className="min-h-screen flex bg-slate-950">
       {/* Left Side Image Section */}
       <div className="relative hidden md:block w-1/2 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/90 to-purple-900/90 mix-blend-multiply z-10"></div>
+        <div className="absolute inset-0 bg-linear-to-br from-indigo-900/90 to-purple-900/90 mix-blend-multiply z-10"></div>
         <img
           src={SideImage}
           alt="background"
@@ -84,7 +106,7 @@ const LoginPage = () => {
 
       {/* Right Side Login Card */}
       <div className="flex flex-1 items-center justify-center p-6 md:p-12">
-        <div className="bg-slate-900/60 backdrop-blur-xl p-8 md:p-12 rounded-[2rem] shadow-2xl shadow-indigo-500/10 border border-slate-800 w-full max-w-md transition-all">
+        <div className="bg-slate-900/60 backdrop-blur-xl p-8 md:p-12 rounded-4xl shadow-2xl shadow-indigo-500/10 border border-slate-800 w-full max-w-md transition-all">
           <div className="text-center mb-10">
             <h1 className="text-3xl font-bold text-white tracking-tight">
               Log In
@@ -166,7 +188,7 @@ const LoginPage = () => {
             {/* SUBMIT BUTTON */}
             <button
               type="submit"
-              className="w-full py-3.5 px-4 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 text-white rounded-xl font-semibold shadow-[0_0_20px_rgb(99,102,241,0.3)] hover:shadow-[0_0_25px_rgb(99,102,241,0.5)] hover:-translate-y-0.5 transition-all duration-200 border border-white/10"
+              className="w-full py-3.5 px-4 bg-linear-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 text-white rounded-xl font-semibold shadow-[0_0_20px_rgb(99,102,241,0.3)] hover:shadow-[0_0_25px_rgb(99,102,241,0.5)] hover:-translate-y-0.5 transition-all duration-200 border border-white/10"
             >
               Log In
             </button>

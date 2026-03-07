@@ -3,10 +3,13 @@ import { useForm } from "react-hook-form";
 import type { LoginDataType } from "../../types/auth.type";
 import { api } from '../../services/api';
 import { useNavigate } from "react-router-dom";
+import { useAppDispatch } from "../../redux/hook";
+import { setAuth } from "../../redux/slices/authSlice";
 
 const AdminLogin = () => {
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
+    const dispath = useAppDispatch()
     const {
         register,
         handleSubmit,
@@ -23,6 +26,19 @@ const AdminLogin = () => {
                 password: data.password,
                 role: "ADMIN"
             });
+
+
+
+            dispath(
+                setAuth({
+                    token:response.data.accessToken,
+                    user:response.data.user
+                })
+            )
+
+
+
+
 
             console.log(response);
             navigate("/admin/dashboard");

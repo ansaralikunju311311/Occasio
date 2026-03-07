@@ -1,7 +1,19 @@
 import { useNavigate } from "react-router-dom";
-
+import { useAppSelector } from "../redux/hook";
+import { useEffect } from "react";
 const LandingPage = () => {
+
+
+
+
   const navigate = useNavigate();
+
+ 
+   const user = useAppSelector((state)=>state.auth.user);
+   console.log("for checking ",user)
+ 
+ 
+  
 
   return (
     <div className="min-h-screen bg-slate-950 pt-16">
@@ -34,13 +46,14 @@ const LandingPage = () => {
             >
               Get Started
             </button>
-
+    {user?.name}
             <button
               onClick={() => navigate("/login")}
               className="w-full sm:w-auto px-8 py-4 rounded-xl bg-slate-900/50 backdrop-blur-sm text-white font-semibold text-lg border border-slate-700 shadow-sm hover:border-slate-500 hover:bg-slate-800 hover:-translate-y-1 transition-all duration-300"
             >
               Login
             </button>
+
           </div>
         </div>
       </section>

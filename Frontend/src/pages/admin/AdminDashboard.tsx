@@ -1,3 +1,5 @@
+import { useAppSelector } from "../../redux/hook";
+
 const AdminDashboard = () => {
     const stats = [
         { title: "Total Users", value: "1,248", icon: "👥", trend: "+12%" },
@@ -6,11 +8,14 @@ const AdminDashboard = () => {
         { title: "Total Revenue", value: "$45,231", icon: "💰", trend: "+24%" }
     ];
 
+    const user = useAppSelector((state)=>state.auth.user)
+
     return (
         <div className="animate-fade-in-up">
             <div className="mb-8">
                 <h1 className="text-3xl font-bold text-white tracking-tight">
                     Admin <span className="text-emerald-400">Dashboard</span>
+                    <p>{user?.email}</p>
                 </h1>
                 <p className="text-slate-400 mt-2">Overview of Occasio platform statistics and activities.</p>
             </div>

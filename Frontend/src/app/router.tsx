@@ -71,7 +71,7 @@ export const router = createBrowserRouter([
     path: "/eventmanager",
     element: <EventManagerLayout />,
     children: [
-      { path: "dashboard", element: <EventManagerDashboard /> },
+      { index:true, element: <EventManagerDashboard /> },
       { path: "create-event", element: <EventManagerPlaceholder /> },
       { path: "my-events", element: <EventManagerPlaceholder /> },
       { path: "bookings", element: <EventManagerPlaceholder /> },
