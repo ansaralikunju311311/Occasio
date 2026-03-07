@@ -1,5 +1,5 @@
 import React from 'react'
-import SideImage from '../../src/assets/SideImage.jpg'
+import SideImage from '../../assets/SideImage.jpg'
 import { useForm } from 'react-hook-form'
 import { api } from '../../services/api'
 import { useNavigate } from 'react-router-dom'
@@ -52,7 +52,7 @@ const ResetPassword: React.FC = () => {
 
     return () => clearInterval(timer)
 
-  }, [])
+  }, [user.otpSendAt])
 
   const onSubmit = async (data: ResetPasswordForm) => {
 
@@ -120,7 +120,7 @@ const ResetPassword: React.FC = () => {
     <div className="min-h-screen flex bg-gray-50">
       {/* Left Side Image Section */}
       <div className="relative hidden md:block w-1/2 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/90 to-purple-900/90 mix-blend-multiply z-10"></div>
+        <div className="absolute inset-0 bg-linear-to-br from-indigo-900/90 to-purple-900/90 mix-blend-multiply z-10"></div>
         <img
           src={SideImage}
           alt="background"
@@ -132,7 +132,7 @@ const ResetPassword: React.FC = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
           </div>
-          <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4 text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-300">
+          <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4 text-transparent bg-clip-text bg-linear-to-r from-white to-gray-300">
             Secure Your Account
           </h2>
           <p className="text-lg text-gray-200 font-light max-w-md">
@@ -143,7 +143,7 @@ const ResetPassword: React.FC = () => {
 
       {/* Right Side Card */}
       <div className="flex flex-1 items-center justify-center p-6 md:p-12">
-        <div className="bg-white p-8 md:p-12 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-100 w-full max-w-md transition-all h-full max-h-screen overflow-y-auto custom-scrollbar">
+        <div className="bg-white p-8 md:p-12 rounded-4xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-100 w-full max-w-md transition-all h-full max-h-screen overflow-y-auto custom-scrollbar">
 
           <div className="text-center mb-10">
             <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
@@ -246,7 +246,7 @@ const ResetPassword: React.FC = () => {
             {/* SUBMIT BUTTON */}
             <button
               type="submit"
-              className="w-full py-3.5 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl font-semibold shadow-[0_4px_14px_0_rgb(79,70,229,0.39)] hover:shadow-[0_6px_20px_rgba(79,70,229,0.23)] hover:-translate-y-0.5 transition-all duration-200"
+              className="w-full py-3.5 px-4 bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl font-semibold shadow-[0_4px_14px_0_rgb(79,70,229,0.39)] hover:shadow-[0_6px_20px_rgba(79,70,229,0.23)] hover:-translate-y-0.5 transition-all duration-200"
             >
               Update Password
             </button>
