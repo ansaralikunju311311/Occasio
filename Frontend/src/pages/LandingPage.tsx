@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "../redux/hook";
-import { useEffect } from "react";
+
 const LandingPage = () => {
 
 
@@ -8,12 +8,11 @@ const LandingPage = () => {
 
   const navigate = useNavigate();
 
- 
-   const user = useAppSelector((state)=>state.auth.user);
-   console.log("for checking ",user)
- 
- 
-  
+
+  const user = useAppSelector((state) => state.auth.user);
+
+
+
 
   return (
     <div className="min-h-screen bg-slate-950 pt-16">
@@ -27,33 +26,62 @@ const LandingPage = () => {
 
         <div className="relative z-10 max-w-4xl mx-auto">
           <span className="inline-block py-1 px-3 rounded-full bg-indigo-500/10 text-indigo-400 text-sm font-semibold mb-6 shadow-sm border border-indigo-500/20">
-            The New Standard for Events
+            {user ? "Welcome Back to Occasio" : "The New Standard for Events"}
           </span>
+
           <h1 className="text-5xl md:text-7xl font-extrabold leading-tight tracking-tight mb-8 text-white">
-            Discover & Book <br />
-            <span className="bg-linear-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent">Amazing Events</span>
+            {user ? (
+              <>
+                Hello, <span className="bg-linear-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent">{user.name}</span>! <br />
+                Ready for your next event?
+              </>
+            ) : (
+              <>
+                Discover & Book <br />
+                <span className="bg-linear-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent">Amazing Events</span>
+              </>
+            )}
           </h1>
 
           <p className="text-xl md:text-2xl text-slate-400 max-w-2xl mx-auto mb-10 font-light leading-relaxed">
-            Occasio makes event booking seamless with real-time seat selection,
-            secure payments, and instant confirmations.
+            {user
+              ? "Browse through the latest events, manage your bookings, and never miss a moment of excitement."
+              : "Occasio makes event booking seamless with real-time seat selection, secure payments, and instant confirmations."
+            }
           </p>
 
           <div className="flex flex-col sm:flex-row justify-center gap-4 items-center">
-            <button
-              onClick={() => navigate("/signup")}
-              className="w-full sm:w-auto px-8 py-4 rounded-xl bg-linear-to-r from-indigo-500 to-purple-600 text-white font-semibold text-lg shadow-[0_0_40px_-5px_rgb(99,102,241,0.4)] hover:shadow-[0_0_60px_-10px_rgb(99,102,241,0.5)] hover:-translate-y-1 transition-all duration-300 border border-white/10"
-            >
-              Get Started
-            </button>
-    {user?.name}
-            <button
-              onClick={() => navigate("/login")}
-              className="w-full sm:w-auto px-8 py-4 rounded-xl bg-slate-900/50 backdrop-blur-sm text-white font-semibold text-lg border border-slate-700 shadow-sm hover:border-slate-500 hover:bg-slate-800 hover:-translate-y-1 transition-all duration-300"
-            >
-              Login
-            </button>
-
+            {user ? (
+              <>
+                <button
+                  onClick={() => navigate("/events")}
+                  className="w-full sm:w-auto px-8 py-4 rounded-xl bg-linear-to-r from-indigo-500 to-purple-600 text-white font-semibold text-lg shadow-[0_0_40px_-5px_rgb(99,102,241,0.4)] hover:shadow-[0_0_60px_-10px_rgb(99,102,241,0.5)] hover:-translate-y-1 transition-all duration-300 border border-white/10"
+                >
+                  Explore Events
+                </button>
+                <button
+                  onClick={() => navigate("/bookings")}
+                  className="w-full sm:w-auto px-8 py-4 rounded-xl bg-slate-900/50 backdrop-blur-sm text-white font-semibold text-lg border border-slate-700 shadow-sm hover:border-slate-500 hover:bg-slate-800 hover:-translate-y-1 transition-all duration-300"
+                >
+                  My Bookings
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={() => navigate("/signup")}
+                  className="w-full sm:w-auto px-8 py-4 rounded-xl bg-linear-to-r from-indigo-500 to-purple-600 text-white font-semibold text-lg shadow-[0_0_40px_-5px_rgb(99,102,241,0.4)] hover:shadow-[0_0_60px_-10px_rgb(99,102,241,0.5)] hover:-translate-y-1 transition-all duration-300 border border-white/10"
+                >
+                  Get Started
+                </button>
+                <button
+                  onClick={() => navigate("/login")}
+                  className="w-full sm:w-auto px-8 py-4 rounded-xl bg-slate-900/50 backdrop-blur-sm text-white font-semibold text-lg border border-slate-700 shadow-sm hover:border-slate-500 hover:bg-slate-800 hover:-translate-y-1 transition-all duration-300"
+                >
+                  Login
+                </button>
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -116,22 +144,24 @@ const LandingPage = () => {
       </section>
 
       {/* CTA SECTION */}
-      <section className="py-32 px-6">
-        <div className="max-w-5xl mx-auto bg-slate-900/60 backdrop-blur-lg border border-slate-800 rounded-[3rem] p-12 md:p-20 text-center relative overflow-hidden shadow-[0_0_50px_-15px_rgb(99,102,241,0.3)]">
-          <div className="absolute inset-0 bg-linear-to-br from-indigo-500/10 via-transparent to-purple-500/10 opacity-100"></div>
-          <div className="relative z-10">
-            <h2 className="text-4xl md:text-5xl font-bold mb-8 text-white tracking-tight">
-              Ready to step into the future of events?
-            </h2>
-            <button
-              onClick={() => navigate("/signup")}
-              className="bg-white text-slate-900 px-10 py-4 rounded-xl font-bold text-lg hover:bg-gray-200 hover:scale-105 transition-all duration-300 shadow-[0_0_20px_rgb(255,255,255,0.2)]"
-            >
-              Join Occasio Today
-            </button>
+      {!user && (
+        <section className="py-32 px-6">
+          <div className="max-w-5xl mx-auto bg-slate-900/60 backdrop-blur-lg border border-slate-800 rounded-[3rem] p-12 md:p-20 text-center relative overflow-hidden shadow-[0_0_50px_-15px_rgb(99,102,241,0.3)]">
+            <div className="absolute inset-0 bg-linear-to-br from-indigo-500/10 via-transparent to-purple-500/10 opacity-100"></div>
+            <div className="relative z-10">
+              <h2 className="text-4xl md:text-5xl font-bold mb-8 text-white tracking-tight">
+                Ready to step into the future of events?
+              </h2>
+              <button
+                onClick={() => navigate("/signup")}
+                className="bg-white text-slate-900 px-10 py-4 rounded-xl font-bold text-lg hover:bg-gray-200 hover:scale-105 transition-all duration-300 shadow-[0_0_20px_rgb(255,255,255,0.2)]"
+              >
+                Join Occasio Today
+              </button>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
     </div>
   );
 };
