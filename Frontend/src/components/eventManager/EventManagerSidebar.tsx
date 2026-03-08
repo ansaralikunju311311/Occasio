@@ -10,10 +10,10 @@ const EventManagerSidebar = () => {
 
 
     const handlelogout = async ()=>{
-      
+       console.log("happen this c all")
         try {
-            const response = await api.post("/logout");
-            console.log(response)
+            const response = await api.post("/auth/logout");
+            console.log("wyting for this",response)
         dispatch(
             logout()
         )
