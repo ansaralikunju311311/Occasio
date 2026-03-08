@@ -1,7 +1,7 @@
-import { useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "../../redux/hook";
-import { setAuth } from "../../redux/slices/authSlice";
-import api from "../../services/api";
+// import { useEffect } from "react";
+// import { useAppDispatch, useAppSelector } from "../../redux/hook";
+// import { setAuth } from "../../redux/slices/authSlice";
+import {api} from "../../services/api";
 const AdminDashboard = () => {
     const stats = [
         { title: "Total Users", value: "1,248", icon: "👥", trend: "+12%" },
@@ -10,27 +10,27 @@ const AdminDashboard = () => {
         { title: "Total Revenue", value: "$45,231", icon: "💰", trend: "+24%" }
     ];
 
-    const user = useAppSelector((state)=>state.auth.user);
-    const dispatch = useAppDispatch()
+    // const user = useAppSelector((state)=>state.auth.user);
+    // const dispatch = useAppDispatch()
 
 
-    useEffect(()=>{
-         const restoreSession = async()=>{
-                try {
-                  const response = await api.get("/auth/me");
-                  dispatch(
-                    setAuth({
-                      token: response.data.accessToken,
-                      user: response.data.user
-                    })
-                  );
-                  console.log(response);
-                } catch (error) {
-                  console.error("error  where the    erorooorororo",error);
-                }
-              };
-              restoreSession();
-    },[dispatch])
+    // useEffect(()=>{
+    //      const restoreSession = async()=>{
+    //             try {
+    //               const response = await api.get("/auth/me");
+    //               dispatch(
+    //                 setAuth({
+    //                   token: response.data.accessToken,
+    //                   user: response.data.user
+    //                 })
+    //               );
+    //               console.log(response);
+    //             } catch (error) {
+    //               console.error("error  where the    erorooorororo",error);
+    //             }
+    //           };
+    //           restoreSession();
+    // },[dispatch])
 
 
     return (
@@ -38,7 +38,7 @@ const AdminDashboard = () => {
             <div className="mb-8">
                 <h1 className="text-3xl font-bold text-white tracking-tight">
                     Admin <span className="text-emerald-400">Dashboard</span>
-                    <p>{user?.email}</p>
+                    {/* <p>{user?.email}</p> */}
                 </h1>
                 <p className="text-slate-400 mt-2">Overview of Occasio platform statistics and activities.</p>
             </div>

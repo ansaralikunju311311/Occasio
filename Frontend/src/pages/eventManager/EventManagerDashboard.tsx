@@ -1,7 +1,7 @@
-import { useAppSelector ,useAppDispatch} from "../../redux/hook";
-import { useEffect } from "react";
-import { setAuth } from "../../redux/slices/authSlice";
-import api from "../../services/api";
+// import { useAppSelector ,useAppDispatch} from "../../redux/hook";
+// import { useEffect } from "react";
+// import { setAuth } from "../../redux/slices/authSlice";
+// import { api } from "../../services/api";
 const EventManagerDashboard = () => {
     const stats = [
         { title: "Total Events", value: "12", icon: "🎟️", trend: "+2" },
@@ -11,43 +11,43 @@ const EventManagerDashboard = () => {
     ];
 
 
-  const user = useAppSelector((state)=>state.auth.user)
+//   const user = useAppSelector((state)=>state.auth.user)
 
 
 
 
-    const dispatch = useAppDispatch();
+    // const dispatch = useAppDispatch();
   
    
   
   
   
-     console.log("dat from the redux",user)
+    //  console.log("dat from the redux",user)
   
-    useEffect(()=>{
-      const restoreSession = async()=>{
-        try {
-          const response = await api.get("/auth/me");
-          dispatch(
-            setAuth({
-              token: response.data.accessToken,
-              user: response.data.user
-            })
-          );
-          console.log(response);
-        } catch (error) {
-          console.error("error  where the    erorooorororo",error);
-        }
-      };
-      restoreSession();
-    },[dispatch]);
+    // useEffect(()=>{
+    //   const restoreSession = async()=>{
+    //     try {
+    //       const response = await api.get("/auth/me");
+    //       dispatch(
+    //         setAuth({
+    //           token: response.data.accessToken,
+    //           user: response.data.user
+    //         })
+    //       );
+    //       console.log(response);
+    //     } catch (error) {
+    //       console.error("error  where the    erorooorororo",error);
+    //     }
+    //   };
+    //   restoreSession();
+    // },[dispatch]);
      
     return (
         <div className="animate-fade-in-up">
             <div className="mb-8">
                 <h1 className="text-3xl font-bold text-white tracking-tight">
                     Manager <span className="text-teal-400">Dashboard</span>
-                    {user?.email}
+                    
                 </h1>
                 <p className="text-slate-400 mt-2">Overview of your events and earnings on Occasio.</p>
             </div>

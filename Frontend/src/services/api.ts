@@ -1,10 +1,10 @@
-// import axios from "axios";
+import axios from "axios";
 // import { store } from "../redux/store";
 
-// export const api = axios.create({
-//   baseURL: "http://localhost:3001/api",
-//   withCredentials: true
-// });
+export const api = axios.create({
+  baseURL: "http://localhost:3001/api",
+  withCredentials: true
+});
 
 // let count = 0;
 // api.interceptors.request.use((config)=>{
@@ -26,78 +26,78 @@
 
 
 
-import axios from "axios";
-import { store } from "../redux/store";
-import { setAuth, logout } from "../redux/slices/authSlice";
+// import axios from "axios";
+// import { store } from "../redux/store";
+// import { setAuth, logout } from "../redux/slices/authSlice";
 
-export const api = axios.create({
-  baseURL: "http://localhost:3001/api",
-  withCredentials: true
-});
-
-
-
-api.interceptors.request.use((config) => {
-
-  const state = store.getState();
-  const token = state.auth.accessToken;
-
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-
-  return config;
-});
+// export const api = axios.create({
+//   baseURL: "http://localhost:3001/api",
+//   withCredentials: true
+// });
 
 
-api.interceptors.response.use(
-  (response) => response,
 
-  async (error) => {
+// api.interceptors.request.use((config) => {
 
-    const originalRequest = error.config;
+//   const state = store.getState();
+//   const token = state.auth.accessToken;
+
+//   if (token) {
+//     config.headers.Authorization = `Bearer ${token}`;
+//   }
+
+//   return config;
+// });
+
+
+// api.interceptors.response.use(
+//   (response) => response,
+
+//   async (error) => {
+
+//     const originalRequest = error.config;
 
   
-    if (error.response?.status === 401 && !originalRequest._retry) {
+//     if (error.response?.status === 401 && !originalRequest._retry) {
 
-      originalRequest._retry = true;
+//       originalRequest._retry = true;
 
-      try {
+//       try {
 
       
-        const res = await axios.get(
-          "http://localhost:3001/api/auth/me",
-          { withCredentials: true }
-        );
+//         const res = await axios.get(
+//           "http://localhost:3001/api/auth/me",
+//           { withCredentials: true }
+//         );
 
-        // update redux
-        store.dispatch(
-          setAuth({
-            token: res.data.accessToken,
-            user: res.data.user
-          })
-        );
+//         // update redux
+//         store.dispatch(
+//           setAuth({
+//             token: res.data.accessToken,
+//             user: res.data.user
+//           })
+//         );
 
-        // attach new token
-        originalRequest.headers.Authorization =
-          `Bearer ${res.data.accessToken}`;
+//         // attach new token
+//         originalRequest.headers.Authorization =
+//           `Bearer ${res.data.accessToken}`;
 
-        // retry original request
-        return api(originalRequest);
+//         // retry original request
+//         return api(originalRequest);
 
-      } catch (err) {
+//       } catch (err) {
 
-        // refresh token expired
-        store.dispatch(logout());
+//         // refresh token expired
+//         store.dispatch(logout());
 
-        window.location.href = "/login";
+//         window.location.href = "/login";
 
-        return Promise.reject(err);
-      }
-    }
+//         return Promise.reject(err);
+//       }
+//     }
 
-    return Promise.reject(error);
-  }
-);
+//     return Promise.reject(error);
+//   }
+// );
 
-export default api;
+// export default api;

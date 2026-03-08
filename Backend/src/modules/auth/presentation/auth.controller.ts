@@ -7,9 +7,9 @@ import { ForgotpasswordUsecase } from "../application/use-cases/forgotpassword.u
 import { ResetPasswordUseCase } from "../application/use-cases/resetpassword.usecase.js";
 import { HttpStatus } from "../../../common/constants/http-stattus.js";
 import { AdminLoginUseCase } from "../application/use-cases/adminlogin.use.js";
-import { GetmeUseCase } from "../application/use-cases/getme.usecase.js";
-import { CreateToken } from "../../../common/service/token.service.js";
-import { ITokenService } from "../domain/services/token.service.interface.js";
+// import { GetmeUseCase } from "../application/use-cases/getme.usecase.js";
+// import { CreateToken } from "../../../common/service/token.service.js";
+// import { ITokenService } from "../domain/services/token.service.interface.js";
 export class AuthController {
   constructor(private SignupUsecase :SignupUsecase,
        private LoginUseCase:LoginUseCase,
@@ -18,8 +18,8 @@ export class AuthController {
        private ForgotpasswordUsecase : ForgotpasswordUsecase,
        private ResetPasswordUseCase : ResetPasswordUseCase,
        private AdminLoginUseCase  :AdminLoginUseCase,
-       private GetmeUseCase : GetmeUseCase,
-       private tokenService:ITokenService
+      //  private GetmeUseCase : GetmeUseCase,
+      //  private tokenService:ITokenService
        
   ){}
   async signup(req: Request, res: Response,next:NextFunction): Promise<void> {
@@ -66,20 +66,19 @@ export class AuthController {
 
       const {email,password,role} = req.body;
       console.log(req.body)
-      const {user,accessToken,refreshToken} = await this.LoginUseCase.execute({email,password,role});
+      const user= await this.LoginUseCase.execute({email,password,role});
 
 
-         res.cookie("refreshToken",refreshToken,{
-          httpOnly:true,
-          secure:true,
-          sameSite:"strict",
-          maxAge:7*24*60*60*1000
-         })
+        //  res.cookie("refreshToken",refreshToken,{
+        //   httpOnly:true,
+        //   secure:true,
+        //   sameSite:"strict",
+        //   maxAge:7*24*60*60*1000
+        //  })
         console.log("onnn check,",user)
        res.status(HttpStatus.OK).json({message:'user login correctly'
         ,
-        user,
-        accessToken})
+        user})
     } catch (error:any) {
       next(error)
     }
@@ -92,18 +91,18 @@ export class AuthController {
 
 
         console.log('opt verification come data',req.body)
-        const {user,refreshToken,accessToken} = await this.VerifyUseCase.execute({email,otp});
+        const user = await this.VerifyUseCase.execute({email,otp});
 
-            res.cookie("refreshToken",refreshToken,{
-          httpOnly:true,
-          secure:true,
-          sameSite:"strict",
-          maxAge:7*24*60*60*1000
-         })
+        //     res.cookie("refreshToken",refreshToken,{
+        //   httpOnly:true,
+        //   secure:true,
+        //   sameSite:"strict",
+        //   maxAge:7*24*60*60*1000
+        //  })
 
-         console.log("checking",user,refreshToken,accessToken)
+        //  console.log("checking",user,refreshToken,accessToken)
       res.status(HttpStatus.OK).json({
-          message:'the otp verification completed',user,accessToken
+          message:'the otp verification completed',user
         })
       }
       catch(error:any){
@@ -136,13 +135,13 @@ export class AuthController {
 
           const user  = await this.ForgotpasswordUsecase.execute(email);
 
-          console.log("th user here",user)
+          // console.log("th user here",user)
              res.status(HttpStatus.OK).json({
               message:"otp sened succesfully",data:user
             })
           }
       catch (error:any) {
-         console.log('error')
+        //  console.log('error')
          next(error)
       }
     
@@ -155,7 +154,7 @@ export class AuthController {
           const{email,otp,password,confirmpassword} = req.body;
 
 
-          console.log(req.body)
+          // console.log(req.body)
           const user = await this.ResetPasswordUseCase.execute({email,otp,password,confirmpassword});
            res.status(HttpStatus.OK).json({
             message:"reset success fully passowrd",data:user
@@ -176,31 +175,32 @@ export class AuthController {
 
     {
 
-      console.log('jnjnfdjnfkdjnfljnfljdnfdljfnd')
+      // console.log('jnjnfdjnfkdjnfljnfljdnfdljfnd')
          
       try {
       
 
       const {email,password,role} = req.body;
-      console.log(req.body)
-      const {user,refreshToken,accessToken} = await this.AdminLoginUseCase.execute({email,password,role});
+      // console.log(req.body)
+      const user= await this.AdminLoginUseCase.execute({email,password,role});
 
-          res.cookie("refreshToken",refreshToken,{
-          httpOnly:true,
-          secure:true,
-          sameSite:"strict",
-          maxAge:7*24*60*60*1000
-         })
+        //   res.cookie("refreshToken",refreshToken,{
+        //   httpOnly:true,
+        //   secure:true,
+        //   sameSite:"strict",
+        //   maxAge:7*24*60*60*1000
+        //  })
          
          
-        console.log("onnn check,",user,refreshToken,accessToken)
+        // console.log("onnn check,",user,refreshToken,accessToken)
        res.status(HttpStatus.OK).json({message:'user login correctly'
         ,
-        user,accessToken})
+        user})
     } catch (error:any) {
       next(error)
     }
     }
+  }
 
 
 
@@ -221,52 +221,52 @@ export class AuthController {
 
 
 
-    async getMe(req: Request, res: Response, next: NextFunction) {
-  try {
+//     async getMe(req: Request, res: Response, next: NextFunction) {
+//   try {
 
-    const refreshToken = req.cookies.refreshToken;
-     console.log(req.cookies)
-     console.log(req.cookies.refreshToken)
-    if (!refreshToken) {
-      return res.status(HttpStatus.UNAUTHORIZED).json({
-        message: "Not authenticated"
-      });
-    }
+//     const refreshToken = req.cookies.refreshToken;
+//      console.log(req.cookies)
+//      console.log(req.cookies.refreshToken)
+//     if (!refreshToken) {
+//       return res.status(HttpStatus.UNAUTHORIZED).json({
+//         message: "Not authenticated"
+//       });
+//     }
 
-    const decoded = this.tokenService.verifyRefreshToken(refreshToken) as any;
+//     const decoded = this.tokenService.verifyRefreshToken(refreshToken) as any;
 
-    const user = await this.GetmeUseCase.execute(decoded.userId);
+//     const user = await this.GetmeUseCase.execute(decoded.userId);
 
-    const accessToken = this.tokenService.generateAccessToken({
-      userId: user.id,
-      role: user.role
-    });
+//     const accessToken = this.tokenService.generateAccessToken({
+//       userId: user.id,
+//       role: user.role
+//     });
 
-    return res.status(HttpStatus.OK).json({
-      user,
-      accessToken
-    });
+//     return res.status(HttpStatus.OK).json({
+//       user,
+//       accessToken
+//     });
 
-  } catch (error) {
-    next(error);
-  }
-}
-async logout(_req:Request,res:Response,_next:NextFunction){
+//   } catch (error) {
+//     next(error);
+//   }
+// }
+// async logout(_req:Request,res:Response,_next:NextFunction){
      
 
-   console.log("function cfknvnf")
+//    console.log("function cfknvnf")
 
-  res.clearCookie("refreshToken", {
-    httpOnly: true,
-    secure: true,
-    sameSite: "strict",
-  });
+//   res.clearCookie("refreshToken", {
+//     httpOnly: true,
+//     secure: true,
+//     sameSite: "strict",
+//   });
 
-  res.status(200).json({
-    message: "Logged out",
-  });
-}
-}
+//   res.status(200).json({
+//     message: "Logged out",
+//   });
+// }
+// }
 
 
 

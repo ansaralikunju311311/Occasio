@@ -9,25 +9,25 @@ import { ForgotpasswordUsecase } from "../modules/auth/application/use-cases/for
 import { ResetPasswordUseCase } from "../modules/auth/application/use-cases/resetpassword.usecase.js";
 import { EmailSerive } from "../common/service/email.service.js";
 import { AdminLoginUseCase } from "../modules/auth/application/use-cases/adminlogin.use.js";
-import { CreateToken } from "../common/service/token.service.js";
-import { GetmeUseCase } from "../modules/auth/application/use-cases/getme.usecase.js";
+// import { CreateToken } from "../common/service/token.service.js";
+// import { GetmeUseCase } from "../modules/auth/application/use-cases/getme.usecase.js";
 export const makeAuthController = () => {
   const userRepository = new UserRepository();
   const hashService = new BcryptHashService();
   const emailService = new EmailSerive();
-  const createToken  = new CreateToken();
+  // const createToken  = new CreateToken();
   
 
   
 
   const signupUsecase = new SignupUsecase(userRepository, hashService,emailService);
-  const loginUseCase = new LoginUseCase(userRepository,hashService,createToken);
-  const verifyUseCase = new VerifyUseCase(userRepository,createToken);
+  const loginUseCase = new LoginUseCase(userRepository,hashService);
+  const verifyUseCase = new VerifyUseCase(userRepository);
   const   resendotpUseCase   = new  ResendotpUseCase(userRepository,emailService)
   const   forgotPasswordUsecase   = new ForgotpasswordUsecase(userRepository,emailService);
   const resetPasswordUseCase = new ResetPasswordUseCase(userRepository,hashService);
-  const adminLoginUseCase  = new AdminLoginUseCase(userRepository,hashService,createToken)
-  const getmeUseCase = new GetmeUseCase(userRepository)
+  const adminLoginUseCase  = new AdminLoginUseCase(userRepository,hashService)
+  // const getmeUseCase = new GetmeUseCase(userRepository)
 
-  return new AuthController(signupUsecase,loginUseCase,verifyUseCase,resendotpUseCase,forgotPasswordUsecase,resetPasswordUseCase,adminLoginUseCase,getmeUseCase,createToken);
+  return new AuthController(signupUsecase,loginUseCase,verifyUseCase,resendotpUseCase,forgotPasswordUsecase,resetPasswordUseCase,adminLoginUseCase);
 };

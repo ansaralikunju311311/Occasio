@@ -1,15 +1,15 @@
-import { useState } from "react";
+// import { useState } from "react";
 import { useForm } from "react-hook-form";
 import type { LoginDataType } from "../../types/auth.type";
 import { api } from '../../services/api';
 import { useNavigate } from "react-router-dom";
-import { useAppDispatch } from "../../redux/hook";
-import { setAuth } from "../../redux/slices/authSlice";
+// import { useAppDispatch } from "../../redux/hook";
+// import { setAuth } from "../../redux/slices/authSlice";
 
 const AdminLogin = () => {
-    const [isLoading, setIsLoading] = useState(false);
+    // const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
-    const dispath = useAppDispatch()
+    // const dispath = useAppDispatch()
     const {
         register,
         handleSubmit,
@@ -19,7 +19,7 @@ const AdminLogin = () => {
     });
 
     const onSubmit = async (data: LoginDataType) => {
-        setIsLoading(true);
+        // setIsLoading(true);
         try {
             const response = await api.post("/auth/admin/login", {
                 email: data.email,
@@ -29,12 +29,12 @@ const AdminLogin = () => {
 
 
 
-            dispath(
-                setAuth({
-                    token:response.data.accessToken,
-                    user:response.data.user
-                })
-            )
+    //         dispath(
+    //             setAuth({
+    //                 token:response.data.accessToken,
+    //                 user:response.data.user
+    //             })
+    //         )
 
 
 
@@ -48,9 +48,10 @@ const AdminLogin = () => {
             } else {
                 alert("Something went wrong");
             }
-        } finally {
-            setIsLoading(false);
-        }
+        } 
+        // finally {
+        //     setIsLoading(false);
+        // }
     };
 
     return (
@@ -151,17 +152,17 @@ const AdminLogin = () => {
                         <div className="pt-4">
                             <button
                                 type="submit"
-                                disabled={isLoading}
+                                // disabled={isLoading}
                                 className="w-full py-4 px-4 bg-linear-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white rounded-xl font-bold shadow-[0_0_20px_rgb(16,185,129,0.2)] hover:shadow-[0_0_30px_rgb(16,185,129,0.4)] hover:-translate-y-0.5 transition-all duration-300 border border-emerald-400/20 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none flex justify-center items-center"
                             >
-                                {isLoading ? (
+                                {/* {isLoading ? (
                                     <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
                                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                     </svg>
-                                ) : (
+                                ) : ( */}
                                     "Establish Connection"
-                                )}
+                                {/* )} */}
                             </button>
                         </div>
                     </form>

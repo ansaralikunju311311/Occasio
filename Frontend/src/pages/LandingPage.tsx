@@ -1,39 +1,39 @@
 import { useNavigate } from "react-router-dom";
-import { useAppSelector,useAppDispatch } from "../redux/hook";
-import { useEffect } from "react";
-import {api} from '../services/api'
-import { setAuth } from "../redux/slices/authSlice";
+// import { useAppSelector,useAppDispatch } from "../redux/hook";
+// import { useEffect } from "react";
+// import {api} from '../services/api'
+// import { setAuth } from "../redux/slices/authSlice";
 const LandingPage = () => {
 
 
 
 
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
+  // const dispatch = useAppDispatch();
 
-  const user = useAppSelector((state) => state.auth.user);
+  // const user = useAppSelector((state) => state.auth.user);
 
 
 
-   console.log("dat from the redux",user)
+  //  console.log("dat from the redux",user)
 
-  useEffect(()=>{
-    const restoreSession = async()=>{
-      try {
-        const response = await api.get("/auth/me");
-        dispatch(
-          setAuth({
-            token: response.data.accessToken,
-            user: response.data.user
-          })
-        );
-        console.log(response);
-      } catch (error) {
-        console.error("error  where the    erorooorororo",error);
-      }
-    };
-    restoreSession();
-  },[dispatch]);
+  // useEffect(()=>{
+  //   const restoreSession = async()=>{
+  //     try {
+  //       const response = await api.get("/auth/me");
+  //       dispatch(
+  //         setAuth({
+  //           token: response.data.accessToken,
+  //           user: response.data.user
+  //         })
+  //       );
+  //       console.log(response);
+  //     } catch (error) {
+  //       console.error("error  where the    erorooorororo",error);
+  //     }
+  //   };
+  //   restoreSession();
+  // },[dispatch]);
 
 
   return (
@@ -48,34 +48,38 @@ const LandingPage = () => {
 
         <div className="relative z-10 max-w-4xl mx-auto">
           <span className="inline-block py-1 px-3 rounded-full bg-indigo-500/10 text-indigo-400 text-sm font-semibold mb-6 shadow-sm border border-indigo-500/20">
-            {user ?    `Welcome Back to Occasio${user.email}` : "The New Standard for Events"   }
+            {/* {user ?    `Welcome Back to Occasio${user.email}` :  */}
+            "The New Standard for Events"   
+            {/* } */}
           </span>
 
           <h1 className="text-5xl md:text-7xl font-extrabold leading-tight tracking-tight mb-8 text-white">
-            {user ? (
-              <>
+            <>
+            {/* {user ? (
+              
                 Hello, <span className="bg-linear-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent">{user.name}</span>! <br />
                 Ready for your next event?
               </>
-            ) : (
-              <>
+            ) : ( */}
+              {/* <> */}
                 Discover & Book <br />
                 <span className="bg-linear-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent">Amazing Events</span>
               </>
-            )}
+            {/* )} */}
           </h1>
 
           <p className="text-xl md:text-2xl text-slate-400 max-w-2xl mx-auto mb-10 font-light leading-relaxed">
-            {user
+            {/* {user
               ? "Browse through the latest events, manage your bookings, and never miss a moment of excitement."
-              : "Occasio makes event booking seamless with real-time seat selection, secure payments, and instant confirmations."
-            }
+              : */}
+               "Occasio makes event booking seamless with real-time seat selection, secure payments, and instant confirmations."
+            {/* } */}
           </p>
 
           <div className="flex flex-col sm:flex-row justify-center gap-4 items-center">
-            {user ? (
+            {/* {user ? ( */}
               <>
-                <button
+                {/* <button
                   onClick={() => navigate("/events")}
                   className="w-full sm:w-auto px-8 py-4 rounded-xl bg-linear-to-r from-indigo-500 to-purple-600 text-white font-semibold text-lg shadow-[0_0_40px_-5px_rgb(99,102,241,0.4)] hover:shadow-[0_0_60px_-10px_rgb(99,102,241,0.5)] hover:-translate-y-1 transition-all duration-300 border border-white/10"
                 >
@@ -89,7 +93,7 @@ const LandingPage = () => {
                 </button>
               </>
             ) : (
-              <>
+              <> */}
                 <button
                   onClick={() => navigate("/signup")}
                   className="w-full sm:w-auto px-8 py-4 rounded-xl bg-linear-to-r from-indigo-500 to-purple-600 text-white font-semibold text-lg shadow-[0_0_40px_-5px_rgb(99,102,241,0.4)] hover:shadow-[0_0_60px_-10px_rgb(99,102,241,0.5)] hover:-translate-y-1 transition-all duration-300 border border-white/10"
@@ -103,7 +107,7 @@ const LandingPage = () => {
                   Login
                 </button>
               </>
-            )}
+            {/* )} */}
           </div>
         </div>
       </section>
@@ -166,7 +170,7 @@ const LandingPage = () => {
       </section>
 
       {/* CTA SECTION */}
-      {!user && (
+      {/* {!user && ( */}
         <section className="py-32 px-6">
           <div className="max-w-5xl mx-auto bg-slate-900/60 backdrop-blur-lg border border-slate-800 rounded-[3rem] p-12 md:p-20 text-center relative overflow-hidden shadow-[0_0_50px_-15px_rgb(99,102,241,0.3)]">
             <div className="absolute inset-0 bg-linear-to-br from-indigo-500/10 via-transparent to-purple-500/10 opacity-100"></div>
@@ -183,7 +187,7 @@ const LandingPage = () => {
             </div>
           </div>
         </section>
-      )}
+      {/* )} */}
     </div>
   );
 };

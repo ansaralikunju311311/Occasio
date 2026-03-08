@@ -5,18 +5,18 @@ import { User } from "../../domain/entites/user.entity.js";
 import { UserStatus } from "../../../../common/enums/user-status.enum.js";
 import { AppError } from "../../../../common/errors/app-error.js";
 import { HttpStatus } from "../../../../common/constants/http-stattus.js";
-import { ITokenService } from "../../domain/services/token.service.interface.js";
+// import { ITokenService } from "../../domain/services/token.service.interface.js";
 import { LoginResponseDto } from "../dtos/loginResponse.dto.js";
 export class LoginUseCase{
     constructor(
         private userRepository:IUserRepository,
         private compareService :IHashServive,
-        private tokenService :ITokenService
+        // private tokenService :ITokenService
 
 
     ){}
 
-   async execute(data:LoginDto):Promise<LoginResponseDto>{
+   async execute(data:LoginDto):Promise<User>{
 
 
     const user = await this.userRepository.findByEmail(data.email)
@@ -39,22 +39,21 @@ export class LoginUseCase{
      throw new AppError('the user is not permitted because your blocked',HttpStatus.UNAUTHORIZED)
    }
 
-   const accessToken =  this.tokenService.generateAccessToken({
-  userId: user.id,
-  role: user.role
-})
+//    const accessToken =  this.tokenService.generateAccessToken({
+//   userId: user.id,
+//   role: user.role
+// })
 
-  const refreshToken = this.tokenService.generateRefreshToken({
-    userId:user.id
-  })
+//   const refreshToken = this.tokenService.generateRefreshToken({
+//     userId:user.id
+//   })
     
     //  console.log("for the login setup",user)
 
-     return {
-      user,
-      accessToken,
-      refreshToken
-   }
+     return user
+  //     accessToken,
+  //     refreshToken
+  //  }
    
 
 

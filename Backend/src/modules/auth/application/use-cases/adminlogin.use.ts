@@ -14,11 +14,11 @@ export class AdminLoginUseCase{
     constructor(
         private userRepository : IUserRepository,
         private compareService :IHashServive,
-        private tokenService :ITokenService
+        // private tokenService :ITokenService
     ){}
 
 
-  async execute (data:AdminLoginDto):Promise<LoginResponseDto>{
+  async execute (data:AdminLoginDto):Promise<User>{
        console.log(data.role)
      const user = await this.userRepository.findByEmail(data.email)
    
@@ -49,24 +49,23 @@ export class AdminLoginUseCase{
 
 
 
-      const accessToken =  this.tokenService.generateAccessToken({
-  userId: user.id,
-  role: user.role
-})
+//       const accessToken =  this.tokenService.generateAccessToken({
+//   userId: user.id,
+//   role: user.role
+// })
 
-  const refreshToken = this.tokenService.generateRefreshToken({
-    userId:user.id
-  })
+//   const refreshToken = this.tokenService.generateRefreshToken({
+//     userId:user.id
+//   })
 
 
-  console.log("refresf",refreshToken);
-  console.log("access",accessToken)
+  // console.log("refresf",refreshToken);
+  // console.log("access",accessToken)
        
-        return {
-          user,
-          accessToken,
-          refreshToken
-        }
+        return user
+        //   accessToken,
+        //   refreshToken
+        // }
 
   }
   
