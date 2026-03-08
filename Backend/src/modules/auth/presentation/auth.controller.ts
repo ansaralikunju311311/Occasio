@@ -200,9 +200,16 @@ export class AuthController {
       next(error)
     }
     }
-  }
 
+      
+   async logout(_req: Request, res: Response, _next: NextFunction) {
+  res.status(HttpStatus.OK).json({
+    success: true,
+    message: "Logout successful"
+  });
+}
 
+}
 
 
     // async getMe(req:Request,res:Response){
@@ -267,6 +274,7 @@ export class AuthController {
 //   });
 // }
 // }
+
 
 
 

@@ -7,24 +7,24 @@ const AdminSidebar = () => {
     const location = useLocation();
     // const dispatch = useAppDispatch();
     const navigate = useNavigate();
-    // const handlelogout = async ()=>{
+    const handlelogout = async ()=>{
 
-    // try {
-    //     const response = await api.post("/auth/logout")
+    try {
+        const response = await api.post("/auth/logout")
 
     // dispatch(
     //     logout()
     // );
-    // console.log(response)
-    //   navigate("/adminlogin")
-    // } catch (error) {
+    console.log(response)
+      navigate("/adminlogin")
+    } catch (error) {
         
 
-    // console.log(error)
+    console.log(error)
 
-    // }
+    }
     
-    // }
+    }
 
     const navLinks = [
         {
