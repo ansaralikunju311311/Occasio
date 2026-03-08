@@ -1,7 +1,7 @@
 // import { useEffect } from "react";
-// import { useAppDispatch, useAppSelector } from "../../redux/hook";
+import { useAppSelector } from "../../redux/hook";
 // import { setAuth } from "../../redux/slices/authSlice";
-import {api} from "../../services/api";
+import { api } from "../../services/api";
 const AdminDashboard = () => {
     const stats = [
         { title: "Total Users", value: "1,248", icon: "👥", trend: "+12%" },
@@ -10,9 +10,9 @@ const AdminDashboard = () => {
         { title: "Total Revenue", value: "$45,231", icon: "💰", trend: "+24%" }
     ];
 
-    // const user = useAppSelector((state)=>state.auth.user);
+    const user = useAppSelector((state) => state.auth.user);
     // const dispatch = useAppDispatch()
-
+    console.log(user)
 
     // useEffect(()=>{
     //      const restoreSession = async()=>{
@@ -38,7 +38,7 @@ const AdminDashboard = () => {
             <div className="mb-8">
                 <h1 className="text-3xl font-bold text-white tracking-tight">
                     Admin <span className="text-emerald-400">Dashboard</span>
-                    {/* <p>{user?.email}</p> */}
+                    <p className="text-sm font-normal text-slate-500 mt-1">{user?.email}</p>
                 </h1>
                 <p className="text-slate-400 mt-2">Overview of Occasio platform statistics and activities.</p>
             </div>

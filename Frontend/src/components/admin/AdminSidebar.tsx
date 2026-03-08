@@ -1,20 +1,20 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-// import { logout } from "../../redux/slices/authSlice";
-// import { useAppDispatch } from "../../redux/hook";
+import { logout } from "../../redux/slices/authSlice";
+import { useAppDispatch } from "../../redux/hook";
 import {api} from "../../services/api";
 const AdminSidebar = () => {
 
     const location = useLocation();
-    // const dispatch = useAppDispatch();
+    const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const handlelogout = async ()=>{
 
     try {
         const response = await api.post("/auth/logout")
 
-    // dispatch(
-    //     logout()
-    // );
+    dispatch(
+        logout()
+    );
     console.log(response)
       navigate("/adminlogin")
     } catch (error) {

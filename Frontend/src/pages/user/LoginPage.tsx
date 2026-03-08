@@ -5,13 +5,13 @@ import type { LoginDataType } from "../../types/auth.type";
 import { api } from '../../services/api'
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-// import { useAppDispatch } from "../../redux/hook";
-// import { setAuth } from "../../redux/slices/authSlice";
+import { useAppDispatch } from "../../redux/hook";
+import { setAuth } from "../../redux/slices/authSlice";
 // import { useDispatch } from "react-redux";
 const LoginPage = () => {
   const [value, setValue] = useState<LoginDataType | null>(null);
   const navigate = useNavigate();
-  // const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch()
   const {
     register,
     handleSubmit,
@@ -39,12 +39,12 @@ const LoginPage = () => {
       })
          console.log("response",response.data.accessToken)
 
-      // dispatch(
-      //   setAuth({
-      //       token:response.data.accessToken,
-      //       user:response.data.user
-      //   })
-      // )
+      dispatch(
+        setAuth({
+            token:response.data.accessToken,
+            user:response.data.user
+        })
+      )
       // console.log("resonse",response);
 
 

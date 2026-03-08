@@ -1,4 +1,4 @@
-// import { useAppSelector ,useAppDispatch} from "../../redux/hook";
+import { useAppSelector } from "../../redux/hook";
 // import { useEffect } from "react";
 // import { setAuth } from "../../redux/slices/authSlice";
 // import { api } from "../../services/api";
@@ -11,19 +11,19 @@ const EventManagerDashboard = () => {
     ];
 
 
-//   const user = useAppSelector((state)=>state.auth.user)
+    const user = useAppSelector((state) => state.auth.user)
 
 
 
-
+    console.log(user)
     // const dispatch = useAppDispatch();
-  
-   
-  
-  
-  
+
+
+
+
+
     //  console.log("dat from the redux",user)
-  
+
     // useEffect(()=>{
     //   const restoreSession = async()=>{
     //     try {
@@ -41,13 +41,13 @@ const EventManagerDashboard = () => {
     //   };
     //   restoreSession();
     // },[dispatch]);
-     
+
     return (
         <div className="animate-fade-in-up">
             <div className="mb-8">
                 <h1 className="text-3xl font-bold text-white tracking-tight">
                     Manager <span className="text-teal-400">Dashboard</span>
-                    
+                    <p className="text-sm font-normal text-slate-500 mt-1">{user?.email}</p>
                 </h1>
                 <p className="text-slate-400 mt-2">Overview of your events and earnings on Occasio.</p>
             </div>
