@@ -7,7 +7,7 @@ import { ForgotpasswordUsecase } from "../application/use-cases/forgotpassword.u
 import { ResetPasswordUseCase } from "../application/use-cases/resetpassword.usecase.js";
 import { HttpStatus } from "../../../common/constants/http-stattus.js";
 import { AdminLoginUseCase } from "../application/use-cases/adminlogin.use.js";
-// import { GetmeUseCase } from "../application/use-cases/getme.usecase.js";
+import { GetmeUseCase } from "../application/use-cases/getme.usecase.js";
 // import { CreateToken } from "../../../common/service/token.service.js";
 // import { ITokenService } from "../domain/services/token.service.interface.js";
 export class AuthController {
@@ -18,7 +18,7 @@ export class AuthController {
        private ForgotpasswordUsecase : ForgotpasswordUsecase,
        private ResetPasswordUseCase : ResetPasswordUseCase,
        private AdminLoginUseCase  :AdminLoginUseCase,
-      //  private GetmeUseCase : GetmeUseCase,
+       private GetmeUseCase : GetmeUseCase,
       //  private tokenService:ITokenService
        
   ){}
@@ -212,18 +212,30 @@ export class AuthController {
   });
 }
 
+    async getMe(req:Request,res:Response){
+
+       try {
+            const decode = (req as any).user;
+
+      console.log("decoded ",decode)
+        const user = await this.GetmeUseCase.execute(decode.userId)
+      res.status(HttpStatus.OK).json({
+         user
+      })
+       } catch (error) {
+        
+
+          console.log(error)
+       }
+    }
+
+
+
+
 }
 
 
-    // async getMe(req:Request,res:Response){
-    //   const decode = (req as any).user;
-
-    //   console.log("decoded ",decode)
-    //     const user = await this.GetmeUseCase.execute(decode.userId)
-    //   res.status(HttpStatus.OK).json({
-    //      user
-    //   })
-    // }
+    
 
 
 

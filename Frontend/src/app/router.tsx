@@ -1,5 +1,8 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense,useEffect } from "react";
+import { useAppDispatch } from "../redux/hook.ts";
+import { setAuth } from "../redux/slices/authSlice.ts";
+import {api} from '../services/api.ts'
 import MainLayout from "../layouts/MainLayout";
 const LandingPage = lazy(() => import("../pages/LandingPage"));
 
@@ -86,8 +89,42 @@ export const router = createBrowserRouter([
 
 ]);
 
-export const RouterWrapper = () => (
-  <Suspense fallback={<div>Loading...</div>}>
-    <RouterProvider router={router} />
-  </Suspense>
-);
+// export const RouterWrapper = () => (
+//   <Suspense fallback={<div>Loading...</div>}>
+//     <RouterProvider router={router} />
+//   </Suspense>
+// );
+export const RouterWrapper = () => {
+  const dispatch = useAppDispatch();
+
+  const restoreSession = async () => {
+    console.log("dfndkbvkdsvkdfvbdkvkf")
+    try {
+      const res = await api.get("/auth/me");
+      console.log("dhdhbdhdhdbhddh");
+      console.log(res.data)
+      dispatch(setAuth(res.data.user));
+
+
+      dispatch(
+        setAuth({
+            token:res.data.accessToken,
+            user:res.data.user
+        })
+      )
+
+    } catch {
+      console.log("No active session");
+    }
+  };
+
+  useEffect(() => {
+    restoreSession();
+  }, []);
+
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <RouterProvider router={router} />
+    </Suspense>
+  );
+};

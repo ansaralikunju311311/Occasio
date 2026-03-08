@@ -1,7 +1,7 @@
 import { Router } from "express";
 // import { AuthController } from "./auth.controller.js";
 import { makeAuthController } from "../../../container/auth.container.js";
-// import { verifyAccessToken } from "./verifyAccessToken.middleware.js";
+import { verifyAccessToken } from "./verifyAccessToken.middleware.js";
 // import { AuthController } from "./auth.controller.js";
 
 const router = Router();
@@ -21,7 +21,7 @@ router.post("/admin/login",controller.adminlogin.bind(controller))
 
 
 
-// router.get("/me",controller.getMe.bind(controller));
+router.get("/me",verifyAccessToken,controller.getMe.bind(controller));
 
 
 
