@@ -1,5 +1,7 @@
-import { useAppSelector } from "../../redux/hook";
-
+import { useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "../../redux/hook";
+import { setAuth } from "../../redux/slices/authSlice";
+import api from "../../services/api";
 const AdminDashboard = () => {
     const stats = [
         { title: "Total Users", value: "1,248", icon: "👥", trend: "+12%" },
@@ -8,7 +10,28 @@ const AdminDashboard = () => {
         { title: "Total Revenue", value: "$45,231", icon: "💰", trend: "+24%" }
     ];
 
-    const user = useAppSelector((state)=>state.auth.user)
+    const user = useAppSelector((state)=>state.auth.user);
+    const dispatch = useAppDispatch()
+
+
+    useEffect(()=>{
+         const restoreSession = async()=>{
+                try {
+                  const response = await api.get("/auth/me");
+                  dispatch(
+                    setAuth({
+                      token: response.data.accessToken,
+                      user: response.data.user
+                    })
+                  );
+                  console.log(response);
+                } catch (error) {
+                  console.error("error  where the    erorooorororo",error);
+                }
+              };
+              restoreSession();
+    },[dispatch])
+
 
     return (
         <div className="animate-fade-in-up">
