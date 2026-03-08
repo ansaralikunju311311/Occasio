@@ -21,6 +21,10 @@ router.post("/admin/login",controller.adminlogin.bind(controller))
 
 
 
-router.get("/me",controller.getMe.bind(controller))
+router.get("/me",controller.getMe.bind(controller));
+
+
+
+router.post("/logout",controller.logout.bind(controller));
 // router.post("/signup",controller.signup)
 export default router;

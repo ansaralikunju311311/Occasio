@@ -251,9 +251,26 @@ export class AuthController {
     next(error);
   }
 }
+async logout(_req:Request,res:Response,_next:NextFunction){
+     
 
+   console.log("function cfknvnf")
+
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "strict",
+  });
+
+  res.status(200).json({
+    message: "Logged out",
+  });
+}
 }
 
+
+
+    
 
 
  

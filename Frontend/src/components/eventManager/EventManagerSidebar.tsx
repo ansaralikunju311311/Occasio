@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../../redux/hook";
 import { logout } from "../../redux/slices/authSlice";
+import api from "../../services/api";
 
 const EventManagerSidebar = () => {
     const navigate = useNavigate()
@@ -8,11 +9,19 @@ const EventManagerSidebar = () => {
     const dispatch = useAppDispatch();
 
 
-    const handlelogout =()=>{
+    const handlelogout = async ()=>{
+      
+        try {
+            const response = await api.post("/logout");
+            console.log(response)
         dispatch(
             logout()
         )
         navigate("/login")
+        } catch (error) {
+            console.log(error)
+        }
+       
     }
 
     const navLinks = [
