@@ -18,6 +18,7 @@ const Navbar = () => {
     try {
       const response = await api.post("/auth/logout");
       console.log(response)
+      localStorage.removeItem("accessToken")
       dispatch(logout());
       navigate("/");
     } catch (error) {

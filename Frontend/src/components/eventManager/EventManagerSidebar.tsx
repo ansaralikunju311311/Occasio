@@ -30,6 +30,7 @@ const EventManagerSidebar = () => {
         console.log("fvnfjnvdfjvndfj")
         try {
             const response  = await api.post("/auth/logout");
+            localStorage.removeItem("accessToken")
              dispatch(
              logout()
         )
