@@ -4,6 +4,7 @@ import { useAppDispatch } from "../redux/hook.ts";
 import { setAuth } from "../redux/slices/authSlice.ts";
 import {api} from '../services/api.ts'
 import MainLayout from "../layouts/MainLayout";
+import {ProtectedRoute,ProtectedRouteAdmin} from "../components/ProtectedRoute/ProtectedRoute.tsx";
 const LandingPage = lazy(() => import("../pages/LandingPage"));
 
 const LoginPage = lazy(() => import("../pages/user/LoginPage.tsx"));
@@ -59,7 +60,7 @@ export const router = createBrowserRouter([
 
   {
     path: "/admin",
-    element: <AdminLayout />,
+    element: (<ProtectedRouteAdmin><AdminLayout /></ProtectedRouteAdmin>),
     children: [
       { path: "dashboard", element: <AdminDashboard /> },
       { path: "events", element: <AdminPlaceholder /> },
@@ -72,7 +73,9 @@ export const router = createBrowserRouter([
 
   {
     path: "/eventmanager",
-    element: <EventManagerLayout />,
+    element: (
+      <ProtectedRoute><EventManagerLayout /></ProtectedRoute>
+    ),
     children: [
       { index:true, element: <EventManagerDashboard /> },
       { path: "create-event", element: <EventManagerPlaceholder /> },
