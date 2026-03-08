@@ -38,6 +38,7 @@ const LoginPage = () => {
 
       })
          console.log("response",response.data.accessToken)
+         localStorage.setItem("accessToken",response.data.accessToken)
 
       dispatch(
         setAuth({
