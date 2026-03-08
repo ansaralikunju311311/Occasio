@@ -185,7 +185,7 @@ export class AuthController {
 
       const {email,password,role} = req.body;
       // console.log(req.body)
-      const user= await this.AdminLoginUseCase.execute({email,password,role});
+      const {user,accessToken}= await this.AdminLoginUseCase.execute({email,password,role});
 
         //   res.cookie("refreshToken",refreshToken,{
         //   httpOnly:true,
@@ -198,7 +198,7 @@ export class AuthController {
         // console.log("onnn check,",user,refreshToken,accessToken)
        res.status(HttpStatus.OK).json({message:'user login correctly'
         ,
-        user})
+        user,accessToken})
     } catch (error:any) {
       next(error)
     }

@@ -15,6 +15,7 @@ const AdminSidebar = () => {
     dispatch(
         logout()
     );
+    localStorage.removeItem("accessToken")
     console.log(response)
       navigate("/adminlogin")
     } catch (error) {

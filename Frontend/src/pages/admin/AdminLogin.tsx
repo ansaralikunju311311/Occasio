@@ -27,6 +27,7 @@ const AdminLogin = () => {
                 role: "ADMIN"
             });
 
+                    localStorage.setItem("accessToken",response.data.accessToken)
 
 
             dispath(
