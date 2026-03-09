@@ -242,7 +242,7 @@ logout = async (req: Request, res: Response) => {
       const refreshToken = req.cookies.refreshToken;
 
       if(!refreshToken){
-        res.status(HttpStatus.UNAUTHORIZED).json({
+        return res.status(HttpStatus.UNAUTHORIZED).json({
           message:'Refresh Token is missing'
         })
       }
