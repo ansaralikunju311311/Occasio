@@ -94,7 +94,7 @@ export class AuthController {
 
 
         console.log('opt verification come data',req.body)
-        const user = await this.VerifyUseCase.execute({email,otp});
+        const {user,accessToken} = await this.VerifyUseCase.execute({email,otp});
 
         //     res.cookie("refreshToken",refreshToken,{
         //   httpOnly:true,
@@ -105,7 +105,7 @@ export class AuthController {
 
         //  console.log("checking",user,refreshToken,accessToken)
       res.status(HttpStatus.OK).json({
-          message:'the otp verification completed',user
+          message:'the otp verification completed',user,accessToken
         })
       }
       catch(error:any){

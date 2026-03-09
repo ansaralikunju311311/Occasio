@@ -36,7 +36,7 @@ export class SignupUsecase{
         let otpSendAt = new Date()
         let otp = generateOTP();
         
-        const otpExpires = new Date(Date.now() + 1 * 60 * 1000);
+        const otpExpires = new Date(Date.now() + 5 * 60 * 1000);
         // console.log("evde ethyoooo")
         const checkig = await this.emailService.sendOtpEmail(data.email,otp);
         console.log("reched here",checkig)

@@ -8,11 +8,11 @@ import { LoginResponseDto } from "../dtos/loginResponse.dto.js";
 export class VerifyUseCase{
     constructor(
         private userRepository :IUserRepository,
-        // private tokenService :ITokenService
+         private tokenService :ITokenService
     ){}
 
 
-    async execute(data:VerfiyOtpDto):Promise<User>{
+    async execute(data:VerfiyOtpDto):Promise<LoginResponseDto>{
 
 
         console.log("body daata for the otp verifction",data)
@@ -51,16 +51,16 @@ export class VerifyUseCase{
         console.log(user.isVerified)
         const updateUser = await this.userRepository.update(user);
 
-        // const accessToken =  this.tokenService.generateAccessToken({
-        //     userId:updateUser.id,
-        //     role:updateUser.role
-        // })
+        const accessToken =  this.tokenService.generateAccessToken({
+            userId:updateUser.id,
+            role:updateUser.role
+        })
         // const refreshToken =  this.tokenService.generateRefreshToken({
         //     userId : updateUser.id
         // })
 
 
-        return updateUser
+        return {user:updateUser,accessToken}
         //    accessToken,
         //    refreshToken
 

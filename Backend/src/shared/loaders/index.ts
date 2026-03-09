@@ -6,7 +6,7 @@ import cron from "node-cron";
 import { UserModel } from "../../modules/auth/infrastructure/database/user.model.js";
 
 export const clearExpiredOtpJob = () => {
-  cron.schedule("* * * * *", async () => {
+  cron.schedule("*/10 * * * *", async () => {
     try {
       const now = new Date();
 

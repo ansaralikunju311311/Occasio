@@ -42,7 +42,7 @@ export class ResendotpUseCase{
        const  newOtp = generateOTP();
        console.log('generated',newOtp)
        user.otp = newOtp;
-       user.otpExpires = new Date(now.getTime() + 1 * 60 * 1000);
+       user.otpExpires = new Date(now.getTime() + 5 * 60 * 1000);
        user.otpType = user.otpType,
        user.otpSendAt= now
           await this.emailService.sendOtpEmail(user.email,newOtp)

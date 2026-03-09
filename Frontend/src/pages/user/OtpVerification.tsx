@@ -86,6 +86,7 @@ const OtpVerification = () => {
       })
       console.log(response);
       localStorage.removeItem("user");
+                localStorage.setItem("accessToken",response.data.accessToken)
 
       dispatch(
         setAuth({
