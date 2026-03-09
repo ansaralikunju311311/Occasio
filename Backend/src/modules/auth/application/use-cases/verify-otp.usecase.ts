@@ -55,12 +55,12 @@ export class VerifyUseCase{
             userId:updateUser.id,
             role:updateUser.role
         })
-        // const refreshToken =  this.tokenService.generateRefreshToken({
-        //     userId : updateUser.id
-        // })
+        const refreshToken =  this.tokenService.generateRefreshToken({
+            userId : updateUser.id
+        })
 
 
-        return {user:updateUser,accessToken}
+        return {user:updateUser,accessToken,refreshToken}
         //    accessToken,
         //    refreshToken
 

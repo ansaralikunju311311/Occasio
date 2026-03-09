@@ -8,7 +8,7 @@ import { ResetPasswordUseCase } from "../application/use-cases/resetpassword.use
 import { HttpStatus } from "../../../common/constants/http-stattus.js";
 import { AdminLoginUseCase } from "../application/use-cases/adminlogin.use.js";
 import { GetmeUseCase } from "../application/use-cases/getme.usecase.js";
-// import { CreateToken } from "../../../common/service/token.service.js";
+import { CreateToken } from "../../../common/service/token.service.js";
 // import { ITokenService } from "../domain/services/token.service.interface.js";
 export class AuthController {
   constructor(private SignupUsecase :SignupUsecase,
@@ -19,6 +19,7 @@ export class AuthController {
        private ResetPasswordUseCase : ResetPasswordUseCase,
        private AdminLoginUseCase  :AdminLoginUseCase,
        private GetmeUseCase : GetmeUseCase,
+       private tokenService : CreateToken
       //  private tokenService:ITokenService
        
   ){}
@@ -66,15 +67,15 @@ export class AuthController {
 
       const {email,password,role} = req.body;
       console.log(req.body)
-      const {user,accessToken}= await this.LoginUseCase.execute({email,password,role});
+      const {user,accessToken,refreshToken}= await this.LoginUseCase.execute({email,password,role});
 
 
-        //  res.cookie("refreshToken",refreshToken,{
-        //   httpOnly:true,
-        //   secure:true,
-        //   sameSite:"strict",
-        //   maxAge:7*24*60*60*1000
-        //  })
+          res.cookie("refreshToken",refreshToken,{
+          httpOnly:true,
+          secure:false,
+          sameSite:"lax",
+          maxAge:7*24*60*60*1000
+         })
 
 
 
@@ -94,14 +95,14 @@ export class AuthController {
 
 
         console.log('opt verification come data',req.body)
-        const {user,accessToken} = await this.VerifyUseCase.execute({email,otp});
+        const {user,accessToken,refreshToken} = await this.VerifyUseCase.execute({email,otp});
 
-        //     res.cookie("refreshToken",refreshToken,{
-        //   httpOnly:true,
-        //   secure:true,
-        //   sameSite:"strict",
-        //   maxAge:7*24*60*60*1000
-        //  })
+            res.cookie("refreshToken",refreshToken,{
+          httpOnly:true,
+          secure:false,
+          sameSite:"lax",
+          maxAge:7*24*60*60*1000
+         })
 
         //  console.log("checking",user,refreshToken,accessToken)
       res.status(HttpStatus.OK).json({
@@ -185,14 +186,14 @@ export class AuthController {
 
       const {email,password,role} = req.body;
       // console.log(req.body)
-      const {user,accessToken}= await this.AdminLoginUseCase.execute({email,password,role});
+      const {user,accessToken,refreshToken}= await this.AdminLoginUseCase.execute({email,password,role});
 
-        //   res.cookie("refreshToken",refreshToken,{
-        //   httpOnly:true,
-        //   secure:true,
-        //   sameSite:"strict",
-        //   maxAge:7*24*60*60*1000
-        //  })
+          res.cookie("refreshToken",refreshToken,{
+          httpOnly:true,
+          secure:false,
+          sameSite:"lax",
+          maxAge:7*24*60*60*1000
+         })
          
          
         // console.log("onnn check,",user,refreshToken,accessToken)
@@ -205,12 +206,18 @@ export class AuthController {
     }
 
       
-   async logout(_req: Request, res: Response, _next: NextFunction) {
-  res.status(HttpStatus.OK).json({
-    success: true,
-    message: "Logout successful"
+logout = async (req: Request, res: Response) => {
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: false, // true in production (HTTPS)
+    sameSite: "lax"
   });
-}
+
+  return res.status(200).json({
+    success: true,
+    message: "Logged out successfully"
+  });
+};
 
     async getMe(req:Request,res:Response){
 
@@ -230,6 +237,40 @@ export class AuthController {
     }
 
 
+
+    async refreshToken(req:Request,res:Response){
+      const refreshToken = req.cookies.refreshToken;
+
+      if(!refreshToken){
+        res.status(HttpStatus.UNAUTHORIZED).json({
+          message:'Refresh Token is missing'
+        })
+      }
+       
+
+      try {
+          const decode = this.tokenService.verifyRefreshToken(refreshToken) as any
+
+           
+          const newaccessToken = this.tokenService.generateAccessToken({
+            userId:decode.userId,
+            role:decode.role
+          })
+
+
+          return res.json({
+            accessToken:newaccessToken
+          })
+      } catch (error) {
+        
+
+        return res.status(HttpStatus.UNAUTHORIZED).json({
+          message:"Invalid Refresh Token"
+        })
+      }
+
+
+    }
 
 
 }

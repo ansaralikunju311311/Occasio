@@ -26,5 +26,7 @@ router.get("/me",verifyAccessToken,controller.getMe.bind(controller));
 
 
 router.post("/logout",controller.logout.bind(controller));
+
+router.post("/refresh",controller.refreshToken.bind(controller))
 // router.post("/signup",controller.signup)
 export default router;

@@ -134,29 +134,96 @@ api.interceptors.request.use((config) => {
 
 /* RESPONSE INTERCEPTOR */
 
+// api.interceptors.response.use(
+//   (response) => response,
+
+//   (error) => {
+//     if (error.response?.status === 401) {
+//       console.log("Unauthorized (401) detected → clearing session");
+
+//       // Clear the invalid token
+//       localStorage.removeItem("accessToken");
+
+//       const skipRedirectPages = ["/", "/login", "/adminlogin", "/signup", "/otpverification", "/forgotpassword", "/resetpassword"];
+//       const currentPath = window.location.pathname;
+
+//       // Only redirect if NOT already on a public or auth page
+//       if (!skipRedirectPages.includes(currentPath)) {
+//         console.log("Redirecting to login portal");
+//         if (currentPath.startsWith("/admin")) {
+//           window.location.href = "/adminlogin";
+//         } else {
+//           window.location.href = "/login";
+//         }
+//       } else {
+//         console.log("On a public or auth page, skipping redirect");
+//       }
+//     }
+
+//     return Promise.reject(error);
+//   }
+// );
+
+
+
+
+
 api.interceptors.response.use(
   (response) => response,
 
-  (error) => {
-    if (error.response?.status === 401) {
-      console.log("Unauthorized (401) detected → clearing session");
+  async (error) => {
+    const originalRequest = error.config;
 
-      // Clear the invalid token
-      localStorage.removeItem("accessToken");
+    if (error.response?.status === 401 && !originalRequest._retry) {
 
-      const skipRedirectPages = ["/", "/login", "/adminlogin", "/signup", "/otpverification", "/forgotpassword", "/resetpassword"];
-      const currentPath = window.location.pathname;
+      originalRequest._retry = true;
 
-      // Only redirect if NOT already on a public or auth page
-      if (!skipRedirectPages.includes(currentPath)) {
-        console.log("Redirecting to login portal");
-        if (currentPath.startsWith("/admin")) {
-          window.location.href = "/adminlogin";
-        } else {
-          window.location.href = "/login";
+      try {
+        console.log("Access token expired → trying refresh");
+
+        const res = await api.post("/auth/refresh");
+
+        const newAccessToken = res.data.accessToken;
+
+        // store new access token
+        localStorage.setItem("accessToken", newAccessToken);
+
+        // update header
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+
+        console.log("New access token received → retrying request");
+
+        return api(originalRequest);
+
+      } catch (refreshError) {
+
+        console.log("Refresh token failed → logging out");
+
+        localStorage.removeItem("accessToken");
+
+        const skipRedirectPages = [
+          "/",
+          "/login",
+          "/adminlogin",
+          "/signup",
+          "/otpverification",
+          "/forgotpassword",
+          "/resetpassword"
+        ];
+
+        const currentPath = window.location.pathname;
+
+        if (!skipRedirectPages.includes(currentPath)) {
+
+          if (currentPath.startsWith("/admin")) {
+            window.location.href = "/adminlogin";
+          } else {
+            window.location.href = "/login";
+          }
+
         }
-      } else {
-        console.log("On a public or auth page, skipping redirect");
+
+        return Promise.reject(refreshError);
       }
     }
 

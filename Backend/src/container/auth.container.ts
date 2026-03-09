@@ -30,6 +30,7 @@ export const makeAuthController = () => {
   const resetPasswordUseCase = new ResetPasswordUseCase(userRepository,hashService);
   const adminLoginUseCase  = new AdminLoginUseCase(userRepository,hashService,createToken)
   const getmeUseCase = new GetmeUseCase(userRepository)
+  const  createtoken = new CreateToken();
 
-  return new AuthController(signupUsecase,loginUseCase,verifyUseCase,resendotpUseCase,forgotPasswordUsecase,resetPasswordUseCase,adminLoginUseCase,getmeUseCase);
+  return new AuthController(signupUsecase,loginUseCase,verifyUseCase,resendotpUseCase,forgotPasswordUsecase,resetPasswordUseCase,adminLoginUseCase,getmeUseCase,createtoken);
 };

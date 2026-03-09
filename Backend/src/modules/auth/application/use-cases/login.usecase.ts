@@ -44,9 +44,9 @@ export class LoginUseCase{
   role: user.role
 })
 
-//   const refreshToken = this.tokenService.generateRefreshToken({
-//     userId:user.id
-//   })
+  const refreshToken = this.tokenService.generateRefreshToken({
+    userId:user.id
+  })
     
     //  console.log("for the login setup",user)
 
@@ -56,7 +56,8 @@ export class LoginUseCase{
   //  }
   return {
     user,
-    accessToken
+    accessToken,
+    refreshToken
   }
    
 
