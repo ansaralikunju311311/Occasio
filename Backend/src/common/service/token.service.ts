@@ -6,6 +6,9 @@ export class CreateToken{
 
     generateAccessToken(payload:object):string{
 
+
+
+        console.log("ACCESS SECRET:", process.env.JWT_ACCESS_SECRET);
         const options: SignOptions={
             expiresIn:process.env.JWT_ACCESS_EXPIRES as StringValue
         }

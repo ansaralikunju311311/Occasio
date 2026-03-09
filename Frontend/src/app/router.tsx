@@ -1,10 +1,10 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { lazy, Suspense,useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { useAppDispatch } from "../redux/hook.ts";
-import { setAuth } from "../redux/slices/authSlice.ts";
-import {api} from '../services/api.ts'
+import { setAuth, logout } from "../redux/slices/authSlice.ts";
+import { api } from '../services/api.ts'
 import MainLayout from "../layouts/MainLayout";
-import {ProtectedRoute,ProtectedRouteAdmin} from "../components/ProtectedRoute/ProtectedRoute.tsx";
+// import { ProtectedRoute, ProtectedRouteAdmin } from "../components/ProtectedRoute/AuthGuard.tsx";
 const LandingPage = lazy(() => import("../pages/LandingPage"));
 
 const LoginPage = lazy(() => import("../pages/user/LoginPage.tsx"));
@@ -60,7 +60,13 @@ export const router = createBrowserRouter([
 
   {
     path: "/admin",
-    element: (<ProtectedRouteAdmin><AdminLayout /></ProtectedRouteAdmin>),
+    element: (
+
+      <AdminLayout />
+
+
+
+    ),
     children: [
       { path: "dashboard", element: <AdminDashboard /> },
       { path: "events", element: <AdminPlaceholder /> },
@@ -74,10 +80,12 @@ export const router = createBrowserRouter([
   {
     path: "/eventmanager",
     element: (
-      <ProtectedRoute><EventManagerLayout /></ProtectedRoute>
+   
+        <EventManagerLayout />
+     
     ),
     children: [
-      { index:true, element: <EventManagerDashboard /> },
+      { index: true, element: <EventManagerDashboard /> },
       { path: "create-event", element: <EventManagerPlaceholder /> },
       { path: "my-events", element: <EventManagerPlaceholder /> },
       { path: "bookings", element: <EventManagerPlaceholder /> },
@@ -101,28 +109,34 @@ export const RouterWrapper = () => {
   const dispatch = useAppDispatch();
 
   const restoreSession = async () => {
-    console.log("dfndkbvkdsvkdfvbdkvkf")
     try {
       const res = await api.get("/auth/me");
-      console.log("dhdhbdhdhdbhddh");
-      console.log(res.data)
-      dispatch(setAuth(res.data.user));
-
-
-      dispatch(
-        setAuth({
-            token:res.data.accessToken,
-            user:res.data.user
-        })
-      )
-
-    } catch {
-      console.log("No active session");
+      if (res.data) {
+        dispatch(
+          setAuth({
+            token: res.data.accessToken || localStorage.getItem("accessToken"),
+            user: res.data.user
+          })
+        );
+      }
+    } catch (error) {
+      console.log("No active session or invalid token:", error);
+      // interceptor handles the redirect, but we can ensure redux is cleared
+      dispatch(logout());
     }
   };
 
   useEffect(() => {
-    restoreSession();
+    const authPages = ["/login", "/adminlogin", "/signup", "/otpverification", "/forgotpassword", "/resetpassword"];
+    const currentPath = window.location.pathname;
+
+    // We allow restoreSession on the landing page (/) to check if user is logged in
+    // But we skip it on auth pages where they are explicitly trying to authenticate
+    if (!authPages.includes(currentPath)) {
+      restoreSession();
+    } else {
+      console.log("On auth page, skipping session restoration");
+    }
   }, []);
 
   return (
