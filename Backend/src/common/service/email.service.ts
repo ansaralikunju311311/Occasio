@@ -16,19 +16,7 @@ export class EmailSerive{
         
     });
 
-    // async sendOtpEmail(to:string,otp:string):Promise<Void>{
-    //     await this.transporter.sendMail({
-    //         from `"Occasio"<${process.env.MAIL_USER}>`,
-    //         to,
-    //         subject:"Your otp code",
-    //         html:`
-    //         <h2>Verify Your Acoount</h2>
-    //         <p>Your OTP is:</p>
-    //         <h1>${otp}</h1>
-    //         <p>This OTP expires in 5 minitues.</p>
-    //         `
-    //     });
-    // }
+    
      async sendOtpEmail(to: string, otp: string): Promise<void> {
         // console.log("evdem ethyyyy")
         console.log(process.env.MAIL_PASS   ,  process.env.MAIL_USER)

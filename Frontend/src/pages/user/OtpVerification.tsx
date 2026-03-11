@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAppDispatch } from '../../redux/hook';
 import { setAuth } from '../../redux/slices/authSlice';
+import { toast } from 'sonner';
 const OtpVerification = () => {
 
 
@@ -64,14 +65,15 @@ const OtpVerification = () => {
       })
 
       console.log(details)
+      toast.success("OTP resent successfully!");
     } catch (error: any) {
 
 
 
       if (error.response) {
-        alert(error.response.data.message);
+        toast.error(error.response.data.message);
       } else {
-        alert("Something went wrong");
+        toast.error("Something went wrong");
       }
     }
 
@@ -85,30 +87,33 @@ const OtpVerification = () => {
         otp: data.otp
       })
       console.log(response);
+      toast.success("OTP verified!");
       localStorage.removeItem("user");
-                localStorage.setItem("accessToken",response.data.accessToken)
+      localStorage.setItem("accessToken", response.data.accessToken)
 
       dispatch(
         setAuth({
-            token:response.data.accessToken,
-            user:response.data.user
+          token: response.data.accessToken,
+          user: response.data.user
         })
       )
 
 
-      if(response.data.user.role === "EVENT_MANAGER"){
-       navigate("/eventmanager")
+      if (response.data.user.role === "EVENT_MANAGER") {
+        navigate("/eventmanager")
       }
-      else if(response.data.user.role === "USER"){
-           navigate("/")
+      else if (response.data.user.role === "USER") {
+        navigate("/")
       }
-      
+
     } catch (error: any) {
+        console.log("error happen incorrect  otp")
       // localStorage.removeItem("user");
       if (error.response) {
-        alert(error.response.data.message);
+        alert(error.message)
+        toast.error(error.response.data.message);
       } else {
-        alert("Something went wrong");
+        toast.error("Something went wrong");
       }
     }
   }

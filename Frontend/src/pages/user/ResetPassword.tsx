@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import { api } from '../../services/api'
 import { useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
+import { toast } from 'sonner'
 type ResetPasswordForm = {
   otp: string
   password: string
@@ -75,8 +76,9 @@ const ResetPassword: React.FC = () => {
 
 
 
-      // For now we just log; integrate API to verify OTP & reset password here later
+    
       console.log('Reset password data:', data);
+      toast.success("Password reset successfully! Please login.");
       localStorage.removeItem("user");
       navigate("/login")
     } catch (error: any) {
@@ -84,9 +86,9 @@ const ResetPassword: React.FC = () => {
       // localStorage.removeItem("user");
 
       if (error.response) {
-        alert(error.response.data.message);
+        toast.error(error.response.data.message);
       } else {
-        alert("Something went wrong");
+        toast.error("Something went wrong");
       }
 
     }
@@ -102,14 +104,15 @@ const ResetPassword: React.FC = () => {
       })
 
       console.log(response)
+      toast.success("New OTP sent to your email!");
 
     } catch (error: any) {
 
 
       if (error.response) {
-        alert(error.response.data.message);
+        toast.error(error.response.data.message);
       } else {
-        alert("Something went wrong");
+        toast.error("Something went wrong");
       }
 
     }

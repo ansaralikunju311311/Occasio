@@ -4,12 +4,13 @@ import { useAppDispatch } from "../redux/hook.ts";
 import { setAuth, logout } from "../redux/slices/authSlice.ts";
 import { api } from '../services/api.ts'
 import MainLayout from "../layouts/MainLayout";
-// import { ProtectedRoute, ProtectedRouteAdmin } from "../components/ProtectedRoute/AuthGuard.tsx";
+
 const LandingPage = lazy(() => import("../pages/LandingPage"));
 
 const LoginPage = lazy(() => import("../pages/user/LoginPage.tsx"));
 const SignPage = lazy(() => import("../pages/user/SignupPage.tsx"))
 const OtpVerification = lazy(() => import("../pages/user/OtpVerification.tsx"));
+const OAuthSuccess = lazy(() => import("../pages/user/OAuthSuccess.tsx"));
 const ForgotPassword = lazy(() => import("../pages/user/Forgotpassword.tsx"));
 const ResetPassword = lazy(() => import("../pages/user/ResetPassword.tsx"))
 
@@ -28,7 +29,7 @@ export const router = createBrowserRouter([
     element: <MainLayout />,
     children: [
       { index: true, element: <LandingPage /> },
-      //  { path: "/login", element: <LoginPage /> },
+      
     ],
   },
 
@@ -57,6 +58,10 @@ export const router = createBrowserRouter([
     path: "/resetpassword",
     element: <ResetPassword />
   },
+  {
+    path: "/oauth-success",
+    element: <OAuthSuccess />
+  },
 
   {
     path: "/admin",
@@ -80,9 +85,9 @@ export const router = createBrowserRouter([
   {
     path: "/eventmanager",
     element: (
-   
-        <EventManagerLayout />
-     
+
+      <EventManagerLayout />
+
     ),
     children: [
       { index: true, element: <EventManagerDashboard /> },
@@ -100,11 +105,11 @@ export const router = createBrowserRouter([
 
 ]);
 
-// export const RouterWrapper = () => (
-//   <Suspense fallback={<div>Loading...</div>}>
-//     <RouterProvider router={router} />
-//   </Suspense>
-// );
+
+
+
+
+
 export const RouterWrapper = () => {
   const dispatch = useAppDispatch();
 
@@ -121,7 +126,7 @@ export const RouterWrapper = () => {
       }
     } catch (error) {
       console.log("No active session or invalid token:", error);
-      // interceptor handles the redirect, but we can ensure redux is cleared
+      
       dispatch(logout());
     }
   };
@@ -130,8 +135,8 @@ export const RouterWrapper = () => {
     const authPages = ["/login", "/adminlogin", "/signup", "/otpverification", "/forgotpassword", "/resetpassword"];
     const currentPath = window.location.pathname;
 
-    // We allow restoreSession on the landing page (/) to check if user is logged in
-    // But we skip it on auth pages where they are explicitly trying to authenticate
+    
+    
     if (!authPages.includes(currentPath)) {
       restoreSession();
     } else {

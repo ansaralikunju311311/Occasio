@@ -48,12 +48,7 @@ export class LoginUseCase{
     userId:user.id
   })
     
-    //  console.log("for the login setup",user)
-
-    //  return user
-  //     accessToken,
-  //     refreshToken
-  //  }
+ 
   return {
     user,
     accessToken,

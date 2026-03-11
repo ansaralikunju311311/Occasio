@@ -1,7 +1,8 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../../redux/hook";
 import { logout } from "../../redux/slices/authSlice";
-import {api} from "../../services/api";
+import { api } from "../../services/api";
+import { toast } from "sonner"
 
 const EventManagerSidebar = () => {
     const navigate = useNavigate()
@@ -21,32 +22,32 @@ const EventManagerSidebar = () => {
     //     } catch (error) {
     //         console.log(error)
     //     }
-       
+
     // }
 
 
 
-    const handlelogout = async()=>{
+    const handlelogout = async () => {
         console.log("fvnfjnvdfjvndfj")
         try {
-            const response  = await api.post("/auth/logout");
+            const response = await api.post("/auth/logout");
             localStorage.removeItem("accessToken")
-             dispatch(
-             logout()
-        )
+            dispatch(
+                logout()
+            )
 
 
-       console.log("the event come here?")
+            console.log("the event come here?")
 
             navigate('/')
             console.log(response)
-        } catch(error:any){
-            console.log("errpr",error)
-             if (error.response) {
-        alert(error.response.data.message);
-      } else {
-        alert("Something went wrong");
-      }
+        } catch (error: any) {
+            console.log("errpr", error)
+            if (error.response) {
+                toast.error(error.response.data.message || "Logout failed");
+            } else {
+                toast.error("Something went wrong");
+            }
 
         }
     }
@@ -164,14 +165,14 @@ const EventManagerSidebar = () => {
                     Logout
                 </button> */}
                 <button
-  className="flex w-full items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-semibold text-slate-400 hover:bg-red-500/10 hover:text-red-400 border border-transparent hover:border-red-500/20 transition-all duration-200 group"
-  onClick={handlelogout}
->
-  <svg className="w-5 h-5 text-slate-500 group-hover:text-red-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-  </svg>
-  Logout
-</button>
+                    className="flex w-full items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-semibold text-slate-400 hover:bg-red-500/10 hover:text-red-400 border border-transparent hover:border-red-500/20 transition-all duration-200 group"
+                    onClick={handlelogout}
+                >
+                    <svg className="w-5 h-5 text-slate-500 group-hover:text-red-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    Logout
+                </button>
             </div>
 
         </aside>

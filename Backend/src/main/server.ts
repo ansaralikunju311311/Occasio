@@ -1,5 +1,4 @@
-// import dotenv from 'dotenv'
-// dotenv.config()
+
 
 import "../shared/config/env.js"
 import app from '../main/app.js'

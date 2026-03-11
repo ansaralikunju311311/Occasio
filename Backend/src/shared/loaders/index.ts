@@ -24,7 +24,6 @@ export const clearExpiredOtpJob = () => {
         }
       );
 
-      console.log("Expired OTPs cleared");
     } catch (error) {
       console.error("Cron job error:", error);
     }

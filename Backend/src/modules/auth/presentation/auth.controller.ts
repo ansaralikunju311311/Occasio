@@ -272,6 +272,34 @@ logout = async (req: Request, res: Response) => {
 
     }
 
+    async googleLogin(req: Request, res: Response) {
+
+  const user = req.user as any;
+
+  if (!user || !user.id) {
+    return res.status(HttpStatus.UNAUTHORIZED).json({
+      message: "User not found"
+    });
+  }
+
+  const accessToken = this.tokenService.generateAccessToken({
+    userId: user.id,
+    role: user.role
+  });
+
+  const refreshToken = this.tokenService.generateRefreshToken({
+    userId: user.id
+  });
+
+  res.cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax"
+  });
+
+  res.redirect(`http://localhost:5173/oauth-success?token=${accessToken}`);
+}
+
 
 }
 

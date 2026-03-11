@@ -3,6 +3,7 @@ import SideImage from '../../assets/SideImage.jpg'
 import { useForm } from 'react-hook-form'
 import { api } from '../../services/api'
 import { useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
 type ForgotPasswordForm = {
   email: string
 }
@@ -31,6 +32,7 @@ const Forgotpassword = () => {
       })
 
       console.log(response)
+      toast.success("Recovery OTP sent to your email!");
 
 
       localStorage.setItem("user", JSON.stringify(response.data.data));
@@ -39,9 +41,9 @@ const Forgotpassword = () => {
       console.log(response)
     } catch (error: any) {
       if (error.response) {
-        alert(error.response.data.message);
+        toast.error(error.response.data.message || "Failed to send OTP");
       } else {
-        alert("Something went wrong");
+        toast.error("Something went wrong");
       }
     }
 

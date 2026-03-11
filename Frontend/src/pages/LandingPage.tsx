@@ -92,7 +92,7 @@ const LandingPage = () => {
                   </button>
                 ) : (
                   <button
-                    onClick={() => navigate("/")} // Just to have a secondary button, or maybe logout is better?
+                    onClick={() => navigate("/")} 
                     className="w-full sm:w-auto px-8 py-4 rounded-xl bg-slate-900/50 backdrop-blur-sm text-white font-semibold text-lg border border-slate-700 shadow-sm hover:border-slate-500 hover:bg-slate-800 hover:-translate-y-1 transition-all duration-300"
                   >
                     View Site

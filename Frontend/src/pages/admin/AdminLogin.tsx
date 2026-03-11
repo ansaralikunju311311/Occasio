@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import type { LoginDataType } from "../../types/auth.type";
 import { api } from '../../services/api';
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { useAppDispatch } from "../../redux/hook";
 import { setAuth } from "../../redux/slices/authSlice";
 
@@ -27,13 +28,13 @@ const AdminLogin = () => {
                 role: "ADMIN"
             });
 
-                    localStorage.setItem("accessToken",response.data.accessToken)
+            localStorage.setItem("accessToken", response.data.accessToken)
 
 
             dispath(
                 setAuth({
-                    token:response.data.accessToken,
-                    user:response.data.user
+                    token: response.data.accessToken,
+                    user: response.data.user
                 })
             )
 
@@ -45,11 +46,11 @@ const AdminLogin = () => {
             navigate("/admin/dashboard");
         } catch (error: any) {
             if (error.response) {
-                alert(error.response.data.message);
+                toast.error(error.response.data.message || "Admin login failed");
             } else {
-                alert("Something went wrong");
+                toast.error("Something went wrong");
             }
-        } 
+        }
         // finally {
         //     setIsLoading(false);
         // }
@@ -162,7 +163,7 @@ const AdminLogin = () => {
                                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                     </svg>
                                 ) : ( */}
-                                    "Establish Connection"
+                                "Establish Connection"
                                 {/* )} */}
                             </button>
                         </div>
