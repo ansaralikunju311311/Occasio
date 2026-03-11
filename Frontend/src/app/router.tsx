@@ -3,6 +3,7 @@ import { lazy, Suspense, useEffect } from "react";
 import { useAppDispatch } from "../redux/hook.ts";
 import { setAuth, logout } from "../redux/slices/authSlice.ts";
 import { api } from '../services/api.ts'
+import LoadingSpinner from "../components/common/LoadingSpinner";
 import MainLayout from "../layouts/MainLayout";
 
 const LandingPage = lazy(() => import("../pages/LandingPage"));
@@ -29,7 +30,7 @@ export const router = createBrowserRouter([
     element: <MainLayout />,
     children: [
       { index: true, element: <LandingPage /> },
-      
+
     ],
   },
 
@@ -126,7 +127,7 @@ export const RouterWrapper = () => {
       }
     } catch (error) {
       console.log("No active session or invalid token:", error);
-      
+
       dispatch(logout());
     }
   };
@@ -135,8 +136,8 @@ export const RouterWrapper = () => {
     const authPages = ["/login", "/adminlogin", "/signup", "/otpverification", "/forgotpassword", "/resetpassword"];
     const currentPath = window.location.pathname;
 
-    
-    
+
+
     if (!authPages.includes(currentPath)) {
       restoreSession();
     } else {
@@ -145,7 +146,7 @@ export const RouterWrapper = () => {
   }, []);
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<LoadingSpinner />}>
       <RouterProvider router={router} />
     </Suspense>
   );
