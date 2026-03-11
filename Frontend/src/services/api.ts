@@ -174,7 +174,12 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // List of auth endpoints that should NOT trigger a token refresh on 401
+    const authEndpoints = ["/auth/login", "/auth/verify-otp", "/auth/signup", "/auth/resend-otp", "/auth/forgot-password", "/auth/reset-password", "/auth/admin-login"];
+
+    const isAuthRequest = authEndpoints.some(endpoint => originalRequest.url?.includes(endpoint));
+
+    if (error.response?.status === 401 && !originalRequest._retry && !isAuthRequest) {
 
       originalRequest._retry = true;
 
