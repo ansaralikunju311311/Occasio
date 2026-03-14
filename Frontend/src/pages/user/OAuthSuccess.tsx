@@ -21,7 +21,6 @@ const OAuthSuccess = () => {
                     if (response.data && response.data.user) {
                         dispatch(
                             setAuth({
-                                token: token,
                                 user: response.data.user,
                             })
                         );

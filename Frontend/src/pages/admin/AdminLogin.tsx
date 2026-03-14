@@ -34,7 +34,6 @@ const AdminLogin = () => {
 
             dispath(
                 setAuth({
-                    token: response.data.accessToken,
                     user: response.data.user
                 })
             )

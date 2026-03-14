@@ -155,7 +155,6 @@ const BecomeAManager: React.FC = () => {
 
       dispatch(
              setAuth({
-               token: response.data.accessToken,
                user: response.data.user
              })
            )

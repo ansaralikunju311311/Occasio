@@ -144,7 +144,6 @@ export const RouterWrapper = () => {
       if (res.data) {
         dispatch(
           setAuth({
-            token: res.data.accessToken || localStorage.getItem("accessToken"),
             user: res.data.user
           })
         );

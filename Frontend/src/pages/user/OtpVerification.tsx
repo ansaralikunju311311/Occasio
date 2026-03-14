@@ -97,7 +97,6 @@ const OtpVerification = () => {
 
       dispatch(
         setAuth({
-          token: response.data.accessToken,
           user: response.data.user
         })
       )

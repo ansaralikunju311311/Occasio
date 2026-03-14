@@ -36,7 +36,6 @@ const LoginPage = () => {
 
       dispatch(
         setAuth({
-          token: response.data.accessToken,
           user: response.data.user
         })
       )

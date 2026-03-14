@@ -1,8 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "../redux/hook";
-// import { useEffect } from "react";
-// import {api} from '../services/api'
-// import { setAuth } from "../redux/slices/authSlice";
 const LandingPage = () => {
 
 
@@ -17,23 +14,6 @@ const LandingPage = () => {
 
   console.log("dat from the redux", user)
 
-  // useEffect(()=>{
-  //   const restoreSession = async()=>{
-  //     try {
-  //       const response = await api.get("/auth/me");
-  //       dispatch(
-  //         setAuth({
-  //           token: response.data.accessToken,
-  //           user: response.data.user
-  //         })
-  //       );
-  //       console.log(response);
-  //     } catch (error) {
-  //       console.error("error  where the    erorooorororo",error);
-  //     }
-  //   };
-  //   restoreSession();
-  // },[dispatch]);
 
 
   return (

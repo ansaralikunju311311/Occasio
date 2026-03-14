@@ -1,6 +1,4 @@
-// import { useEffect } from "react";
 import { useAppSelector } from "../../redux/hook";
-// import { setAuth } from "../../redux/slices/authSlice";
 import { api } from "../../services/api";
 const AdminDashboard = () => {
     const stats = [
@@ -14,23 +12,6 @@ const AdminDashboard = () => {
     // const dispatch = useAppDispatch()
     console.log(user)
 
-    // useEffect(()=>{
-    //      const restoreSession = async()=>{
-    //             try {
-    //               const response = await api.get("/auth/me");
-    //               dispatch(
-    //                 setAuth({
-    //                   token: response.data.accessToken,
-    //                   user: response.data.user
-    //                 })
-    //               );
-    //               console.log(response);
-    //             } catch (error) {
-    //               console.error("error  where the    erorooorororo",error);
-    //             }
-    //           };
-    //           restoreSession();
-    // },[dispatch])
 
 
     return (
