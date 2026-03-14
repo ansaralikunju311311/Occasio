@@ -4,6 +4,7 @@ import type { SignDataType } from '../../types/auth.type'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../../services/api'
 import { Link } from 'react-router-dom'
+import PasswordInput from '../../components/common/PasswordInput'
 import { toast } from 'sonner'
 const SignupPage = () => {
   const navigate = useNavigate()
@@ -19,23 +20,19 @@ const SignupPage = () => {
 
 
   const onSubmit = async (data: SignDataType) => {
-    const roleValue = data.remember ? "EVENT_MANAGER" : "USER"
     try {
-      console.log("bvuvhjgyjttffyjttfyjtfyr")
+      console.log("Submitting signup...")
       const response = await api.post("/auth/signup", {
         name: data.name,
         email: data.email,
         password: data.password,
         confirmpassword: data.confirmpassword,
-        role: roleValue
+        role: "USER"
       })
 
-
       localStorage.setItem("user", JSON.stringify(response.data.data));
-
       toast.success("Account created! Please verify your email.");
       navigate("/otpverification")
-      console.log('Submitted Data:', response)
     } catch (error: any) {
       if (error.response) {
         toast.error(error.response.data.message || "Signup failed");
@@ -86,6 +83,7 @@ const SignupPage = () => {
                 placeholder="Enter your name"
                 {...register("name", {
                   required: "Name is required",
+                  validate: (value) => value.trim().length >= 3 || "Name must contain at least 3 valid characters",
                   minLength: {
                     value: 3,
                     message: "Name must be at least 3 characters"
@@ -111,8 +109,8 @@ const SignupPage = () => {
                 {...register("email", {
                   required: "Email is required",
                   pattern: {
-                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                    message: "Enter a valid email address",
+                    value: /^[^\s@]{3,}@[^\s@]+\.[^\s@]+$/,
+                    message: "Enter a valid email with at least 3 characters before @",
                   },
                 })}
                 className="block w-full px-4 py-2.5 bg-slate-950/50 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
@@ -129,8 +127,7 @@ const SignupPage = () => {
               <label className="block text-sm font-semibold text-slate-300 mb-1.5">
                 Password
               </label>
-              <input
-                type="password"
+              <PasswordInput
                 placeholder="Enter password"
                 {...register("password", {
                   required: "Password is required",
@@ -155,8 +152,7 @@ const SignupPage = () => {
               <label className="block text-sm font-semibold text-slate-300 mb-1.5">
                 Confirm Password
               </label>
-              <input
-                type="password"
+              <PasswordInput
                 placeholder="Confirm password"
                 {...register("confirmpassword", {
                   required: "Confirm password is required",
@@ -170,19 +166,6 @@ const SignupPage = () => {
                   {errors.confirmpassword.message}
                 </p>
               )}
-            </div>
-
-            {/* EVENT MANAGER CHECK */}
-            <div className="flex items-center pt-2">
-              <input
-                type="checkbox"
-                id="managerCheck"
-                {...register("remember")}
-                className="h-4 w-4 text-indigo-500 focus:ring-indigo-500 border-slate-700 bg-slate-900 rounded cursor-pointer"
-              />
-              <label htmlFor="managerCheck" className="ml-2 block text-sm text-slate-300 cursor-pointer">
-                Sign up as an Event Manager
-              </label>
             </div>
 
             {/* SUBMIT BUTTON */}
@@ -206,12 +189,9 @@ const SignupPage = () => {
           <button
             type="button"
             className="w-full flex items-center justify-center gap-3 py-3 px-4 bg-slate-950 hover:bg-slate-900 text-white rounded-xl font-medium border border-slate-800 transition-all duration-200"
-
             onClick={() => {
-              const role = getValues("remember") ? "EVENT_MANAGER" : "USER";
-              window.location.href = `http://localhost:3001/api/auth/google?role=${role}`;
+              window.location.href = `http://localhost:3001/api/auth/google?role=USER`;
             }}
-
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path

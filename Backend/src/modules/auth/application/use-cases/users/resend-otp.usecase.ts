@@ -1,10 +1,11 @@
-import { UserOtp } from "../../../../common/enums/user-otp.enum.js";
-import { generateOTP } from "../../../../common/utils/generate-otp.js";
-import { User } from "../../domain/entites/user.entity.js";
-import { IUserRepository } from "../../domain/repositories/user.repository.interface.js";
-import { AppError } from "../../../../common/errors/app-error.js";
-import { HttpStatus } from "../../../../common/constants/http-stattus.js";
-import { EmailSerive } from "../../../../common/service/email.service.js";
+import { UserOtp } from "../../../../../common/enums/user-otp.enum.js";
+import { generateOTP } from "../../../../../common/utils/generate-otp.js";
+import { User } from "../../../domain/entites/user.entity.js";
+import { IUserRepository } from "../../../domain/repositories/user/user.repository.interface.js";
+import { AppError } from "../../../../../common/errors/app-error.js";
+import { HttpStatus } from "../../../../../common/constants/http-stattus.js";
+import { EmailSerive } from "../../../../../common/service/email.service.js";
+import { ErrorMessage } from "../../../../../common/enums/message.enum.js";
 
 export class ResendotpUseCase{
     constructor(
@@ -21,10 +22,10 @@ export class ResendotpUseCase{
 
         console.log('user',user)
         if(!user){
-            throw new AppError('user is not exist register first',HttpStatus.UNAUTHORIZED)
+            throw new AppError(ErrorMessage.USER_NOT_FOUND,HttpStatus.UNAUTHORIZED)
         }
         if(user.isVerified === true && user.otpType === UserOtp.SIGNUP){
-            throw new AppError('user is already verified',HttpStatus.CONFLICT)
+            throw new AppError(ErrorMessage.USER_ALREADY_EXISTS,HttpStatus.CONFLICT)
         }
        const now = new Date();
       console.log("the time now ",now);
@@ -36,7 +37,7 @@ export class ResendotpUseCase{
          console.log("the diff",diff)
 
          if(diff < 60){
-            throw new AppError('please wait',HttpStatus.MANY_REQUEST)
+            throw new AppError(ErrorMessage.WAIT_ONE_MINUTE,HttpStatus.MANY_REQUEST)
          }
        }
        const  newOtp = generateOTP();

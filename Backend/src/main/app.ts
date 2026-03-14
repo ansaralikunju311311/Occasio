@@ -1,6 +1,8 @@
 import express from 'express';
 import "../shared/config/passport/google.strategy.js"
 import authRoutes from "../modules/auth/presentation/auth.routes.js";
+import adminRoutes from "../modules/auth/presentation/admin.routes.js"
+import userRoutes from '../modules/auth/presentation/user/user.routes.js'
 import { errorMiddleware } from '../middleware/error.middleware.js';
 import passport from 'passport';
 import cors from 'cors'
@@ -19,6 +21,8 @@ app.get('/', (req, res) => {
     res.send('helooo')
 })
 app.use("/api/auth", authRoutes);
+app.use("/api/admin",adminRoutes);
+app.use("/api/user",userRoutes)
 app.use((_req, res) => {
     res.status(404).json({ message: 'the page not found' })
 });

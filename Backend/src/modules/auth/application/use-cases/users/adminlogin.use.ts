@@ -1,13 +1,14 @@
-import { IUserRepository } from "../../domain/repositories/user.repository.interface.js";
-import { IHashServive } from "../../domain/services/hash.service.interface.js";
-import { User } from "../../domain/entites/user.entity.js";
-import { HttpStatus } from "../../../../common/constants/http-stattus.js";
-import { AppError } from "../../../../common/errors/app-error.js";
-import { UserStatus } from "../../../../common/enums/user-status.enum.js";
-import { UserRole } from "../../../../common/enums/user-role.enum.js";
-import { AdminLoginDto } from "../dtos/adminlogin.dto.js";
-import { LoginResponseDto } from "../dtos/loginResponse.dto.js";
- import { ITokenService } from "../../domain/services/token.service.interface.js";
+import { IUserRepository } from "../../../domain/repositories/user/user.repository.interface.js";
+import { IHashServive } from "../../../domain/services/hash.service.interface.js";
+
+import { HttpStatus } from "../../../../../common/constants/http-stattus.js";
+import { AppError } from "../../../../../common/errors/app-error.js";
+import { UserStatus } from "../../../../../common/enums/user-status.enum.js";
+import { UserRole } from "../../../../../common/enums/user-role.enum.js";
+import { AdminLoginDto } from "../../dtos/adminlogin.dto.js";
+import { LoginResponseDto } from "../../dtos/loginResponse.dto.js";
+ import { ITokenService } from "../../../domain/services/token.service.interface.js";
+ import { ErrorMessage } from "../../../../../common/enums/message.enum.js";
 export class AdminLoginUseCase{
 
 
@@ -25,25 +26,25 @@ export class AdminLoginUseCase{
     //    console.log(value)
   console.log("user",user)
      if(!user){
-          throw new AppError('user not exist',HttpStatus.NOT_FOUND)
+          throw new AppError(ErrorMessage.USER_NOT_FOUND,HttpStatus.NOT_FOUND)
          }
         
           if(user.role != UserRole.ADMIN){
             console.log("user.role",user.role)
-            throw new AppError('NO permission Only Admin',HttpStatus.UNAUTHORIZED)
+            throw new AppError(ErrorMessage.NO_PERMISSION_ADMIN,HttpStatus.UNAUTHORIZED)
         }
          const isMatch = await this.compareService.comapre(data.password,user.password)
      
          if(!isMatch){
-         throw new AppError('the passowrd is not matching',HttpStatus.UNAUTHORIZED)
+         throw new AppError(ErrorMessage.INCORRECT_PASSWORD,HttpStatus.UNAUTHORIZED)
         }
      
         if(user.isVerified === false){
-         throw new AppError('verifiy user account correctly',HttpStatus.FORBIDDEN)
+         throw new AppError(ErrorMessage.ACCOUNT_NOT_VERIFIED,HttpStatus.FORBIDDEN)
         }
      
         if(user.status === UserStatus.BLOCK){
-          throw new AppError('the user is not permitted because your blocked',HttpStatus.UNAUTHORIZED)
+          throw new AppError(ErrorMessage.ACCOUNT_BLOCKED,HttpStatus.UNAUTHORIZED)
         }
      
 

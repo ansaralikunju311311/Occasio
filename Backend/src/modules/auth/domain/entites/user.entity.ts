@@ -29,7 +29,10 @@ export class User {
     public otp : string | null,
     public otpExpires : Date | null,
     public otpType : UserOtp | null,
-    public otpSendAt : Date | null
+    public otpSendAt : Date | null,
+    public isEventManger:boolean,
+    public applyingupgrade:boolean,
+    
   ) {}
 
   isAdmin(): boolean {

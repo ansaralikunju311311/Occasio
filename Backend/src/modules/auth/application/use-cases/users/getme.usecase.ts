@@ -1,6 +1,6 @@
-import { IUserRepository } from "../../domain/repositories/user.repository.interface.js";
-import { HttpStatus } from "../../../../common/constants/http-stattus.js";
-import { AppError } from "../../../../common/errors/app-error.js";
+import { IUserRepository } from "../../../domain/repositories/user/user.repository.interface.js";
+import { HttpStatus } from "../../../../../common/constants/http-stattus.js";
+import { AppError } from "../../../../../common/errors/app-error.js";
 export class GetmeUseCase{
     constructor(
         private userRepository :IUserRepository

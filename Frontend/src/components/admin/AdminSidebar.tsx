@@ -2,7 +2,10 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { logout } from "../../redux/slices/authSlice";
 import { useAppDispatch } from "../../redux/hook";
 import {api} from "../../services/api";
+import { useState } from "react";
+
 const AdminSidebar = () => {
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
 
     const location = useLocation();
     const dispatch = useAppDispatch();
@@ -61,6 +64,15 @@ const AdminSidebar = () => {
             icon: (
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+            )
+        },
+        {
+            name: "Pending Managers",
+            path: "/admin/pendingmanagers",
+            icon: (
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
             )
         },
@@ -139,13 +151,41 @@ const AdminSidebar = () => {
             {/* Account / Logout */}
             <div className="p-4 border-t border-slate-800/60">
                 <button className="flex w-full items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-semibold text-slate-400 hover:bg-red-500/10 hover:text-red-400 border border-transparent hover:border-red-500/20 transition-all duration-200 group"
-                onClick={handlelogout}>
+                onClick={() => setShowLogoutModal(true)}>
                     <svg className="w-5 h-5 text-slate-500 group-hover:text-red-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                     </svg>
                     Logout
                 </button>
             </div>
+
+            {/* Logout Confirmation Modal */}
+            {showLogoutModal && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-[#070b14]/80 backdrop-blur-sm" onClick={() => setShowLogoutModal(false)}></div>
+                    <div className="relative bg-[#0a0f16] border border-slate-800 rounded-2xl shadow-2xl p-6 w-full max-w-sm animate-fade-in-up">
+                        <h3 className="text-xl font-bold text-white mb-2">Confirm Logout</h3>
+                        <p className="text-slate-400 text-sm mb-6">Are you sure you want to securely exit the admin portal?</p>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setShowLogoutModal(false)}
+                                className="flex-1 px-4 py-2.5 bg-slate-800/50 hover:bg-slate-800 text-white text-sm font-semibold rounded-xl transition-colors border border-slate-700"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setShowLogoutModal(false);
+                                    handlelogout();
+                                }}
+                                className="flex-1 px-4 py-2.5 bg-red-500/10 hover:bg-red-500/20 text-red-500 text-sm font-semibold rounded-xl transition-colors border border-red-500/20 shadow-[0_0_15px_rgba(239,68,68,0.1)] hover:shadow-[0_0_20px_rgba(239,68,68,0.2)]"
+                            >
+                                Logout
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
         </aside>
     );

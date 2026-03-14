@@ -20,7 +20,7 @@ const OtpVerification = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<OtpData>({
-    mode: "onBlur", // validation triggers when leaving input
+    mode: "onBlur", 
   });
 
   // console.log(user.email);

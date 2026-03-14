@@ -4,6 +4,7 @@ import type { LoginDataType } from "../../types/auth.type";
 import { api } from '../../services/api'
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import PasswordInput from "../../components/common/PasswordInput";
 import { useAppDispatch } from "../../redux/hook";
 import { setAuth } from "../../redux/slices/authSlice";
 import { toast } from "sonner";
@@ -14,17 +15,13 @@ const LoginPage = () => {
   const {
     register,
     handleSubmit,
-    getValues,
     formState: { errors },
   } = useForm<LoginDataType>({
-    mode: "onBlur", // validation triggers when leaving input
+    mode: "onBlur",
   });
 
   console.log("user")
   const onSubmit = async (data: LoginDataType) => {
-    const roleValue = data.remember ? "EVENT_MANAGER" : "USER"
-
-
 
 
     try {
@@ -32,9 +29,7 @@ const LoginPage = () => {
       const response = await api.post("/auth/login", {
         email: data.email,
         password: data.password,
-        role: roleValue
-
-
+        role: "USER"
       })
       console.log("response", response.data.accessToken)
       localStorage.setItem("accessToken", response.data.accessToken)
@@ -53,13 +48,9 @@ const LoginPage = () => {
       // console.log("the login respose are cming from the backend",response.data)
 
 
-
-      if (response.data.user.role === "EVENT_MANAGER") {
-        navigate("/eventmanager")
-      }
-      else if (response.data.user.role === "USER") {
-        navigate("/");
-      }
+       alert(response.data)
+       console.log(response.data)
+      navigate("/");
 
 
 
@@ -145,8 +136,7 @@ const LoginPage = () => {
               <label className="block text-sm font-semibold text-slate-300 mb-2">
                 Password
               </label>
-              <input
-                type="password"
+              <PasswordInput
                 placeholder="Enter your password"
                 {...register("password", {
                   required: "Password is required",
@@ -169,15 +159,6 @@ const LoginPage = () => {
             {/* REMEMBER & FORGOT */}
             <div className="flex items-center justify-between mt-2">
               <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="remember"
-                  {...register("remember")}
-                  className="h-4 w-4 text-indigo-500 focus:ring-indigo-500 border-slate-700 bg-slate-900 rounded cursor-pointer"
-                />
-                <label htmlFor="remember" className="ml-2 block text-sm text-slate-300 cursor-pointer">
-                  Login as Event Manager
-                </label>
               </div>
 
               <Link to="/forgotpassword" className="text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors">
@@ -209,8 +190,7 @@ const LoginPage = () => {
 
 
             onClick={() => {
-              const role = getValues("remember") ? "EVENT_MANAGER" : "USER";
-              window.location.href = `http://localhost:3001/api/auth/google?role=${role}`;
+              window.location.href = `http://localhost:3001/api/auth/google?role=USER`;
             }}
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">

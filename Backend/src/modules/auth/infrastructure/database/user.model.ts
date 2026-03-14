@@ -14,7 +14,10 @@ export interface IUserDocument extends Document{
     otp:string | null,
     otpExpires:Date | null,
     otpType: UserOtp | null,
-    otpSentAt : Date | null
+    otpSentAt : Date | null,
+    isEventManger:boolean,
+    applyingupgrade:boolean,
+    
 }
 
 const userSchema = new Schema<IUserDocument>(
@@ -40,7 +43,10 @@ const userSchema = new Schema<IUserDocument>(
         default:UserRole.USER
 
     },
-
+    isEventManger:{
+        type:Boolean,
+        default:false
+    },
     status:{
         type:String,
         enum:Object.values(UserStatus) as string[],
@@ -64,7 +70,13 @@ const userSchema = new Schema<IUserDocument>(
     },
     otpSentAt:{
         type:Date
-    }
+    },
+    applyingupgrade:{
+        type:Boolean,
+        default:false
+    },
+    
+    
 },
 {timestamps:true}
 )

@@ -18,3 +18,11 @@ export interface OtpData{
   email:string,
   otp:string
 }
+
+
+export interface ResetPassword{
+  email:string,
+  currentPassword:string,
+  newPassword:string,
+  confirmPassword:string
+}

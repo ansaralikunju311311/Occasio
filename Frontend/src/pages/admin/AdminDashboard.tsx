@@ -62,7 +62,7 @@ const AdminDashboard = () => {
                 ))}
             </div>
 
-            {/* Additional space for charts or recent activity */}
+
             <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-2xl p-8 shadow-xl min-h-100 flex items-center justify-center relative overflow-hidden group">
 
                 <div className="absolute inset-0 bg-linear-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>

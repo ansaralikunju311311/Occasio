@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import { api } from '../../services/api'
 import { useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
+import PasswordInput from '../../components/common/PasswordInput'
 import { toast } from 'sonner'
 type ResetPasswordForm = {
   otp: string
@@ -185,8 +186,7 @@ const ResetPassword: React.FC = () => {
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 New Password
               </label>
-              <input
-                type="password"
+              <PasswordInput
                 placeholder="Enter new password"
                 {...register('password', {
                   required: 'Password is required',
@@ -211,8 +211,7 @@ const ResetPassword: React.FC = () => {
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Confirm Password
               </label>
-              <input
-                type="password"
+              <PasswordInput
                 placeholder="Confirm new password"
                 {...register('confirmpassword', {
                   required: 'Confirm password is required',

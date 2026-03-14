@@ -19,10 +19,23 @@ const AdminLogin = lazy(() => import("../pages/admin/AdminLogin.tsx"));
 const AdminLayout = lazy(() => import("../layouts/AdminLayout.tsx"));
 const AdminDashboard = lazy(() => import("../pages/admin/AdminDashboard.tsx"));
 const AdminPlaceholder = lazy(() => import("../pages/admin/AdminPlaceholder.tsx"));
+const AdminUsers = lazy(() => import("../pages/admin/AdminUsers.tsx"));
+const AdminPendingManagers = lazy(() => import("../pages/admin/AdminPendingManagers.tsx"));
+const AdminEventManagers = lazy(() => import("../pages/admin/AdminEventManagers.tsx"));
 
 const EventManagerLayout = lazy(() => import("../layouts/EventManagerLayout.tsx"));
 const EventManagerDashboard = lazy(() => import("../pages/eventManager/EventManagerDashboard.tsx"));
 const EventManagerPlaceholder = lazy(() => import("../pages/eventManager/EventManagerPlaceholder.tsx"));
+
+// New Personal Dashboard Pages
+const Profile = lazy(() => import("../pages/user/Profile.tsx"));
+const UserBookings = lazy(() => import("../pages/user/UserBookings.tsx"));
+const SavedEvents = lazy(() => import("../pages/user/SavedEvents.tsx"));
+const Settings = lazy(() => import("../pages/user/Settings.tsx"));
+const BecomeAManager = lazy(() => import("../pages/user/BecomeAManager.tsx"));
+
+
+import ManagerGuard from "../components/common/ManagerGuard.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -63,6 +76,11 @@ export const router = createBrowserRouter([
     path: "/oauth-success",
     element: <OAuthSuccess />
   },
+  {
+    path: "/applyasmanager",
+    element: <BecomeAManager />
+  },
+
 
   {
     path: "/admin",
@@ -76,8 +94,9 @@ export const router = createBrowserRouter([
     children: [
       { path: "dashboard", element: <AdminDashboard /> },
       { path: "events", element: <AdminPlaceholder /> },
-      { path: "users", element: <AdminPlaceholder /> },
-      { path: "eventmanagers", element: <AdminPlaceholder /> },
+      { path: "users", element: <AdminUsers /> },
+      { path: "eventmanagers", element: <AdminEventManagers /> },
+      { path: "pendingmanagers", element: <AdminPendingManagers /> },
       { path: "categories", element: <AdminPlaceholder /> },
       { path: "wallet", element: <AdminPlaceholder /> },
     ]
@@ -91,11 +110,16 @@ export const router = createBrowserRouter([
 
     ),
     children: [
-      { index: true, element: <EventManagerDashboard /> },
-      { path: "create-event", element: <EventManagerPlaceholder /> },
-      { path: "my-events", element: <EventManagerPlaceholder /> },
-      { path: "bookings", element: <EventManagerPlaceholder /> },
-      { path: "wallet", element: <EventManagerPlaceholder /> },
+      { index: true, element: <Profile /> },
+      { path: "profile", element: <Profile /> },
+      { path: "user-bookings", element: <UserBookings /> },
+      { path: "saved-events", element: <SavedEvents /> },
+      { path: "settings", element: <Settings /> },
+      { path: "stats", element: <ManagerGuard><EventManagerDashboard /></ManagerGuard> },
+      { path: "create-event", element: <ManagerGuard><EventManagerPlaceholder /></ManagerGuard> },
+      { path: "my-events", element: <ManagerGuard><EventManagerPlaceholder /></ManagerGuard> },
+      { path: "bookings", element: <ManagerGuard><EventManagerPlaceholder /></ManagerGuard> },
+      { path: "wallet", element: <ManagerGuard><EventManagerPlaceholder /></ManagerGuard> },
     ]
   },
 

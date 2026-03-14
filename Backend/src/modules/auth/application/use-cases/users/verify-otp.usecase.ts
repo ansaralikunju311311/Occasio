@@ -1,10 +1,11 @@
-import { IUserRepository } from "../../domain/repositories/user.repository.interface.js";
-import { VerfiyOtpDto } from "../dtos/verify-otp.dto.js";
-import { User } from "../../domain/entites/user.entity.js";
-import { AppError } from "../../../../common/errors/app-error.js";
-import { HttpStatus } from "../../../../common/constants/http-stattus.js";
-import { ITokenService } from "../../domain/services/token.service.interface.js";
-import { LoginResponseDto } from "../dtos/loginResponse.dto.js";
+import { IUserRepository } from "../../../domain/repositories/user/user.repository.interface.js";
+import { VerfiyOtpDto } from "../../dtos/verify-otp.dto.js";
+
+import { AppError } from "../../../../../common/errors/app-error.js";
+import { HttpStatus } from "../../../../../common/constants/http-stattus.js";
+import { ITokenService } from "../../../domain/services/token.service.interface.js";
+import { LoginResponseDto } from "../../dtos/loginResponse.dto.js";
+import { ErrorMessage } from "../../../../../common/enums/message.enum.js";
 export class VerifyUseCase{
     constructor(
         private userRepository :IUserRepository,
@@ -19,15 +20,15 @@ export class VerifyUseCase{
 
         const user = await this.userRepository.findByEmail(data.email);
         if(!user){
-            throw new AppError('the user is not exist their',HttpStatus.NOT_FOUND)
+            throw new AppError(ErrorMessage.USER_NOT_FOUND,HttpStatus.NOT_FOUND)
         }
         console.log("fjnjfnvfj",user)
 
         if(!user.otp || !user.otpExpires){
-               throw new AppError('no otp here',HttpStatus.BAD_REQUEST)
+               throw new AppError(ErrorMessage.NO_OTP_FOUND,HttpStatus.BAD_REQUEST)
         }
         if(user.otp != data.otp){
-            throw new AppError('incorrect otp',HttpStatus.UNAUTHORIZED)
+            throw new AppError(ErrorMessage.INCORRECT_OTP,HttpStatus.UNAUTHORIZED)
         }
         if(user.otpExpires < new Date() ){
              user.otp = null,
@@ -35,7 +36,7 @@ export class VerifyUseCase{
         user.otpType = null,
         user.otpSendAt = null
            await this.userRepository.update(user)
-            throw new AppError('time expired',HttpStatus.GONE)
+            throw new AppError(ErrorMessage.OTP_EXPIRED,HttpStatus.GONE)
         }
 
         

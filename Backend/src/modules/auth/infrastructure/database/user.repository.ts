@@ -1,4 +1,4 @@
-import { IUserRepository } from "../../domain/repositories/user.repository.interface.js";
+import { IUserRepository } from "../../domain/repositories/user/user.repository.interface.js";
 
 import { User } from "../../domain/entites/user.entity.js";
 
@@ -22,7 +22,10 @@ export class UserRepository implements IUserRepository{
             doc.otp,
             doc.otpExpires,
             doc.otpType,
-            doc.otpSentAt
+            doc.otpSentAt,
+            doc.isEventManger,
+            doc.applyingupgrade,
+           
         )
     }
 
@@ -42,7 +45,9 @@ export class UserRepository implements IUserRepository{
             user.otp,
             user.otpExpires,
             user.otpType,
-            user.otpSentAt
+            user.otpSentAt,
+            user.isEventManger,
+            user.applyingupgrade
         )
 
      }
@@ -59,7 +64,9 @@ export class UserRepository implements IUserRepository{
       otp:user.otp,
       otpExpires:user.otpExpires,
       otpType:user.otpType,
-      otpSentAt:user.otpSendAt
+      otpSentAt:user.otpSendAt,
+      isEventManger:user.isEventManger,
+      applyingupgrade:user.applyingupgrade
     });
 
     return new User(
@@ -73,7 +80,9 @@ export class UserRepository implements IUserRepository{
       created.otp,
       created.otpExpires,
       created.otpType,
-      created.otpSentAt
+      created.otpSentAt,
+      created.isEventManger,
+      created.applyingupgrade
     );
     }
 
@@ -91,7 +100,10 @@ export class UserRepository implements IUserRepository{
              otp:user.otp,
              otpExpires:user.otpExpires,
              otpType:user.otpType,
-             otpSentAt:user.otpSendAt
+             otpSentAt:user.otpSendAt,
+             applyingupgrade:user.applyingupgrade,
+             isEventManger:user.isEventManger
+
             }
          )
 

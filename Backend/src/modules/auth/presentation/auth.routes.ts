@@ -29,7 +29,8 @@ router.get("/me", verifyAccessToken, controller.getMe.bind(controller));
 router.post("/logout", controller.logout.bind(controller));
 
 router.post("/refresh", controller.refreshToken.bind(controller))
-// router.post("/signup",controller.signup)
+
+router.post("/updatepassword",controller.updatePassword.bind(controller))
 
 
 router.get(

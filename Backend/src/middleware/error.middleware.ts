@@ -2,6 +2,7 @@ import { Request,Response,NextFunction } from "express";
 
 import { HttpStatus } from "../common/constants/http-stattus.js";
 import { AppError } from "../common/errors/app-error.js";
+import { ErrorMessage } from "../common/enums/message.enum.js";
 
 export const errorMiddleware=(err:any,req:Request,res:Response,next:NextFunction)=>{
     console.log("error",err)
@@ -14,6 +15,6 @@ export const errorMiddleware=(err:any,req:Request,res:Response,next:NextFunction
 
 
     return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-        message:"Something Wrong"
+        message: ErrorMessage.INTERNAL_SERVER_ERROR
     })
 }

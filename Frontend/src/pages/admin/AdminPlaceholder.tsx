@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 const AdminPlaceholder = () => {
     const location = useLocation();
     const pageName = location.pathname.split('/').pop() || 'Page';
-    // Attempt to format "eventmanagers" nicely
+
     const formattedName = pageName === 'eventmanagers'
         ? 'Event Managers'
         : pageName.charAt(0).toUpperCase() + pageName.slice(1);

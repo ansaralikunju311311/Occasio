@@ -1,7 +1,7 @@
 import { NextFunction,Request,Response } from 'express'
-import jwt from 'jsonwebtoken'
 import { HttpStatus } from '../../../common/constants/http-stattus.js';
 import { CreateToken } from '../../../common/service/token.service.js';
+import { ErrorMessage } from '../../../common/enums/message.enum.js';
 
 
 const tokenService = new CreateToken()
@@ -16,7 +16,7 @@ export const verifyAccessToken =(req:Request,res:Response,next:NextFunction)=>{
    console.log("evode ntha kittane?",authHeader)
     if(!authHeader){
          return res.status(HttpStatus.UNAUTHORIZED).json({
-            message:"Token missing"
+            message: ErrorMessage.TOKEN_MISSING
          })
     }
     
@@ -26,7 +26,7 @@ export const verifyAccessToken =(req:Request,res:Response,next:NextFunction)=>{
      console.log("this is the token",token)
        if (!token) {
         return res.status(HttpStatus.UNAUTHORIZED).json({
-            message: "Token missing"
+            message: ErrorMessage.TOKEN_MISSING
         })
         
     }
@@ -40,6 +40,6 @@ export const verifyAccessToken =(req:Request,res:Response,next:NextFunction)=>{
         
 
          console.log('error',error)
-        return res.status(HttpStatus.UNAUTHORIZED).json({message:"Invalid Tokne"})
+        return res.status(HttpStatus.UNAUTHORIZED).json({message: ErrorMessage.INVALID_TOKEN})
     }
 }
