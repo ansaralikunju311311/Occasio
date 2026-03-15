@@ -1,5 +1,5 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { lazy, Suspense, useEffect } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { useAppDispatch } from "../redux/hook.ts";
 import { setAuth, logout } from "../redux/slices/authSlice.ts";
 import { api } from '../services/api.ts'
@@ -36,11 +36,18 @@ const BecomeAManager = lazy(() => import("../pages/user/BecomeAManager.tsx"));
 
 
 import ManagerGuard from "../components/common/ManagerGuard.tsx";
+import ProtectedRoute from "../components/common/ProtectedRoute.tsx";
+import PublicRoute from "../components/common/PublicRoute.tsx";
+import PreventAdminRoute from "../components/common/PreventAdminRoute.tsx";
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <MainLayout />,
+    element: (
+      <PreventAdminRoute>
+        <MainLayout />
+      </PreventAdminRoute>
+    ),
     children: [
       { index: true, element: <LandingPage /> },
 
@@ -49,28 +56,28 @@ export const router = createBrowserRouter([
 
   {
     path: "/login",
-    element: <LoginPage />,
+    element: <PublicRoute><LoginPage /></PublicRoute>,
   },
 
   {
     path: "/signup",
-    element: <SignPage />,
+    element: <PublicRoute><SignPage /></PublicRoute>,
   },
 
 
   {
     path: "/otpverification",
-    element: <OtpVerification />
+    element: <PublicRoute><OtpVerification /></PublicRoute>
   },
 
   {
     path: "/forgotpassword",
-    element: <ForgotPassword />
+    element: <PublicRoute><ForgotPassword /></PublicRoute>
   },
 
   {
     path: "/resetpassword",
-    element: <ResetPassword />
+    element: <PublicRoute><ResetPassword /></PublicRoute>
   },
   {
     path: "/oauth-success",
@@ -78,18 +85,16 @@ export const router = createBrowserRouter([
   },
   {
     path: "/applyasmanager",
-    element: <BecomeAManager />
+    element: <ProtectedRoute><BecomeAManager /></ProtectedRoute>
   },
 
 
   {
     path: "/admin",
     element: (
-
-      <AdminLayout />
-
-
-
+      <ProtectedRoute allowedRoles={["ADMIN"]}>
+        <AdminLayout />
+      </ProtectedRoute>
     ),
     children: [
       { path: "dashboard", element: <AdminDashboard /> },
@@ -105,9 +110,9 @@ export const router = createBrowserRouter([
   {
     path: "/eventmanager",
     element: (
-
-      <EventManagerLayout />
-
+      <ProtectedRoute allowedRoles={["USER", "EVENT_MANAGER"]}>
+        <EventManagerLayout />
+      </ProtectedRoute>
     ),
     children: [
       { index: true, element: <Profile /> },
@@ -125,7 +130,7 @@ export const router = createBrowserRouter([
 
   {
     path: "/adminlogin",
-    element: <AdminLogin />
+    element: <PublicRoute><AdminLogin /></PublicRoute>
   }
 
 ]);
@@ -137,6 +142,7 @@ export const router = createBrowserRouter([
 
 export const RouterWrapper = () => {
   const dispatch = useAppDispatch();
+  const [isChecking, setIsChecking] = useState(true);
 
   const restoreSession = async () => {
     try {
@@ -152,21 +158,18 @@ export const RouterWrapper = () => {
       console.log("No active session or invalid token:", error);
 
       dispatch(logout());
+    } finally {
+      setIsChecking(false);
     }
   };
 
   useEffect(() => {
-    const authPages = ["/login", "/adminlogin", "/signup", "/otpverification", "/forgotpassword", "/resetpassword"];
-    const currentPath = window.location.pathname;
-
-
-
-    if (!authPages.includes(currentPath)) {
-      restoreSession();
-    } else {
-      console.log("On auth page, skipping session restoration");
-    }
+    restoreSession();
   }, []);
+
+  if (isChecking) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <Suspense fallback={<LoadingSpinner />}>

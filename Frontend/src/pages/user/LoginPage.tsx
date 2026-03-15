@@ -41,14 +41,6 @@ const LoginPage = () => {
       )
 
       toast.success("Login successful!");
-      // console.log("resonse",response);
-
-
-      // console.log("the login respose are cming from the backend",response.data)
-
-
-       alert(response.data)
-       console.log(response.data)
       navigate("/");
 
 

@@ -1,5 +1,5 @@
 import { useAppSelector } from "../../redux/hook";
-import { api } from "../../services/api";
+
 const AdminDashboard = () => {
     const stats = [
         { title: "Total Users", value: "1,248", icon: "👥", trend: "+12%" },

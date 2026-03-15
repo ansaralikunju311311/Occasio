@@ -11,7 +11,7 @@ import { setAuth } from "../../redux/slices/authSlice";
 const AdminLogin = () => {
     // const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
-    const dispath = useAppDispatch()
+    const dispatch = useAppDispatch()
     const {
         register,
         handleSubmit,
@@ -32,7 +32,7 @@ const AdminLogin = () => {
             localStorage.setItem("accessToken", response.data.accessToken)
 
 
-            dispath(
+            dispatch(
                 setAuth({
                     user: response.data.user
                 })
