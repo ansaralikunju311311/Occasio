@@ -151,7 +151,7 @@ const BecomeAManager: React.FC = () => {
         socialLinks:payload.socialLinks,
         organizationType:payload.organizationType
      })
-     console.log(response)
+     console.log("for the chekign the checking the thingssss",response)
 
       dispatch(
              setAuth({
@@ -206,7 +206,7 @@ const BecomeAManager: React.FC = () => {
 
                             <h1 className="text-5xl lg:text-7xl font-black tracking-tighter leading-tight">
                                 Elevate Your <br />
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-500 to-pink-500">
+                                <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-400 via-purple-500 to-pink-500">
                                     Event Game
                                 </span>
                             </h1>
@@ -218,7 +218,7 @@ const BecomeAManager: React.FC = () => {
                             <div className="flex flex-col sm:flex-row gap-4 pt-4">
                                 <button
                                     onClick={() => setView('form')}
-                                    className="px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-500 hover:to-purple-600 text-white font-bold rounded-2xl shadow-2xl shadow-indigo-500/20 transition-all hover:scale-105 active:scale-95 group flex items-center justify-center gap-2"
+                                    className="px-8 py-4 bg-linear-to-r from-indigo-600 to-purple-700 hover:from-indigo-500 hover:to-purple-600 text-white font-bold rounded-2xl shadow-2xl shadow-indigo-500/20 transition-all hover:scale-105 active:scale-95 group flex items-center justify-center gap-2"
                                 >
                                     Become a Manager
                                     <CheckIcon className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -234,14 +234,14 @@ const BecomeAManager: React.FC = () => {
 
                         {/* Right Content - Stats/Card */}
                         <div className="relative animate-in fade-in slide-in-from-right-5 duration-1000">
-                            <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 blur-[80px] rounded-3xl" />
+                            <div className="absolute inset-0 bg-linear-to-r from-indigo-500/20 to-purple-500/20 blur-[80px] rounded-3xl" />
                             <div className="relative bg-slate-900/40 backdrop-blur-3xl border border-white/10 p-8 lg:p-12 rounded-[2.5rem] shadow-2xl space-y-8">
                                 <h3 className="text-2xl font-bold">Why Upgrade?</h3>
 
                                 <div className="space-y-6">
                                     {perks.map((perk, index) => (
                                         <div key={index} className="flex gap-4 group">
-                                            <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-slate-800/50 border border-white/5 flex items-center justify-center group-hover:border-indigo-500/50 transition-colors">
+                                            <div className="shrink-0 w-12 h-12 rounded-xl bg-slate-800/50 border border-white/5 flex items-center justify-center group-hover:border-indigo-500/50 transition-colors">
                                                 {perk.icon}
                                             </div>
                                             <div>
@@ -417,7 +417,7 @@ const BecomeAManager: React.FC = () => {
                                 </button>
                                 <button
                                     type="submit"
-                                    className="flex-[2] px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-500 hover:to-purple-600 text-white font-bold rounded-2xl shadow-xl shadow-indigo-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                                    className="flex-2 px-8 py-4 bg-linear-to-r from-indigo-600 to-purple-700 hover:from-indigo-500 hover:to-purple-600 text-white font-bold rounded-2xl shadow-xl shadow-indigo-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
                                 >
                                     Submit Application
                                 </button>
