@@ -155,7 +155,7 @@ const BecomeAManager: React.FC = () => {
 
       dispatch(
              setAuth({
-               user: response.data.user
+               user: response.data.users
              })
            )
     setView('success');
@@ -170,6 +170,27 @@ const BecomeAManager: React.FC = () => {
             </div>
 
             <div className="relative max-w-7xl mx-auto px-6 py-20 lg:py-32">
+                {user?.applyingupgrade ? (
+                    <div className="max-w-2xl mx-auto text-center animate-in fade-in zoom-in-95 duration-500">
+                        <div className="w-24 h-24 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-8 border border-amber-500/20 shadow-2xl shadow-amber-500/10">
+                            <svg className="w-12 h-12 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" fill="none" />
+                            </svg>
+                        </div>
+                        <h2 className="text-4xl font-bold mb-4">Application Under Review</h2>
+                        <p className="text-slate-400 text-lg mb-10 max-w-md mx-auto">
+                            Your application to become an event manager is currently pending admin approval. You will receive an update once it's reviewed.
+                        </p>
+                        <button
+                            onClick={() => navigate('/')}
+                            className="px-8 py-4 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-2xl transition-all"
+                        >
+                            Return to Homepage
+                        </button>
+                    </div>
+                ) : (
+                    <>
                 {view === 'perks' && (
                     <div className="grid lg:grid-cols-2 gap-16 items-center">
 
@@ -421,6 +442,8 @@ const BecomeAManager: React.FC = () => {
                             Return to Homepage
                         </button>
                     </div>
+                )}
+                    </>
                 )}
             </div>
         </div>
