@@ -1,5 +1,5 @@
 import { SignupUsecase } from "../modules/auth/application/use-cases/users/signup.usecase.js";
-import { UserRepository } from "../modules/auth/infrastructure/database/user.repository.js";
+import { UserRepository } from "../modules/auth/infrastructure/database/user/user.repository.js";
 import { BcryptHashService } from "../modules/auth/infrastructure/services/bcrypt-hash.service.js";
 import { AuthController } from "../modules/auth/presentation/auth.controller.js";
 import { LoginUseCase } from "../modules/auth/application/use-cases/users/login.usecase.js";

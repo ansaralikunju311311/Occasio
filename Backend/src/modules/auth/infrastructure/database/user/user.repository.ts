@@ -1,8 +1,8 @@
-import { IUserRepository } from "../../domain/repositories/user/user.repository.interface.js";
+import { IUserRepository } from "../../../domain/repositories/user/user.repository.interface.js";
 
-import { User } from "../../domain/entites/user.entity.js";
+import { User } from "../../../domain/entites/user.entity.js";
 
-import { UserModel } from "./user.model.js";
+import { UserModel } from "../user.model.js";
 
 export class UserRepository implements IUserRepository{
 
