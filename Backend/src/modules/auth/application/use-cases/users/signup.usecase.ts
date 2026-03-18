@@ -31,12 +31,12 @@ export class SignupUsecase{
 
 
         const hashpassword = await this.hashService.hash(data.password)
-        let role: UserRole = UserRole.USER;
-        let applyingupgrade=false
-        let isEventManger = false;
-        let isVerified = false ;
-        let otpSendAt = new Date()
-        let otp = generateOTP();
+        const role: UserRole = UserRole.USER;
+        const applyingupgrade=false
+        const isEventManger = false;
+        const isVerified = false ;
+        const otpSendAt = new Date()
+        const otp = generateOTP();
         
         const otpExpires = new Date(Date.now() + 5 * 60 * 1000);
      

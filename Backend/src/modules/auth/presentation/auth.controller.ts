@@ -279,7 +279,7 @@ logout = async (req: Request, res: Response) => {
           })
       } catch (error) {
         
-
+        
         return res.status(HttpStatus.UNAUTHORIZED).json({
           message: ErrorMessage.INVALID_REFRESH_TOKEN
         })

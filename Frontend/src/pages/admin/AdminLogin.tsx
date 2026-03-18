@@ -9,7 +9,6 @@ import { useAppDispatch } from "../../redux/hook";
 import { setAuth } from "../../redux/slices/authSlice";
 
 const AdminLogin = () => {
-    // const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
     const dispatch = useAppDispatch()
     const {
@@ -21,7 +20,7 @@ const AdminLogin = () => {
     });
 
     const onSubmit = async (data: LoginDataType) => {
-        // setIsLoading(true);
+        
         try {
             const response = await api.post("/auth/admin/login", {
                 email: data.email,
@@ -51,15 +50,13 @@ const AdminLogin = () => {
                 toast.error("Something went wrong");
             }
         }
-        // finally {
-        //     setIsLoading(false);
-        // }
+     
     };
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-[#070b14] relative overflow-hidden font-sans">
 
-            {/* Dynamic Background Elements */}
+           
             <div className="absolute inset-0 z-0 pointer-events-none">
                 <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-emerald-600/20 rounded-full mix-blend-screen filter blur-[100px] animate-pulse"></div>
                 <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-teal-600/20 rounded-full mix-blend-screen filter blur-[100px] animate-pulse" style={{ animationDelay: "2s" }}></div>
@@ -68,7 +65,7 @@ const AdminLogin = () => {
 
             <div className="w-full max-w-md p-6 relative z-10 animate-fade-in-up">
 
-                {/* Logo and Header Context */}
+              
                 <div className="text-center mb-10">
                     <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 mb-6 shadow-[0_0_30px_rgb(16,185,129,0.15)] glow-animation group">
                         <svg className="w-8 h-8 text-emerald-400 group-hover:scale-110 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -84,14 +81,15 @@ const AdminLogin = () => {
                     </p>
                 </div>
 
-                {/* Login Card */}
+
+
                 <div className="bg-slate-900/40 backdrop-blur-2xl rounded-4xl p-8 md:p-10 shadow-2xl shadow-black/50 border border-slate-800/60 relative overflow-hidden group hover:border-emerald-500/30 transition-colors duration-500">
 
                     <div className="absolute inset-0 bg-linear-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
 
                     <form className="space-y-7 relative z-10" onSubmit={handleSubmit(onSubmit)}>
 
-                        {/* EMAIL */}
+                       
                         <div>
                             <label className="block text-xs font-bold text-slate-400 uppercase mb-2 tracking-wider">
                                 Admin Email
@@ -123,7 +121,7 @@ const AdminLogin = () => {
                             )}
                         </div>
 
-                        {/* PASSWORD */}
+                      
                         <div>
                             <label className="block text-xs font-bold text-slate-400 uppercase mb-2 tracking-wider">
                                 Security Key
@@ -153,24 +151,19 @@ const AdminLogin = () => {
                         <div className="pt-4">
                             <button
                                 type="submit"
-                                // disabled={isLoading}
+                              
                                 className="w-full py-4 px-4 bg-linear-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white rounded-xl font-bold shadow-[0_0_20px_rgb(16,185,129,0.2)] hover:shadow-[0_0_30px_rgb(16,185,129,0.4)] hover:-translate-y-0.5 transition-all duration-300 border border-emerald-400/20 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none flex justify-center items-center"
                             >
-                                {/* {isLoading ? (
-                                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                    </svg>
-                                ) : ( */}
+                             
                                 "Establish Connection"
-                                {/* )} */}
+                              
                             </button>
                         </div>
                     </form>
 
                 </div>
 
-                {/* Footer info */}
+             
                 <p className="text-center text-xs text-slate-600 mt-8 font-medium">
                     Restricted System. Unauthorized access is strictly prohibited.
                 </p>
