@@ -41,6 +41,33 @@ const AdminUsers = () => {
     fetchUsers();
   }, []);
 
+  const handleUser= async(userId:string,userStatus:string)=>{
+    console.log(userId, userStatus);
+    const newstatus = userStatus === "ACTIVE" ? "BLOCK" : "ACTIVE";
+    
+    // Optimistic UI update for instant feedback
+    setUsers((prevUsers) =>
+      prevUsers.map((user) =>
+        (user._id || user.id) === userId ? { ...user, status: newstatus } : user
+      )
+    );
+
+    try {
+      const response =  await api.patch(`/admin/blockorunblock/${userId}`,{
+          status: newstatus
+       });
+       console.log("response", response);
+    } catch (error) {
+      console.error("Failed to block/unblock user:", error);
+      // Revert UI on failure
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          (user._id || user.id) === userId ? { ...user, status: userStatus } : user
+        )
+      );
+    }
+  }
+
   const getInitials = (name: string) => {
     if (!name) return "U";
     return name.substring(0, 2).toUpperCase();
@@ -195,7 +222,8 @@ const AdminUsers = () => {
                       <button className="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md transition-colors duration-150 mr-2">
                         View
                       </button>
-                      <button className="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md transition-colors duration-150">
+                      <button className="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md transition-colors duration-150"
+                      onClick={()=>handleUser(userId,user?.status)}>
                         {user.status?.toUpperCase() === 'ACTIVE' ? 'Block' : 'Unblock'}
                       </button>
                     </td>

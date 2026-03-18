@@ -26,4 +26,27 @@ export class AdminRepository implements IAdminRepository{
             )
         ))
     }
+
+      async findById(id: string): Promise<User | null> {
+              const user = await UserModel.findById(id)
+              if(!user) return null;
+                 return new User(
+                 user._id.toString(),
+                 user.name,
+                 user.email,
+                 user.password,
+                 user.role,
+                 user.status,
+                 user.isVerified,
+                 user.otp,
+                 user.otpExpires,
+                 user.otpType,
+                 user.otpSentAt,
+                 user.isEventManger,
+                 user.applyingupgrade
+             )
+     
+          }
+
+   
 }
