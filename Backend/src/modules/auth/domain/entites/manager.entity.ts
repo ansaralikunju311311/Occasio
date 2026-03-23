@@ -1,5 +1,6 @@
 export class EventManager{
     constructor(
+         public readonly id: string | null,
         public userId:string,
         public fullName:string,
         public organizationName:string,

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { api } from "../../services/api";
 
 interface User {
@@ -10,12 +11,16 @@ interface User {
   status: string;
   isVerified: boolean;
   isEventManger: boolean;
+  createdAt?: string;
+  applyingupgrade?: boolean;
 }
 
 const AdminUsers = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -24,7 +29,6 @@ const AdminUsers = () => {
         setError(null);
         const response = await api.get("/admin/users");
         
-       
         const usersData = Array.isArray(response.data) 
           ? response.data 
           : (response.data?.users || response.data?.data || []);
@@ -41,11 +45,11 @@ const AdminUsers = () => {
     fetchUsers();
   }, []);
 
-  const handleUser= async(userId:string,userStatus:string)=>{
+  const handleUser = async (userId: string, userStatus: string) => {
     console.log(userId, userStatus);
     const newstatus = userStatus === "ACTIVE" ? "BLOCK" : "ACTIVE";
     
-    // Optimistic UI update for instant feedback
+    // Optimistic UI update
     setUsers((prevUsers) =>
       prevUsers.map((user) =>
         (user._id || user.id) === userId ? { ...user, status: newstatus } : user
@@ -53,10 +57,9 @@ const AdminUsers = () => {
     );
 
     try {
-      const response =  await api.patch(`/admin/blockorunblock/${userId}`,{
-          status: newstatus
-       });
-       console.log("response", response);
+      await api.patch(`/admin/blockorunblock/${userId}`, {
+        status: newstatus
+      });
     } catch (error) {
       console.error("Failed to block/unblock user:", error);
       // Revert UI on failure
@@ -66,7 +69,23 @@ const AdminUsers = () => {
         )
       );
     }
-  }
+  };
+
+  const detailsView = async (userId: string) => {
+    try {
+      const response = await api.get(`/admin/userDetails/${userId}`);
+      const userData = response.data?.user || response.data?.data || response.data;
+      setSelectedUser(userData);
+      setIsDetailsModalOpen(true);
+    } catch (error) {
+      console.error("Failed to fetch user details:", error);
+    }
+  };
+
+  const closeDetailsModal = () => {
+    setIsDetailsModalOpen(false);
+    setSelectedUser(null);
+  };
 
   const getInitials = (name: string) => {
     if (!name) return "U";
@@ -77,7 +96,7 @@ const AdminUsers = () => {
     switch (status?.toUpperCase()) {
       case "ACTIVE":
         return "bg-green-100 text-green-800 border-green-200";
-      case "BLOCKED":
+      case "BLOCK":
         return "bg-red-100 text-red-800 border-red-200";
       default:
         return "bg-gray-100 text-gray-800 border-gray-200";
@@ -114,7 +133,6 @@ const AdminUsers = () => {
           </p>
         </div>
         
-        {/* Optional: Add user button or search bar here */}
         <div className="flex w-full sm:w-auto items-center gap-3">
           <div className="relative w-full sm:w-64">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -172,63 +190,68 @@ const AdminUsers = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {users.length > 0 ? (
                 users.map((user, index) => {
-                  // Some systems use _id, some use id
                   const userId = user._id || user.id || index.toString();
                   
                   return (
-                  <tr key={userId} className="hover:bg-gray-50 transition-colors duration-150">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0 h-10 w-10">
-                          <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-blue-500 to-blue-600 flex items-center justify-center text-white font-medium shadow-sm">
-                            {getInitials(user.name)}
+                    <tr key={userId} className="hover:bg-gray-50 transition-colors duration-150">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="flex-shrink-0 h-10 w-10">
+                            <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-blue-500 to-blue-600 flex items-center justify-center text-white font-medium shadow-sm">
+                              {getInitials(user.name)}
+                            </div>
+                          </div>
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-gray-900">{user.name || "N/A"}</div>
+                            <div className="text-sm text-gray-500">{user.email}</div>
                           </div>
                         </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">{user.name || "N/A"}</div>
-                          <div className="text-sm text-gray-500">{user.email}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getRoleBadgeColor(user.role)}`}>
-                        {user.role?.replace('_', ' ') || "USER"}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusBadgeColor(user.status)}`}>
-                        <span className={`h-1.5 w-1.5 rounded-full mr-1.5 ${user.status?.toUpperCase() === 'ACTIVE' ? 'bg-green-600' : 'bg-red-600'}`}></span>
-                        {user.status || "UNKNOWN"}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {user.isVerified ? (
-                        <div className="flex items-center text-green-600 bg-green-50 px-2.5 py-1 rounded-md w-fit border border-green-100">
-                          <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                          </svg>
-                          <span className="text-xs font-medium">Verified</span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center text-yellow-600 bg-yellow-50 px-2.5 py-1 rounded-md w-fit border border-yellow-100">
-                          <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                          </svg>
-                          <span className="text-xs font-medium">Pending</span>
-                        </div>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button className="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md transition-colors duration-150 mr-2">
-                        View
-                      </button>
-                      <button className="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md transition-colors duration-150"
-                      onClick={()=>handleUser(userId,user?.status)}>
-                        {user.status?.toUpperCase() === 'ACTIVE' ? 'Block' : 'Unblock'}
-                      </button>
-                    </td>
-                  </tr>
-                )})
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getRoleBadgeColor(user.role)}`}>
+                          {user.role?.replace('_', ' ') || "USER"}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusBadgeColor(user.status)}`}>
+                          <span className={`h-1.5 w-1.5 rounded-full mr-1.5 ${user.status?.toUpperCase() === 'ACTIVE' ? 'bg-green-600' : 'bg-red-600'}`}></span>
+                          {user.status || "UNKNOWN"}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {user.isVerified ? (
+                          <div className="flex items-center text-green-600 bg-green-50 px-2.5 py-1 rounded-md w-fit border border-green-100">
+                            <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span className="text-xs font-medium">Verified</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center text-yellow-600 bg-yellow-50 px-2.5 py-1 rounded-md w-fit border border-yellow-100">
+                            <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span className="text-xs font-medium">Pending</span>
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button 
+                          className="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md transition-colors duration-150 mr-2"
+                          onClick={() => detailsView(userId)}
+                        >
+                          View
+                        </button>
+                        <button 
+                          className="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md transition-colors duration-150"
+                          onClick={() => handleUser(userId, user.status)}
+                        >
+                          {user.status?.toUpperCase() === 'ACTIVE' ? 'Block' : 'Unblock'}
+                        </button>
+                      </td>
+                    </tr>
+                  )
+                })
               ) : (
                 <tr>
                   <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
@@ -278,6 +301,126 @@ const AdminUsers = () => {
           </div>
         )}
       </div>
+
+      {/* User Details Modal */}
+      {isDetailsModalOpen && selectedUser && typeof document !== 'undefined' && createPortal(
+        <div 
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm"
+          onClick={closeDetailsModal}
+        >
+          <div 
+            className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden transform transition-all animate-in fade-in zoom-in duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="relative p-6 border-b border-gray-100">
+              <button 
+                onClick={closeDetailsModal}
+                className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              
+              <div className="flex items-center space-x-4">
+                <div className="h-14 w-14 rounded-full bg-gradient-to-tr from-blue-500 to-blue-600 flex items-center justify-center text-white text-xl font-bold shadow-md">
+                  {getInitials(selectedUser.name)}
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 leading-tight">{selectedUser.name}</h3>
+                  <p className="text-sm text-gray-500 font-medium">{selectedUser.email}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 space-y-5">
+              <div className="grid grid-cols-2 gap-y-4 gap-x-6">
+                <div className="col-span-2">
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-1">Email Identifier</label>
+                  <p className="text-sm font-semibold text-gray-900 bg-gray-50 p-2 rounded-lg border border-gray-100">{selectedUser.email}</p>
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-1">Role</label>
+                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border ${getRoleBadgeColor(selectedUser.role)}`}>
+                    {selectedUser.role?.replace('_', ' ') || "USER"}
+                  </span>
+                </div>
+                
+                <div>
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-1">Status</label>
+                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border ${getStatusBadgeColor(selectedUser.status)}`}>
+                    <span className={`h-2 w-2 rounded-full mr-1.5 ${selectedUser.status?.toUpperCase() === 'ACTIVE' ? 'bg-green-600' : 'bg-red-600'}`}></span>
+                    {selectedUser.status || "UNKNOWN"}
+                  </span>
+                </div>
+
+                {/* <div className="col-span-2 sm:col-span-1">
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-1">User ID</label>
+                  <div className="text-[10px] font-mono text-gray-500 bg-gray-50 px-2 py-1 rounded border border-gray-100 truncate">
+                    {selectedUser._id || selectedUser.id || "N/A"}
+                  </div>
+                </div> */}
+
+                {/* <div className="col-span-2 sm:col-span-1">
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-1">Joined On</label>
+                  <div className="text-sm font-medium text-gray-700">
+                    {selectedUser.createdAt ? new Date(selectedUser.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' }) : "N/A"}
+                  </div>
+                </div> */}
+
+                <div>
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-1">Verified Member</label>
+                  {selectedUser.isVerified ? (
+                    <div className="flex items-center text-green-600 font-semibold text-sm">
+                      <svg className="w-5 h-5 mr-1 bg-green-100 rounded-full p-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5"/></svg>
+                      Verified
+                    </div>
+                  ) : (
+                    <div className="flex items-center text-yellow-600 font-semibold text-sm">
+                      <svg className="w-5 h-5 mr-1 bg-yellow-100 rounded-full p-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5"/></svg>
+                      Pending
+                    </div>
+                  )}
+                </div>
+
+                {selectedUser.applyingupgrade && (
+                   <div>
+                    <label className="text-xs font-semibold text-blue-400 uppercase tracking-wider block mb-1">Upgrade Status</label>
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-blue-100 text-blue-700 border border-blue-200">
+                      Processing Upgrade...
+                    </span>
+                  </div>
+                )}
+
+                {selectedUser.isEventManger && (
+                  <div className="col-span-2 mt-2">
+                    <div className="bg-blue-50 text-blue-700 p-3 rounded-xl border border-blue-100 flex items-start space-x-3">
+                      <svg className="w-5 h-5 text-blue-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                      </svg>
+                      <span className="text-sm font-medium">Authorized Event Manager with elevated platform permissions.</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4 bg-gray-50 border-t border-gray-100 flex justify-end">
+              <button
+                onClick={closeDetailsModal}
+                className="px-6 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-xl font-semibold text-sm hover:bg-gray-100 hover:border-gray-400 transition-all shadow-sm active:scale-95"
+              >
+                Close Profile
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 };

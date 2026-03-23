@@ -10,6 +10,10 @@ const controller = makeAdminController()
 router.get("/users",verifyAccessToken,controller.getUsers.bind(controller));
 
 
-router.patch("/blockorunblock/:userId",verifyAccessToken,controller.userManage.bind(controller))
-// router.get("/pendingmanagers",verifyAccessToken,controller.getPendingManagers.bind(controller))
+router.patch("/blockorunblock/:userId",verifyAccessToken,controller.userManage.bind(controller));
+router.get("/userDetails/:userId",verifyAccessToken,controller.userDetails.bind(controller));
+
+
+
+router.get("/pendingmanagers/:userId",verifyAccessToken,controller.pendingmanagerDetails.bind(controller));
 export default router

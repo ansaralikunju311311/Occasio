@@ -39,6 +39,7 @@ export class UpgradeUseCase{
 
 
           const request = new EventManager(
+            null, 
         user.id,
       data.fullName,
       data.organizationName,

@@ -1,7 +1,7 @@
-import { IAdminRepository } from "../../../domain/repositories/admin/admin.repository.interface.js"
 import { User } from "../../../domain/entites/user.entity.js";
 import { ManageDto } from "../../dtos/manage.dto.js";
 import { IUserRepository } from "../../../domain/repositories/user/user.repository.interface.js";
+import { UserStatus } from "../../../../../common/enums/user-status.enum.js";
 export class UserManageUseCase{
     constructor(
            
@@ -17,7 +17,7 @@ export class UserManageUseCase{
 
           if(!user) return null
     
-          user.status = data.status;
+          user.status = data.status as UserStatus;
           return this.userRepository.update(user)
        }
     
