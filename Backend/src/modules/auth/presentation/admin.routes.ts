@@ -16,4 +16,9 @@ router.get("/userDetails/:userId",verifyAccessToken,controller.userDetails.bind(
 
 
 router.get("/pendingmanagers/:userId",verifyAccessToken,controller.pendingmanagerDetails.bind(controller));
-export default router
+
+
+
+router.patch("/approval/:id",verifyAccessToken,controller.managerApproval.bind(controller));
+router.patch("/rejection/:id",verifyAccessToken,controller.managerRejection.bind(controller))
+export default router;

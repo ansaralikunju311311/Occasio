@@ -35,4 +35,32 @@ export class EmailSerive{
     //  console.log("for the checking",value)
   }
  
+  async sendApprovalEmail(to: string, name: string): Promise<void> {
+    await this.transporter.sendMail({
+      from: `"Occasio" <${process.env.MAIL_USER}>`,
+      to,
+      subject: "Event Manager Application Approved",
+      html: `
+        <h2>Congratulations ${name}!</h2>
+        <p>Your application to become an Event Manager on Occasio has been approved.</p>
+        <p>You can now log in and start creating events.</p>
+        <p>Best regards,<br/>The Occasio Team</p>
+      `
+    });
+  }
+
+  async sendRejectionEmail(to: string, name: string): Promise<void> {
+    await this.transporter.sendMail({
+      from: `"Occasio" <${process.env.MAIL_USER}>`,
+      to,
+      subject: "Event Manager Application Update",
+      html: `
+        <h2>Hello ${name},</h2>
+        <p>Thank you for your interest in becoming an Event Manager on Occasio.</p>
+        <p>After reviewing your application, we regret to inform you that we cannot approve your request at this time.</p>
+        <p>If you have any questions, please feel free to contact our support team.</p>
+        <p>Best regards,<br/>The Occasio Team</p>
+      `
+    });
+  }
 }

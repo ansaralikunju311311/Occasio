@@ -9,7 +9,7 @@ export class PendingmanagerDetailsUseCase {
     private adminRepository: IAdminRepository
   ) { }
 
-  async execute(userId:any): Promise<EventManager | null> {
+  async execute(userId:string): Promise<EventManager | null> {
 
     const user = await this.adminRepository.findByuserId(userId);
 

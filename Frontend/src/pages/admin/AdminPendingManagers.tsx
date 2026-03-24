@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
-import { useAppSelector } from "../../redux/hook";
+
+
 import { api } from "../../services/api";
+import { toast } from "sonner";
+
 interface PendingManager {
   _id?: string;
   id?: string;
@@ -31,6 +34,8 @@ const AdminPendingManagers = () => {
   const [selectedManager, setSelectedManager] = useState<ManagerDetails | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [fetchingDetails, setFetchingDetails] = useState(false);
+
+
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -70,7 +75,7 @@ const AdminPendingManagers = () => {
       setFetchingDetails(true);
       const response = await api.get(`/admin/pendingmanagers/${userId}`);
       console.log("manager details get", response);
-
+  
       // Extract the manager details object safely
       let details = response.data;
       if (details.data?.user) details = details.data.user;
@@ -79,7 +84,6 @@ const AdminPendingManagers = () => {
 
       console.log("Extracted details:", details);
 
-      // Ensure socialLinks is an array if it comes as a string or handle its format
       if (typeof details.socialLinks === 'string') {
         details.socialLinks = details.socialLinks.split(',').map((s: string) => s.trim()).filter(Boolean);
       } else if (!Array.isArray(details.socialLinks)) {
@@ -92,6 +96,35 @@ const AdminPendingManagers = () => {
       console.error("Failed to fetch manager details:", error);
     } finally {
       setFetchingDetails(false);
+    }
+  };
+
+  const handleApproval = async (id: string) => {
+    try {
+      const response = await api.patch(`admin/approval/${id}`);
+
+     
+      console.log(response);
+      toast.success("Manager application approved successfully!");
+      setManagers(prev => prev.filter(m => (m._id || m.id) !== id));
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Approval failed:", error);
+      toast.error("Failed to approve manager application.");
+    }
+  };
+
+  const handleRejection = async (id: string) => {
+    try {
+      const response = await api.patch(`admin/rejection/${id}`);
+      console.log(response);
+
+      toast.success("Manager application rejected.");
+      setManagers(prev => prev.filter(m => (m._id || m.id) !== id));
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Rejection failed:", error);
+      toast.error("Failed to reject manager application.");
     }
   };
   const getInitials = (name: string) => {
@@ -164,7 +197,7 @@ const AdminPendingManagers = () => {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="shrink-0 h-10 w-10">
-                            <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-emerald-500 to-emerald-600 flex items-center justify-center text-white font-medium shadow-sm">
+                            <div className="h-10 w-10 rounded-full bg-linear-to-tr from-emerald-500 to-emerald-600 flex items-center justify-center text-white font-medium shadow-sm">
                               {getInitials(manager.name)}
                             </div>
                           </div>
@@ -197,14 +230,20 @@ const AdminPendingManagers = () => {
                             )}
                             {fetchingDetails ? 'Loading...' : 'View'}
                           </button>
-                          <button className="inline-flex items-center text-teal-600 hover:text-teal-900 bg-teal-50 hover:bg-teal-100 px-3 py-1.5 rounded-lg transition-all duration-200 shadow-sm border border-teal-100">
+                          {/* <button
+                            className="inline-flex items-center text-teal-600 hover:text-teal-900 bg-teal-50 hover:bg-teal-100 px-3 py-1.5 rounded-lg transition-all duration-200 shadow-sm border border-teal-100"
+                            onClick={() => handleApproval(managerId)}
+                          >
                             <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
                             Approve
                           </button>
-                          <button className="inline-flex items-center text-rose-600 hover:text-rose-900 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-lg transition-all duration-200 shadow-sm border border-rose-100">
+                          <button
+                            className="inline-flex items-center text-rose-600 hover:text-rose-900 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-lg transition-all duration-200 shadow-sm border border-rose-100"
+                            onClick={() => handleRejection(managerId)}
+                          >
                             <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                             Reject
-                          </button>
+                          </button> */}
                         </div>
                       </td>
                     </tr>
@@ -367,10 +406,12 @@ const AdminPendingManagers = () => {
                 Close
               </button>
               <div className="flex gap-2">
-                <button className="px-6 py-2.5 rounded-xl bg-rose-600 text-white text-sm font-semibold hover:bg-rose-700 transition-all shadow-md shadow-rose-200">
+                <button className="px-6 py-2.5 rounded-xl bg-rose-600 text-white text-sm font-semibold hover:bg-rose-700 transition-all shadow-md shadow-rose-200"
+                onClick={()=>handleRejection(selectedManager.userId)}>
                   Reject Application
                 </button>
-                <button className="px-6 py-2.5 rounded-xl bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 transition-all shadow-md shadow-emerald-200">
+                <button className="px-6 py-2.5 rounded-xl bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 transition-all shadow-md shadow-emerald-200"
+                onClick={()=>handleApproval(selectedManager.userId)}>
                   Approve Application
                 </button>
               </div>

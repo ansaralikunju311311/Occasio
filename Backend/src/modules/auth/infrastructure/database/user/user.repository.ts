@@ -4,12 +4,12 @@ import { User } from "../../../domain/entites/user.entity.js";
 
 import { UserModel } from "../user.model.js";
 
-export class UserRepository implements IUserRepository{
+export class UserRepository implements IUserRepository {
 
 
     async findByEmail(email: string): Promise<User | null> {
-        const doc = await UserModel.findOne({email});
-        if(!doc) return null;
+        const doc = await UserModel.findOne({ email });
+        if (!doc) return null;
 
         return new User(
             doc._id.toString(),
@@ -25,16 +25,17 @@ export class UserRepository implements IUserRepository{
             doc.otpSentAt,
             doc.isEventManger,
             doc.applyingupgrade,
-           
+
         )
     }
 
 
 
-     async findById(id: string): Promise<User | null> {
-         const user = await UserModel.findById(id)
-         if(!user) return null;
-            return new User(
+    async findById(id: string): Promise<User | null> {
+        console.log("gvhbjnkmlhgdrfghjkml,;.")
+        const user = await UserModel.findById(id)
+        if (!user) return null;
+        return new User(
             user._id.toString(),
             user.name,
             user.email,
@@ -50,68 +51,69 @@ export class UserRepository implements IUserRepository{
             user.applyingupgrade
         )
 
-     }
+    }
 
     async create(user: User): Promise<User> {
         // console.log('user',user.role);
-          const created = await UserModel.create({
-      name: user.name,
-      email: user.email,
-      password: user.password,
-      role: user.role,
-      status: user.status,
-      isVerified:user.isVerified,
-      otp:user.otp,
-      otpExpires:user.otpExpires,
-      otpType:user.otpType,
-      otpSentAt:user.otpSendAt,
-      isEventManger:user.isEventManger,
-      applyingupgrade:user.applyingupgrade
-    });
+        const created = await UserModel.create({
+            name: user.name,
+            email: user.email,
+            password: user.password,
+            role: user.role,
+            status: user.status,
+            isVerified: user.isVerified,
+            otp: user.otp,
+            otpExpires: user.otpExpires,
+            otpType: user.otpType,
+            otpSentAt: user.otpSendAt,
+            isEventManger: user.isEventManger,
+            applyingupgrade: user.applyingupgrade
+        });
 
-    return new User(
-        created._id.toString(),
-      created.name,
-      created.email,
-      created.password,
-      created.role,
-      created.status,
-      created.isVerified,
-      created.otp,
-      created.otpExpires,
-      created.otpType,
-      created.otpSentAt,
-      created.isEventManger,
-      created.applyingupgrade
-    );
+        return new User(
+            created._id.toString(),
+            created.name,
+            created.email,
+            created.password,
+            created.role,
+            created.status,
+            created.isVerified,
+            created.otp,
+            created.otpExpires,
+            created.otpType,
+            created.otpSentAt,
+            created.isEventManger,
+            created.applyingupgrade
+        );
     }
 
-    async update(user:User):Promise<User>{
+    async update(user: User): Promise<User> {
 
-        console.log("the user details",user.isVerified)
+        console.log("the user details", user.isVerified)
         // console.log('the user coming here for the upation',user)
-         await UserModel.updateOne(
-            {email:user.email},
+        await UserModel.updateOne(
+            { email: user.email },
 
 
             {
-                status:user.status,
-            password:user.password,
-            isVerified:user.isVerified,
-             otp:user.otp,
-             otpExpires:user.otpExpires,
-             otpType:user.otpType,
-             otpSentAt:user.otpSendAt,
-             applyingupgrade:user.applyingupgrade,
-             isEventManger:user.isEventManger
+                status: user.status,
+                password: user.password,
+                isVerified: user.isVerified,
+                otp: user.otp,
+                otpExpires: user.otpExpires,
+                otpType: user.otpType,
+                otpSentAt: user.otpSendAt,
+                applyingupgrade: user.applyingupgrade,
+                isEventManger: user.isEventManger,
+                role: user.role
 
             }
-         )
+        )
 
-         console.log('after the updation the values',user)
+        console.log('after the updation the values', user)
         //  console.log('the user after the u[dation',user);
         //   return new User()
         return user
     }
-   
+
 }

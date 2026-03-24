@@ -2,9 +2,11 @@ import { NextFunction,Request,Response } from 'express';
 import {FindAllUseCase} from '../application/use-cases/admin/findall.usecase.js'
 import { HttpStatus } from '../../../common/constants/http-stattus.js';
 import { UserManageUseCase } from '../application/use-cases/admin/usermange.usecase.js';
-import { PendingManagerUsecase } from '../application/use-cases/admin/pending.usecase.js';
+// import { PendingManagerUsecase } from '../application/use-cases/admin/pending.usecase.js';
 import { UserDetailsUseCase } from '../application/use-cases/admin/userdetails.usecase.js';
  import { PendingmanagerDetailsUseCase } from '../application/use-cases/admin/pendingmanager.usecase.js';
+import { ManagerApprovalUseCase } from '../application/use-cases/admin/managerapproval.usecase.js';
+import { ManagerRejectionUseCase } from '../application/use-cases/admin/managerrejection.usecase.js';
 export class AdminController{
     
     constructor(
@@ -12,7 +14,8 @@ export class AdminController{
         private userManageUseCase:UserManageUseCase,
         private userDetailsUseCase:UserDetailsUseCase,
         private pendingmanagerDetailsUseCase:PendingmanagerDetailsUseCase,
-                             
+        private managerApprovalUseCase:ManagerApprovalUseCase,
+         private managerRejectionUseCase:ManagerRejectionUseCase      
     
 
     //    private pendingManagerUsecase : PendingManagerUsecase
@@ -113,4 +116,34 @@ export class AdminController{
     //         next(error)
     //     }
     // }
+
+    async managerApproval(req:Request,res:Response,next:NextFunction){
+        try {
+            const {id} = req.params;
+
+            const users = await this.managerApprovalUseCase.execute(id);
+            res.status(HttpStatus.OK).json({
+                users
+            })
+            console.log('helloo')
+        } catch (error) {
+             next(error)
+        }
+    }
+
+
+
+    async managerRejection(req:Request,res:Response,next:NextFunction){
+        try {
+            const {id} = req.params;
+            console.log("id",id)
+            const users = await this.managerRejectionUseCase.execute(id);
+            res.status(HttpStatus.OK).json({
+                users
+            })
+            console.log("users list for the rejection purpose",users)
+        } catch (error) {
+            next(error)
+        }
+    }
 }
