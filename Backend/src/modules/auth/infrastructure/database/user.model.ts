@@ -17,6 +17,7 @@ export interface IUserDocument extends Document{
     otpSentAt : Date | null,
     isEventManger:boolean,
     applyingupgrade:boolean,
+    rejected:boolean|null
     
 }
 
@@ -75,6 +76,10 @@ const userSchema = new Schema<IUserDocument>(
         type:Boolean,
         default:false
     },
+    rejected:{
+        type:Boolean,
+        default:null
+    }
     
     
 },

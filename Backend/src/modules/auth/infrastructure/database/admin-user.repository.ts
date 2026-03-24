@@ -24,7 +24,9 @@ export class AdminRepository implements IAdminRepository {
                 user.otpType,
                 user.otpSentAt,
                 user.isEventManger,
-                user.applyingupgrade
+                user.applyingupgrade,
+                 user.rejected
+
             )
         ))
     }
@@ -45,7 +47,8 @@ export class AdminRepository implements IAdminRepository {
             user.otpType,
             user.otpSentAt,
             user.isEventManger,
-            user.applyingupgrade
+            user.applyingupgrade,
+            user.rejected
         )
 
     }

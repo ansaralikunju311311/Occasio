@@ -13,6 +13,9 @@ export class ManagerRejectionUseCase{
                 if(!user) return null
 
                 
+
+            user.rejected = true;
+            user.applyingupgrade = false;
             const updatedUser = await this.userRepository.update(user);
             
             if (updatedUser) {

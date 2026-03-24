@@ -54,7 +54,7 @@ const BecomeAManager: React.FC = () => {
     const user = useAppSelector((state) => state.auth.user);
 
 
-    console.log("thos userfrom the redux",user)
+    console.log("thos userfrom the redux", user)
     const dispatch = useAppDispatch()
     const navigate = useNavigate();
     const [view, setView] = React.useState<'perks' | 'form' | 'success'>('perks');
@@ -173,7 +173,43 @@ const BecomeAManager: React.FC = () => {
             </div>
 
             <div className="relative max-w-7xl mx-auto px-6 py-20 lg:py-32">
-                {user?.applyingupgrade && user?.role !== 'EVENT_MANAGER' ? (
+                {user?.role === 'EVENT_MANAGER' ? (
+                    <div className="max-w-2xl mx-auto text-center animate-in fade-in zoom-in-95 duration-500">
+                        <div className="w-24 h-24 bg-indigo-500/10 rounded-full flex items-center justify-center mx-auto mb-8 border border-indigo-500/20 shadow-2xl shadow-indigo-500/10">
+                            <CheckIcon className="w-12 h-12 text-indigo-400" />
+                        </div>
+                        <h2 className="text-4xl font-bold mb-4">Welcome, Manager</h2>
+                        <p className="text-slate-400 text-lg mb-10 max-w-md mx-auto">
+                            You are already an Event Manager. You can access your specialized tools and manage your events from the dashboard.
+                        </p>
+                        <button
+                            onClick={() => navigate('/eventmanager/stats')}
+                            className="px-8 py-4 bg-linear-to-r from-indigo-600 to-purple-700 hover:from-indigo-500 hover:to-purple-600 text-white font-bold rounded-2xl transition-all shadow-xl shadow-indigo-500/20"
+                        >
+                            Go to Dashboard
+                        </button>
+                    </div>
+                ) : user?.rejected ? (
+                    <div className="max-w-2xl mx-auto text-center animate-in fade-in zoom-in-95 duration-500">
+                        <div className="w-24 h-24 bg-rose-500/10 rounded-full flex items-center justify-center mx-auto mb-8 border border-rose-500/20 shadow-2xl shadow-rose-500/10">
+                            <svg className="w-12 h-12 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </div>
+                        <h2 className="text-4xl font-bold mb-4 text-rose-500">Application Rejected</h2>
+                        <p className="text-slate-400 text-lg mb-10 max-w-md mx-auto">
+                            Unfortunately, your application to become an event manager has been rejected at this time. Please contact support for more information or try again later.
+                        </p>
+                        <div className="flex gap-4 justify-center">
+                            <button
+                                onClick={() => navigate('/')}
+                                className="px-8 py-4 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-2xl transition-all"
+                            >
+                                Back to Homepage
+                            </button>
+                        </div>
+                    </div>
+                ) : user?.applyingupgrade ? (
                     <div className="max-w-2xl mx-auto text-center animate-in fade-in zoom-in-95 duration-500">
                         <div className="w-24 h-24 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-8 border border-amber-500/20 shadow-2xl shadow-amber-500/10">
                             <svg className="w-12 h-12 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -190,22 +226,6 @@ const BecomeAManager: React.FC = () => {
                             className="px-8 py-4 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-2xl transition-all"
                         >
                             Return to Homepage
-                        </button>
-                    </div>
-                ) : user?.role === 'EVENT_MANAGER' ? (
-                    <div className="max-w-2xl mx-auto text-center animate-in fade-in zoom-in-95 duration-500">
-                        <div className="w-24 h-24 bg-indigo-500/10 rounded-full flex items-center justify-center mx-auto mb-8 border border-indigo-500/20 shadow-2xl shadow-indigo-500/10">
-                            <CheckIcon className="w-12 h-12 text-indigo-400" />
-                        </div>
-                        <h2 className="text-4xl font-bold mb-4">Welcome, Manager</h2>
-                        <p className="text-slate-400 text-lg mb-10 max-w-md mx-auto">
-                            You are already an Event Manager. You can access your specialized tools and manage your events from the dashboard.
-                        </p>
-                        <button
-                            onClick={() => navigate('/event-manager/dashboard')}
-                            className="px-8 py-4 bg-linear-to-r from-indigo-600 to-purple-700 hover:from-indigo-500 hover:to-purple-600 text-white font-bold rounded-2xl transition-all shadow-xl shadow-indigo-500/20"
-                        >
-                            Go to Dashboard
                         </button>
                     </div>
                 ) : (

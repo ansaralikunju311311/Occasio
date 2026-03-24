@@ -47,7 +47,9 @@ export class UpdatePasswordUseCase{
                                     null,
                                     null,
                                     user.isEventManger,
-                                    user.applyingupgrade
+                                    user.applyingupgrade,
+                                                user.rejected
+
                                     
                                 );
 

@@ -6,6 +6,7 @@ interface User {
   email: string;
   role: string;
   applyingupgrade?: boolean;
+  rejected?: boolean;
 }
 
 interface AuthState {

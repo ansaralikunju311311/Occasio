@@ -16,7 +16,8 @@ export class ManagerApprovalUseCase{
             
    user.isEventManger=true;
    user.role = UserRole.EVENT_MANAGER;
-   
+   user.rejected=false;
+   user.applyingupgrade=false;
    const updatedUser = await this.userRepository.update(user);
    
    if (updatedUser) {
