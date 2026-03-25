@@ -58,7 +58,7 @@ export class SignupUsecase{
             otpExpires,
             UserOtp.SIGNUP,
             otpSendAt,
-            isEventManger,
+            
             applyingupgrade,
             rejected
 

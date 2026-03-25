@@ -11,7 +11,6 @@ interface PendingManager {
   email: string;
   status: string;
   createdAt?: string;
-  isEventManger?: boolean;
   applyingupgrade?: boolean;
 }
 
@@ -49,14 +48,14 @@ const AdminPendingManagers = () => {
 
 
 
-
+      console.log("users are coming",response)
 
         const usersData: any[] = Array.isArray(response.data)
           ? response.data
           : (response.data?.users || response.data?.data || []);
 
         const pendingManagers = usersData.filter(
-          (user) => user.applyingupgrade === true && user.isEventManger === false
+          (user) => user.applyingupgrade === true
         );
 
 
@@ -74,10 +73,14 @@ const AdminPendingManagers = () => {
 
 
   const handleManagerDetails = async (userId: string) => {
+
+
+
+
     try {
       setFetchingDetails(true);
       const response = await api.get(`/admin/pendingmanagers/${userId}`);
-      console.log("manager details get", response);
+      console.log("manager details get  for the checking purpose", response);
   
       // Extract the manager details object safely
       let details = response.data;

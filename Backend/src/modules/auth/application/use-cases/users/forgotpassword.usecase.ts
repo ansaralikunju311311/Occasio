@@ -51,7 +51,6 @@ export class ForgotpasswordUsecase {
                         otpExpires,
                         UserOtp.FORGOT_PASSWORD,
                         otpSendAt,
-                        data.isEventManger,
                         data.applyingupgrade,
                         data.rejected
 

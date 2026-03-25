@@ -23,7 +23,6 @@ export class UserRepository implements IUserRepository {
             doc.otpExpires,
             doc.otpType,
             doc.otpSentAt,
-            doc.isEventManger,
             doc.applyingupgrade,
             doc.rejected
         )
@@ -47,7 +46,6 @@ export class UserRepository implements IUserRepository {
             user.otpExpires,
             user.otpType,
             user.otpSentAt,
-            user.isEventManger,
             user.applyingupgrade,
             user.rejected
 
@@ -68,7 +66,6 @@ export class UserRepository implements IUserRepository {
             otpExpires: user.otpExpires,
             otpType: user.otpType,
             otpSentAt: user.otpSendAt,
-            isEventManger: user.isEventManger,
             applyingupgrade: user.applyingupgrade
         });
 
@@ -84,7 +81,6 @@ export class UserRepository implements IUserRepository {
             created.otpExpires,
             created.otpType,
             created.otpSentAt,
-            created.isEventManger,
             created.applyingupgrade,
                         created.rejected
 
@@ -108,7 +104,6 @@ export class UserRepository implements IUserRepository {
                 otpType: user.otpType,
                 otpSentAt: user.otpSendAt,
                 applyingupgrade: user.applyingupgrade,
-                isEventManger: user.isEventManger,
                 role: user.role,
                 rejected :user.rejected
 

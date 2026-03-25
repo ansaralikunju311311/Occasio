@@ -15,7 +15,6 @@ export class User {
     public otpExpires: Date | null,
     public otpType: UserOtp | null,
     public otpSendAt: Date | null,
-    public isEventManger: boolean,
     public applyingupgrade: boolean,
     public rejected : boolean | null
 
