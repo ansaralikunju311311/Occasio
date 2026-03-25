@@ -34,6 +34,9 @@ const AdminPendingManagers = () => {
   const [selectedManager, setSelectedManager] = useState<ManagerDetails | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [fetchingDetails, setFetchingDetails] = useState(false);
+  const [isRejectionModalOpen, setIsRejectionModalOpen] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState("");
+  const [rejectionId, setRejectionId] = useState<string | null>(null);
 
 
 
@@ -114,14 +117,16 @@ const AdminPendingManagers = () => {
     }
   };
 
-  const handleRejection = async (id: string) => {
+  const handleRejection = async (id: string, reason?: string) => {
     try {
-      const response = await api.patch(`admin/rejection/${id}`);
+      const response = await api.patch(`admin/rejection/${id}`, { reason });
       console.log(response);
 
       toast.success("Manager application rejected.");
       setManagers(prev => prev.filter(m => (m._id || m.id) !== id));
       setIsModalOpen(false);
+      setIsRejectionModalOpen(false);
+      setRejectionReason("");
     } catch (error) {
       console.error("Rejection failed:", error);
       toast.error("Failed to reject manager application.");
@@ -406,8 +411,13 @@ const AdminPendingManagers = () => {
                 Close
               </button>
               <div className="flex gap-2">
-                <button className="px-6 py-2.5 rounded-xl bg-rose-600 text-white text-sm font-semibold hover:bg-rose-700 transition-all shadow-md shadow-rose-200"
-                onClick={()=>handleRejection(selectedManager.userId)}>
+                <button 
+                  className="px-6 py-2.5 rounded-xl bg-rose-600 text-white text-sm font-semibold hover:bg-rose-700 transition-all shadow-md shadow-rose-200"
+                  onClick={() => {
+                    setRejectionId(selectedManager.userId);
+                    setIsRejectionModalOpen(true);
+                  }}
+                >
                   Reject Application
                 </button>
                 <button className="px-6 py-2.5 rounded-xl bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 transition-all shadow-md shadow-emerald-200"
@@ -415,6 +425,44 @@ const AdminPendingManagers = () => {
                   Approve Application
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Rejection Reason Modal */}
+      {isRejectionModalOpen && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden flex flex-col">
+            <div className="px-6 py-4 border-b border-gray-100 bg-rose-50/30">
+              <h2 className="text-xl font-bold text-gray-900">Provide Rejection Reason</h2>
+              <p className="text-sm text-gray-500 mt-1">This reason will be included in the email sent to the applicant.</p>
+            </div>
+            
+            <div className="p-6">
+              <textarea
+                className="w-full h-32 p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none resize-none transition-all text-sm"
+                placeholder="Enter the reason for rejection (optional)..."
+                value={rejectionReason}
+                onChange={(e) => setRejectionReason(e.target.value)}
+              />
+            </div>
+
+            <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/50 flex justify-end gap-3">
+              <button
+                onClick={() => {
+                  setIsRejectionModalOpen(false);
+                  setRejectionReason("");
+                }}
+                className="px-4 py-2 rounded-lg border border-gray-300 text-sm font-semibold text-gray-700 hover:bg-white transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleRejection(rejectionId!, rejectionReason)}
+                className="px-4 py-2 rounded-lg bg-rose-600 text-white text-sm font-semibold hover:bg-rose-700 transition-all shadow-md shadow-rose-200"
+              >
+                Confirm Rejection
+              </button>
             </div>
           </div>
         </div>

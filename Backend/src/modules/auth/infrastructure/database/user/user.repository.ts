@@ -26,8 +26,6 @@ export class UserRepository implements IUserRepository {
             doc.isEventManger,
             doc.applyingupgrade,
             doc.rejected
-
-
         )
     }
 
@@ -51,7 +49,7 @@ export class UserRepository implements IUserRepository {
             user.otpSentAt,
             user.isEventManger,
             user.applyingupgrade,
-                        user.rejected
+            user.rejected
 
         )
 

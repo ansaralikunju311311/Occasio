@@ -88,7 +88,7 @@ export class AdminController{
                console.log("ethiyooooo",userId)
                try {
                 console.log("we reached here")
-                  const user = await this.pendingmanagerDetailsUseCase.execute(userId);
+                  const user = await this.pendingmanagerDetailsUseCase.execute(userId as string);
                   console.log('the cliked manager details',user)
                   res.status(HttpStatus.OK).json({
                     user
@@ -121,7 +121,7 @@ export class AdminController{
         try {
             const {id} = req.params;
 
-            const users = await this.managerApprovalUseCase.execute(id);
+            const users = await this.managerApprovalUseCase.execute(id as string);
             res.status(HttpStatus.OK).json({
                 users
             })
@@ -136,8 +136,9 @@ export class AdminController{
     async managerRejection(req:Request,res:Response,next:NextFunction){
         try {
             const {id} = req.params;
-            console.log("id",id)
-            const users = await this.managerRejectionUseCase.execute(id);
+            const {reason} = req.body;
+            console.log("id",id,"reason",reason)
+            const users = await this.managerRejectionUseCase.execute(id as string, reason);
             res.status(HttpStatus.OK).json({
                 users
             })

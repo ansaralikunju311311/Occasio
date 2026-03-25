@@ -60,7 +60,7 @@ export class EmailSerive {
         }
     }
 
-    async sendRejectionEmail(to: string, name: string): Promise<void> {
+    async sendRejectionEmail(to: string, name: string, reason?: string): Promise<void> {
         try {
             console.log(`Sending rejection email to ${to}...`);
             await this.transporter.sendMail({
@@ -71,6 +71,10 @@ export class EmailSerive {
                     <h2>Hello ${name},</h2>
                     <p>Thank you for your interest in becoming an Event Manager on Occasio.</p>
                     <p>After reviewing your application, we regret to inform you that we cannot approve your request at this time.</p>
+                    ${reason ? `<div style="background-color: #fff5f5; border-left: 4px solid #f56565; padding: 15px; margin: 20px 0;">
+                        <strong>Reason for Rejection:</strong><br/>
+                        ${reason}
+                    </div>` : ""}
                     <p>If you have any questions, please feel free to contact our support team.</p>
                     <p>Best regards,<br/>The Occasio Team</p>
                 `
