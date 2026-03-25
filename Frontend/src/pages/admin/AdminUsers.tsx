@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { api } from "../../services/api";
+import { UpgradeStatus } from "../../types/upgrade-status.enum";
 
 interface User {
   _id?: string;
@@ -12,7 +13,7 @@ interface User {
   isVerified: boolean;
   isEventManger: boolean;
   createdAt?: string;
-  applyingupgrade?: boolean;
+  applyingupgrade?: UpgradeStatus;
 }
 
 const AdminUsers = () => {
@@ -386,11 +387,17 @@ const AdminUsers = () => {
                   )}
                 </div>
 
-                {selectedUser.applyingupgrade && (
+                {selectedUser.applyingupgrade && selectedUser.applyingupgrade !== UpgradeStatus.NONE && (
                    <div>
                     <label className="text-xs font-semibold text-blue-400 uppercase tracking-wider block mb-1">Upgrade Status</label>
-                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-blue-100 text-blue-700 border border-blue-200">
-                      Processing Upgrade...
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-bold border ${
+                      selectedUser.applyingupgrade === UpgradeStatus.PENDING ? 'bg-amber-100 text-amber-700 border-amber-200' :
+                      selectedUser.applyingupgrade === UpgradeStatus.REJECTED ? 'bg-rose-100 text-rose-700 border-rose-200' :
+                      'bg-blue-100 text-blue-700 border-blue-200'
+                    }`}>
+                      {selectedUser.applyingupgrade === UpgradeStatus.PENDING ? 'PENDING APPROVAL' :
+                       selectedUser.applyingupgrade === UpgradeStatus.REJECTED ? 'REJECTED' :
+                       'APPROVED'}
                     </span>
                   </div>
                 )}

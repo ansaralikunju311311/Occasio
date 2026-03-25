@@ -1,6 +1,7 @@
 import { IUserRepository } from "../../../domain/repositories/user/user.repository.interface.js";
 import { User } from "../../../domain/entites/user.entity.js";
 import { EmailSerive } from "../../../../../common/service/email.service.js";
+import { UpgradeStatus } from "../../../../../common/enums/upgrade.enum.js";
 export class ManagerRejectionUseCase{
     constructor(
         private userRepository : IUserRepository,
@@ -12,8 +13,8 @@ export class ManagerRejectionUseCase{
         console.log("user", user);
         if (!user) return null
 
-        user.rejected = true;
-        user.applyingupgrade = false;
+        user.rejectedAt = new Date();
+        user.applyingupgrade = UpgradeStatus.REJECTED;
         const updatedUser = await this.userRepository.update(user);
 
         if (updatedUser) {

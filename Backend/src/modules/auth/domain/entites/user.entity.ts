@@ -2,6 +2,7 @@
 import { UserRole } from "../../../../common/enums/user-role.enum.js";
 import { UserStatus } from "../../../../common/enums/user-status.enum.js";
 import { UserOtp } from "../../../../common/enums/user-otp.enum.js";
+import { UpgradeStatus } from "../../../../common/enums/upgrade.enum.js";
 export class User {
   constructor(
     public readonly id: string | null,
@@ -15,8 +16,8 @@ export class User {
     public otpExpires: Date | null,
     public otpType: UserOtp | null,
     public otpSendAt: Date | null,
-    public applyingupgrade: boolean,
-    public rejected : boolean | null
+    public applyingupgrade: UpgradeStatus,
+    public rejectedAt : Date | null
 
   ) { }
 

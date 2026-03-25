@@ -2,6 +2,7 @@ import mongoose, { Document, Schema } from "mongoose";
 import { UserRole } from "../../../../common/enums/user-role.enum.js";
 import { UserStatus } from "../../../../common/enums/user-status.enum.js";
 import { UserOtp } from "../../../../common/enums/user-otp.enum.js";
+import { UpgradeStatus } from "../../../../common/enums/upgrade.enum.js";
 // import { devNull } from "node:os";
 
 export interface IUserDocument extends Document{
@@ -16,8 +17,8 @@ export interface IUserDocument extends Document{
     otpType: UserOtp | null,
     otpSentAt : Date | null,
     
-    applyingupgrade:boolean,
-    rejected:boolean|null
+    applyingupgrade:UpgradeStatus,
+    rejectedAt:Date|null
     
 }
 
@@ -69,11 +70,12 @@ const userSchema = new Schema<IUserDocument>(
         type:Date
     },
     applyingupgrade:{
-        type:Boolean,
-        default:false
+        type:String,
+        enum:Object.values(UpgradeStatus),
+        default:UpgradeStatus.NONE
     },
-    rejected:{
-        type:Boolean,
+    rejectedAt:{
+        type:Date,
         default:null
     }
     

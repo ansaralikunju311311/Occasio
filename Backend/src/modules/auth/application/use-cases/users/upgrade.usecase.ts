@@ -3,6 +3,7 @@ import { IEventManagerRepository } from "../../../domain/repositories/manager/ma
 import { IUserRepository } from "../../../domain/repositories/user/user.repository.interface.js";
 import { UpgraderoleDto } from "../../dtos/upgraderole.dto.js";
 import { EventManager } from "../../../domain/entites/manager.entity.js";
+import { UpgradeStatus } from "../../../../../common/enums/upgrade.enum.js";
 
 export class UpgradeUseCase{
     constructor(
@@ -57,7 +58,7 @@ export class UpgradeUseCase{
 
        await this.managerRepository.create(request)
 
-       user.applyingupgrade=true;
+       user.applyingupgrade=UpgradeStatus.PENDING;
          // Add your upgrade logic here, for now just return the user
          return this.userRepository.update(user)
     }

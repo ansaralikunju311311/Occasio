@@ -4,6 +4,8 @@ import { useForm } from 'react-hook-form';
 import { api } from '../../services/api';
 import { useAppSelector, useAppDispatch } from '../../redux/hook';
 import { setAuth } from '../../redux/slices/authSlice';
+import { UpgradeStatus } from '../../types/upgrade-status.enum';
+
 
 
 interface ManagerFormData {
@@ -14,7 +16,7 @@ interface ManagerFormData {
     aboutEvents: string;
     socialLinks: string;
     documentReference: string;
-    certificate: string;
+    certificate: any;
 }
 
 const RocketIcon = () => (
@@ -189,7 +191,7 @@ const BecomeAManager: React.FC = () => {
                             Go to Dashboard
                         </button>
                     </div>
-                ) : user?.rejected ? (
+                ) : user?.applyingupgrade === UpgradeStatus.REJECTED ? (
                     <div className="max-w-2xl mx-auto text-center animate-in fade-in zoom-in-95 duration-500">
                         <div className="w-24 h-24 bg-rose-500/10 rounded-full flex items-center justify-center mx-auto mb-8 border border-rose-500/20 shadow-2xl shadow-rose-500/10">
                             <svg className="w-12 h-12 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -209,7 +211,7 @@ const BecomeAManager: React.FC = () => {
                             </button>
                         </div>
                     </div>
-                ) : user?.applyingupgrade ? (
+                ) : user?.applyingupgrade === UpgradeStatus.PENDING ? (
                     <div className="max-w-2xl mx-auto text-center animate-in fade-in zoom-in-95 duration-500">
                         <div className="w-24 h-24 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-8 border border-amber-500/20 shadow-2xl shadow-amber-500/10">
                             <svg className="w-12 h-12 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -443,7 +445,7 @@ const BecomeAManager: React.FC = () => {
                                                 </div>
                                             )}
                                         </div>
-                                        {errors.certificate && <p className="text-red-500 text-xs mt-1 ml-1">{errors.certificate.message}</p>}
+                                        {errors.certificate && <p className="text-red-500 text-xs mt-1 ml-1">{errors.certificate.message?.toString()}</p>}
                                     </div>
 
                                     <div className="flex gap-4 pt-4">

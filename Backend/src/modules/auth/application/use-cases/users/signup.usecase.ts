@@ -10,6 +10,7 @@ import { AppError } from "../../../../../common/errors/app-error.js";
 import { HttpStatus } from "../../../../../common/constants/http-stattus.js";
 import { EmailSerive } from "../../../../../common/service/email.service.js";
 import { ErrorMessage } from "../../../../../common/enums/message.enum.js";
+import { UpgradeStatus } from "../../../../../common/enums/upgrade.enum.js";
 export class SignupUsecase{
     constructor(
         private userRepository:IUserRepository,
@@ -32,10 +33,10 @@ export class SignupUsecase{
 
         const hashpassword = await this.hashService.hash(data.password)
         const role: UserRole = UserRole.USER;
-        const applyingupgrade=false
-        const isEventManger = false;
+        const applyingupgrade=UpgradeStatus.NONE
+        // const isEventManger = false;
         const isVerified = false ;
-        const  rejected = null
+        const  rejectedAt = null
 
         const otpSendAt = new Date()
         const otp = generateOTP();
@@ -60,7 +61,7 @@ export class SignupUsecase{
             otpSendAt,
             
             applyingupgrade,
-            rejected
+            rejectedAt
 
             
         );

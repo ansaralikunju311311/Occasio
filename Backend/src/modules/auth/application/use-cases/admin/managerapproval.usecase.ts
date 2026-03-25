@@ -2,6 +2,7 @@ import { IUserRepository } from "../../../domain/repositories/user/user.reposito
 import { User } from "../../../domain/entites/user.entity.js";
 import { UserRole } from "../../../../../common/enums/user-role.enum.js";
 import { EmailSerive } from "../../../../../common/service/email.service.js";
+import { UpgradeStatus } from "../../../../../common/enums/upgrade.enum.js";
 export class ManagerApprovalUseCase{
     constructor(
         private userRepository : IUserRepository,
@@ -13,11 +14,10 @@ export class ManagerApprovalUseCase{
         console.log(user)
 
         if(!user) return null
-            
-   user.isEventManger=true;
+  
    user.role = UserRole.EVENT_MANAGER;
-   user.rejected=false;
-   user.applyingupgrade=false;
+   user.rejectedAt=null;
+   user.applyingupgrade=UpgradeStatus.APPROVED;
    const updatedUser = await this.userRepository.update(user);
    
    if (updatedUser) {

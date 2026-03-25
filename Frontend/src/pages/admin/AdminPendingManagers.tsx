@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { UpgradeStatus } from "../../types/upgrade-status.enum";
+
 
 
 import { api } from "../../services/api";
@@ -11,7 +13,7 @@ interface PendingManager {
   email: string;
   status: string;
   createdAt?: string;
-  applyingupgrade?: boolean;
+  applyingupgrade?: UpgradeStatus;
 }
 
 interface ManagerDetails {
@@ -55,7 +57,7 @@ const AdminPendingManagers = () => {
           : (response.data?.users || response.data?.data || []);
 
         const pendingManagers = usersData.filter(
-          (user) => user.applyingupgrade === true
+          (user) => user.applyingupgrade === UpgradeStatus.PENDING
         );
 
 

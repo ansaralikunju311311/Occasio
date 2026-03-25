@@ -1,12 +1,13 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
+import { UpgradeStatus } from "../../types/upgrade-status.enum";
+
 interface User {
   _id: string;
   name: string;
   email: string;
   role: string;
-  applyingupgrade?: boolean;
-  rejected?: boolean;
+  applyingupgrade: UpgradeStatus;
 }
 
 interface AuthState {

@@ -23,9 +23,8 @@ export class AdminRepository implements IAdminRepository {
                 user.otpExpires,
                 user.otpType,
                 user.otpSentAt,
-                
                 user.applyingupgrade,
-                 user.rejected
+                 user.rejectedAt
 
             )
         ))
@@ -48,7 +47,7 @@ export class AdminRepository implements IAdminRepository {
             user.otpSentAt,
            
             user.applyingupgrade,
-            user.rejected
+            user.rejectedAt
         )
 
     }

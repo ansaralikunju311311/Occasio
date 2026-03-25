@@ -12,9 +12,6 @@ export class ForgotpasswordUsecase {
         private userRepository :IUserRepository,
         private emailService :EmailSerive
     ){}
-
-
-
     async execute(email:string):Promise<User>{
 
 
@@ -52,7 +49,7 @@ export class ForgotpasswordUsecase {
                         UserOtp.FORGOT_PASSWORD,
                         otpSendAt,
                         data.applyingupgrade,
-                        data.rejected
+                        data.rejectedAt
 
                         
                     );
