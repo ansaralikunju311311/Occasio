@@ -65,11 +65,19 @@ const BecomeAManager: React.FC = () => {
     const [isReapplying, setIsReapplying] = React.useState(false);
 
     // Cooldown calculation
-    const rejectedAt = user?.rejectedAt ? new Date(user.rejectedAt) : null;
-    const cooldownMinutes = 1;
-    const minutesPassed = rejectedAt ? (new Date().getTime() - rejectedAt.getTime()) / (1000 * 60) : 0;
-    const canReapply = minutesPassed >= cooldownMinutes;
-    const secondsRemaining = Math.max(0, Math.ceil((cooldownMinutes * 60) - (minutesPassed * 60)));
+    const reapplyAt = user?.reapplyAt ? new Date(user.reapplyAt).getTime() : null;
+    
+    const [currentTime, setCurrentTime] = React.useState(Date.now());
+    
+    React.useEffect(() => {
+        if (reapplyAt && Date.now() < reapplyAt) {
+            const interval = setInterval(() => setCurrentTime(Date.now()), 1000);
+            return () => clearInterval(interval);
+        }
+    }, [reapplyAt]);
+
+    const canReapply = reapplyAt ? currentTime >= reapplyAt : true;
+    const secondsRemaining = reapplyAt ? Math.max(0, Math.ceil((reapplyAt - currentTime) / 1000)) : 0;
 
     const [preview, setPreview] = React.useState<string | null>(null);
 
@@ -186,7 +194,7 @@ const BecomeAManager: React.FC = () => {
                     user: response.data.users || response.data.user || response.data
                 })
             );
-         navigate("/applyasmanager")
+            navigate("/applyasmanager")
             // toast.success("Re-apply request sent successfully!");
         } catch (error: any) {
             console.error("Re-apply failed:", error);

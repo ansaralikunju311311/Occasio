@@ -37,7 +37,7 @@ export class SignupUsecase{
         // const isEventManger = false;
         const isVerified = false ;
         const  rejectedAt = null
-
+        const reapplyAt=null
         const otpSendAt = new Date()
         const otp = generateOTP();
         
@@ -61,7 +61,9 @@ export class SignupUsecase{
             otpSendAt,
             
             applyingupgrade,
-            rejectedAt
+            rejectedAt,
+            reapplyAt
+            
 
             
         );

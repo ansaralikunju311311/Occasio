@@ -49,7 +49,8 @@ export class ForgotpasswordUsecase {
                         UserOtp.FORGOT_PASSWORD,
                         otpSendAt,
                         data.applyingupgrade,
-                        data.rejectedAt
+                        data.rejectedAt,
+                        data.reapplyAt
 
                         
                     );

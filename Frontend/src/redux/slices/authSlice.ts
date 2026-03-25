@@ -9,6 +9,7 @@ interface User {
   role: string;
   applyingupgrade: UpgradeStatus;
   rejectedAt?: string | null;
+  reapplyAt?: string | null;
 }
 
 interface AuthState {

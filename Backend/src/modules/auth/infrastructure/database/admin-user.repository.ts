@@ -24,8 +24,8 @@ export class AdminRepository implements IAdminRepository {
                 user.otpType,
                 user.otpSentAt,
                 user.applyingupgrade,
-                 user.rejectedAt
-
+                user.rejectedAt,
+                user.reapplyAt
             )
         ))
     }
@@ -46,20 +46,21 @@ export class AdminRepository implements IAdminRepository {
             user.otpType,
             user.otpSentAt,
             user.applyingupgrade,
-            user.rejectedAt
+            user.rejectedAt,
+            user.reapplyAt
         )
 
     }
 
-    async findByuserId(id:string): Promise<EventManager | null> {
+    async findByuserId(id: string): Promise<EventManager | null> {
 
-        console.log("id evide vannooo just",id)
-        const manager = await EventManagerModel.findOne({userId:id});
-
-
+        console.log("id evide vannooo just", id)
+        const manager = await EventManagerModel.findOne({ userId: id });
 
 
-        
+
+
+
         if (!manager) return null;
 
         return new EventManager(

@@ -47,7 +47,8 @@ export class UpdatePasswordUseCase{
                                     null,
                                     null,
                                     user.applyingupgrade,
-                                                user.rejectedAt
+                                                user.rejectedAt,
+                                                user.reapplyAt
 
                                     
                                 );

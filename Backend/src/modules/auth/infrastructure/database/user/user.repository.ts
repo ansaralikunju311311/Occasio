@@ -24,7 +24,8 @@ export class UserRepository implements IUserRepository {
             doc.otpType,
             doc.otpSentAt,
             doc.applyingupgrade,
-            doc.rejectedAt
+            doc.rejectedAt,
+            doc.reapplyAt
         )
     }
 
@@ -47,14 +48,15 @@ export class UserRepository implements IUserRepository {
             user.otpType,
             user.otpSentAt,
             user.applyingupgrade,
-            user.rejectedAt
+            user.rejectedAt,
+            user.reapplyAt
 
         )
 
     }
 
     async create(user: User): Promise<User> {
-        
+
         const created = await UserModel.create({
             name: user.name,
             email: user.email,
@@ -67,7 +69,8 @@ export class UserRepository implements IUserRepository {
             otpType: user.otpType,
             otpSentAt: user.otpSendAt,
             applyingupgrade: user.applyingupgrade,
-            rejectedAt:user.rejectedAt
+            rejectedAt: user.rejectedAt,
+            reapplyAt: user.reapplyAt
         });
 
         return new User(
@@ -83,7 +86,8 @@ export class UserRepository implements IUserRepository {
             created.otpType,
             created.otpSentAt,
             created.applyingupgrade,
-            created.rejectedAt
+            created.rejectedAt,
+            created.reapplyAt
 
         );
     }
@@ -91,7 +95,7 @@ export class UserRepository implements IUserRepository {
     async update(user: User): Promise<User> {
 
         console.log("the user details", user.isVerified)
-       
+
         await UserModel.updateOne(
             { email: user.email },
 
@@ -106,8 +110,8 @@ export class UserRepository implements IUserRepository {
                 otpSentAt: user.otpSendAt,
                 applyingupgrade: user.applyingupgrade,
                 role: user.role,
-                rejectedAt :user.rejectedAt
-
+                rejectedAt: user.rejectedAt,
+                reapplyAt: user.reapplyAt
             }
         )
 

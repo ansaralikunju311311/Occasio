@@ -26,23 +26,28 @@ export class ReapplyUseCase {
             throw new AppError(ErrorMessage.ACCOUNT_BLOCKED, HttpStatus.UNAUTHORIZED)
         }
 
-        const now = new Date()
-        //  const email = user?.email
-        const rejectedTime = new Date(user.rejectedAt);
-        const diffInMinutes =
-            (now.getTime() - rejectedTime.getTime()) / (1000 * 60);
+        // const now = new Date()
 
-        if (diffInMinutes < 1) {
-            throw new Error(`You can reapply after 1 minute.`);
-        }
+        // const rejectedTime = new Date(user.rejectedAt);
+        // const diffInMinutes =
+        //     (now.getTime() - rejectedTime.getTime()) / (1000 * 60);
+
+        // if (diffInMinutes < 1) {
+        //     throw new Error(`You can reapply after 1 minute.`);
+        // }
 
         // const updatedUser = await this.userRepository.update(email, {
         //       applyingupgrade: UpgradeStatus.PENDING
         //       rejectedAt: null
         //     });
 
+        if (user.reapplyAt && new Date() < user.reapplyAt) {
+            throw new Error(`You must wait before reapplying.`);
+        }
+
         user.applyingupgrade = UpgradeStatus.NONE;
         user.rejectedAt = null;
+        user.reapplyAt = null;
         const updated = await this.userRepository.update(user)
 
 

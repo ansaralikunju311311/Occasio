@@ -17,7 +17,8 @@ export class User {
     public otpType: UserOtp | null,
     public otpSendAt: Date | null,
     public applyingupgrade: UpgradeStatus,
-    public rejectedAt : Date | null
+    public rejectedAt: Date | null,
+    public reapplyAt: Date | null
 
   ) { }
 
