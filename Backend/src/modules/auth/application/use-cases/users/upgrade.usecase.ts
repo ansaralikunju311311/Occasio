@@ -5,20 +5,20 @@ import { UpgraderoleDto } from "../../dtos/upgraderole.dto.js";
 import { EventManager } from "../../../domain/entites/manager.entity.js";
 import { UpgradeStatus } from "../../../../../common/enums/upgrade.enum.js";
 
-export class UpgradeUseCase{
+export class UpgradeUseCase {
     constructor(
-        private userRepository :IUserRepository,
-        private managerRepository : IEventManagerRepository
-    ){}
+        private userRepository: IUserRepository,
+        private managerRepository: IEventManagerRepository
+    ) { }
 
-    async execute(data:UpgraderoleDto):Promise<EventManager | User | null>{
-         const user = await this.userRepository.findByEmail(data.email);
+    async execute(data: UpgraderoleDto): Promise<EventManager | User | null> {
+        const user = await this.userRepository.findByEmail(data.email);
 
-         if(!user) return null;
+        if (!user) return null;
 
 
 
-         console.log("lvefjnjvjsfv");
+        console.log("lvefjnjvjsfv");
 
         //    const newUser = new User(
         //                             user.id,
@@ -34,32 +34,32 @@ export class UpgradeUseCase{
         //                             user.otpSendAt = null,
         //                             user.isEventManger,
         //                             user.applyingupgrade=true,
-                                    
+
         //                         );
 
 
 
-          const request = new EventManager(
-            null, 
-        user.id,
-      data.fullName,
-      data.organizationName,
-      data.aboutEvents,
-      data.certificate,
-      data.documentReference,
-      data.experienceLevel,
-      data.socialLinks,
-           data.organizationType
-    );
+        const request = new EventManager(
+            null,
+            user.id,
+            data.fullName,
+            data.organizationName,
+            data.aboutEvents,
+            data.certificate,
+            data.documentReference,
+            data.experienceLevel,
+            data.socialLinks,
+            data.organizationType
+        );
 
 
-    console.log("cheking for tthe request")
+        console.log("cheking for tthe request")
 
 
-       await this.managerRepository.create(request)
+        await this.managerRepository.create(request)
 
-       user.applyingupgrade=UpgradeStatus.PENDING;
-         // Add your upgrade logic here, for now just return the user
-         return this.userRepository.update(user)
+        user.applyingupgrade = UpgradeStatus.PENDING;
+        // Add your upgrade logic here, for now just return the user
+        return this.userRepository.update(user)
     }
 }

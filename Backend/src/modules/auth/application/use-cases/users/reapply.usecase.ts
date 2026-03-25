@@ -4,51 +4,51 @@ import { ErrorMessage } from "../../../../../common/enums/message.enum.js";
 import { HttpStatus } from "../../../../../common/constants/http-stattus.js";
 import { UserStatus } from "../../../../../common/enums/user-status.enum.js";
 import { UpgradeStatus } from "../../../../../common/enums/upgrade.enum.js";
-export class ReapplyUseCase{
+export class ReapplyUseCase {
     constructor(
-        private userRepository:IUserRepository
-    ){}
+        private userRepository: IUserRepository
+    ) { }
 
 
 
-    async execute(userId:string){
+    async execute(userId: string) {
         console.log(userId);
 
 
         const user = await this.userRepository.findById(userId);
         console.log(user)
-         
-        if(!user){
-             throw new AppError(ErrorMessage.USER_NOT_FOUND,HttpStatus.NOT_FOUND)
-            }
-        
-        if(user.status == UserStatus.BLOCK){
-            throw new AppError(ErrorMessage.ACCOUNT_BLOCKED,HttpStatus.UNAUTHORIZED)
+
+        if (!user) {
+            throw new AppError(ErrorMessage.USER_NOT_FOUND, HttpStatus.NOT_FOUND)
+        }
+
+        if (user.status == UserStatus.BLOCK) {
+            throw new AppError(ErrorMessage.ACCOUNT_BLOCKED, HttpStatus.UNAUTHORIZED)
         }
 
         const now = new Date()
         //  const email = user?.email
         const rejectedTime = new Date(user.rejectedAt);
-        const diffInDays =
-      (now.getTime() - rejectedTime.getTime()) / (1000 * 60 * 60 * 24);
+        const diffInMinutes =
+            (now.getTime() - rejectedTime.getTime()) / (1000 * 60);
 
-    if (diffInDays < 5) {
-      throw new Error(`You can reapply after ${Math.ceil(5 - diffInDays)} days`);
+        if (diffInMinutes < 1) {
+            throw new Error(`You can reapply after 1 minute.`);
+        }
+
+        // const updatedUser = await this.userRepository.update(email, {
+        //       applyingupgrade: UpgradeStatus.PENDING
+        //       rejectedAt: null
+        //     });
+
+        user.applyingupgrade = UpgradeStatus.NONE;
+        user.rejectedAt = null;
+        const updated = await this.userRepository.update(user)
+
+
+        return updated
+
     }
 
-// const updatedUser = await this.userRepository.update(email, {
-//       applyingupgrade: UpgradeStatus.PENDING
-//       rejectedAt: null
-//     });
 
-      user.applyingupgrade= UpgradeStatus.PENDING;
-      user.rejectedAt=null;
-      const updated =  await this.userRepository.update(user)
-
-
-      return updated
-
-    }
-
-    
 }

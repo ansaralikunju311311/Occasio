@@ -45,7 +45,6 @@ export class AdminRepository implements IAdminRepository {
             user.otpExpires,
             user.otpType,
             user.otpSentAt,
-           
             user.applyingupgrade,
             user.rejectedAt
         )

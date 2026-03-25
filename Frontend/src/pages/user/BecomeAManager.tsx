@@ -66,10 +66,10 @@ const BecomeAManager: React.FC = () => {
 
     // Cooldown calculation
     const rejectedAt = user?.rejectedAt ? new Date(user.rejectedAt) : null;
-    const cooldownDays = 5;
-    const daysPassed = rejectedAt ? (new Date().getTime() - rejectedAt.getTime()) / (1000 * 60 * 60 * 24) : 0;
-    const canReapply = daysPassed >= cooldownDays;
-    const daysRemaining = Math.max(0, Math.ceil(cooldownDays - daysPassed));
+    const cooldownMinutes = 1;
+    const minutesPassed = rejectedAt ? (new Date().getTime() - rejectedAt.getTime()) / (1000 * 60) : 0;
+    const canReapply = minutesPassed >= cooldownMinutes;
+    const secondsRemaining = Math.max(0, Math.ceil((cooldownMinutes * 60) - (minutesPassed * 60)));
 
     const [preview, setPreview] = React.useState<string | null>(null);
 
@@ -179,15 +179,15 @@ const BecomeAManager: React.FC = () => {
     const handleReapply = async () => {
         try {
             setIsReapplying(true);
-            const response = await api.post("/user/reapply");
-            
+            const response = await api.patch("/user/reapply");
+
             dispatch(
                 setAuth({
                     user: response.data.users || response.data.user || response.data
                 })
             );
-            
-            toast.success("Re-apply request sent successfully!");
+         navigate("/applyasmanager")
+            // toast.success("Re-apply request sent successfully!");
         } catch (error: any) {
             console.error("Re-apply failed:", error);
             const errorMessage = error.response?.data?.message || "Failed to re-apply. Please try again later.";
@@ -243,11 +243,10 @@ const BecomeAManager: React.FC = () => {
                             <button
                                 onClick={handleReapply}
                                 disabled={!canReapply || isReapplying}
-                                className={`px-8 py-4 font-bold rounded-2xl transition-all flex items-center justify-center gap-2 ${
-                                    canReapply 
-                                    ? "bg-linear-to-r from-indigo-600 to-purple-700 hover:from-indigo-500 hover:to-purple-600 text-white shadow-xl shadow-indigo-500/20" 
+                                className={`px-8 py-4 font-bold rounded-2xl transition-all flex items-center justify-center gap-2 ${canReapply
+                                    ? "bg-linear-to-r from-indigo-600 to-purple-700 hover:from-indigo-500 hover:to-purple-600 text-white shadow-xl shadow-indigo-500/20"
                                     : "bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700"
-                                }`}
+                                    }`}
                             >
                                 {isReapplying ? (
                                     <>
@@ -256,7 +255,7 @@ const BecomeAManager: React.FC = () => {
                                     </>
                                 ) : (
                                     <>
-                                        {canReapply ? "Re-apply Now" : `Re-apply in ${daysRemaining} days`}
+                                        {canReapply ? "Re-apply Now" : `Re-apply in ${secondsRemaining} seconds`}
                                     </>
                                 )}
                             </button>
