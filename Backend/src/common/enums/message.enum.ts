@@ -8,6 +8,7 @@ export enum SuccessMessage {
   PASSWORD_UPDATED = "Password updated successfully",
   LOGOUT_SUCCESS = "Logged out successfully",
   UPGRADE_REQUEST_SENT = "Upgrade request sent successfully",
+  REAPPLY_REQUEST_SENT = " Reapply request sent successfully"
 }
 
 export enum ErrorMessage {

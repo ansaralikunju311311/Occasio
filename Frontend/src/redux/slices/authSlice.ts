@@ -8,6 +8,7 @@ interface User {
   email: string;
   role: string;
   applyingupgrade: UpgradeStatus;
+  rejectedAt?: string | null;
 }
 
 interface AuthState {

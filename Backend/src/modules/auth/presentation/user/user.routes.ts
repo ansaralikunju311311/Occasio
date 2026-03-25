@@ -5,5 +5,6 @@ const router = Router();
 const controller = makeUserController()
 
 router.post("/upgraderole",verifyAccessToken,controller.upgraderole.bind(controller))
+router.post("/reapply",verifyAccessToken,controller.reapply.bind(controller))
 
 export default router;

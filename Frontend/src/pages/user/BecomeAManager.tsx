@@ -5,6 +5,7 @@ import { api } from '../../services/api';
 import { useAppSelector, useAppDispatch } from '../../redux/hook';
 import { setAuth } from '../../redux/slices/authSlice';
 import { UpgradeStatus } from '../../types/upgrade-status.enum';
+import { toast } from 'sonner';
 
 
 
@@ -60,6 +61,15 @@ const BecomeAManager: React.FC = () => {
     const dispatch = useAppDispatch()
     const navigate = useNavigate();
     const [view, setView] = React.useState<'perks' | 'form' | 'success'>('perks');
+
+    const [isReapplying, setIsReapplying] = React.useState(false);
+
+    // Cooldown calculation
+    const rejectedAt = user?.rejectedAt ? new Date(user.rejectedAt) : null;
+    const cooldownDays = 5;
+    const daysPassed = rejectedAt ? (new Date().getTime() - rejectedAt.getTime()) / (1000 * 60 * 60 * 24) : 0;
+    const canReapply = daysPassed >= cooldownDays;
+    const daysRemaining = Math.max(0, Math.ceil(cooldownDays - daysPassed));
 
     const [preview, setPreview] = React.useState<string | null>(null);
 
@@ -166,6 +176,27 @@ const BecomeAManager: React.FC = () => {
         setView('success');
     };
 
+    const handleReapply = async () => {
+        try {
+            setIsReapplying(true);
+            const response = await api.post("/user/reapply");
+            
+            dispatch(
+                setAuth({
+                    user: response.data.users || response.data.user || response.data
+                })
+            );
+            
+            toast.success("Re-apply request sent successfully!");
+        } catch (error: any) {
+            console.error("Re-apply failed:", error);
+            const errorMessage = error.response?.data?.message || "Failed to re-apply. Please try again later.";
+            toast.error(errorMessage);
+        } finally {
+            setIsReapplying(false);
+        }
+    };
+
     return (
         <div className="min-h-screen bg-[#050B18] text-white selection:bg-indigo-500/30 overflow-x-hidden">
             {/* Background Glows */}
@@ -202,12 +233,32 @@ const BecomeAManager: React.FC = () => {
                         <p className="text-slate-400 text-lg mb-10 max-w-md mx-auto">
                             Unfortunately, your application to become an event manager has been rejected at this time. Please contact support for more information or try again later.
                         </p>
-                        <div className="flex gap-4 justify-center">
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
                             <button
                                 onClick={() => navigate('/')}
                                 className="px-8 py-4 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-2xl transition-all"
                             >
                                 Back to Homepage
+                            </button>
+                            <button
+                                onClick={handleReapply}
+                                disabled={!canReapply || isReapplying}
+                                className={`px-8 py-4 font-bold rounded-2xl transition-all flex items-center justify-center gap-2 ${
+                                    canReapply 
+                                    ? "bg-linear-to-r from-indigo-600 to-purple-700 hover:from-indigo-500 hover:to-purple-600 text-white shadow-xl shadow-indigo-500/20" 
+                                    : "bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700"
+                                }`}
+                            >
+                                {isReapplying ? (
+                                    <>
+                                        <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                                        Processing...
+                                    </>
+                                ) : (
+                                    <>
+                                        {canReapply ? "Re-apply Now" : `Re-apply in ${daysRemaining} days`}
+                                    </>
+                                )}
                             </button>
                         </div>
                     </div>
