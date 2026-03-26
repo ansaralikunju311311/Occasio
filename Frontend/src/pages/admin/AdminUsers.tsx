@@ -14,6 +14,7 @@ interface User {
   isEventManger: boolean;
   createdAt?: string;
   applyingupgrade?: UpgradeStatus;
+  rejectedAt?: Date | null;
 }
 
 const AdminUsers = () => {
@@ -29,12 +30,12 @@ const AdminUsers = () => {
         setLoading(true);
         setError(null);
         const response = await api.get("/admin/users");
-        
-        const usersData = Array.isArray(response.data) 
-          ? response.data 
-          : (response.data?.users || response.data?.data || []);
-          
-        setUsers(usersData);
+
+        const usersData = (Array.isArray(response.data)
+          ? response.data
+          : (response.data?.users || response.data?.data || [])) as User[];
+
+        setUsers(usersData.filter(user => user.role === "USER"));
       } catch (err: any) {
         console.error("Failed to fetch users:", err);
         setError(err?.response?.data?.message || "Failed to load users. Please try again later.");
@@ -49,7 +50,7 @@ const AdminUsers = () => {
   const handleUser = async (userId: string, userStatus: string) => {
     console.log(userId, userStatus);
     const newstatus = userStatus === "ACTIVE" ? "BLOCK" : "ACTIVE";
-    
+
     // Optimistic UI update
     setUsers((prevUsers) =>
       prevUsers.map((user) =>
@@ -133,7 +134,7 @@ const AdminUsers = () => {
             View and manage all registered users on the platform.
           </p>
         </div>
-        
+
         <div className="flex w-full sm:w-auto items-center gap-3">
           <div className="relative w-full sm:w-64">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -141,9 +142,9 @@ const AdminUsers = () => {
                 <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
               </svg>
             </div>
-            <input 
-              type="text" 
-              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out" 
+            <input
+              type="text"
+              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out"
               placeholder="Search users..."
             />
           </div>
@@ -192,7 +193,7 @@ const AdminUsers = () => {
               {users.length > 0 ? (
                 users.map((user, index) => {
                   const userId = user._id || user.id || index.toString();
-                  
+
                   return (
                     <tr key={userId} className="hover:bg-gray-50 transition-colors duration-150">
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -237,13 +238,13 @@ const AdminUsers = () => {
                         )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button 
+                        <button
                           className="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md transition-colors duration-150 mr-2"
                           onClick={() => detailsView(userId)}
                         >
                           View
                         </button>
-                        <button 
+                        <button
                           className="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md transition-colors duration-150"
                           onClick={() => handleUser(userId, user.status)}
                         >
@@ -269,7 +270,7 @@ const AdminUsers = () => {
             </tbody>
           </table>
         </div>
-        
+
         {/* Pagination Section (Static for now) */}
         {users.length > 0 && (
           <div className="bg-white px-4 py-3 border-t border-gray-200 flex items-center justify-between sm:px-6">
@@ -305,17 +306,17 @@ const AdminUsers = () => {
 
       {/* User Details Modal */}
       {isDetailsModalOpen && selectedUser && typeof document !== 'undefined' && createPortal(
-        <div 
+        <div
           className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm"
           onClick={closeDetailsModal}
         >
-          <div 
+          <div
             className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden transform transition-all animate-in fade-in zoom-in duration-200"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
             <div className="relative p-6 border-b border-gray-100">
-              <button 
+              <button
                 onClick={closeDetailsModal}
                 className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all"
               >
@@ -323,7 +324,7 @@ const AdminUsers = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
-              
+
               <div className="flex items-center space-x-4">
                 <div className="h-14 w-14 rounded-full bg-gradient-to-tr from-blue-500 to-blue-600 flex items-center justify-center text-white text-xl font-bold shadow-md">
                   {getInitials(selectedUser.name)}
@@ -349,7 +350,7 @@ const AdminUsers = () => {
                     {selectedUser.role?.replace('_', ' ') || "USER"}
                   </span>
                 </div>
-                
+
                 <div>
                   <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-1">Status</label>
                   <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border ${getStatusBadgeColor(selectedUser.status)}`}>
@@ -376,28 +377,27 @@ const AdminUsers = () => {
                   <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-1">Verified Member</label>
                   {selectedUser.isVerified ? (
                     <div className="flex items-center text-green-600 font-semibold text-sm">
-                      <svg className="w-5 h-5 mr-1 bg-green-100 rounded-full p-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5"/></svg>
+                      <svg className="w-5 h-5 mr-1 bg-green-100 rounded-full p-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" /></svg>
                       Verified
                     </div>
                   ) : (
                     <div className="flex items-center text-yellow-600 font-semibold text-sm">
-                      <svg className="w-5 h-5 mr-1 bg-yellow-100 rounded-full p-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5"/></svg>
+                      <svg className="w-5 h-5 mr-1 bg-yellow-100 rounded-full p-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" /></svg>
                       Pending
                     </div>
                   )}
                 </div>
 
                 {selectedUser.applyingupgrade && selectedUser.applyingupgrade !== UpgradeStatus.NONE && (
-                   <div>
+                  <div>
                     <label className="text-xs font-semibold text-blue-400 uppercase tracking-wider block mb-1">Upgrade Status</label>
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-bold border ${
-                      selectedUser.applyingupgrade === UpgradeStatus.PENDING ? 'bg-amber-100 text-amber-700 border-amber-200' :
-                      selectedUser.applyingupgrade === UpgradeStatus.REJECTED ? 'bg-rose-100 text-rose-700 border-rose-200' :
-                      'bg-blue-100 text-blue-700 border-blue-200'
-                    }`}>
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-bold border ${selectedUser.applyingupgrade === UpgradeStatus.PENDING ? 'bg-amber-100 text-amber-700 border-amber-200' :
+                        selectedUser.applyingupgrade === UpgradeStatus.REJECTED ? 'bg-rose-100 text-rose-700 border-rose-200' :
+                          'bg-blue-100 text-blue-700 border-blue-200'
+                      }`}>
                       {selectedUser.applyingupgrade === UpgradeStatus.PENDING ? 'PENDING APPROVAL' :
-                       selectedUser.applyingupgrade === UpgradeStatus.REJECTED ? 'REJECTED' :
-                       'APPROVED'}
+                        selectedUser.applyingupgrade === UpgradeStatus.REJECTED ? 'REJECTED' :
+                          'APPROVED'}
                     </span>
                   </div>
                 )}

@@ -24,6 +24,10 @@ const AdminEventManagers = () => {
         setError(null);
         const response = await api.get("/admin/users");
         
+
+
+
+        console.log("console.log",response)
         // Extract array from response appropriately
         const usersData: any[] = Array.isArray(response.data) 
           ? response.data 
