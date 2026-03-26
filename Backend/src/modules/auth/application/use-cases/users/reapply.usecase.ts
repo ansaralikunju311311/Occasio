@@ -48,7 +48,7 @@ export class ReapplyUseCase {
         user.applyingupgrade = UpgradeStatus.NONE;
         user.rejectedAt = null;
         user.reapplyAt = null;
-        const updated = await this.userRepository.update(user)
+        const updated = await this.userRepository.updateOne(user)
 
 
         return updated

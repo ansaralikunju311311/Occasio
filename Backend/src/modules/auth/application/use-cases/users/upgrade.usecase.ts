@@ -60,6 +60,6 @@ export class UpgradeUseCase {
 
         user.applyingupgrade = UpgradeStatus.PENDING;
         // Add your upgrade logic here, for now just return the user
-        return this.userRepository.update(user)
+        return this.userRepository.updateOne(user)
     }
 }

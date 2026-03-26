@@ -46,6 +46,6 @@ export class ResetPasswordUseCase{
         user.otpType = null;
        
 
-         return this.userRespository.update(user)
+         return this.userRespository.updateOne(user)
      }
 }

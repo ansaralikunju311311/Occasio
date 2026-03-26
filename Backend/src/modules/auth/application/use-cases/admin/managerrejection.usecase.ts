@@ -16,7 +16,7 @@ export class ManagerRejectionUseCase {
         user.rejectedAt = new Date();
         user.reapplyAt = new Date(Date.now() + 60 * 1000); // 1 minute cooldown
         user.applyingupgrade = UpgradeStatus.REJECTED;
-        const updatedUser = await this.userRepository.update(user);
+        const updatedUser = await this.userRepository.updateOne(user);
         
         if (updatedUser) {
             await this.emailService.sendRejectionEmail(updatedUser.email, updatedUser.name, reason);

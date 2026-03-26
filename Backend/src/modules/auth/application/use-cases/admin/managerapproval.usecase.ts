@@ -18,7 +18,7 @@ export class ManagerApprovalUseCase{
    user.role = UserRole.EVENT_MANAGER;
    user.rejectedAt=null;
    user.applyingupgrade=UpgradeStatus.APPROVED;
-   const updatedUser = await this.userRepository.update(user);
+   const updatedUser = await this.userRepository.updateOne(user);
    
    if (updatedUser) {
        await this.emailService.sendApprovalEmail(updatedUser.email, updatedUser.name);

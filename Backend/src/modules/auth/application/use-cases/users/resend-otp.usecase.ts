@@ -47,6 +47,6 @@ export class ResendotpUseCase{
        user.otpType = user.otpType,
        user.otpSendAt= now
           await this.emailService.sendOtpEmail(user.email,newOtp)
-        return this.userRepository.update(user)
+        return this.userRepository.updateOne(user)
     }
 }

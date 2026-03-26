@@ -18,7 +18,7 @@ export class UserManageUseCase{
           if(!user) return null
     
           user.status = data.status as UserStatus;
-          return this.userRepository.update(user)
+          return this.userRepository.updateOne(user)
        }
     
 }

@@ -35,7 +35,7 @@ export class VerifyUseCase{
         user.otpExpires = null,
         user.otpType = null,
         user.otpSendAt = null
-           await this.userRepository.update(user)
+           await this.userRepository.updateOne(user)
             throw new AppError(ErrorMessage.OTP_EXPIRED,HttpStatus.GONE)
         }
 
@@ -50,7 +50,7 @@ export class VerifyUseCase{
 
         console.log("the passing value for the updation after the otp",user);
         console.log(user.isVerified)
-        const updateUser = await this.userRepository.update(user);
+        const updateUser = await this.userRepository.updateOne(user);
 
         const accessToken =  this.tokenService.generateAccessToken({
             userId:updateUser.id,

@@ -92,7 +92,7 @@ export class UserRepository implements IUserRepository {
         );
     }
 
-    async update(user: User): Promise<User> {
+    async updateOne(user: User): Promise<User> {
 
         console.log("the user details", user.isVerified)
 
