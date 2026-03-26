@@ -50,6 +50,32 @@ const AdminEventManagers = () => {
     fetchManagers();
   }, []);
 
+
+
+  const handleManager = async (userId: string, status: string) => {
+    const newstatus = status === "ACTIVE" ? "BLOCK" : "ACTIVE";
+    
+    // Optimistic UI update
+    setManagers((prevManagers) =>
+      prevManagers.map((manager) =>
+        (manager._id || manager.id) === userId ? { ...manager, status: newstatus } : manager
+      )
+    );
+
+    try {
+      await api.patch(`/admin/blockorunblock/${userId}`, {
+        status: newstatus
+      });
+    } catch (error) {
+      console.error("Failed to block/unblock manager:", error);
+      // Revert UI on failure
+      setManagers((prevManagers) =>
+        prevManagers.map((manager) =>
+          (manager._id || manager.id) === userId ? { ...manager, status: status } : manager
+        )
+      );
+    }
+  };
   const getInitials = (name: string) => {
     if (!name) return "E";
     return name.substring(0, 2).toUpperCase();
@@ -184,7 +210,8 @@ const AdminEventManagers = () => {
                       <button className="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md transition-colors duration-150 mr-2">
                         View
                       </button>
-                      <button className="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md transition-colors duration-150">
+                      <button className="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md transition-colors duration-150"
+                      onClick={() => handleManager(managerId, manager.status)}>
                         {manager.status?.toUpperCase() === 'ACTIVE' ? 'Block' : 'Unblock'}
                       </button>
                     </td>

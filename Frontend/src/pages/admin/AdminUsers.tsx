@@ -51,7 +51,7 @@ const AdminUsers = () => {
     console.log(userId, userStatus);
     const newstatus = userStatus === "ACTIVE" ? "BLOCK" : "ACTIVE";
 
-    // Optimistic UI update
+  
     setUsers((prevUsers) =>
       prevUsers.map((user) =>
         (user._id || user.id) === userId ? { ...user, status: newstatus } : user
