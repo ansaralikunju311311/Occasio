@@ -7,6 +7,7 @@ import { UserDetailsUseCase } from '../application/use-cases/admin/userdetails.u
  import { PendingmanagerDetailsUseCase } from '../application/use-cases/admin/pendingmanager.usecase.js';
 import { ManagerApprovalUseCase } from '../application/use-cases/admin/managerapproval.usecase.js';
 import { ManagerRejectionUseCase } from '../application/use-cases/admin/managerrejection.usecase.js';
+import { ManagerDetailsUseCase } from '../application/use-cases/admin/managerdetails.usecase.js';
 export class AdminController{
     
     constructor(
@@ -15,7 +16,8 @@ export class AdminController{
         private userDetailsUseCase:UserDetailsUseCase,
         private pendingmanagerDetailsUseCase:PendingmanagerDetailsUseCase,
         private managerApprovalUseCase:ManagerApprovalUseCase,
-         private managerRejectionUseCase:ManagerRejectionUseCase      
+         private managerRejectionUseCase:ManagerRejectionUseCase,
+         private managerDetailsUseCase:ManagerDetailsUseCase  
     
 
     //    private pendingManagerUsecase : PendingManagerUsecase
@@ -72,6 +74,19 @@ export class AdminController{
             
             console.log(error);
             next(error)
+        }
+    }
+
+
+    async managerDetails(req:Request,res:Response,next:NextFunction){
+        const {id} = req.params;
+        try {
+             const manager = await this.managerDetailsUseCase.execute(id as string);
+             res.status(HttpStatus.OK).json({
+                manager
+             })
+        } catch (error) {
+             next(error)
         }
     }
 

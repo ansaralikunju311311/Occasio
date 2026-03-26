@@ -10,10 +10,13 @@ import { ManagerApprovalUseCase } from "../modules/auth/application/use-cases/ad
  import { PendingmanagerDetailsUseCase } from "../modules/auth/application/use-cases/admin/pendingmanager.usecase.js"
  import { ManagerRejectionUseCase } from "../modules/auth/application/use-cases/admin/managerrejection.usecase.js"
 import { EmailSerive } from "../common/service/email.service.js"
+import { ManagerRepository } from "../modules/auth/infrastructure/database/user/manager.repository.js"
+import { ManagerDetailsUseCase } from "../modules/auth/application/use-cases/admin/managerdetails.usecase.js"
 export const makeAdminController=()=>{
      const adminRepository = new AdminRepository;
      const userRepository = new UserRepository;
      const emailService = new EmailSerive;
+     const  managerRepository = new ManagerRepository;
      // const managerRespository = new ManagerRepository
 
 
@@ -22,9 +25,10 @@ export const makeAdminController=()=>{
 const userDetailsUseCase= new UserDetailsUseCase(userRepository);
 const pendingmanagerDetailsUseCase = new PendingmanagerDetailsUseCase(adminRepository)
 const managerApprovalUseCase = new ManagerApprovalUseCase(userRepository, emailService);
- const managerRejectionUseCase=new ManagerRejectionUseCase(userRepository, emailService)
+ const managerRejectionUseCase=new ManagerRejectionUseCase(userRepository, emailService);
+ const  managerDetailsUseCase = new ManagerDetailsUseCase(managerRepository)
 
 
-     return new AdminController(findAllUseCase,userManageUseCase,userDetailsUseCase,pendingmanagerDetailsUseCase,managerApprovalUseCase,managerRejectionUseCase
+     return new AdminController(findAllUseCase,userManageUseCase,userDetailsUseCase,pendingmanagerDetailsUseCase,managerApprovalUseCase,managerRejectionUseCase,managerDetailsUseCase
      )
 }

@@ -89,6 +89,12 @@ export class ManagerRepository
     return this.toEntity(doc);
   }
 
+  async findByIdManager(id: string): Promise<EventManager | null> {
+      const manager = await super.findOne({ userId: id } as any);
+      if (!manager) return null;
+      return this.toEntity(manager);
+  }
+
   private toEntity(doc: any): EventManager {
     return new EventManager(
       doc._id.toString(),

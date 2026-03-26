@@ -20,5 +20,7 @@ router.get("/pendingmanagers/:userId",verifyAccessToken,controller.pendingmanage
 
 
 router.patch("/approval/:id",verifyAccessToken,controller.managerApproval.bind(controller));
-router.patch("/rejection/:id",verifyAccessToken,controller.managerRejection.bind(controller))
+router.patch("/rejection/:id",verifyAccessToken,controller.managerRejection.bind(controller));
+
+router.get("/managerDetails/:id",verifyAccessToken,controller.managerDetails.bind(controller))
 export default router;

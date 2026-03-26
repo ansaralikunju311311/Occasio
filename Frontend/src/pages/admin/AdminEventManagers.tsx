@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { api } from "../../services/api";
 
 interface EventManager {
@@ -16,6 +17,8 @@ const AdminEventManagers = () => {
   const [managers, setManagers] = useState<EventManager[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedManager, setSelectedManager] = useState<any | null>(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchManagers = async () => {
@@ -28,13 +31,12 @@ const AdminEventManagers = () => {
 
 
         console.log("console.log",response)
-        // Extract array from response appropriately
         const usersData: any[] = Array.isArray(response.data) 
           ? response.data 
           : (response.data?.users || response.data?.data || []);
           
-        // Filter users who are specifically Event Managers
-        const eventManagersData = usersData.filter(
+
+          const eventManagersData = usersData.filter(
             (user) => user.role === "EVENT_MANAGER" || user.isEventManger === true
         );
         
@@ -55,7 +57,7 @@ const AdminEventManagers = () => {
   const handleManager = async (userId: string, status: string) => {
     const newstatus = status === "ACTIVE" ? "BLOCK" : "ACTIVE";
     
-    // Optimistic UI update
+
     setManagers((prevManagers) =>
       prevManagers.map((manager) =>
         (manager._id || manager.id) === userId ? { ...manager, status: newstatus } : manager
@@ -76,6 +78,35 @@ const AdminEventManagers = () => {
       );
     }
   };
+
+   const detailView = async (id: string, email: string) => {
+    try {
+       const response = await api.get(`/admin/managerDetails/${id}`);
+       const managerData = response.data?.manager || response.data?.data || response.data;
+       
+       if (managerData) {
+         setSelectedManager({ ...managerData, authEmail: email });
+         setIsDetailsModalOpen(true);
+       }
+    } catch (error) {
+        console.error("Failed to fetch manager details:", error);
+    }
+   };
+
+   const closeDetailsModal = () => {
+     setIsDetailsModalOpen(false);
+     setSelectedManager(null);
+   };
+
+
+
+
+  const isImageFile = (url: string) => {
+    if (!url) return false;
+    const lowerUrl = url.toLowerCase();
+    return lowerUrl.match(/\.(jpeg|jpg|gif|png|webp|svg)$/i) !== null || lowerUrl.includes('cloudinary.com/dliraelbo/image/upload');
+  };
+
   const getInitials = (name: string) => {
     if (!name) return "E";
     return name.substring(0, 2).toUpperCase();
@@ -166,6 +197,7 @@ const AdminEventManagers = () => {
             <tbody className="bg-white divide-y divide-gray-100">
               {managers.length > 0 ? (
                 managers.map((manager, index) => {
+                  console.log("checking",manager)
                   const managerId = manager._id || manager.id || index.toString();
                   
                   return (
@@ -207,7 +239,8 @@ const AdminEventManagers = () => {
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button className="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md transition-colors duration-150 mr-2">
+                      <button className="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md transition-colors duration-150 mr-2"
+                      onClick={() => detailView(managerId, manager.email)}>
                         View
                       </button>
                       <button className="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md transition-colors duration-150"
@@ -234,6 +267,140 @@ const AdminEventManagers = () => {
           </table>
         </div>
       </div>
+
+      {/* Manager Details Modal */}
+      {isDetailsModalOpen && selectedManager && typeof document !== 'undefined' && createPortal(
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm"
+          onClick={closeDetailsModal}
+        >
+          <div
+            className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden transform transition-all animate-in fade-in zoom-in duration-200 flex flex-col max-h-[90vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="relative p-6 border-b border-gray-100 shrink-0">
+              <button
+                onClick={closeDetailsModal}
+                className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+
+              <div className="flex items-center space-x-4">
+                <div className="h-14 w-14 rounded-full bg-gradient-to-tr from-blue-500 to-blue-600 flex items-center justify-center text-white text-xl font-bold shadow-md">
+                  {getInitials(selectedManager.fullName || selectedManager.organizationName || "M")}
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 leading-tight">{selectedManager.fullName || selectedManager.organizationName || "Manager"}</h3>
+                  <p className="text-sm text-gray-500 font-medium">{selectedManager.authEmail}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 overflow-y-auto space-y-6">
+              {/* Organization Info */}
+              <div className="space-y-4">
+                <h4 className="text-sm font-bold text-gray-900 border-b pb-2">Organization Information</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-1">Organization Name</label>
+                    <p className="text-sm font-medium text-gray-900">{selectedManager.organizationName || "N/A"}</p>
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-1">Organization Type</label>
+                    <p className="text-sm font-medium text-gray-900">{selectedManager.organizationType || "N/A"}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Experience & Details */}
+              <div className="space-y-4">
+                <h4 className="text-sm font-bold text-gray-900 border-b pb-2">Experience & Qualifications</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-1">Experience Level</label>
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
+                      {selectedManager.experienceLevel || "N/A"}
+                    </span>
+                  </div>
+                  {selectedManager.documentReference && (
+                    <div>
+                      <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-1">Document</label>
+                      <a href={selectedManager.documentReference} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:underline flex items-center">
+                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                        View Document
+                      </a>
+                    </div>
+                  )}
+                  {selectedManager.socialLinks && (
+                    <div>
+                      <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-1">Social Links</label>
+                      <a href={selectedManager.socialLinks} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:underline flex items-center">
+                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
+                        Social Profile
+                      </a>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Certificate Preview */}
+              {selectedManager.certificate && (
+                <div className="space-y-4 mt-6">
+                  <h4 className="text-sm font-bold text-gray-900 border-b pb-2">Certificate Preview</h4>
+                  <div className="p-4 rounded-xl border border-gray-200 bg-gray-50/50 hover:bg-white hover:border-blue-200 transition-all">
+                    {isImageFile(selectedManager.certificate) ? (
+                      <div className="space-y-3">
+                        <img 
+                          src={selectedManager.certificate} 
+                          alt="Certificate" 
+                          className="w-full h-auto max-h-64 object-contain rounded-lg shadow-sm border border-gray-100 bg-white" 
+                        />
+                        <a href={selectedManager.certificate} target="_blank" rel="noopener noreferrer" className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-700">
+                          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                          View Full Resolution
+                        </a>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-gray-700 truncate mr-2">{selectedManager.certificate || 'Not provided'}</span>
+                        <a href={selectedManager.certificate} target="_blank" rel="noopener noreferrer" className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* About Events */}
+              {selectedManager.aboutEvents && (
+                <div className="space-y-2">
+                  <h4 className="text-sm font-bold text-gray-900 border-b pb-2">About Events</h4>
+                  <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded-lg border border-gray-100 whitespace-pre-wrap">
+                    {selectedManager.aboutEvents}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4 bg-gray-50 border-t border-gray-100 flex justify-end shrink-0">
+              <button
+                onClick={closeDetailsModal}
+                className="px-6 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-xl font-semibold text-sm hover:bg-gray-100 hover:border-gray-400 transition-all shadow-sm active:scale-95"
+              >
+                Close Profile
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 };
