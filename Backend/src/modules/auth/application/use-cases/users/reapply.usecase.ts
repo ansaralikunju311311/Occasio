@@ -15,7 +15,7 @@ export class ReapplyUseCase {
         console.log(userId);
 
 
-        const user = await this.userRepository.findById(userId);
+        const user = await this.userRepository.findByIdUser(userId);
         console.log(user)
 
         if (!user) {
@@ -48,7 +48,7 @@ export class ReapplyUseCase {
         user.applyingupgrade = UpgradeStatus.NONE;
         user.rejectedAt = null;
         user.reapplyAt = null;
-        const updated = await this.userRepository.updateOne(user)
+        const updated = await this.userRepository.updateUser(user)
 
 
         return updated

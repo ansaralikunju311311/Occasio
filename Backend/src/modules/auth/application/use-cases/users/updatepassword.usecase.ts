@@ -53,6 +53,6 @@ export class UpdatePasswordUseCase{
                                     
                                 );
 
-            return this.userRepository.updateOne(newUser)
+            return this.userRepository.updateUser(newUser)
     }
 }

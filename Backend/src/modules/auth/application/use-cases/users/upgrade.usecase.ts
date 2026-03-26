@@ -56,10 +56,10 @@ export class UpgradeUseCase {
         console.log("cheking for tthe request")
 
 
-        await this.managerRepository.create(request)
+        await this.managerRepository.createManager(request)
 
         user.applyingupgrade = UpgradeStatus.PENDING;
         // Add your upgrade logic here, for now just return the user
-        return this.userRepository.updateOne(user)
+        return this.userRepository.updateUser(user)
     }
 }

@@ -10,7 +10,7 @@ export class ManagerApprovalUseCase{
     ){}
     async execute(id:string):Promise<User | null>{
 
-        const user = await this.userRepository.findById(id);
+        const user = await this.userRepository.findByIdUser(id);
         console.log(user)
 
         if(!user) return null
@@ -18,7 +18,7 @@ export class ManagerApprovalUseCase{
    user.role = UserRole.EVENT_MANAGER;
    user.rejectedAt=null;
    user.applyingupgrade=UpgradeStatus.APPROVED;
-   const updatedUser = await this.userRepository.updateOne(user);
+   const updatedUser = await this.userRepository.updateUser(user);
    
    if (updatedUser) {
        await this.emailService.sendApprovalEmail(updatedUser.email, updatedUser.name);

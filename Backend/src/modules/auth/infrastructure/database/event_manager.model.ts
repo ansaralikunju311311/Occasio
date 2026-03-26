@@ -1,6 +1,6 @@
 import mongoose,{Document,Schema} from "mongoose";
 
-interface IEventManagerDocument extends Document{
+export interface IEventManagerDocument extends Document{
 
 
     userId :mongoose.Types.ObjectId,

@@ -69,7 +69,7 @@ export class SignupUsecase{
         );
 
        
-        return this.userRepository.create(newUser)
+        return this.userRepository.createUser(newUser)
      
     }
 }

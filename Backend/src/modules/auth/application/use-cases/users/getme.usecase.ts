@@ -10,7 +10,7 @@ export class GetmeUseCase{
 
     async execute(id:string){
         console.log("evidunn as chyne",id)
-        const user = await this.userRepository.findById(id)
+        const user = await this.userRepository.findByIdUser(id)
         console.log("get the correct user",user)
 
     if (!user) {

@@ -57,7 +57,7 @@ export class ForgotpasswordUsecase {
             
 
         
-                    return this.userRepository.updateOne(newUser)
+                    return this.userRepository.updateUser(newUser)
             
     }
 }

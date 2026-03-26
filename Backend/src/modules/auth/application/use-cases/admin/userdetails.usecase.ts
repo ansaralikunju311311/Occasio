@@ -9,7 +9,7 @@ export class UserDetailsUseCase{
 
      async execute(userId:string):Promise< User| null>{
 
-        const user = await this.userRepository.findById(userId);
+        const user = await this.userRepository.findByIdUser(userId);
         if(!user) return null;
 
         return user

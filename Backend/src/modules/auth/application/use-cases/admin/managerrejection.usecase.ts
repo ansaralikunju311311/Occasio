@@ -9,14 +9,14 @@ export class ManagerRejectionUseCase {
     ) { }
     async execute(id: string, reason?: string): Promise<User | null> {
 
-        const user = await this.userRepository.findById(id);
+        const user = await this.userRepository.findByIdUser(id);
         console.log("user", user);
         if (!user) return null
 
         user.rejectedAt = new Date();
         user.reapplyAt = new Date(Date.now() + 60 * 1000); // 1 minute cooldown
         user.applyingupgrade = UpgradeStatus.REJECTED;
-        const updatedUser = await this.userRepository.updateOne(user);
+        const updatedUser = await this.userRepository.updateUser(user);
         
         if (updatedUser) {
             await this.emailService.sendRejectionEmail(updatedUser.email, updatedUser.name, reason);

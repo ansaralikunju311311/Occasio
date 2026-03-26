@@ -13,12 +13,12 @@ export class UserManageUseCase{
         async execute(data:ManageDto):Promise<User | null>{
 
 
-          const user = await this.userRepository.findById(data.userId)
+          const user = await this.userRepository.findByIdUser(data.userId)
 
           if(!user) return null
     
           user.status = data.status as UserStatus;
-          return this.userRepository.updateOne(user)
+          return this.userRepository.updateUser(user)
        }
     
 }
