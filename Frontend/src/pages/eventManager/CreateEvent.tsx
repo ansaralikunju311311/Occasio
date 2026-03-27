@@ -94,12 +94,11 @@ const CreateEvent = () => {
         try {
             setIsSubmitting(true);
             
-            // Final check to prevent past dates if the user waited after selection
             const now = new Date();
             const start = new Date(data.startTime);
             const end = new Date(data.endTime);
             
-            if (start.getTime() < (now.getTime() - 60000)) { // 1 min buffer
+            if (start.getTime() < (now.getTime() - 60000)) {
                 toast.error("Start time is in the past! Please select a future time.");
                 setIsSubmitting(false);
                 return;

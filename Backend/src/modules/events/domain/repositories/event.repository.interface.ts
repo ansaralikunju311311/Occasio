@@ -4,4 +4,5 @@ export interface IEventRepository{
 
 
     createEvent(event:Events):Promise<Events>
+    findAllEvents():Promise<Events[] | null>
 }
