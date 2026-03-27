@@ -31,7 +31,8 @@ const CreateEvent = () => {
     const navigate = useNavigate();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
-    const { register, handleSubmit, setValue, watch, reset, formState: { errors } } = useForm<IEventFormInput>({
+    const { register, handleSubmit, setValue, watch, reset, formState: { errors }, trigger } = useForm<IEventFormInput>({
+        mode: "onChange",
         defaultValues: {
             eventType: EventType.ONLINE,
             price: 0,
@@ -42,7 +43,16 @@ const CreateEvent = () => {
     });
 
     const selectedEventType = watch("eventType");
+    const startTimeValue = watch("startTime");
     const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+    // Helper to get local ISO string (YYYY-MM-DDTHH:MM) for datetime-local
+    const getLocalISOString = (date: Date) => {
+        const tzOffset = date.getTimezoneOffset() * 60000;
+        return new Date(date.getTime() - tzOffset).toISOString().slice(0, 16);
+    };
+
+    const minDateTime = getLocalISOString(new Date());
 
     const uploadImageToCloudinary = async (file: File) => {
         const formData = new FormData();
@@ -84,6 +94,23 @@ const CreateEvent = () => {
         try {
             setIsSubmitting(true);
             
+            // Final check to prevent past dates if the user waited after selection
+            const now = new Date();
+            const start = new Date(data.startTime);
+            const end = new Date(data.endTime);
+            
+            if (start.getTime() < (now.getTime() - 60000)) { // 1 min buffer
+                toast.error("Start time is in the past! Please select a future time.");
+                setIsSubmitting(false);
+                return;
+            }
+
+            if (end <= start) {
+                toast.error("End time must be after start time!");
+                setIsSubmitting(false);
+                return;
+            }
+
             let bannerUrl = "";
             if (data.banner && data.banner.length > 0) {
                 bannerUrl = await uploadImageToCloudinary(data.banner[0]);
@@ -102,17 +129,17 @@ const CreateEvent = () => {
                 price: Number(data.price),
                 bannerUrl: bannerUrl
             };
-            
+
             console.log('Form Submitted with Cloudinary URL', eventPayload);
-        
 
 
 
-                    
+
+
 
             const response = await api.post("/events/creation", eventPayload);
-            console.log("well the contoller",response)
-            
+            console.log("well the contoller", response)
+
             toast.success("Event created successfully!");
             setShowSuccessModal(true);
 
@@ -120,10 +147,9 @@ const CreateEvent = () => {
 
 
 
-            
+
         } catch (error) {
             console.error('Submission Error:', error);
-            // You might want to add a toast notification here
         } finally {
             setIsSubmitting(false);
         }
@@ -140,7 +166,7 @@ const CreateEvent = () => {
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-                {/* Basic Details Section */}
+
                 <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-2xl p-8 shadow-xl group hover:border-teal-500/30 transition-all duration-300">
                     <h2 className="text-xl font-semibold text-white mb-6 flex items-center">
                         <span className="p-2 bg-teal-500/10 rounded-lg mr-3 text-teal-400 border border-teal-500/20">
@@ -173,10 +199,10 @@ const CreateEvent = () => {
                                         key={type.id}
                                         type="button"
                                         onClick={() => setValue("eventType", type.id)}
-                                        className={`flex items-center justify-center px-4 py-3 rounded-xl border transition-all font-medium ${selectedEventType === type.id 
-                                            ? 'bg-teal-500/10 border-teal-500 text-teal-400 shadow-[0_0_15px_rgba(20,184,166,0.2)]' 
+                                        className={`flex items-center justify-center px-4 py-3 rounded-xl border transition-all font-medium ${selectedEventType === type.id
+                                            ? 'bg-teal-500/10 border-teal-500 text-teal-400 shadow-[0_0_15px_rgba(20,184,166,0.2)]'
                                             : 'bg-slate-800/50 border-slate-700 text-slate-400 hover:border-slate-600 hover:text-slate-300'
-                                        }`}
+                                            }`}
                                     >
                                         {type.icon}
                                         {type.label}
@@ -189,7 +215,6 @@ const CreateEvent = () => {
                     </div>
                 </div>
 
-                {/* Date & Time Section */}
                 <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-2xl p-8 shadow-xl group hover:border-teal-500/30 transition-all duration-300">
                     <h2 className="text-xl font-semibold text-white mb-6 flex items-center">
                         <span className="p-2 bg-teal-500/10 rounded-lg mr-3 text-teal-400 border border-teal-500/20">
@@ -202,8 +227,18 @@ const CreateEvent = () => {
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-slate-300">Start Time <span className="text-red-500">*</span></label>
                             <input
-                                {...register("startTime", { required: "Start time is required" })}
+                                {...register("startTime", { 
+                                    required: "Start time is required",
+                                    validate: (value) => {
+                                        const now = new Date();
+                                        const start = new Date(value);
+                                        // Allow a small buffer (1 minute) for selection lag
+                                        return start.getTime() >= (now.getTime() - 60000) || "Start time cannot be in the past";
+                                    },
+                                    onChange: () => trigger("endTime") // Re-validate end time when start time changes
+                                })}
                                 type="datetime-local"
+                                min={minDateTime}
                                 className={`w-full bg-slate-800/50 border rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-teal-500/50 transition-all scheme-dark ${errors.startTime ? 'border-red-500 focus:border-red-500' : 'border-slate-700 focus:border-teal-500'}`}
                             />
                             {errors.startTime && <p className="text-red-500 text-xs mt-1">{errors.startTime.message}</p>}
@@ -212,8 +247,17 @@ const CreateEvent = () => {
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-slate-300">End Time <span className="text-red-500">*</span></label>
                             <input
-                                {...register("endTime", { required: "End time is required" })}
+                                {...register("endTime", { 
+                                    required: "End time is required",
+                                    validate: (value) => {
+                                        if (!startTimeValue) return true;
+                                        const start = new Date(startTimeValue);
+                                        const end = new Date(value);
+                                        return end > start || "End time must be after start time";
+                                    }
+                                })}
                                 type="datetime-local"
+                                min={startTimeValue || minDateTime}
                                 className={`w-full bg-slate-800/50 border rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-teal-500/50 transition-all scheme-dark ${errors.endTime ? 'border-red-500 focus:border-red-500' : 'border-slate-700 focus:border-teal-500'}`}
                             />
                             {errors.endTime && <p className="text-red-500 text-xs mt-1">{errors.endTime.message}</p>}
@@ -221,7 +265,6 @@ const CreateEvent = () => {
                     </div>
                 </div>
 
-                {/* Location Details Section - Conditional */}
                 {(selectedEventType === EventType.OFFLINE || selectedEventType === EventType.HYBRID) && (
                     <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-2xl p-8 shadow-xl group hover:border-teal-500/30 transition-all duration-300 animate-in fade-in slide-in-from-top-4">
                         <h2 className="text-xl font-semibold text-white mb-6 flex items-center">
@@ -276,7 +319,6 @@ const CreateEvent = () => {
                     </div>
                 )}
 
-                {/* Seat Layout Section - Conditional */}
                 {(selectedEventType === EventType.OFFLINE || selectedEventType === EventType.HYBRID) && (
                     <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-2xl p-8 shadow-xl group hover:border-teal-500/30 transition-all duration-300 animate-in fade-in slide-in-from-top-4 delay-75">
                         <h2 className="text-xl font-semibold text-white mb-6 flex items-center">
@@ -285,15 +327,15 @@ const CreateEvent = () => {
                             </span>
                             Seat Layout
                         </h2>
-                        
+
                         <div className="flex items-center justify-between p-4 bg-slate-800/30 border border-slate-700/50 rounded-xl">
                             <div>
                                 <h3 className="text-white font-medium">Enable Seat Layout</h3>
                                 <p className="text-xs text-slate-400">Specify precise seating for your venue</p>
                             </div>
                             <label className="relative inline-flex items-center cursor-pointer">
-                                <input 
-                                    type="checkbox" 
+                                <input
+                                    type="checkbox"
                                     className="sr-only peer"
                                     {...register("isSeatLayoutEnabled")}
                                 />
@@ -303,7 +345,6 @@ const CreateEvent = () => {
                     </div>
                 )}
 
-                {/* Ticketing & Capacity Section */}
                 <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-2xl p-8 shadow-xl group hover:border-teal-500/30 transition-all duration-300">
                     <h2 className="text-xl font-semibold text-white mb-6 flex items-center">
                         <span className="p-2 bg-teal-500/10 rounded-lg mr-3 text-teal-400 border border-teal-500/20">
@@ -353,7 +394,7 @@ const CreateEvent = () => {
                     </div>
                 </div>
 
-                {/* About Section */}
+
                 <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-2xl p-8 shadow-xl group hover:border-teal-500/30 transition-all duration-300">
                     <h2 className="text-xl font-semibold text-white mb-6 flex items-center">
                         <span className="p-2 bg-teal-500/10 rounded-lg mr-3 text-teal-400 border border-teal-500/20">
@@ -379,8 +420,8 @@ const CreateEvent = () => {
                             <div className="relative border border-slate-700 rounded-xl overflow-hidden group">
                                 <img src={imagePreview} alt="Preview" className="w-full h-64 object-cover" />
                                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                    <button 
-                                        type="button" 
+                                    <button
+                                        type="button"
                                         onClick={handleRemoveImage}
                                         className="bg-red-500/20 text-red-400 border border-red-500/50 px-4 py-2 rounded-lg hover:bg-red-500 hover:text-white transition-all flex items-center"
                                     >
@@ -393,13 +434,13 @@ const CreateEvent = () => {
                             </div>
                         ) : (
                             <label className="border-2 border-dashed border-slate-700 rounded-xl p-8 text-center bg-slate-800/20 hover:bg-slate-800/50 hover:border-teal-500/50 transition-all cursor-pointer group/upload block">
-                                <input 
-                                    type="file" 
-                                    accept="image/*" 
-                                    className="hidden" 
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
                                     {...register("banner", {
                                         onChange: handleImageChange
-                                    })} 
+                                    })}
                                 />
                                 <div className="flex flex-col items-center justify-center">
                                     <svg className="w-10 h-10 text-slate-500 mb-3 group-hover/upload:text-teal-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
@@ -415,8 +456,8 @@ const CreateEvent = () => {
                     <button type="button" className="px-6 py-3 rounded-xl border border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white transition-all font-medium">
                         Save as Draft
                     </button>
-                    <button 
-                        type="submit" 
+                    <button
+                        type="submit"
                         disabled={isSubmitting}
                         className="px-6 py-3 rounded-xl bg-teal-500 text-white hover:bg-teal-400 shadow-lg shadow-teal-500/20 transition-all font-medium flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
                     >
@@ -436,31 +477,32 @@ const CreateEvent = () => {
                 </div>
             </form>
 
-            {/* Success Modal */}
+
             {showSuccessModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    {/* Backdrop */}
-                    <div 
+
+
+                    <div
                         className="absolute inset-0 bg-slate-950/80 backdrop-blur-md animate-fade-in"
                         onClick={() => setShowSuccessModal(false)}
                     ></div>
-                    
-                    {/* Modal Content */}
+
+
                     <div className="relative bg-slate-900 border border-slate-800 rounded-3xl p-8 max-w-md w-full shadow-2xl animate-scale-in">
                         <div className="flex flex-col items-center text-center">
-                            {/* Success Icon */}
+
                             <div className="w-20 h-20 bg-teal-500/10 rounded-full flex items-center justify-center mb-6 border border-teal-500/20 shadow-[0_0_30px_rgba(20,184,166,0.2)]">
                                 <svg className="w-10 h-10 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                                 </svg>
                             </div>
-                            
+
                             <h2 className="text-2xl font-bold text-white mb-2 underline decoration-teal-500/50 decoration-4 underline-offset-4">Event Created!</h2>
                             <p className="text-slate-400 mb-8 mt-4">
-                                Your event has been successfully scheduled and published. 
+                                Your event has been successfully scheduled and published.
                                 It's now active on our platform.
                             </p>
-                            
+
                             <div className="grid grid-cols-1 gap-3 w-full">
                                 <button
                                     onClick={() => navigate("/eventmanager/stats")}
@@ -469,7 +511,7 @@ const CreateEvent = () => {
                                     Go to Dashboard
                                     <svg className="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
                                 </button>
-                                
+
                                 <button
                                     onClick={() => navigate("/eventmanager/my-events")}
                                     className="w-full bg-slate-800 hover:bg-slate-700 text-white font-semibold py-4 rounded-2xl border border-slate-700 transition-all flex items-center justify-center"
@@ -477,15 +519,14 @@ const CreateEvent = () => {
                                     View My Events
                                     <svg className="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
                                 </button>
-                                
+
                                 <button
                                     onClick={() => {
                                         setShowSuccessModal(false);
                                         reset();
                                         setImagePreview(null);
                                     }}
-                                    className="w-full text-slate-500 hover:text-teal-400 py-2 transition-all font-medium text-sm mt-2"
-                                >
+                                    className="w-full text-slate-500 hover:text-teal-400 py-2 transition-all font-medium text-sm mt-2">
                                     Create Another Event
                                 </button>
                             </div>

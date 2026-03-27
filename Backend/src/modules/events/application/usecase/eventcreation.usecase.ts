@@ -1,6 +1,7 @@
 import { EventStatus } from "../../../../common/enums/event-status.js";
 import { Events } from "../../domain/entities/events.entity.js";
 import { IEventRepository } from "../../domain/repositories/event.repository.interface.js";
+import { EventDto } from "../dtos/event.dto.js";
 export class EventCretionUseCase{
 
     constructor(
@@ -8,7 +9,7 @@ export class EventCretionUseCase{
     ){}
 
 
-  async execute(data: any,userId:string) {
+  async execute(data: EventDto,userId:string) {
 
 
     console.log("checking this data",data)
