@@ -25,6 +25,7 @@ interface IEventFormInput {
 }
 
 const CreateEvent = () => {
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<IEventFormInput>({
         defaultValues: {
             eventType: EventType.ONLINE,
@@ -37,6 +38,25 @@ const CreateEvent = () => {
 
     const selectedEventType = watch("eventType");
     const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+    const uploadImageToCloudinary = async (file: File) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("upload_preset", "occasio_upload");
+
+        const res = await fetch(
+            "https://api.cloudinary.com/v1_1/dliraelbo/image/upload",
+            {
+                method: "POST",
+                body: formData
+            }
+        );
+
+        if (!res.ok) throw new Error("Image upload failed");
+
+        const data = await res.json();
+        return data.secure_url;
+    };
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -55,23 +75,40 @@ const CreateEvent = () => {
         setImagePreview(null);
     };
 
-    const onSubmit: SubmitHandler<IEventFormInput> = (data) => {
-        const eventPayload = {
-            ...data,
-            location: (data.eventType === EventType.OFFLINE || data.eventType === EventType.HYBRID) ? {
-                type: "Point",
-                coordinates: [Number(data.longitude), Number(data.latitude)],
-                address: data.address
-            } : null,
-            startTime: new Date(data.startTime),
-            endTime: new Date(data.endTime),
-            maxOnlineUsers: (data.eventType === EventType.ONLINE || data.eventType === EventType.HYBRID) ? (data.maxOnlineUsers ? Number(data.maxOnlineUsers) : undefined) : undefined,
-            price: Number(data.price),
-            bannerFile: data.banner && data.banner.length > 0 ? data.banner[0] : null
-        };
-        console.log('Form Submitted', eventPayload);
-        // Add API call here
+    const onSubmit: SubmitHandler<IEventFormInput> = async (data) => {
+        try {
+            setIsSubmitting(true);
+            
+            let bannerUrl = "";
+            if (data.banner && data.banner.length > 0) {
+                bannerUrl = await uploadImageToCloudinary(data.banner[0]);
+            }
+
+            const eventPayload = {
+                ...data,
+                location: (data.eventType === EventType.OFFLINE || data.eventType === EventType.HYBRID) ? {
+                    type: "Point",
+                    coordinates: [Number(data.longitude), Number(data.latitude)],
+                    address: data.address
+                } : null,
+                startTime: new Date(data.startTime),
+                endTime: new Date(data.endTime),
+                maxOnlineUsers: (data.eventType === EventType.ONLINE || data.eventType === EventType.HYBRID) ? (data.maxOnlineUsers ? Number(data.maxOnlineUsers) : undefined) : undefined,
+                price: Number(data.price),
+                bannerUrl: bannerUrl
+            };
+            
+            console.log('Form Submitted with Cloudinary URL', eventPayload);
+            // Add API call here
+            
+        } catch (error) {
+            console.error('Submission Error:', error);
+            // You might want to add a toast notification here
+        } finally {
+            setIsSubmitting(false);
+        }
     };
+
 
     return (
         <div className="animate-fade-in-up pb-12">
@@ -358,10 +395,24 @@ const CreateEvent = () => {
                     <button type="button" className="px-6 py-3 rounded-xl border border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white transition-all font-medium">
                         Save as Draft
                     </button>
-                    <button type="submit" className="px-6 py-3 rounded-xl bg-teal-500 text-white hover:bg-teal-400 shadow-lg shadow-teal-500/20 transition-all font-medium flex items-center">
-                        Publish Event
-                        <svg className="w-4 h-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                    <button 
+                        type="submit" 
+                        disabled={isSubmitting}
+                        className="px-6 py-3 rounded-xl bg-teal-500 text-white hover:bg-teal-400 shadow-lg shadow-teal-500/20 transition-all font-medium flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {isSubmitting ? (
+                            <>
+                                <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin mr-2" />
+                                Publishing...
+                            </>
+                        ) : (
+                            <>
+                                Publish Event
+                                <svg className="w-4 h-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                            </>
+                        )}
                     </button>
+
                 </div>
             </form>
         </div>
