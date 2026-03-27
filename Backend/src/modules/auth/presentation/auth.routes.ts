@@ -2,7 +2,7 @@ import { Router } from "express";
 import passport from "passport";
 // import { AuthController } from "./auth.controller.js";
 import { makeAuthController } from "../../../container/auth.container.js";
-import { verifyAccessToken } from "./verifyAccessToken.middleware.js";
+import { verifyAccessToken } from "../../../middleware/verifyAccessToken.middleware.js";
 // import { AuthController } from "./auth.controller.js";
 
 const router = Router();

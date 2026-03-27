@@ -1,7 +1,7 @@
 import { NextFunction,Request,Response } from 'express'
-import { HttpStatus } from '../../../common/constants/http-stattus.js';
-import { CreateToken } from '../../../common/service/token.service.js';
-import { ErrorMessage } from '../../../common/enums/message.enum.js';
+import { HttpStatus } from '../common/constants/http-stattus.js';
+import { CreateToken } from '../common/service/token.service.js';
+import { ErrorMessage } from '../common/enums/message.enum.js';
 
 
 const tokenService = new CreateToken()

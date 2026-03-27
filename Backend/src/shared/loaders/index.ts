@@ -3,6 +3,7 @@ export const initializaApp = async():Promise<void>=>{
  await connectDateBase();
 }
 import cron from "node-cron";
+
 import { UserModel } from "../../modules/auth/infrastructure/database/user.model.js";
 
 export const clearExpiredOtpJob = () => {
@@ -10,19 +11,21 @@ export const clearExpiredOtpJob = () => {
     try {
       const now = new Date();
 
-      await UserModel.updateMany(
-        { otpExpires: { $lt: now } },
+      const result = await UserModel.updateMany(
+        {
+          otpExpires: { $ne: null, $lt: now }
+        },
         {
           $set: {
             otp: null,
-           
-             
-       otpExpires:null,
-       otpType:null,
-      otpSentAt:null
+            otpExpires: null,
+            otpType: null,
+            otpSentAt: null
           }
         }
       );
+
+      console.log(` OTP cleanup: ${result.modifiedCount} users updated`);
 
     } catch (error) {
       console.error("Cron job error:", error);

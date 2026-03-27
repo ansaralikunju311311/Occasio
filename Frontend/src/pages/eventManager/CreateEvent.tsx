@@ -100,6 +100,12 @@ const CreateEvent = () => {
             
             console.log('Form Submitted with Cloudinary URL', eventPayload);
             // Add API call here
+
+
+
+            
+
+
             
         } catch (error) {
             console.error('Submission Error:', error);
