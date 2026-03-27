@@ -38,7 +38,8 @@ export class SignupUsecase{
         const isVerified = false ;
         const  rejectedAt = null
         const reapplyAt=null
-        const otpSendAt = new Date()
+        const otpSendAt = new Date();
+
         const otp = generateOTP();
         
         const otpExpires = new Date(Date.now() + 5 * 60 * 1000);
@@ -59,14 +60,12 @@ export class SignupUsecase{
             otpExpires,
             UserOtp.SIGNUP,
             otpSendAt,
-            
             applyingupgrade,
             rejectedAt,
             reapplyAt
-            
 
-            
         );
+
 
        
         return this.userRepository.createUser(newUser)

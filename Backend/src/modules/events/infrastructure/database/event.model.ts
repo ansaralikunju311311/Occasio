@@ -1,7 +1,7 @@
 import { Document, Schema, model } from "mongoose";
 import { EventType } from "../../../../common/enums/event-type.js";
 import { EventStatus } from "../../../../common/enums/event-status.js";
-import { truncate } from "node:fs";
+
 
 export interface IEventDocument extends Document {
     title: string;
@@ -51,22 +51,22 @@ const eventSchema = new Schema<IEventDocument>(
             required: true,
         },
 
-        location?: {
+        location: {
             type: {
                 type: String,
                 enum: ["Point"],
-                required: true,
+                required: false,
             },
             coordinates: {
                 type: [Number],
-                required: true,
+                required: false,
             },
             address: {
                 type: String,
             },
         },
 
-        maxOnlineUsers?: Number,
+        maxOnlineUsers: Number,
         price: Number,
 
         createdBy: {
@@ -82,7 +82,7 @@ const eventSchema = new Schema<IEventDocument>(
         },
         picture:{
             type:String,
-            required:truncate
+            required: true
         }
     },
     { timestamps: true }

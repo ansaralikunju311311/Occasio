@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import { api } from '../../services/api';
 
 export const EventType = {
     ONLINE: "ONLINE",
@@ -25,8 +28,10 @@ interface IEventFormInput {
 }
 
 const CreateEvent = () => {
+    const navigate = useNavigate();
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<IEventFormInput>({
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const { register, handleSubmit, setValue, watch, reset, formState: { errors } } = useForm<IEventFormInput>({
         defaultValues: {
             eventType: EventType.ONLINE,
             price: 0,
@@ -99,11 +104,20 @@ const CreateEvent = () => {
             };
             
             console.log('Form Submitted with Cloudinary URL', eventPayload);
-            // Add API call here
+        
 
 
 
+                    
+
+            const response = await api.post("/events/creation", eventPayload);
+            console.log("well the contoller",response)
             
+            toast.success("Event created successfully!");
+            setShowSuccessModal(true);
+
+
+
 
 
             
@@ -190,7 +204,7 @@ const CreateEvent = () => {
                             <input
                                 {...register("startTime", { required: "Start time is required" })}
                                 type="datetime-local"
-                                className={`w-full bg-slate-800/50 border rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-teal-500/50 transition-all [color-scheme:dark] ${errors.startTime ? 'border-red-500 focus:border-red-500' : 'border-slate-700 focus:border-teal-500'}`}
+                                className={`w-full bg-slate-800/50 border rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-teal-500/50 transition-all scheme-dark ${errors.startTime ? 'border-red-500 focus:border-red-500' : 'border-slate-700 focus:border-teal-500'}`}
                             />
                             {errors.startTime && <p className="text-red-500 text-xs mt-1">{errors.startTime.message}</p>}
                         </div>
@@ -200,7 +214,7 @@ const CreateEvent = () => {
                             <input
                                 {...register("endTime", { required: "End time is required" })}
                                 type="datetime-local"
-                                className={`w-full bg-slate-800/50 border rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-teal-500/50 transition-all [color-scheme:dark] ${errors.endTime ? 'border-red-500 focus:border-red-500' : 'border-slate-700 focus:border-teal-500'}`}
+                                className={`w-full bg-slate-800/50 border rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-teal-500/50 transition-all scheme-dark ${errors.endTime ? 'border-red-500 focus:border-red-500' : 'border-slate-700 focus:border-teal-500'}`}
                             />
                             {errors.endTime && <p className="text-red-500 text-xs mt-1">{errors.endTime.message}</p>}
                         </div>
@@ -209,7 +223,7 @@ const CreateEvent = () => {
 
                 {/* Location Details Section - Conditional */}
                 {(selectedEventType === EventType.OFFLINE || selectedEventType === EventType.HYBRID) && (
-                    <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-2xl p-8 shadow-xl group hover:border-teal-500/30 transition-all duration-300 animate-in fade-in slide-in-from-top-4 duration-500">
+                    <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-2xl p-8 shadow-xl group hover:border-teal-500/30 transition-all duration-300 animate-in fade-in slide-in-from-top-4">
                         <h2 className="text-xl font-semibold text-white mb-6 flex items-center">
                             <span className="p-2 bg-teal-500/10 rounded-lg mr-3 text-teal-400 border border-teal-500/20">
                                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
@@ -264,7 +278,7 @@ const CreateEvent = () => {
 
                 {/* Seat Layout Section - Conditional */}
                 {(selectedEventType === EventType.OFFLINE || selectedEventType === EventType.HYBRID) && (
-                    <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-2xl p-8 shadow-xl group hover:border-teal-500/30 transition-all duration-300 animate-in fade-in slide-in-from-top-4 duration-500 delay-75">
+                    <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-2xl p-8 shadow-xl group hover:border-teal-500/30 transition-all duration-300 animate-in fade-in slide-in-from-top-4 delay-75">
                         <h2 className="text-xl font-semibold text-white mb-6 flex items-center">
                             <span className="p-2 bg-teal-500/10 rounded-lg mr-3 text-teal-400 border border-teal-500/20">
                                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" /></svg>
@@ -283,7 +297,7 @@ const CreateEvent = () => {
                                     className="sr-only peer"
                                     {...register("isSeatLayoutEnabled")}
                                 />
-                                <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-500"></div>
+                                <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-500"></div>
                             </label>
                         </div>
                     </div>
@@ -421,6 +435,64 @@ const CreateEvent = () => {
 
                 </div>
             </form>
+
+            {/* Success Modal */}
+            {showSuccessModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    {/* Backdrop */}
+                    <div 
+                        className="absolute inset-0 bg-slate-950/80 backdrop-blur-md animate-fade-in"
+                        onClick={() => setShowSuccessModal(false)}
+                    ></div>
+                    
+                    {/* Modal Content */}
+                    <div className="relative bg-slate-900 border border-slate-800 rounded-3xl p-8 max-w-md w-full shadow-2xl animate-scale-in">
+                        <div className="flex flex-col items-center text-center">
+                            {/* Success Icon */}
+                            <div className="w-20 h-20 bg-teal-500/10 rounded-full flex items-center justify-center mb-6 border border-teal-500/20 shadow-[0_0_30px_rgba(20,184,166,0.2)]">
+                                <svg className="w-10 h-10 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                                </svg>
+                            </div>
+                            
+                            <h2 className="text-2xl font-bold text-white mb-2 underline decoration-teal-500/50 decoration-4 underline-offset-4">Event Created!</h2>
+                            <p className="text-slate-400 mb-8 mt-4">
+                                Your event has been successfully scheduled and published. 
+                                It's now active on our platform.
+                            </p>
+                            
+                            <div className="grid grid-cols-1 gap-3 w-full">
+                                <button
+                                    onClick={() => navigate("/eventmanager/stats")}
+                                    className="w-full bg-teal-500 hover:bg-teal-400 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-teal-500/20 flex items-center justify-center"
+                                >
+                                    Go to Dashboard
+                                    <svg className="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                                </button>
+                                
+                                <button
+                                    onClick={() => navigate("/eventmanager/my-events")}
+                                    className="w-full bg-slate-800 hover:bg-slate-700 text-white font-semibold py-4 rounded-2xl border border-slate-700 transition-all flex items-center justify-center"
+                                >
+                                    View My Events
+                                    <svg className="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+                                </button>
+                                
+                                <button
+                                    onClick={() => {
+                                        setShowSuccessModal(false);
+                                        reset();
+                                        setImagePreview(null);
+                                    }}
+                                    className="w-full text-slate-500 hover:text-teal-400 py-2 transition-all font-medium text-sm mt-2"
+                                >
+                                    Create Another Event
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

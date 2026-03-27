@@ -57,7 +57,8 @@ export class VerifyUseCase{
             role:updateUser.role
         })
         const refreshToken =  this.tokenService.generateRefreshToken({
-            userId : updateUser.id
+            userId: updateUser.id,
+            role: updateUser.role
         })
 
 

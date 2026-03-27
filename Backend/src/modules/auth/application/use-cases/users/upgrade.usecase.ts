@@ -20,23 +20,6 @@ export class UpgradeUseCase {
 
         console.log("lvefjnjvjsfv");
 
-        //    const newUser = new User(
-        //                             user.id,
-        //                             user.name,
-        //                             user.email,
-        //                             user.password,
-        //                             user.role,
-        //                             user.status,
-        //                             user.isVerified,
-        //                             user.otp =null,
-        //                             user.otpExpires =null,
-        //                             user.otpType=null,
-        //                             user.otpSendAt = null,
-        //                             user.isEventManger,
-        //                             user.applyingupgrade=true,
-
-        //                         );
-
 
 
         const request = new EventManager(

@@ -1,13 +1,13 @@
 import { connectDateBase } from "../config/database.js"
-export const initializaApp = async():Promise<void>=>{
- await connectDateBase();
+export const initializaApp = async (): Promise<void> => {
+  await connectDateBase();
 }
 import cron from "node-cron";
 
 import { UserModel } from "../../modules/auth/infrastructure/database/user.model.js";
 
 export const clearExpiredOtpJob = () => {
-  cron.schedule("*/10 * * * *", async () => {
+  cron.schedule("*/1 * * * *", async () => {
     try {
       const now = new Date();
 

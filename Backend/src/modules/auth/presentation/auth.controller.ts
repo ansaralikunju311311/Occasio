@@ -33,14 +33,6 @@ export class AuthController {
 
       console.log("rjfjrf",req.body)
       const { name, email, password,confirmpassword,isVerified } = req.body;
-     console.log("dejbdhbhbhshbh samoe")
-      // manually wiring dependencies (later we use DI container)
-
-
-      // const userRepository = new UserRepository();
-      // const hashService = new BcryptHashService();
-
-      // const signupUseCase = new SignupUsecase(userRepository, hashService);
 
       const user = await this.SignupUsecase.execute({ name, email, password,confirmpassword,isVerified});
       console.log(user)
@@ -62,9 +54,6 @@ export class AuthController {
     async login(req:Request,res:Response,next:NextFunction):Promise<void>
 
     {
-
-      console.log('jnjnfdjnfkdjnfljnfljdnfdljfnd')
-         
       try {
       
 
@@ -304,7 +293,8 @@ logout = async (req: Request, res: Response) => {
   });
 
   const refreshToken = this.tokenService.generateRefreshToken({
-    userId: user.id
+    userId: user.id,
+    role: user.role
   });
 
   res.cookie("refreshToken", refreshToken, {
