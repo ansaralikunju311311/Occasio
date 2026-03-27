@@ -22,7 +22,7 @@ router.get("/pendingmanagers/:userId",verifyAccessToken,requireRole(UserRole.ADM
 
 
 router.patch("/approval/:id",verifyAccessToken,requireRole(UserRole.ADMIN),controller.managerApproval.bind(controller));
-router.patch("/rejection/:id",verifyAccessToken,controller.managerRejection.bind(controller));
+router.patch("/rejection/:id",verifyAccessToken,requireRole(UserRole.ADMIN),controller.managerRejection.bind(controller));
 
 router.get("/managerDetails/:id",verifyAccessToken,requireRole(UserRole.ADMIN),controller.managerDetails.bind(controller))
 export default router;
