@@ -26,6 +26,7 @@ const AdminEventManagers = lazy(() => import("../pages/admin/AdminEventManagers.
 const EventManagerLayout = lazy(() => import("../layouts/EventManagerLayout.tsx"));
 const EventManagerDashboard = lazy(() => import("../pages/eventManager/EventManagerDashboard.tsx"));
 const EventManagerPlaceholder = lazy(() => import("../pages/eventManager/EventManagerPlaceholder.tsx"));
+const CreateEvent = lazy(() => import("../pages/eventManager/CreateEvent.tsx"));
 
 // New Personal Dashboard Pages
 const Profile = lazy(() => import("../pages/user/Profile.tsx"));
@@ -121,7 +122,7 @@ export const router = createBrowserRouter([
       { path: "saved-events", element: <SavedEvents /> },
       { path: "settings", element: <Settings /> },
       { path: "stats", element: <ManagerGuard><EventManagerDashboard /></ManagerGuard> },
-      { path: "create-event", element: <ManagerGuard><EventManagerPlaceholder /></ManagerGuard> },
+      { path: "create-event", element: <ManagerGuard><CreateEvent /></ManagerGuard> },
       { path: "my-events", element: <ManagerGuard><EventManagerPlaceholder /></ManagerGuard> },
       { path: "bookings", element: <ManagerGuard><EventManagerPlaceholder /></ManagerGuard> },
       { path: "wallet", element: <ManagerGuard><EventManagerPlaceholder /></ManagerGuard> },

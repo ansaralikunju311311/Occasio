@@ -158,7 +158,7 @@ export class UserRepository
       otp: user.otp,
       otpExpires: user.otpExpires,
       otpType: user.otpType,
-      otpSentAt: user.otpSendAt,
+      otpSendAt: user.otpSendAt,
       applyingupgrade: user.applyingupgrade,
       rejectedAt: user.rejectedAt,
       reapplyAt: user.reapplyAt
@@ -177,7 +177,7 @@ export class UserRepository
         otp: user.otp,
         otpExpires: user.otpExpires,
         otpType: user.otpType,
-        otpSentAt: user.otpSendAt,
+        otpSendAt: user.otpSendAt,
         applyingupgrade: user.applyingupgrade,
         role: user.role,
         rejectedAt: user.rejectedAt,

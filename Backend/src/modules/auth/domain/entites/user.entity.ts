@@ -22,7 +22,5 @@ export class User {
 
   ) { }
 
-  isAdmin(): boolean {
-    return this.role === UserRole.ADMIN;
-  }
+  
 }

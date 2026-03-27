@@ -15,7 +15,7 @@ export interface IUserDocument extends Document {
     otp: string | null,
     otpExpires: Date | null,
     otpType: UserOtp | null,
-    otpSentAt: Date | null,
+    otpSendAt: Date | null,
 
     applyingupgrade: UpgradeStatus,
     rejectedAt: Date | null,
@@ -66,7 +66,7 @@ const userSchema = new Schema<IUserDocument>(
             enum: Object.values(UserOtp) as string[],
             default: null
         },
-        otpSentAt: {
+        otpSendAt: {
             type: Date
         },
         applyingupgrade: {
