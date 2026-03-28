@@ -22,6 +22,6 @@ router.get("/events",
 
 
 router.get("/eventDetails/:id",
-   controller.eventDetails.bind(controller)
+  controller.eventDetails.bind(controller)
 )
 export default router;

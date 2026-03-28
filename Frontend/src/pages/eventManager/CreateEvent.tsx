@@ -93,11 +93,11 @@ const CreateEvent = () => {
     const onSubmit: SubmitHandler<IEventFormInput> = async (data) => {
         try {
             setIsSubmitting(true);
-            
+
             const now = new Date();
             const start = new Date(data.startTime);
             const end = new Date(data.endTime);
-            
+
             if (start.getTime() < (now.getTime() - 60000)) {
                 toast.error("Start time is in the past! Please select a future time.");
                 setIsSubmitting(false);
@@ -120,7 +120,7 @@ const CreateEvent = () => {
                 location: (data.eventType === EventType.OFFLINE || data.eventType === EventType.HYBRID) ? {
                     type: "Point",
                     coordinates: [Number(data.longitude), Number(data.latitude)],
-                    address: data.address
+                    address: null
                 } : null,
                 startTime: new Date(data.startTime),
                 endTime: new Date(data.endTime),
@@ -226,7 +226,7 @@ const CreateEvent = () => {
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-slate-300">Start Time <span className="text-red-500">*</span></label>
                             <input
-                                {...register("startTime", { 
+                                {...register("startTime", {
                                     required: "Start time is required",
                                     validate: (value) => {
                                         const now = new Date();
@@ -246,7 +246,7 @@ const CreateEvent = () => {
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-slate-300">End Time <span className="text-red-500">*</span></label>
                             <input
-                                {...register("endTime", { 
+                                {...register("endTime", {
                                     required: "End time is required",
                                     validate: (value) => {
                                         if (!startTimeValue) return true;
@@ -266,15 +266,15 @@ const CreateEvent = () => {
 
                 {(selectedEventType === EventType.OFFLINE || selectedEventType === EventType.HYBRID) && (
                     <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-2xl p-8 shadow-xl group hover:border-teal-500/30 transition-all duration-300 animate-in fade-in slide-in-from-top-4">
-                        <h2 className="text-xl font-semibold text-white mb-6 flex items-center">
+                        {/* <h2 className="text-xl font-semibold text-white mb-6 flex items-center">
                             <span className="p-2 bg-teal-500/10 rounded-lg mr-3 text-teal-400 border border-teal-500/20">
                                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                             </span>
-                            Location Details
-                        </h2>
+                         Location Details
+                        </h2> */}
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-2 md:col-span-2">
+                            {/* <div className="space-y-2 md:col-span-2">
                                 <label className="text-sm font-medium text-slate-300">Venue Address <span className="text-red-500">*</span></label>
                                 <input
                                     {...register("address", { required: "Address is required" })}
@@ -283,7 +283,7 @@ const CreateEvent = () => {
                                     className={`w-full bg-slate-800/50 border rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500/50 transition-all ${errors.address ? 'border-red-500 focus:border-red-500' : 'border-slate-700 focus:border-teal-500'}`}
                                 />
                                 {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address.message}</p>}
-                            </div>
+                            </div> */}
 
                             <div className="space-y-2">
                                 <label className="text-sm font-medium text-slate-300">Latitude (Coordinates)</label>

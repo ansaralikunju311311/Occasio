@@ -3,7 +3,6 @@ import { useAppSelector } from "../redux/hook";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { api } from "../services/api"
-
 const LandingPage = () => {
     const [events, setEvents] = useState<any[]>([]);
     const [selectedEvent, setSelectedEvent] = useState<any>(null);
@@ -11,9 +10,7 @@ const LandingPage = () => {
     const [error, setError] = useState("");
     const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
     const navigate = useNavigate();
-
     const user = useAppSelector((state) => state.auth.user);
-
     useEffect(() => {
         const fetchEvents = async () => {
             try {
@@ -32,8 +29,6 @@ const LandingPage = () => {
 
         fetchEvents();
     }, []);
-   
-
     const viewEventDetails = async (id: string) => {
         try {
             setLoading(true);
@@ -49,7 +44,6 @@ const LandingPage = () => {
             setLoading(false);
         }
     };
-
     const closeDetailsModal = () => {
         setIsDetailsModalOpen(false);
         setSelectedEvent(null);
@@ -63,7 +57,6 @@ const LandingPage = () => {
             minute: "2-digit",
         });
     };
-
     return (
         <div className="min-h-screen bg-slate-950 pt-16">
             {/* HERO SECTION */}
@@ -146,7 +139,6 @@ const LandingPage = () => {
                     </div>
                 </div>
             </section>
-
             {/* FEATURES SECTION */}
             <section className="py-32 px-6 max-w-7xl mx-auto relative z-10">
                 <div className="text-center mb-20">
@@ -155,7 +147,6 @@ const LandingPage = () => {
                     </h2>
                     <p className="text-lg text-slate-400 max-w-2xl mx-auto">Everything you need for the perfect event experience.</p>
                 </div>
-
                 <div className="grid md:grid-cols-3 gap-8">
                     {/* Feature 1 */}
                     <div className="group p-10 bg-slate-900/40 backdrop-blur-md rounded-3xl shadow-xl border border-slate-800 hover:border-indigo-500/30 hover:shadow-[0_0_40px_-10px_rgb(99,102,241,0.15)] hover:-translate-y-2 transition-all duration-300">
@@ -171,7 +162,6 @@ const LandingPage = () => {
                             Select your exact seat with dynamic layouts and live availability updates ensuring no double bookings.
                         </p>
                     </div>
-
                     {/* Feature 2 */}
                     <div className="group p-10 bg-slate-900/40 backdrop-blur-md rounded-3xl shadow-xl border border-slate-800 hover:border-purple-500/30 hover:shadow-[0_0_40px_-10px_rgb(168,85,247,0.15)] hover:-translate-y-2 transition-all duration-300">
                         <div className="w-14 h-14 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center mb-8 group-hover:bg-purple-500 group-hover:border-transparent transition-all duration-300">
@@ -186,7 +176,6 @@ const LandingPage = () => {
                             Stripe-powered secure transactions with instant booking confirmation and encrypted data processing.
                         </p>
                     </div>
-
                     {/* Feature 3 */}
                     <div className="group p-10 bg-slate-900/40 backdrop-blur-md rounded-3xl shadow-xl border border-slate-800 hover:border-pink-500/30 hover:shadow-[0_0_40px_-10px_rgb(236,72,153,0.15)] hover:-translate-y-2 transition-all duration-300">
                         <div className="w-14 h-14 rounded-2xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center mb-8 group-hover:bg-pink-500 group-hover:border-transparent transition-all duration-300">
@@ -203,7 +192,6 @@ const LandingPage = () => {
                     </div>
                 </div>
             </section>
-
             {/* EVENTS SECTION */}
             <section className="py-24 px-6 max-w-7xl mx-auto relative z-10">
                 <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
@@ -222,7 +210,6 @@ const LandingPage = () => {
                         View All Events
                     </button>
                 </div>
-
                 {error && (
                     <div className="text-center py-10 bg-red-500/10 border border-red-500/20 rounded-2xl mb-12">
                         <p className="text-red-400 font-light">{error}</p>
@@ -234,7 +221,6 @@ const LandingPage = () => {
                         </button>
                     </div>
                 )}
-
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-24">
                         <div className="w-12 h-12 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin mb-4"></div>
@@ -311,7 +297,6 @@ const LandingPage = () => {
                     </div>
                 )}
             </section>
-
             {/* CTA SECTION */}
             {!user && (
                 <section className="py-32 px-6">
