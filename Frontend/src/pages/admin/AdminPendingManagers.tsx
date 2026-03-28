@@ -50,7 +50,7 @@ const AdminPendingManagers = () => {
 
 
 
-      console.log("users are coming",response)
+        console.log("users are coming", response)
 
         const usersData: any[] = Array.isArray(response.data)
           ? response.data
@@ -83,7 +83,7 @@ const AdminPendingManagers = () => {
       setFetchingDetails(true);
       const response = await api.get(`/admin/pendingmanagers/${userId}`);
       console.log("manager details get  for the checking purpose", response);
-  
+
       // Extract the manager details object safely
       let details = response.data;
       if (details.data?.user) details = details.data.user;
@@ -111,7 +111,7 @@ const AdminPendingManagers = () => {
     try {
       const response = await api.patch(`admin/approval/${id}`);
 
-     
+
       console.log(response);
       toast.success("Manager application approved successfully!");
       setManagers(prev => prev.filter(m => (m._id || m.id) !== id));
@@ -353,10 +353,10 @@ const AdminPendingManagers = () => {
                     <div className="p-4 rounded-xl border border-gray-200 bg-gray-50/50 hover:bg-white hover:border-emerald-200 transition-all">
                       {selectedManager.certificate && isImageFile(selectedManager.certificate) ? (
                         <div className="space-y-3">
-                          <img 
-                            src={selectedManager.certificate} 
-                            alt="Certificate" 
-                            className="w-full h-auto max-h-64 object-contain rounded-lg shadow-sm border border-gray-100 bg-white" 
+                          <img
+                            src={selectedManager.certificate}
+                            alt="Certificate"
+                            className="w-full h-auto max-h-64 object-contain rounded-lg shadow-sm border border-gray-100 bg-white"
                           />
                           <a href={selectedManager.certificate} target="_blank" rel="noopener noreferrer" className="inline-flex items-center text-sm font-medium text-emerald-600 hover:text-emerald-700">
                             <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
@@ -382,10 +382,10 @@ const AdminPendingManagers = () => {
                     <div className="p-4 rounded-xl border border-gray-200 bg-gray-50/50 hover:bg-white hover:border-emerald-200 transition-all">
                       {selectedManager.documentReference && isImageFile(selectedManager.documentReference) ? (
                         <div className="space-y-3">
-                          <img 
-                            src={selectedManager.documentReference} 
-                            alt="Document Reference" 
-                            className="w-full h-auto max-h-64 object-contain rounded-lg shadow-sm border border-gray-100 bg-white" 
+                          <img
+                            src={selectedManager.documentReference}
+                            alt="Document Reference"
+                            className="w-full h-auto max-h-64 object-contain rounded-lg shadow-sm border border-gray-100 bg-white"
                           />
                           <a href={selectedManager.documentReference} target="_blank" rel="noopener noreferrer" className="inline-flex items-center text-sm font-medium text-emerald-600 hover:text-emerald-700">
                             <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
@@ -416,7 +416,7 @@ const AdminPendingManagers = () => {
                 Close
               </button>
               <div className="flex gap-2">
-                <button 
+                <button
                   className="px-6 py-2.5 rounded-xl bg-rose-600 text-white text-sm font-semibold hover:bg-rose-700 transition-all shadow-md shadow-rose-200"
                   onClick={() => {
                     setRejectionId(selectedManager.userId);
@@ -426,7 +426,7 @@ const AdminPendingManagers = () => {
                   Reject Application
                 </button>
                 <button className="px-6 py-2.5 rounded-xl bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 transition-all shadow-md shadow-emerald-200"
-                onClick={()=>handleApproval(selectedManager.userId)}>
+                  onClick={() => handleApproval(selectedManager.userId)}>
                   Approve Application
                 </button>
               </div>
@@ -442,7 +442,7 @@ const AdminPendingManagers = () => {
               <h2 className="text-xl font-bold text-gray-900">Provide Rejection Reason</h2>
               <p className="text-sm text-gray-500 mt-1">This reason will be included in the email sent to the applicant.</p>
             </div>
-            
+
             <div className="p-6">
               <textarea
                 className="w-full h-32 p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none resize-none transition-all text-sm"

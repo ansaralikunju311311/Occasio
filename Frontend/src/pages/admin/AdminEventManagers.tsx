@@ -26,20 +26,20 @@ const AdminEventManagers = () => {
         setLoading(true);
         setError(null);
         const response = await api.get("/admin/users");
-        
 
 
 
-        console.log("console.log",response)
-        const usersData: any[] = Array.isArray(response.data) 
-          ? response.data 
+
+        console.log("console.log", response)
+        const usersData: any[] = Array.isArray(response.data)
+          ? response.data
           : (response.data?.users || response.data?.data || []);
-          
 
-          const eventManagersData = usersData.filter(
-            (user) => user.role === "EVENT_MANAGER" || user.isEventManger === true
+
+        const eventManagersData = usersData.filter(
+          (user) => user.role === "EVENT_MANAGER" || user.isEventManger === true
         );
-        
+
         setManagers(eventManagersData);
       } catch (err: any) {
         console.error("Failed to fetch event managers:", err);
@@ -56,7 +56,7 @@ const AdminEventManagers = () => {
 
   const handleManager = async (userId: string, status: string) => {
     const newstatus = status === "ACTIVE" ? "BLOCK" : "ACTIVE";
-    
+
 
     setManagers((prevManagers) =>
       prevManagers.map((manager) =>
@@ -79,24 +79,24 @@ const AdminEventManagers = () => {
     }
   };
 
-   const detailView = async (id: string, email: string) => {
+  const detailView = async (id: string, email: string) => {
     try {
-       const response = await api.get(`/admin/managerDetails/${id}`);
-       const managerData = response.data?.manager || response.data?.data || response.data;
-       
-       if (managerData) {
-         setSelectedManager({ ...managerData, authEmail: email });
-         setIsDetailsModalOpen(true);
-       }
-    } catch (error) {
-        console.error("Failed to fetch manager details:", error);
-    }
-   };
+      const response = await api.get(`/admin/managerDetails/${id}`);
+      const managerData = response.data?.manager || response.data?.data || response.data;
 
-   const closeDetailsModal = () => {
-     setIsDetailsModalOpen(false);
-     setSelectedManager(null);
-   };
+      if (managerData) {
+        setSelectedManager({ ...managerData, authEmail: email });
+        setIsDetailsModalOpen(true);
+      }
+    } catch (error) {
+      console.error("Failed to fetch manager details:", error);
+    }
+  };
+
+  const closeDetailsModal = () => {
+    setIsDetailsModalOpen(false);
+    setSelectedManager(null);
+  };
 
 
 
@@ -141,7 +141,7 @@ const AdminEventManagers = () => {
             View and manage approved Event Managers on the platform.
           </p>
         </div>
-        
+
         {/* Search bar */}
         <div className="flex w-full sm:w-auto items-center gap-3">
           <div className="relative w-full sm:w-64">
@@ -150,9 +150,9 @@ const AdminEventManagers = () => {
                 <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
               </svg>
             </div>
-            <input 
-              type="text" 
-              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out" 
+            <input
+              type="text"
+              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out"
               placeholder="Search event managers..."
             />
           </div>
@@ -163,7 +163,7 @@ const AdminEventManagers = () => {
         <div className="rounded-lg bg-red-50 p-4 border border-red-200">
           <div className="flex">
             <div className="flex-shrink-0">
-               <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+              <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
               </svg>
             </div>
@@ -197,62 +197,63 @@ const AdminEventManagers = () => {
             <tbody className="bg-white divide-y divide-gray-100">
               {managers.length > 0 ? (
                 managers.map((manager, index) => {
-                  console.log("checking",manager)
+                  console.log("checking", manager)
                   const managerId = manager._id || manager.id || index.toString();
-                  
+
                   return (
-                  <tr key={managerId} className="hover:bg-gray-50 transition-colors duration-150">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0 h-10 w-10">
-                          <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-blue-500 to-blue-600 flex items-center justify-center text-white font-medium shadow-sm">
-                            {getInitials(manager.name)}
+                    <tr key={managerId} className="hover:bg-gray-50 transition-colors duration-150">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="flex-shrink-0 h-10 w-10">
+                            <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-blue-500 to-blue-600 flex items-center justify-center text-white font-medium shadow-sm">
+                              {getInitials(manager.name)}
+                            </div>
+                          </div>
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-gray-900">{manager.name || "N/A"}</div>
+                            <div className="text-sm text-gray-500">{manager.email}</div>
                           </div>
                         </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">{manager.name || "N/A"}</div>
-                          <div className="text-sm text-gray-500">{manager.email}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusBadgeColor(manager.status)}`}>
-                        <span className={`h-1.5 w-1.5 rounded-full mr-1.5 ${manager.status?.toUpperCase() === 'ACTIVE' ? 'bg-green-600' : 'bg-red-600'}`}></span>
-                        {manager.status || "UNKNOWN"}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {manager.isVerified ? (
-                        <div className="flex items-center text-green-600 bg-green-50 px-2.5 py-1 rounded-md w-fit border border-green-100">
-                          <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                          </svg>
-                          <span className="text-xs font-medium">Verified</span>
-                        </div>
-                      ) : (
-                         <div className="flex items-center text-yellow-600 bg-yellow-50 px-2.5 py-1 rounded-md w-fit border border-yellow-100">
-                          <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                          </svg>
-                          <span className="text-xs font-medium">Pending</span>
-                        </div>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button className="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md transition-colors duration-150 mr-2"
-                      onClick={() => detailView(managerId, manager.email)}>
-                        View
-                      </button>
-                      <button className="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md transition-colors duration-150"
-                      onClick={() => handleManager(managerId, manager.status)}>
-                        {manager.status?.toUpperCase() === 'ACTIVE' ? 'Block' : 'Unblock'}
-                      </button>
-                    </td>
-                  </tr>
-                )})
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusBadgeColor(manager.status)}`}>
+                          <span className={`h-1.5 w-1.5 rounded-full mr-1.5 ${manager.status?.toUpperCase() === 'ACTIVE' ? 'bg-green-600' : 'bg-red-600'}`}></span>
+                          {manager.status || "UNKNOWN"}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {manager.isVerified ? (
+                          <div className="flex items-center text-green-600 bg-green-50 px-2.5 py-1 rounded-md w-fit border border-green-100">
+                            <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span className="text-xs font-medium">Verified</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center text-yellow-600 bg-yellow-50 px-2.5 py-1 rounded-md w-fit border border-yellow-100">
+                            <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span className="text-xs font-medium">Pending</span>
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button className="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md transition-colors duration-150 mr-2"
+                          onClick={() => detailView(managerId, manager.email)}>
+                          View
+                        </button>
+                        <button className="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md transition-colors duration-150"
+                          onClick={() => handleManager(managerId, manager.status)}>
+                          {manager.status?.toUpperCase() === 'ACTIVE' ? 'Block' : 'Unblock'}
+                        </button>
+                      </td>
+                    </tr>
+                  )
+                })
               ) : (
                 <tr>
-                   <td colSpan={4} className="px-6 py-16 text-center text-gray-500">
+                  <td colSpan={4} className="px-6 py-16 text-center text-gray-500">
                     <div className="flex flex-col items-center justify-center">
                       <svg className="h-16 w-16 text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -355,10 +356,10 @@ const AdminEventManagers = () => {
                   <div className="p-4 rounded-xl border border-gray-200 bg-gray-50/50 hover:bg-white hover:border-blue-200 transition-all">
                     {isImageFile(selectedManager.certificate) ? (
                       <div className="space-y-3">
-                        <img 
-                          src={selectedManager.certificate} 
-                          alt="Certificate" 
-                          className="w-full h-auto max-h-64 object-contain rounded-lg shadow-sm border border-gray-100 bg-white" 
+                        <img
+                          src={selectedManager.certificate}
+                          alt="Certificate"
+                          className="w-full h-auto max-h-64 object-contain rounded-lg shadow-sm border border-gray-100 bg-white"
                         />
                         <a href={selectedManager.certificate} target="_blank" rel="noopener noreferrer" className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-700">
                           <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>

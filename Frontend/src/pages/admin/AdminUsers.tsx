@@ -51,7 +51,7 @@ const AdminUsers = () => {
     console.log(userId, userStatus);
     const newstatus = userStatus === "ACTIVE" ? "BLOCK" : "ACTIVE";
 
-  
+
     setUsers((prevUsers) =>
       prevUsers.map((user) =>
         (user._id || user.id) === userId ? { ...user, status: newstatus } : user
@@ -392,8 +392,8 @@ const AdminUsers = () => {
                   <div>
                     <label className="text-xs font-semibold text-blue-400 uppercase tracking-wider block mb-1">Upgrade Status</label>
                     <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-bold border ${selectedUser.applyingupgrade === UpgradeStatus.PENDING ? 'bg-amber-100 text-amber-700 border-amber-200' :
-                        selectedUser.applyingupgrade === UpgradeStatus.REJECTED ? 'bg-rose-100 text-rose-700 border-rose-200' :
-                          'bg-blue-100 text-blue-700 border-blue-200'
+                      selectedUser.applyingupgrade === UpgradeStatus.REJECTED ? 'bg-rose-100 text-rose-700 border-rose-200' :
+                        'bg-blue-100 text-blue-700 border-blue-200'
                       }`}>
                       {selectedUser.applyingupgrade === UpgradeStatus.PENDING ? 'PENDING APPROVAL' :
                         selectedUser.applyingupgrade === UpgradeStatus.REJECTED ? 'REJECTED' :

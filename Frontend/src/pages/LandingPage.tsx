@@ -1,12 +1,15 @@
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "../redux/hook";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { api } from "../services/api"
 
 const LandingPage = () => {
     const [events, setEvents] = useState<any[]>([]);
+    const [selectedEvent, setSelectedEvent] = useState<any>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
     const navigate = useNavigate();
 
     const user = useAppSelector((state) => state.auth.user);
@@ -23,13 +26,34 @@ const LandingPage = () => {
             } catch (err: any) {
                 setError("Failed to fetch events");
             } finally {
-                setLoading(false);
+               setLoading(false);
             }
         };
 
         fetchEvents();
     }, []);
+   
 
+    const viewEventDetails = async (id: string) => {
+        try {
+            setLoading(true);
+            const response = await api.get(`/events/eventDetails/${id}`);
+            // The backend returns { events: { ... } }
+            const eventData = response.data.events;
+            setSelectedEvent(eventData);
+            setIsDetailsModalOpen(true);
+        } catch (err: any) {
+            console.error("Failed to fetch event details:", err);
+            setError("Could not load event details. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const closeDetailsModal = () => {
+        setIsDetailsModalOpen(false);
+        setSelectedEvent(null);
+    };
     const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleDateString("en-US", {
             weekday: "short",
@@ -218,9 +242,9 @@ const LandingPage = () => {
                     </div>
                 ) : events.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {events.slice(0, 6).map((event) => (
+                        {events.map((event) => (
                             <div
-                                key={event._id}
+                                key={event.id}
                                 className="group relative bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-[2rem] overflow-hidden hover:border-indigo-500/40 hover:shadow-[0_20px_50px_-12px_rgba(99,102,241,0.2)] transition-all duration-500 flex flex-col h-full"
                             >
                                 <div className="aspect-video w-full overflow-hidden relative">
@@ -262,7 +286,7 @@ const LandingPage = () => {
                                             {event.price > 0 ? `$${event.price}` : <span className="text-emerald-400">Join Free</span>}
                                         </div>
                                         <button
-                                            onClick={() => navigate(`/events/${event._id}`)}
+                                            onClick={() => viewEventDetails(event.id)}
                                             className="text-indigo-400 hover:text-white text-sm font-semibold flex items-center transition-colors group/btn"
                                         >
                                             View Details
@@ -306,6 +330,108 @@ const LandingPage = () => {
                         </div>
                     </div>
                 </section>
+            )}
+            {/* EVENT DETAILS MODAL */}
+            {isDetailsModalOpen && selectedEvent && typeof document !== 'undefined' && createPortal(
+                <div
+                    className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md transition-all duration-300 animate-in fade-in"
+                    onClick={closeDetailsModal}
+                >
+                    <div
+                        className="bg-slate-900 border border-slate-800 w-full max-w-4xl max-h-[90vh] rounded-[2.5rem] overflow-hidden shadow-[0_0_100px_-20px_rgba(99,102,241,0.3)] transform transition-all animate-in zoom-in-95 duration-300 flex flex-col md:flex-row relative"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Close Button */}
+                        <button
+                            onClick={closeDetailsModal}
+                            className="absolute top-6 right-6 z-50 p-2.5 bg-slate-950/50 backdrop-blur-md text-white/70 hover:text-white hover:bg-slate-800 rounded-full transition-all border border-white/10"
+                        >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+
+                        {/* Image Section */}
+                        <div className="md:w-1/2 h-64 md:h-auto overflow-hidden relative group">
+                            <img
+                                src={selectedEvent.picture || "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2070&auto=format&fit=crop"}
+                                alt={selectedEvent.title}
+                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                            />
+                            <div className="absolute inset-0 bg-linear-to-t from-slate-900 via-transparent to-transparent"></div>
+                            <div className="absolute bottom-8 left-8">
+                                <span className="px-4 py-1.5 rounded-full bg-indigo-500/20 backdrop-blur-md text-xs font-bold text-indigo-400 border border-indigo-500/30 uppercase tracking-[0.2em]">
+                                    {selectedEvent.eventType}
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* Content Section */}
+                        <div className="md:w-1/2 p-8 md:p-12 overflow-y-auto flex flex-col bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.05),transparent)]">
+                            <div className="mb-8">
+                                <div className="flex items-center gap-2 text-indigo-400 text-xs font-bold mb-4 uppercase tracking-[0.3em]">
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    {formatDate(selectedEvent.startTime)}
+                                </div>
+                                <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-6 leading-tight tracking-tight">
+                                    {selectedEvent.title}
+                                </h2>
+                                <p className="text-slate-400 text-lg font-light leading-relaxed mb-8">
+                                    {selectedEvent.description}
+                                </p>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-8 mb-10">
+                                <div className="space-y-2">
+                                    <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Pricing</p>
+                                    <p className="text-2xl font-bold text-white">
+                                        {selectedEvent.price > 0 ? `$${selectedEvent.price}` : <span className="text-emerald-400 font-extrabold">FREE</span>}
+                                    </p>
+                                </div>
+                                <div className="space-y-2">
+                                    <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Attendance</p>
+                                    <p className="text-lg font-medium text-slate-200">
+                                        {selectedEvent.eventType === 'ONLINE' ? `${selectedEvent.maxOnlineUsers} Slots` : 'In-Person'}
+                                    </p>
+                                </div>
+                                {selectedEvent.location && (
+                                    <div className="col-span-2 space-y-2">
+                                        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Location</p>
+                                        <div className="flex items-start gap-3">
+                                            <div className="mt-1 p-1.5 rounded-lg bg-indigo-500/10 text-indigo-400">
+                                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                </svg>
+                                            </div>
+                                            <p className="text-sm font-medium text-slate-300 leading-relaxed">
+                                                {selectedEvent.location.address}
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="mt-auto flex gap-4">
+                                <button
+                                    onClick={() => navigate(`/checkout/${selectedEvent.id}`)}
+                                    className="flex-1 py-4 bg-linear-to-r from-indigo-500 to-purple-600 text-white font-bold rounded-2xl shadow-[0_20px_40px_-10px_rgba(99,102,241,0.4)] hover:shadow-[0_25px_50px_-12px_rgba(99,102,241,0.5)] hover:-translate-y-1 transition-all duration-300 active:scale-95"
+                                >
+                                    Book This Experience
+                                </button>
+                                <button
+                                    onClick={closeDetailsModal}
+                                    className="px-8 py-4 bg-slate-800/50 text-white font-bold rounded-2xl border border-slate-700 hover:bg-slate-800 transition-all active:scale-95"
+                                >
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>,
+                document.body
             )}
         </div>
     );

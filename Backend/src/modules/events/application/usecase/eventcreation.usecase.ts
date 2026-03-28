@@ -12,8 +12,13 @@ export class EventCretionUseCase{
   async execute(data: EventDto,userId:string) {
 
 
-    console.log("checking this data",data)
-  const status= EventStatus.ACTIVE
+    
+  const status= EventStatus.ACTIVE;
+
+
+  console.log(data.location);
+
+  console.log("latitude",data.latitude   , "longitude",data.longitude)
   const eventEntity = new Events(
     null,
     data.title,

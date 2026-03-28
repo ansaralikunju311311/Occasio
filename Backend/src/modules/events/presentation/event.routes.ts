@@ -19,4 +19,9 @@ router.get("/events",
   // requireRole(UserRole.EVENT_MANAGER),
   controller.allEvents.bind(controller)
 )
+
+
+router.get("/eventDetails/:id",
+   controller.eventDetails.bind(controller)
+)
 export default router;

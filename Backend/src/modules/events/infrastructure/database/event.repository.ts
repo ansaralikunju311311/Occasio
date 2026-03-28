@@ -33,6 +33,12 @@ export class EventRepository extends BaseRepository<IEventDocument> implements I
     return events.map((event) => this.toEntity(event));
   }
 
+
+  async findByIdEvents(id: string): Promise<Events | null> {
+    const event = await this.model.findById(id);
+    return event ? this.toEntity(event) : null;
+  }
+
   private toEntity(manager: any): Events {
     console.log("Mapping document to entity. Status:", manager.status, "Location Type:", manager.location?.type);
     return new Events(
