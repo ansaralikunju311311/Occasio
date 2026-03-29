@@ -27,9 +27,10 @@ export class EventRepository extends BaseRepository<IEventDocument> implements I
     return this.toEntity(events)
   }
 
-  async findAllEvents(): Promise<Events[]> {
+  async findAllEvents(eventType: string): Promise<Events[]> {
     // Sort by createdAt descending to show newest events first
-    const events = await this.model.find({}).sort({ createdAt: -1 });
+    const query = eventType ? { eventType } : {};
+    const events = await this.model.find(query).sort({ createdAt: -1 });
     return events.map((event) => this.toEntity(event));
   }
 
@@ -41,17 +42,17 @@ export class EventRepository extends BaseRepository<IEventDocument> implements I
 
 
   async findExactConflict(longitude: number, latitude: number, startTime: Date, endTime: Date): Promise<Events | null> {
-      
-       const events = await this.model.findOne({
-        "location.coordinates":[longitude,latitude],
-        startTime:{$lt:endTime},
-        endTime:{$gt:startTime}
-       })
+
+    const events = await this.model.findOne({
+      "location.coordinates": [longitude, latitude],
+      startTime: { $lt: endTime },
+      endTime: { $gt: startTime }
+    })
 
 
-       console.log("evnts are coming in tis area",events)
+    console.log("evnts are coming in tis area", events)
 
-       return events ? this.toEntity(events) : null;
+    return events ? this.toEntity(events) : null;
   }
 
   private toEntity(manager: any): Events {

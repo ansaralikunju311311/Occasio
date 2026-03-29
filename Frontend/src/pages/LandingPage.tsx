@@ -6,6 +6,7 @@ import { api } from "../services/api"
 import EventMap from "../components/eventManager/EventMap";
 // import LocationFinder from "../components/user/LocationFinder";
 import CurrentLocation from "../components/user/CurrentLocation";
+import { EventType } from "./eventManager/CreateEvent";
 
 const LandingPage = () => {
     const [events, setEvents] = useState<any[]>([]);
@@ -15,22 +16,31 @@ const LandingPage = () => {
     const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
     const navigate = useNavigate();
     const user = useAppSelector((state) => state.auth.user);
-    useEffect(() => {
-        const fetchEvents = async () => {
-            try {
-                setLoading(true);
-                const response = await api.get("/events/events");
-                // The backend returns an object with an 'events' property: { events: [...] }
-                const fetchedEvents = response.data.events || [];
-                setEvents(Array.isArray(fetchedEvents) ? fetchedEvents : []);
-                console.log("Fetched Events:", fetchedEvents);
-            } catch (err: any) {
-                setError("Failed to fetch events");
-            } finally {
-                setLoading(false);
+    
+    const fetchEvents = async (eventType: string = "ALL") => {
+        try {
+            setLoading(true);
+            
+            const queryParams: any = {};
+            // If the user selects "All", do not send the eventType parameter 
+            // so the backend fetches everything via `{}` query
+            if (eventType && eventType.toUpperCase() !== "ALL") {
+                queryParams.eventType = eventType;
             }
-        };
 
+            const response = await api.get("/events/events", { params: queryParams });
+            // The backend returns an object with an 'events' property: { events: [...] }
+            const fetchedEvents = response.data.events || [];
+            setEvents(Array.isArray(fetchedEvents) ? fetchedEvents : []);
+            console.log("Fetched Events:", fetchedEvents);
+        } catch (err: any) {
+            setError("Failed to fetch events");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
         fetchEvents();
     }, []);
     const viewEventDetails = async (id: string) => {
@@ -216,12 +226,32 @@ const LandingPage = () => {
                             Discover local and international events across online, offline, and hybrid formats.
                         </p>
                     </div>
-                    <button
-                        onClick={() => navigate("/events")}
-                        className="px-6 py-3 rounded-xl bg-slate-900/50 text-white font-medium border border-slate-800 hover:border-slate-500 hover:bg-slate-800 transition-all duration-300"
-                    >
-                        View All Events
-                    </button>
+                    <div className="flex flex-col sm:flex-row items-center gap-4">
+                        <div className="flex items-center gap-2">
+                            <button className="px-4 py-2 rounded-xl bg-slate-900/50 text-slate-300 text-sm font-medium border border-slate-800 hover:border-slate-500 hover:bg-slate-800 hover:text-white transition-all duration-300"
+                                onClick={() => fetchEvents("All")}>
+                                All
+                            </button>
+                            <button className="px-4 py-2 rounded-xl bg-slate-900/50 text-slate-300 text-sm font-medium border border-slate-800 hover:border-slate-500 hover:bg-slate-800 hover:text-white transition-all duration-300"
+                                onClick={() => fetchEvents(EventType.ONLINE)}>
+                                Online
+                            </button>
+                            <button className="px-4 py-2 rounded-xl bg-slate-900/50 text-slate-300 text-sm font-medium border border-slate-800 hover:border-slate-500 hover:bg-slate-800 hover:text-white transition-all duration-300"
+                                onClick={() => fetchEvents(EventType.OFFLINE)}>
+                                Offline
+                            </button>
+                            <button className="px-4 py-2 rounded-xl bg-slate-900/50 text-slate-300 text-sm font-medium border border-slate-800 hover:border-slate-500 hover:bg-slate-800 hover:text-white transition-all duration-300"
+                                onClick={() => fetchEvents(EventType.HYBRID)}>
+                                Hybrid
+                            </button>
+                        </div>
+                        <button
+                            onClick={() => navigate("/events")}
+                            className="px-6 py-3 rounded-xl bg-slate-900/50 text-white font-medium border border-slate-800 hover:border-slate-500 hover:bg-slate-800 transition-all duration-300"
+                        >
+                            View All Events
+                        </button>
+                    </div>
                 </div>
                 {error && (
                     <div className="text-center py-10 bg-red-500/10 border border-red-500/20 rounded-2xl mb-12">
@@ -419,7 +449,7 @@ const LandingPage = () => {
                                         {(() => {
                                             const lng = selectedEvent.location.coordinates[0];
                                             const lat = selectedEvent.location.coordinates[1];
-                                            
+
                                             // Debug log to verify coordinates
                                             console.log("Rendering Map with Coordinates:", { lat, lng });
 

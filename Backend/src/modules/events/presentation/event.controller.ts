@@ -29,7 +29,14 @@ export class EventController {
     }
     async allEvents(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const events = await this.getEventsUseCase.execute();
+
+
+            const {eventType} = req.query;
+
+
+            console.log("queyryyyy",req.query)
+            console.log("value",eventType)
+            const events = await this.getEventsUseCase.execute(eventType);
             res.status(HttpStatus.OK).json({
                 events
             })

@@ -5,10 +5,10 @@ export class GetEventsUseCase{
    constructor(
     private eventRepository:IEventRepository
    ){}
-    async execute(){
+    async execute(eventType:string){
 
 
-        const events = await this.eventRepository.findAllEvents();
+        const events = await this.eventRepository.findAllEvents(eventType);
         return events
     }
 }
