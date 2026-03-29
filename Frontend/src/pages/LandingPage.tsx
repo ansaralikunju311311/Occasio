@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { api } from "../services/api"
 import EventMap from "../components/eventManager/EventMap";
+// import LocationFinder from "../components/user/LocationFinder";
+import CurrentLocation from "../components/user/CurrentLocation";
+
 const LandingPage = () => {
     const [events, setEvents] = useState<any[]>([]);
     const [selectedEvent, setSelectedEvent] = useState<any>(null);
@@ -24,7 +27,7 @@ const LandingPage = () => {
             } catch (err: any) {
                 setError("Failed to fetch events");
             } finally {
-               setLoading(false);
+                setLoading(false);
             }
         };
 
@@ -144,6 +147,10 @@ const LandingPage = () => {
                         )}
                     </div>
                 </div>
+
+                <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-20">
+                    <CurrentLocation />
+                </div>
             </section>
             {/* FEATURES SECTION */}
             <section className="py-32 px-6 max-w-7xl mx-auto relative z-10">
@@ -219,7 +226,7 @@ const LandingPage = () => {
                 {error && (
                     <div className="text-center py-10 bg-red-500/10 border border-red-500/20 rounded-2xl mb-12">
                         <p className="text-red-400 font-light">{error}</p>
-                        <button 
+                        <button
                             onClick={() => window.location.reload()}
                             className="text-indigo-400 text-sm mt-2 hover:underline"
                         >
@@ -341,12 +348,12 @@ const LandingPage = () => {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>
-                       
 
 
 
 
-                       {/* ncncn */}
+
+                        {/* ncncn */}
                         {/* Image Section */}
                         <div className="md:w-1/2 h-64 md:h-auto overflow-hidden relative group">
                             <img
@@ -406,8 +413,8 @@ const LandingPage = () => {
                                             </p>
                                         </div>
 
-                                          
-                                        
+
+
                                         {/* Map Integration */}
                                         <div className="mt-4 rounded-2xl overflow-hidden border border-slate-700/50 shadow-inner group/map h-[200px] relative">
                                             <EventMap
