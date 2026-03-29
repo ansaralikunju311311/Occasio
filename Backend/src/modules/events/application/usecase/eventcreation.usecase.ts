@@ -3,6 +3,7 @@ import { Events } from "../../domain/entities/events.entity.js";
 import { IEventRepository } from "../../domain/repositories/event.repository.interface.js";
 import { EventDto } from "../dtos/event.dto.js";
 import { getLocationName } from "../../../../common/service/location.service.js";
+import { normalizeCoordinates } from "../../../../common/utils/geo.util.js";
 export class EventCretionUseCase{
 
     constructor(
@@ -27,7 +28,10 @@ if (data.eventType !== "ONLINE") {
 
 
 
-  // console.log(data.location);
+
+
+
+   console.log("location",data.location , "longitude",longitude , "latitude",latitude);
 
 
   data.location={
@@ -39,9 +43,45 @@ if (data.eventType !== "ONLINE") {
 }
 
 
+
+console.log("thehhehe location",data.location)
+
+   
+
+
     const status= EventStatus.ACTIVE;
 
 
+console.log("sample", status)
+
+
+    const {location,startTime,endTime} = data;
+
+
+    const {longitude,latitude} = normalizeCoordinates(
+      location?.coordinates[0],
+      location?.coordinates[1]
+    )
+  
+    console.log("checking come here ")
+
+    const conflict = await this.eventRepository.findExactConflict(
+      longitude,
+      latitude,
+      new Date(startTime),
+      new Date(endTime)
+    )
+
+    console.log("the conflict here happen ", conflict)
+
+    if(conflict){
+      throw new Error("Duplicate EVent at same location and time")
+    }
+
+
+
+    console.log("evide varanindioooo")
+    data.location.coordinates=[longitude,latitude];
     console.log(data.location)
   console.log("latitude",data.latitude   , "longitude",data.longitude)
   const eventEntity = new Events(

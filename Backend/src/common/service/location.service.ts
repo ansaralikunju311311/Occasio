@@ -9,7 +9,7 @@ export const getLocationName = async (address: string) => {
 
     if (!results || results.length === 0) return null;
 
-    // ✅ Prefer high confidence result
+    //  Prefer high confidence result
     const bestResult = results.find(r => r.confidence >= 8) || results[0];
 
     return {

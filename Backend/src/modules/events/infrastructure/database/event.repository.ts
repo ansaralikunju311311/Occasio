@@ -39,6 +39,21 @@ export class EventRepository extends BaseRepository<IEventDocument> implements I
     return event ? this.toEntity(event) : null;
   }
 
+
+  async findExactConflict(longitude: number, latitude: number, startTime: Date, endTime: Date): Promise<Events | null> {
+      
+       const events = await this.model.findOne({
+        "location.coordinates":[longitude,latitude],
+        startTime:{$lt:endTime},
+        endTime:{$gt:startTime}
+       })
+
+
+       console.log("evnts are coming in tis area",events)
+
+       return events ? this.toEntity(events) : null;
+  }
+
   private toEntity(manager: any): Events {
     console.log("Mapping document to entity. Status:", manager.status, "Location Type:", manager.location?.type);
     return new Events(
