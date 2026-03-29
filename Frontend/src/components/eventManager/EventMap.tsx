@@ -20,6 +20,7 @@ const EventMap = ({ lat, lng, locationName }: Props) => {
         <Popup>{locationName}</Popup>
       </Marker>
     </MapContainer>
+    
   );
 };
 
