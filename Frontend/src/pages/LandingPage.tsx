@@ -416,23 +416,36 @@ const LandingPage = () => {
 
 
                                         {/* Map Integration */}
-                                        <div className="mt-4 rounded-2xl overflow-hidden border border-slate-700/50 shadow-inner group/map h-[200px] relative">
-                                            <EventMap
-                                                lat={selectedEvent.location.coordinates[1]}
-                                                lng={selectedEvent.location.coordinates[0]}
-                                                locationName={selectedEvent.location.address}
-                                            />
-                                        </div>
+                                        {(() => {
+                                            const lng = selectedEvent.location.coordinates[0];
+                                            const lat = selectedEvent.location.coordinates[1];
+                                            
+                                            // Debug log to verify coordinates
+                                            console.log("Rendering Map with Coordinates:", { lat, lng });
 
-                                        <button
-                                            onClick={() => openInMaps(selectedEvent.location.coordinates[1], selectedEvent.location.coordinates[0])}
-                                            className="mt-4 w-full py-2 bg-slate-800/50 hover:bg-slate-700/50 text-indigo-400 text-xs font-bold rounded-xl border border-slate-700/50 transition-all flex items-center justify-center gap-2 group/mapbtn"
-                                        >
-                                            <svg className="w-4 h-4 group-hover/mapbtn:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                            </svg>
-                                            Open in Google Maps
-                                        </button>
+                                            return (
+                                                <>
+                                                    <div className="mt-4 rounded-2xl overflow-hidden border border-slate-700/50 shadow-inner group/map h-[200px] relative">
+                                                        <EventMap
+                                                            lat={lat}
+                                                            lng={lng}
+                                                            locationName={selectedEvent.location.address}
+                                                        />
+                                                    </div>
+
+                                                    <button
+                                                        onClick={() => openInMaps(lat, lng)}
+                                                        className="mt-4 w-full py-2 bg-slate-800/50 hover:bg-slate-700/50 text-indigo-400 text-xs font-bold rounded-xl border border-slate-700/50 transition-all flex items-center justify-center gap-2 group/mapbtn"
+                                                    >
+                                                        <svg className="w-4 h-4 group-hover/mapbtn:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                                        </svg>
+                                                        Open in Google Maps
+                                                    </button>
+                                                </>
+                                            );
+                                        })()}
+
                                     </div>
                                 )}
                             </div>

@@ -7,6 +7,9 @@ type Props = {
 };
 
 const EventMap = ({ lat, lng, locationName }: Props) => {
+
+
+  
   return (
     <MapContainer
       {...{ center: [lat, lng], zoom: 15 } as any}
@@ -20,7 +23,7 @@ const EventMap = ({ lat, lng, locationName }: Props) => {
         <Popup>{locationName}</Popup>
       </Marker>
     </MapContainer>
-    
+
   );
 };
 

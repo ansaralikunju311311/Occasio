@@ -15,23 +15,25 @@ export class EventCretionUseCase{
 
 if (data.eventType !== "ONLINE") {
 
-    const { latitude, longitude } = data;
+    // const {} = data;
 
-    if (!latitude || !longitude) {
+    const {address} = data
+
+    if (!address) {
       throw new Error("Location coordinates required");
-    }    const locationName = await getLocationName(latitude, longitude);
+    }    const  {longitude,latitude}= await getLocationName(address);
 
-    console.log("location finding the ",locationName)
+    // console.log("location finding the ",locationName)
 
 
 
-  console.log(data.location);
+  // console.log(data.location);
 
 
   data.location={
     type:"Point",
     coordinates:[longitude,latitude],
-      address:locationName
+      address
 
   };
 }
