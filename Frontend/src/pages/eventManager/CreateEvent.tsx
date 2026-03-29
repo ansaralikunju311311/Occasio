@@ -3,6 +3,7 @@ import { useForm, type SubmitHandler } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { api } from '../../services/api';
+// import EventMap from '../../components/eventManager/EventMap';
 
 export const EventType = {
     ONLINE: "ONLINE",

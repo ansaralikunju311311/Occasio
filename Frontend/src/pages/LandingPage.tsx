@@ -3,6 +3,7 @@ import { useAppSelector } from "../redux/hook";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { api } from "../services/api"
+import EventMap from "../components/eventManager/EventMap";
 const LandingPage = () => {
     const [events, setEvents] = useState<any[]>([]);
     const [selectedEvent, setSelectedEvent] = useState<any>(null);
@@ -335,7 +336,12 @@ const LandingPage = () => {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>
+                       
 
+
+
+
+                       {/* ncncn */}
                         {/* Image Section */}
                         <div className="md:w-1/2 h-64 md:h-auto overflow-hidden relative group">
                             <img
@@ -350,7 +356,6 @@ const LandingPage = () => {
                                 </span>
                             </div>
                         </div>
-
                         {/* Content Section */}
                         <div className="md:w-1/2 p-8 md:p-12 overflow-y-auto flex flex-col bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.05),transparent)]">
                             <div className="mb-8">
@@ -394,6 +399,14 @@ const LandingPage = () => {
                                             <p className="text-sm font-medium text-slate-300 leading-relaxed">
                                                 {selectedEvent.location.address}
                                             </p>
+                                        </div>
+                                        {/* Map Integration */}
+                                        <div className="mt-4 rounded-2xl overflow-hidden border border-slate-700/50 shadow-inner group/map h-[200px] relative">
+                                            <EventMap
+                                                lat={selectedEvent.location.coordinates[1]}
+                                                lng={selectedEvent.location.coordinates[0]}
+                                                locationName={selectedEvent.location.address}
+                                            />
                                         </div>
                                     </div>
                                 )}
