@@ -20,6 +20,7 @@ const AdminLayout = lazy(() => import("../layouts/AdminLayout.tsx"));
 const AdminDashboard = lazy(() => import("../pages/admin/AdminDashboard.tsx"));
 const AdminPlaceholder = lazy(() => import("../pages/admin/AdminPlaceholder.tsx"));
 const AdminUsers = lazy(() => import("../pages/admin/AdminUsers.tsx"));
+const AdminEvents = lazy(() => import("../pages/admin/AdminEvents.tsx"));
 const AdminPendingManagers = lazy(() => import("../pages/admin/AdminPendingManagers.tsx"));
 const AdminEventManagers = lazy(() => import("../pages/admin/AdminEventManagers.tsx"));
 
@@ -99,7 +100,7 @@ export const router = createBrowserRouter([
     ),
     children: [
       { path: "dashboard", element: <AdminDashboard /> },
-      { path: "events", element: <AdminPlaceholder /> },
+      { path: "events", element: <AdminEvents /> },
       { path: "users", element: <AdminUsers /> },
       { path: "eventmanagers", element: <AdminEventManagers /> },
       { path: "pendingmanagers", element: <AdminPendingManagers /> },
