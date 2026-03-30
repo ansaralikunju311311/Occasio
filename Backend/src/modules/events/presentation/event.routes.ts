@@ -24,4 +24,6 @@ router.get("/events",
 router.get("/eventDetails/:id",
   controller.eventDetails.bind(controller)
 )
+
+router.get("/allevents",verifyAccessToken,requireRole(UserRole.ADMIN),controller.allEvents.bind(controller))
 export default router;

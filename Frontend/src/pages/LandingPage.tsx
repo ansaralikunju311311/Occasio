@@ -245,12 +245,7 @@ const LandingPage = () => {
                                 Hybrid
                             </button>
                         </div>
-                        <button
-                            onClick={() => navigate("/events")}
-                            className="px-6 py-3 rounded-xl bg-slate-900/50 text-white font-medium border border-slate-800 hover:border-slate-500 hover:bg-slate-800 transition-all duration-300"
-                        >
-                            View All Events
-                        </button>
+                
                     </div>
                 </div>
                 {error && (

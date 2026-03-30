@@ -1,65 +1,15 @@
-import { useState } from "react";
-
-// Dummy data generator
-const dummyEvents = [
-    {
-        id: "EVT-8291",
-        title: "Global Tech Summit 2026",
-        date: "2026-05-15T09:00:00Z",
-        format: "HYBRID",
-        ticketsSold: 1250,
-        revenue: 125000,
-        status: "UPCOMING",
-        category: "Technology"
-    },
-    {
-        id: "EVT-4421",
-        title: "Web3 Developer Workshop",
-        date: "2026-04-10T14:30:00Z",
-        format: "ONLINE",
-        ticketsSold: 450,
-        revenue: 0,
-        status: "ACTIVE",
-        category: "Workshop"
-    },
-    {
-        id: "EVT-9923",
-        title: "Creative Arts Festival",
-        date: "2026-06-20T10:00:00Z",
-        format: "OFFLINE",
-        ticketsSold: 85,
-        revenue: 4250,
-        status: "UPCOMING",
-        category: "Arts & Culture"
-    },
-    {
-        id: "EVT-1102",
-        title: "Leadership Masterclass",
-        date: "2026-03-01T10:00:00Z",
-        format: "ONLINE",
-        ticketsSold: 500,
-        revenue: 25000,
-        status: "ENDED",
-        category: "Business"
-    },
-    {
-        id: "EVT-7734",
-        title: "Startup Pitch Night",
-        date: "2026-04-25T18:00:00Z",
-        format: "OFFLINE",
-        ticketsSold: 200,
-        revenue: 3000,
-        status: "UPCOMING",
-        category: "Business"
-    }
-];
+import { useEffect, useState } from "react";
+import { api } from "../../services/api";
 
 const AdminEvents = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [statusFilter, setStatusFilter] = useState("ALL");
+    const [events, setEvents] = useState<any[]>([]);
 
-    const filteredEvents = dummyEvents.filter((event) => {
-        const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) || event.id.toLowerCase().includes(searchTerm.toLowerCase());
+    const filteredEvents = events.filter((event) => {
+        const eventTitle = event.title || "";
+        const eventId = event.id || "";
+        const matchesSearch = eventTitle.toLowerCase().includes(searchTerm.toLowerCase()) || eventId.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesStatus = statusFilter === "ALL" || event.status === statusFilter;
         return matchesSearch && matchesStatus;
     });
@@ -81,6 +31,22 @@ const AdminEvents = () => {
             default: return 'text-slate-400 bg-slate-400/10';
         }
     };
+
+    useEffect(()=>{
+        const fetchEvent =async ()=>{
+            try {
+                const response = await api.get("/events/allevents");
+                if (response.data && response.data.events) {
+                    setEvents(response.data.events);
+                } else {
+                    setEvents([]);
+                }
+            } catch (error) {
+                console.error("Error fetching events", error)
+            }
+        }
+        fetchEvent()
+    },[])
 
     return (
         <div className="p-8 w-full min-h-screen bg-[#070b14]">
@@ -156,7 +122,7 @@ const AdminEvents = () => {
                             <tr className="bg-slate-900/60 border-b border-slate-800 text-slate-400 text-xs uppercase tracking-wider font-semibold">
                                 <th className="px-6 py-4">Event Info</th>
                                 <th className="px-6 py-4">Date & Format</th>
-                                <th className="px-6 py-4">Tickets & Revenue</th>
+                                <th className="px-6 py-4">Ticket Price</th>
                                 <th className="px-6 py-4">Status</th>
                                 <th className="px-6 py-4 text-right">Actions</th>
                             </tr>
@@ -169,33 +135,39 @@ const AdminEvents = () => {
                                             {event.title}
                                         </div>
                                         <div className="flex items-center gap-2 text-xs">
-                                            <span className="text-slate-500 font-mono">{event.id}</span>
+                                            <span className="text-slate-500 font-mono" title={event.id}>
+                                                {event.id ? `${event.id.substring(0, 8)}...` : 'N/A'}
+                                            </span>
                                             <span className="w-1 h-1 rounded-full bg-slate-700"></span>
-                                            <span className="text-slate-400">{event.category}</span>
+                                            <span className="text-slate-400 capitalize">{event.eventType?.toLowerCase() || 'Event'}</span>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <div className="text-sm text-slate-300 mb-1 flex items-center gap-2">
-                                            <svg className="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <div className="text-sm text-slate-300 mb-2 flex items-start gap-2">
+                                            <svg className="w-3.5 h-3.5 text-slate-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                             </svg>
-                                            {new Date(event.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                            <div className="flex flex-col">
+                                                <span>{event.startTime ? `${new Date(event.startTime).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} at ${new Date(event.startTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}` : 'N/A'}</span>
+                                                {event.endTime && (
+                                                    <span className="text-xs text-slate-500 mt-0.5">
+                                                        to {new Date(event.endTime).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} at {new Date(event.endTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                                                    </span>
+                                                )}
+                                            </div>
                                         </div>
-                                        <span className={`inline-flex px-2 py-0.5 rounded-md text-[10px] font-bold ${getFormatStyle(event.format)}`}>
-                                            {event.format}
+                                        <span className={`inline-flex px-2 py-0.5 rounded-md text-[10px] font-bold ${getFormatStyle(event.eventType)}`}>
+                                            {event.eventType || 'UNKNOWN'}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <div className="text-sm font-medium text-white mb-1">
-                                            {event.ticketsSold.toLocaleString()} <span className="text-slate-500 font-normal text-xs">sold</span>
-                                        </div>
-                                        <div className="text-xs font-mono text-emerald-400">
-                                            ${event.revenue.toLocaleString()}
+                                        <div className="text-sm font-medium text-emerald-400">
+                                            ${event.price || 0}
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
                                         <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full border ${getStatusStyle(event.status)}`}>
-                                            {event.status}
+                                            {event.status || 'UNKNOWN'}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 text-right space-x-2 whitespace-nowrap">
