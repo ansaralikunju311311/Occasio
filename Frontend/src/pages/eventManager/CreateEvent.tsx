@@ -201,9 +201,51 @@ const CreateEvent = () => {
                 bannerUrl = await uploadImageToCloudinary(data.banner[0]);
             }
 
+            const isOfflineOrHybrid = data.eventType === EventType.OFFLINE || data.eventType === EventType.HYBRID;
+            
+            // Mandatory Seat Layout Validation for Offline/Hybrid
+            if (isOfflineOrHybrid) {
+                if (layoutBlocks.length === 0) {
+                    toast.error("At least one seat block is required for Offline/Hybrid events!");
+                    setIsSubmitting(false);
+                    return;
+                }
+
+                for (let i = 0; i < layoutBlocks.length; i++) {
+                    const block = layoutBlocks[i];
+                    if (!block.blockName.trim()) {
+                        toast.error(`Block ${i + 1} must have a name!`);
+                        setIsSubmitting(false);
+                        return;
+                    }
+                    if (!block.category.name) {
+                        toast.error(`Please select a category for Block ${block.blockName}!`);
+                        setIsSubmitting(false);
+                        return;
+                    }
+                    if (block.category.price === "" || Number(block.category.price) < 0) {
+                        toast.error(`Please enter a valid price for Block ${block.blockName}!`);
+                        setIsSubmitting(false);
+                        return;
+                    }
+                    if (block.rows.length === 0) {
+                        toast.error(`Block ${block.blockName} must have at least one row!`);
+                        setIsSubmitting(false);
+                        return;
+                    }
+                    for (let j = 0; j < block.rows.length; j++) {
+                        if (block.rows[j].columns === "" || Number(block.rows[j].columns) <= 0) {
+                            toast.error(`Row ${block.rows[j].rowNumber} in Block ${block.blockName} must have at least 1 seat!`);
+                            setIsSubmitting(false);
+                            return;
+                        }
+                    }
+                }
+            }
+
             const eventPayload = {
                 ...data,
-                location: (data.eventType === EventType.OFFLINE || data.eventType === EventType.HYBRID) ? {
+                location: isOfflineOrHybrid ? {
                     type: "Point",
                     coordinates: [Number(data.longitude), Number(data.latitude)],
                     address: null
@@ -211,9 +253,10 @@ const CreateEvent = () => {
                 startTime: new Date(data.startTime),
                 endTime: new Date(data.endTime),
                 maxOnlineUsers: (data.eventType === EventType.ONLINE || data.eventType === EventType.HYBRID) ? (data.maxOnlineUsers ? Number(data.maxOnlineUsers) : undefined) : undefined,
-                price: Number(data.price),
+                 price: (data.eventType === EventType.ONLINE || data.eventType === EventType.HYBRID) ? (data.price ? Number(data.price) : undefined) : undefined,
+                
                 bannerUrl: bannerUrl,
-                layout: (data.isSeatLayoutEnabled && (data.eventType === EventType.OFFLINE || data.eventType === EventType.HYBRID)) ? { blocks: layoutBlocks } : undefined
+                layout: isOfflineOrHybrid ? { blocks: layoutBlocks } : undefined
             };
 
             console.log('Form Submitted with Cloudinary URL', eventPayload);
@@ -414,23 +457,19 @@ const CreateEvent = () => {
                             Seat Layout
                         </h2>
 
-                        <div className="flex items-center justify-between p-4 bg-slate-800/30 border border-slate-700/50 rounded-xl mb-4">
-                            <div>
-                                <h3 className="text-white font-medium">Enable Seat Layout</h3>
-                                <p className="text-xs text-slate-400">Specify precise seating for your venue</p>
+                        <div className="bg-teal-500/5 border border-teal-500/20 rounded-xl p-4 mb-6">
+                            <div className="flex items-start gap-3">
+                                <div className="p-2 bg-teal-500/10 rounded-lg text-teal-400">
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                </div>
+                                <div>
+                                    <h3 className="text-white font-medium text-sm">Mandatory Configuration</h3>
+                                    <p className="text-xs text-slate-400 mt-1">Specify precisely the seating layout for your offline audience. This data is required to publish this event type.</p>
+                                </div>
                             </div>
-                            <label className="relative inline-flex items-center cursor-pointer">
-                                <input
-                                    type="checkbox"
-                                    className="sr-only peer"
-                                    {...register("isSeatLayoutEnabled")}
-                                />
-                                <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-500"></div>
-                            </label>
                         </div>
                         
-                        {isSeatLayoutEnabled && (
-                            <div className="space-y-6 animate-in fade-in zoom-in-95 duration-300">
+                        <div className="space-y-6 animate-in fade-in zoom-in-95 duration-300">
                                 {layoutBlocks.map((block, blockIndex) => (
                                     <div key={blockIndex} className="bg-slate-800/40 border border-slate-700 rounded-xl p-5 relative overflow-hidden group/block">
                                         <div className="absolute top-0 left-0 w-1 h-full bg-teal-500/50"></div>
@@ -549,8 +588,7 @@ const CreateEvent = () => {
                                     Add Another Block
                                 </button>
                             </div>
-                        )}
-                    </div>
+                        </div>
                 )}
 
                 <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-2xl p-8 shadow-xl group hover:border-teal-500/30 transition-all duration-300">
@@ -562,6 +600,7 @@ const CreateEvent = () => {
                     </h2>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {(selectedEventType === EventType.ONLINE || selectedEventType === EventType.HYBRID) && (
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-slate-300">Ticket Price ($) <span className="text-red-500">*</span></label>
                             <div className="relative">
@@ -580,7 +619,7 @@ const CreateEvent = () => {
                                 />
                             </div>
                             {errors.price && <p className="text-red-500 text-xs mt-1">{errors.price.message}</p>}
-                        </div>
+                        </div>)}
 
                         {(selectedEventType === EventType.ONLINE || selectedEventType === EventType.HYBRID) && (
                             <div className="space-y-2 animate-in fade-in slide-in-from-left-4 duration-500">
