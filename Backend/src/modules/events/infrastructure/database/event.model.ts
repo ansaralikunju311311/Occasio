@@ -21,7 +21,8 @@ export interface IEventDocument extends Document {
 
     createdBy: Schema.Types.ObjectId;
     status: EventStatus;
-    picture:string
+    picture:string,
+    seatLayoutId:Schema.Types.ObjectId
 }
 
 const eventSchema = new Schema<IEventDocument>(
@@ -83,7 +84,12 @@ const eventSchema = new Schema<IEventDocument>(
         picture:{
             type:String,
             required: true
-        }
+        },
+        seatLayoutId: {
+  type: Schema.Types.ObjectId,
+  ref: "SeatLayout",
+  required: false
+}
     },
     { timestamps: true }
 );

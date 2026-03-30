@@ -26,6 +26,7 @@ interface IEventFormInput {
     price: number;
     banner?: FileList;
     isSeatLayoutEnabled?: boolean;
+    layout?: any;
 }
 
 const CreateEvent = () => {
@@ -45,7 +46,91 @@ const CreateEvent = () => {
 
     const selectedEventType = watch("eventType");
     const startTimeValue = watch("startTime");
+    const isSeatLayoutEnabled = watch("isSeatLayoutEnabled");
     const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+    // Layout Builder State
+    const [layoutBlocks, setLayoutBlocks] = useState<any[]>([
+        {
+            blockName: "",
+            category: { name: "", price: "" },
+            rows: [{ rowNumber: 1, columns: "" }]
+        }
+    ]);
+
+    const addBlock = () => {
+        setLayoutBlocks(prev => [...prev, {
+            blockName: "",
+            category: { name: "", price: "" },
+            rows: [{ rowNumber: 1, columns: "" }]
+        }]);
+    };
+
+    const removeBlock = (index: number) => {
+        setLayoutBlocks(prev => prev.filter((_, i) => i !== index));
+    };
+
+    const updateBlock = (index: number, field: string, value: any) => {
+        setLayoutBlocks(prev => {
+            const newBlocks = [...prev];
+            // deep copy the block and category to avoid strict mode mutations
+            const blockCopy = { ...newBlocks[index], category: { ...newBlocks[index].category } };
+            
+            if (field === 'blockName') blockCopy.blockName = value;
+            if (field === 'categoryName') blockCopy.category.name = value;
+            if (field === 'categoryPrice') blockCopy.category.price = value === "" ? "" : Number(value);
+            
+            newBlocks[index] = blockCopy;
+            return newBlocks;
+        });
+    };
+
+    const addRow = (blockIndex: number) => {
+        setLayoutBlocks(prev => {
+            const newBlocks = [...prev];
+            const blockCopy = { ...newBlocks[blockIndex] };
+            const rowsCopy = [...blockCopy.rows];
+            
+            const nextRowNumber = rowsCopy.length > 0 ? rowsCopy[rowsCopy.length - 1].rowNumber + 1 : 1;
+            rowsCopy.push({ rowNumber: nextRowNumber, columns: "" });
+            
+            blockCopy.rows = rowsCopy;
+            newBlocks[blockIndex] = blockCopy;
+            return newBlocks;
+        });
+    };
+
+    const removeRow = (blockIndex: number, rowIndex: number) => {
+        setLayoutBlocks(prev => {
+            const newBlocks = [...prev];
+            const blockCopy = { ...newBlocks[blockIndex] };
+            
+            let rowsCopy = blockCopy.rows.filter((_: any, i: number) => i !== rowIndex);
+            // Reassign row numbers immutably to keep them sequential
+            rowsCopy = rowsCopy.map((r: any, i: number) => ({ ...r, rowNumber: i + 1 }));
+            
+            blockCopy.rows = rowsCopy;
+            newBlocks[blockIndex] = blockCopy;
+            return newBlocks;
+        });
+    };
+
+    const updateRowColumns = (blockIndex: number, rowIndex: number, columns: number | string) => {
+        setLayoutBlocks(prev => {
+            const newBlocks = [...prev];
+            const blockCopy = { ...newBlocks[blockIndex] };
+            const rowsCopy = [...blockCopy.rows];
+            
+            rowsCopy[rowIndex] = { 
+                ...rowsCopy[rowIndex], 
+                columns: columns === "" ? "" : Number(columns) 
+            };
+            
+            blockCopy.rows = rowsCopy;
+            newBlocks[blockIndex] = blockCopy;
+            return newBlocks;
+        });
+    };
 
     // Helper to get local ISO string (YYYY-MM-DDTHH:MM) for datetime-local
     const getLocalISOString = (date: Date) => {
@@ -127,7 +212,8 @@ const CreateEvent = () => {
                 endTime: new Date(data.endTime),
                 maxOnlineUsers: (data.eventType === EventType.ONLINE || data.eventType === EventType.HYBRID) ? (data.maxOnlineUsers ? Number(data.maxOnlineUsers) : undefined) : undefined,
                 price: Number(data.price),
-                bannerUrl: bannerUrl
+                bannerUrl: bannerUrl,
+                layout: (data.isSeatLayoutEnabled && (data.eventType === EventType.OFFLINE || data.eventType === EventType.HYBRID)) ? { blocks: layoutBlocks } : undefined
             };
 
             console.log('Form Submitted with Cloudinary URL', eventPayload);
@@ -328,7 +414,7 @@ const CreateEvent = () => {
                             Seat Layout
                         </h2>
 
-                        <div className="flex items-center justify-between p-4 bg-slate-800/30 border border-slate-700/50 rounded-xl">
+                        <div className="flex items-center justify-between p-4 bg-slate-800/30 border border-slate-700/50 rounded-xl mb-4">
                             <div>
                                 <h3 className="text-white font-medium">Enable Seat Layout</h3>
                                 <p className="text-xs text-slate-400">Specify precise seating for your venue</p>
@@ -342,6 +428,128 @@ const CreateEvent = () => {
                                 <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-500"></div>
                             </label>
                         </div>
+                        
+                        {isSeatLayoutEnabled && (
+                            <div className="space-y-6 animate-in fade-in zoom-in-95 duration-300">
+                                {layoutBlocks.map((block, blockIndex) => (
+                                    <div key={blockIndex} className="bg-slate-800/40 border border-slate-700 rounded-xl p-5 relative overflow-hidden group/block">
+                                        <div className="absolute top-0 left-0 w-1 h-full bg-teal-500/50"></div>
+                                        
+                                        <div className="flex justify-between items-start mb-4">
+                                            <h4 className="text-slate-200 font-semibold flex items-center">
+                                                <span className="bg-slate-700 text-teal-400 text-xs px-2 py-1 rounded mr-2 font-mono">Block {blockIndex + 1}</span>
+                                            </h4>
+                                            {layoutBlocks.length > 1 && (
+                                                <button 
+                                                    type="button" 
+                                                    onClick={() => removeBlock(blockIndex)}
+                                                    className="text-slate-500 hover:text-red-400 p-1 bg-slate-800 rounded transition-all"
+                                                    title="Remove Block"
+                                                >
+                                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                                </button>
+                                            )}
+                                        </div>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 relative z-10">
+                                            <div>
+                                                <label className="block text-xs font-medium text-slate-400 mb-1">Block Name (e.g., A, Left Balcony)</label>
+                                                <input 
+                                                    type="text" 
+                                                    value={block.blockName} 
+                                                    onChange={(e) => updateBlock(blockIndex, 'blockName', e.target.value)}
+                                                    className="w-full bg-slate-900/50 border border-slate-700/80 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-teal-500 transition-colors"
+                                                    placeholder="Block Name"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs font-medium text-slate-400 mb-1">Category Name</label>
+                                                <select
+                                                    value={block.category.name}
+                                                    onChange={(e) => updateBlock(blockIndex, 'categoryName', e.target.value)}
+                                                    className={`w-full bg-slate-900/50 border border-slate-700/80 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500 transition-colors ${!block.category.name ? 'text-slate-500' : 'text-white'}`}
+                                                >
+                                                    <option value="" disabled>Select Category</option>
+                                                    <option value="VIP">VIP</option>
+                                                    <option value="VVIP">VVIP</option>
+                                                    <option value="PREMIUM">PREMIUM</option>
+                                                    <option value="GOLD">GOLD</option>
+                                                    <option value="SILVER">SILVER</option>
+                                                    <option value="REGULAR">REGULAR</option>
+                                                    <option value="BALCONY">BALCONY</option>
+                                                    <option value="BOX">BOX</option>
+                                                    <option value="RECLINER">RECLINER</option>
+                                                    <option value="FAN_PIT">FAN_PIT</option>
+                                                    <option value="GENERAL">GENERAL</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs font-medium text-slate-400 mb-1">Price per Seat ($)</label>
+                                                <input 
+                                                    type="number" 
+                                                    min="0"
+                                                    value={block.category.price} 
+                                                    onChange={(e) => updateBlock(blockIndex, 'categoryPrice', e.target.value)}
+                                                    className="w-full bg-slate-900/50 border border-slate-700/80 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-teal-500 transition-colors"
+                                                    placeholder="0"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-slate-900/30 rounded-lg p-4 border border-slate-800/50">
+                                            <div className="flex justify-between items-center mb-3">
+                                                <h5 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Rows in this Block</h5>
+                                                <button 
+                                                    type="button" 
+                                                    onClick={() => addRow(blockIndex)}
+                                                    className="text-xs text-teal-400 hover:text-teal-300 font-medium px-2 py-1 bg-teal-500/10 rounded border border-teal-500/20 transition-all flex items-center"
+                                                >
+                                                    <svg className="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                                                    Add Row
+                                                </button>
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                {block.rows.map((row: any, rowIndex: number) => (
+                                                    <div key={rowIndex} className="flex items-center gap-3 bg-slate-800/50 px-3 py-2 rounded-lg border border-slate-700/50">
+                                                        <span className="text-xs font-mono text-slate-500 w-12 shrink-0">Row {row.rowNumber}</span>
+                                                        <div className="flex-1 flex items-center bg-slate-900/80 rounded-md border border-slate-700 overflow-hidden focus-within:border-teal-500">
+                                                            <span className="text-[10px] text-slate-500 px-2 bg-slate-800/50 uppercase tracking-wider border-r border-slate-700 h-full flex items-center">Seats</span>
+                                                            <input 
+                                                                type="number" 
+                                                                min="1"
+                                                                value={row.columns}
+                                                                onChange={(e) => updateRowColumns(blockIndex, rowIndex, e.target.value as any)}
+                                                                className="w-full bg-transparent border-none text-white text-sm px-2 py-1.5 focus:outline-none focus:ring-0"
+                                                                placeholder="Columns"
+                                                            />
+                                                        </div>
+                                                        <button 
+                                                            type="button" 
+                                                            onClick={() => removeRow(blockIndex, rowIndex)}
+                                                            className="text-slate-600 hover:text-red-400 transition-colors p-1"
+                                                            title="Delete Row"
+                                                            disabled={block.rows.length <= 1}
+                                                        >
+                                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+
+                                <button 
+                                    type="button" 
+                                    onClick={addBlock}
+                                    className="w-full py-3 border-2 border-dashed border-slate-700 rounded-xl text-slate-400 font-medium hover:border-teal-500/50 hover:bg-slate-800/30 hover:text-teal-400 transition-all flex items-center justify-center gap-2"
+                                >
+                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
+                                    Add Another Block
+                                </button>
+                            </div>
+                        )}
                     </div>
                 )}
 
