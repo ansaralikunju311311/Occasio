@@ -36,6 +36,9 @@ const AdminEvents = () => {
         const fetchEvent =async ()=>{
             try {
                 const response = await api.get("/events/allevents");
+
+
+                console.log(response)
                 if (response.data && response.data.events) {
                     setEvents(response.data.events);
                 } else {
@@ -121,6 +124,7 @@ const AdminEvents = () => {
                         <thead>
                             <tr className="bg-slate-900/60 border-b border-slate-800 text-slate-400 text-xs uppercase tracking-wider font-semibold">
                                 <th className="px-6 py-4">Event Info</th>
+                                <th className="px-6 py-4">Creator</th>
                                 <th className="px-6 py-4">Date & Format</th>
                                 <th className="px-6 py-4">Ticket Price</th>
                                 <th className="px-6 py-4">Status</th>
@@ -135,12 +139,22 @@ const AdminEvents = () => {
                                             {event.title}
                                         </div>
                                         <div className="flex items-center gap-2 text-xs">
-                                            <span className="text-slate-500 font-mono" title={event.id}>
+                                            {/* <span className="text-slate-500 font-mono" title={event.id}>
                                                 {event.id ? `${event.id.substring(0, 8)}...` : 'N/A'}
-                                            </span>
+                                            </span> */}
                                             <span className="w-1 h-1 rounded-full bg-slate-700"></span>
                                             <span className="text-slate-400 capitalize">{event.eventType?.toLowerCase() || 'Event'}</span>
                                         </div>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        {event.creatorDetails ? (
+                                            <div className="flex flex-col gap-0.5">
+                                                <span className="font-medium text-slate-200 text-sm whitespace-nowrap">{event.creatorDetails.name || 'Unknown User'}</span>
+                                                <span className="text-slate-500 text-xs truncate max-w-[150px]" title={event.creatorDetails.email}>{event.creatorDetails.email || 'No email'}</span>
+                                            </div>
+                                        ) : (
+                                            <span className="text-slate-500 text-xs italic">Not available</span>
+                                        )}
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="text-sm text-slate-300 mb-2 flex items-start gap-2">
@@ -192,7 +206,7 @@ const AdminEvents = () => {
                             ))}
                             {filteredEvents.length === 0 && (
                                 <tr>
-                                    <td colSpan={5} className="px-6 py-12 text-center text-slate-500">
+                                    <td colSpan={6} className="px-6 py-12 text-center text-slate-500">
                                         <div className="flex flex-col items-center justify-center">
                                             <svg className="w-10 h-10 mb-3 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />

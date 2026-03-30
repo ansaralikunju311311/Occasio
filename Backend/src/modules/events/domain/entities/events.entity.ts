@@ -14,18 +14,19 @@ export class Events {
         public startTime: Date,
         public endTime: Date,
 
-        public location?: {
+        public location: {
             type: "Point";
             coordinates: [number, number];
             address: string;
-        },
+        } | undefined,
 
-        public maxOnlineUsers?: number,
+        public maxOnlineUsers: number | undefined,
         public price: number,
 
         public createdBy: string,
         public status: EventStatus,
-        public picture:string
+        public picture:string,
+        public creatorDetails?: any
     ) {
         this.validate();
     }

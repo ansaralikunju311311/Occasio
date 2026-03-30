@@ -30,7 +30,7 @@ export class EventRepository extends BaseRepository<IEventDocument> implements I
   async findAllEvents(eventType: string): Promise<Events[]> {
     // Sort by createdAt descending to show newest events first
     const query = eventType ? { eventType } : {};
-    const events = await this.model.find(query).sort({ createdAt: -1 });
+    const events = await this.model.find(query).populate("createdBy").sort({ createdAt: -1 });
     return events.map((event) => this.toEntity(event));
   }
 
@@ -56,20 +56,33 @@ export class EventRepository extends BaseRepository<IEventDocument> implements I
   }
 
   private toEntity(manager: any): Events {
-    console.log("Mapping document to entity. Status:", manager.status, "Location Type:", manager.location?.type);
-    return new Events(
-      manager._id.toString(),
-      manager.title,
-      manager.description,
-      manager.eventType,
-      manager.startTime,
-      manager.endTime,
-      manager.location && manager.location.type ? manager.location : undefined,
-      manager.maxOnlineUsers,
-      manager.price,
-      manager.createdBy.toString(),
-      manager.status,
-      manager.picture,
-    )
+
+  let createdById;
+  let creatorDetails;
+
+  if (typeof manager.createdBy === "object") {
+    // populate case
+    createdById = manager.createdBy._id.toString();
+    creatorDetails = manager.createdBy;
+  } else {
+    // normal case
+    createdById = manager.createdBy.toString();
   }
+
+  return new Events(
+    manager._id.toString(),
+    manager.title,
+    manager.description,
+    manager.eventType,
+    manager.startTime,
+    manager.endTime,
+    manager.location && manager.location.type ? manager.location : undefined,
+    manager.maxOnlineUsers,
+    manager.price,
+    createdById, // ✅ fixed
+    manager.status,
+    manager.picture,
+    creatorDetails
+  );
+}
 }
