@@ -4,6 +4,8 @@ import { IEventRepository } from "../../domain/repositories/event.repository.int
 import { EventDto } from "../dtos/event.dto.js";
 import { getLocationName } from "../../../../common/service/location.service.js";
 import { normalizeCoordinates } from "../../../../common/utils/geo.util.js";
+import mongoose from "mongoose";
+import { SeatStatus } from "../../../../common/enums/seat-status.js";
 export class EventCretionUseCase{
 
     constructor(
@@ -14,7 +16,15 @@ export class EventCretionUseCase{
   async execute(data: EventDto,userId:string) {
 
 
-if (data.eventType !== "ONLINE") {
+
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+
+
+  try{
+     if (data.eventType !== "ONLINE") {
 
     // const {} = data;
 
@@ -99,10 +109,60 @@ console.log("sample", status)
     data.bannerUrl
   );
 
-  const event = await this.eventRepository.createEvent(eventEntity);
+  const event = await this.eventRepository.createEvent(eventEntity,session);
 
+
+  const layout = await this.eventRepository.createSeatLayout({
+    eventId:event.id,
+    blocks:data.layout.blocks
+  },session)
+
+
+
+  const seats:any[] = [];
+
+
+  for(const block of data.layout.blocks){
+    for(const row of block.rows){
+      for(let c = 1;c<=row.columns;c++){
+        seats.push({
+          eventId:event.id,
+          layoutId:layout._id,
+          block:block.blockName,
+          row:row.rowNumber,
+          column:c,
+          seatNumber:`${block.blockName}-${row.rowNumber}-${c}`,
+          categoryName:block.category.name,
+          price:block.category.price,
+          status:SeatStatus.AVAILABLE,
+          holdExpiresAt:null
+
+        })
+      }
+    }
+  }
+
+  await this.eventRepository.createSeats(seats,session);
+  await this.eventRepository.updateEventLayout(
+    event.id,
+    layout._id,
+    session
+  )
+   await session.commitTransaction();
+    session.endSession();
   return event;
 }
+
+  catch (error) {
+     
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
+    }
+
+
+  }
+
 
 }
 

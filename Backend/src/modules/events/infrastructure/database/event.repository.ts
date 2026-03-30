@@ -3,7 +3,9 @@ import { Events } from "../../domain/entities/events.entity.js";
 import { IEventRepository } from "../../domain/repositories/event.repository.interface.js";
 import { IEventDocument } from "./event.model.js";
 import { EventModel } from "./event.model.js";
-
+import mongoose from "mongoose";
+import { SeatModel } from "./seat.model.js";
+import { SeatLayoutModel } from "./seatLayout.model.js";
 export class EventRepository extends BaseRepository<IEventDocument> implements IEventRepository {
 
   constructor() {
@@ -60,6 +62,29 @@ export class EventRepository extends BaseRepository<IEventDocument> implements I
 
       return event.map((event)=> this.toEntity(event))
   }
+
+
+
+    async updateEventLayout(eventId: string, layoutId: string, session?: mongoose.ClientSession) {
+    await this.model.findByIdAndUpdate(
+      eventId,
+      { seatLayoutId: layoutId },
+      { session }
+    );
+  }
+
+
+   async createSeats(seats: any[], session?: mongoose.ClientSession) {
+    await SeatModel.insertMany(seats, { session });
+  }
+
+
+  async createSeatLayout(data: any, session?: mongoose.ClientSession) {
+    const [layout] = await SeatLayoutModel.create([data], { session });
+    return layout;
+  }
+
+
 
   private toEntity(manager: any): Events {
 

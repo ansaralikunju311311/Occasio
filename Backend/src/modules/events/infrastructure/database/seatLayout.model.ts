@@ -12,7 +12,7 @@ export interface ISeatLayout extends Document{
     }[];
 }
 
-const seatLayoutSchema = new Schema<ISeatLayout>({
+const SeatLayoutSchema = new Schema<ISeatLayout>({
     eventId:{type:Schema.Types.ObjectId,ref:"Event"},
     blocks:[{
         blocName:String,
@@ -28,4 +28,4 @@ const seatLayoutSchema = new Schema<ISeatLayout>({
     }]
 },{timestamps:true}
 )
-export const seatLayoutModel = mongoose.model("SeatLayout",seatLayoutSchema)
+export const SeatLayoutModel = mongoose.model("SeatLayout",SeatLayoutSchema)
