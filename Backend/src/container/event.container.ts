@@ -3,13 +3,15 @@ import { EventController } from "../modules/events/presentation/event.controller
 import { EventRepository } from "../modules/events/infrastructure/database/event.repository.js"
 import { GetEventsUseCase } from "../modules/events/application/usecase/getEvents.usecase.js"
 import { EventDetailsUseCase } from "../modules/events/application/usecase/eventDetails.usecase.js"
+import { MyEventsUseCase } from "../modules/events/application/usecase/myevent.usecase.js"
 export const MakeEventController=()=>{
 
    const eventRepository = new EventRepository()
    const eventCretionUseCase = new EventCretionUseCase(eventRepository)
    const getEventsUseCase  = new GetEventsUseCase(eventRepository)
+   const myEventsUseCase = new MyEventsUseCase(eventRepository)
 
    const eventDetailsUseCase  = new EventDetailsUseCase(eventRepository)
 
-    return new EventController(eventCretionUseCase,getEventsUseCase,eventDetailsUseCase)
+    return new EventController(eventCretionUseCase,getEventsUseCase,eventDetailsUseCase,myEventsUseCase)
 }

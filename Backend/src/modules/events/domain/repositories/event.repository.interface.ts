@@ -8,4 +8,5 @@ export interface IEventRepository{
     findByIdEvents(id:string):Promise<Events | null>
 
     findExactConflict(longitude:number,latitude:number,startTime:Date,endTime:Date):Promise<Events | null>
+    findEvents(userId:string):Promise<Events[] | null>
 }

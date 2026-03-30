@@ -55,6 +55,12 @@ export class EventRepository extends BaseRepository<IEventDocument> implements I
     return events ? this.toEntity(events) : null;
   }
 
+  async findEvents(userId: string): Promise<Events[] | null> {
+      const event = await this.model.find({createdBy:userId}).sort({createdAt:-1})
+
+      return event.map((event)=> this.toEntity(event))
+  }
+
   private toEntity(manager: any): Events {
 
   let createdById;

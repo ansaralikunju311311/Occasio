@@ -3,12 +3,14 @@ import { EventCretionUseCase } from "../application/usecase/eventcreation.usecas
 import { HttpStatus } from "../../../common/constants/http-stattus.js";
 import { GetEventsUseCase } from "../application/usecase/getEvents.usecase.js";
 import { EventDetailsUseCase } from "../application/usecase/eventDetails.usecase.js";
+import { MyEventsUseCase } from "../application/usecase/myevent.usecase.js";
 export class EventController {
 
     constructor(
         private eventCreationUseCase: EventCretionUseCase,
         private getEventsUseCase: GetEventsUseCase,
-        private eventDetailsUseCase: EventDetailsUseCase
+        private eventDetailsUseCase: EventDetailsUseCase,
+        private myEventsUseCase : MyEventsUseCase
     ) { }
 
     async eventCreation(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -57,7 +59,20 @@ export class EventController {
             next(error)
         }
     }
+     async myEvents(req:Request,res:Response,next:NextFunction):Promise<void>{
+        try {
+            
 
+            const user = (req as any).user;
+            const userId = user.userId;
+            const events = await this.myEventsUseCase.execute(userId);
+            res.status(HttpStatus.OK).json({
+                events
+            })
+        } catch (error) {
+            next(error)
+        }
+     }
 
 
 }
