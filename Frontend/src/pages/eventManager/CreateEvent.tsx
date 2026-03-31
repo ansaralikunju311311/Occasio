@@ -3,6 +3,7 @@ import { useForm, type SubmitHandler } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { api } from '../../services/api';
+import HomeButton from '../../components/common/HomeButton';
 // import EventMap from '../../components/eventManager/EventMap';
 
 export const EventType = {
@@ -292,6 +293,9 @@ const CreateEvent = () => {
                     Create <span className="text-teal-400">New Event</span>
                 </h1>
                 <p className="text-slate-400 mt-2">Set up a new event for your audience with all the details.</p>
+                <div className="mt-4">
+                    <HomeButton />
+                </div>
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">

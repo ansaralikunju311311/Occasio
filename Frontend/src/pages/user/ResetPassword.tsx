@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import PasswordInput from '../../components/common/PasswordInput'
 import { toast } from 'sonner'
+import HomeButton from '../../components/common/HomeButton'
 type ResetPasswordForm = {
   otp: string
   password: string
@@ -148,6 +149,9 @@ const ResetPassword: React.FC = () => {
       {/* Right Side Card */}
       <div className="flex flex-1 items-center justify-center p-6 md:p-12">
         <div className="bg-white p-8 md:p-12 rounded-4xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-100 w-full max-w-md transition-all h-full max-h-screen overflow-y-auto custom-scrollbar">
+          <div className="flex justify-start mb-6">
+            <HomeButton />
+          </div>
 
           <div className="text-center mb-10">
             <h1 className="text-3xl font-bold text-gray-900 tracking-tight">

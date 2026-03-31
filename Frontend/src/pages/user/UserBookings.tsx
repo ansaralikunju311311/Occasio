@@ -1,3 +1,4 @@
+import HomeButton from "../../components/common/HomeButton";
 
 const UserBookings = () => {
     return (
@@ -7,6 +8,9 @@ const UserBookings = () => {
                     My <span className="text-purple-400">Bookings</span>
                 </h1>
                 <p className="text-slate-400 mt-2">View and manage all your event registrations and tickets.</p>
+                <div className="mt-4">
+                    <HomeButton />
+                </div>
             </div>
 
             <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-2xl p-12 shadow-xl min-h-80 flex flex-col items-center justify-center text-center">

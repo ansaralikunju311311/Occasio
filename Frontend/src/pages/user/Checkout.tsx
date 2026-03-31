@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { api } from "../../services/api";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 import { toast } from "sonner";
+import HomeButton from "../../components/common/HomeButton";
 
 const Checkout = () => {
     const { id } = useParams();
@@ -52,6 +53,9 @@ const Checkout = () => {
     return (
         <div className="min-h-screen bg-slate-950 pt-24 pb-16 text-white px-4">
             <div className="max-w-4xl mx-auto">
+            <div className="mb-6">
+                <HomeButton />
+            </div>
                 <div className="flex flex-col md:flex-row gap-8">
                     {/* Main Content */}
                     <div className="flex-1 space-y-6">

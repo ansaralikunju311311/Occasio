@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {api} from "../../services/api"
+import HomeButton from "../../components/common/HomeButton";
 
 
 const EventManagerMyEvents = () => {
@@ -71,6 +72,9 @@ const EventManagerMyEvents = () => {
                         My Events
                     </h1>
                     <p className="text-slate-400 mt-2 font-light">Manage your hosted events, track ticket sales, and view analytics.</p>
+                    <div className="mt-4">
+                        <HomeButton />
+                    </div>
                 </div>
 
                 <div className="flex gap-3">

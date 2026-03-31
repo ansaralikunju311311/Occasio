@@ -1,4 +1,5 @@
 import { useLocation } from "react-router-dom";
+import HomeButton from "../../components/common/HomeButton";
 
 const EventManagerPlaceholder = () => {
     const location = useLocation();
@@ -39,6 +40,10 @@ const EventManagerPlaceholder = () => {
                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800/50 border border-slate-700/50 text-sm text-slate-400">
                         <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
                         Work in Progress
+                    </div>
+
+                    <div className="mt-10 flex justify-center">
+                        <HomeButton />
                     </div>
                 </div>
             </div>

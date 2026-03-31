@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import { api } from '../../services/api'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
+import HomeButton from '../../components/common/HomeButton'
 type ForgotPasswordForm = {
   email: string
 }
@@ -79,12 +80,15 @@ const Forgotpassword = () => {
       <div className="flex flex-1 items-center justify-center p-6 md:p-12">
         <div className="bg-slate-900/60 backdrop-blur-xl p-8 md:p-12 rounded-4xl shadow-2xl shadow-indigo-500/10 border border-slate-800 w-full max-w-md transition-all">
 
-          <button onClick={() => navigate('/login')} className="flex items-center text-sm font-medium text-slate-400 hover:text-indigo-400 transition-colors mb-8 group">
-            <svg className="w-4 h-4 mr-1 group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Back to login
-          </button>
+          <div className="flex justify-between items-center mb-8">
+            <button onClick={() => navigate('/login')} className="flex items-center text-sm font-medium text-slate-400 hover:text-indigo-400 transition-colors group">
+              <svg className="w-4 h-4 mr-1 group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              Back to login
+            </button>
+            <HomeButton />
+          </div>
 
           <div className="text-left mb-10">
             <h1 className="text-3xl font-bold text-white tracking-tight">

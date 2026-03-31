@@ -28,7 +28,7 @@ const LandingPage = () => {
             }
 
             const response = await api.get("/events/events", { params: queryParams });
-            // The backend returns an object with an 'events' property: { events: [...] }
+
 
 
             console.log("foe the checking response for layout defining",response)
@@ -79,7 +79,6 @@ const LandingPage = () => {
         });
     };
 
-    // Get the lowest category price from seat layout blocks
     const getMinSeatPrice = (event: any): number | null => {
         const blocks =
             event?.SeatLayout?.blocks ??

@@ -1,4 +1,5 @@
 import { useAppSelector } from "../../redux/hook";
+import HomeButton from "../../components/common/HomeButton";
 const EventManagerDashboard = () => {
     const stats = [
         { title: "Total Events", value: "12", icon: "🎟️", trend: "+2" },
@@ -30,6 +31,9 @@ const EventManagerDashboard = () => {
                     <p className="text-sm font-normal text-slate-500 mt-1">{user?.email}</p>
                 </h1>
                 <p className="text-slate-400 mt-2">Overview of your events and earnings on Occasio.</p>
+                <div className="mt-4">
+                    <HomeButton />
+                </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

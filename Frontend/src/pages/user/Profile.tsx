@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useAppSelector } from "../../redux/hook";
 import ChangePasswordModal from "../../components/user/ChangePasswordModal";
+import HomeButton from "../../components/common/HomeButton";
 
 const Profile = () => {
     const { user } = useAppSelector((state) => state.auth);
@@ -14,6 +15,9 @@ const Profile = () => {
                     My <span className="text-indigo-400">Profile</span>
                 </h1>
                 <p className="text-slate-400 mt-2">Manage your personal information and account security.</p>
+                <div className="mt-4">
+                    <HomeButton />
+                </div>
             </div>
 
             <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-2xl p-8 shadow-xl max-w-2xl">

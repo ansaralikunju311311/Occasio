@@ -1,3 +1,4 @@
+import HomeButton from "../../components/common/HomeButton";
 
 const Settings = () => {
     return (
@@ -7,6 +8,9 @@ const Settings = () => {
                     Account <span className="text-slate-400">Settings</span>
                 </h1>
                 <p className="text-slate-400 mt-2">Manage your preferences and notification settings.</p>
+                <div className="mt-4 text-left">
+                    <HomeButton />
+                </div>
             </div>
 
             <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-2xl p-8 shadow-xl max-w-3xl">
