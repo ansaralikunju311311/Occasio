@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { api } from "../../services/api";
+import { toast } from "sonner";
 
 interface EventManager {
   _id?: string;
@@ -68,8 +69,9 @@ const AdminEventManagers = () => {
       await api.patch(`/admin/blockorunblock/${userId}`, {
         status: newstatus
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to block/unblock manager:", error);
+      toast.error(error.response?.data?.message || "Failed to update manager status.");
       // Revert UI on failure
       setManagers((prevManagers) =>
         prevManagers.map((manager) =>
@@ -88,8 +90,9 @@ const AdminEventManagers = () => {
         setSelectedManager({ ...managerData, authEmail: email });
         setIsDetailsModalOpen(true);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to fetch manager details:", error);
+      toast.error(error.response?.data?.message || "Failed to load manager details.");
     }
   };
 

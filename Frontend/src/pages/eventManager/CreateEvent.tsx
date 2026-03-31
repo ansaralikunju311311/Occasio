@@ -202,6 +202,13 @@ const CreateEvent = () => {
                 bannerUrl = await uploadImageToCloudinary(data.banner[0]);
             }
 
+            // Validation for Online Capacity
+            if ((data.eventType === EventType.ONLINE || data.eventType === EventType.HYBRID) && (!data.maxOnlineUsers || data.maxOnlineUsers <= 0)) {
+                toast.error("Online capacity (Max Users) is required for Online/Hybrid events!");
+                setIsSubmitting(false);
+                return;
+            }
+
             const isOfflineOrHybrid = data.eventType === EventType.OFFLINE || data.eventType === EventType.HYBRID;
             
             // Mandatory Seat Layout Validation for Offline/Hybrid
@@ -278,10 +285,18 @@ const CreateEvent = () => {
 
 
 
-        } catch (error) {
+        } catch (error: any) {
             console.error('Submission Error:', error);
+            toast.error(error.response?.data?.message || error.message || "Failed to create event. Please try again.");
         } finally {
             setIsSubmitting(false);
+        }
+    };
+
+    const onFormError = (errors: any) => {
+        const errorMessages = Object.values(errors);
+        if (errorMessages.length > 0) {
+            toast.error("Please fill in all required fields correctly.");
         }
     };
 
@@ -298,7 +313,7 @@ const CreateEvent = () => {
                 </div>
             </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+            <form onSubmit={handleSubmit(onSubmit, onFormError)} className="space-y-8">
 
                 <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-2xl p-8 shadow-xl group hover:border-teal-500/30 transition-all duration-300">
                     <h2 className="text-xl font-semibold text-white mb-6 flex items-center">
@@ -627,7 +642,7 @@ const CreateEvent = () => {
 
                         {(selectedEventType === EventType.ONLINE || selectedEventType === EventType.HYBRID) && (
                             <div className="space-y-2 animate-in fade-in slide-in-from-left-4 duration-500">
-                                <label className="text-sm font-medium text-slate-300">Total Online Capacity (Max Users)</label>
+                                <label className="text-sm font-medium text-slate-300">Total Online Capacity (Max Users) <span className="text-red-500">*</span></label>
                                 <input
                                     {...register("maxOnlineUsers", {
                                         valueAsNumber: true,

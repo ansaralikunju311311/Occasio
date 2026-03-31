@@ -3,6 +3,7 @@ import { useAppSelector, useAppDispatch } from "../../redux/hook";
 import { logout } from "../../redux/slices/authSlice";
 import { api } from "../../services/api";
 import { useState } from "react";
+import { toast } from "sonner";
 
 const Navbar = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -21,10 +22,11 @@ const Navbar = () => {
       console.log(response)
       localStorage.removeItem("accessToken")
       dispatch(logout());
+      toast.success("Logged out successfully");
       navigate("/");
-    } catch (error) {
-
+    } catch (error: any) {
       console.log(error)
+      toast.error(error.response?.data?.message || "Logout failed");
     }
 
   };

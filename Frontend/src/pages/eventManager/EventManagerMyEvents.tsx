@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {api} from "../../services/api"
 import HomeButton from "../../components/common/HomeButton";
+import { toast } from "sonner";
 
 
 const EventManagerMyEvents = () => {
@@ -22,8 +23,9 @@ const EventManagerMyEvents = () => {
                 } else {
                     setEvents([]);
                 }
-            } catch (error) {
+            } catch (error: any) {
                 console.error("Error fetching my events", error);
+                toast.error(error.response?.data?.message || "Failed to load your events.");
             }
         };
         fetchEvent();

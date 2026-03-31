@@ -86,23 +86,27 @@ const BecomeAManager: React.FC = () => {
 
 
     const uploadImageToCloudinary = async (file: File) => {
+        try {
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("upload_preset", "occasio_upload");
 
-        const formData = new FormData();
+            const res = await fetch(
+                "https://api.cloudinary.com/v1_1/dliraelbo/image/upload",
+                {
+                    method: "POST",
+                    body: formData
+                }
+            );
 
-        formData.append("file", file);
-        formData.append("upload_preset", "occasio_upload");
+            if (!res.ok) throw new Error("Image upload failed");
 
-        const res = await fetch(
-            "https://api.cloudinary.com/v1_1/dliraelbo/image/upload",
-            {
-                method: "POST",
-                body: formData
-            }
-        );
-
-        const data = await res.json();
-
-        return data.secure_url;
+            const data = await res.json();
+            return data.secure_url;
+        } catch (error) {
+            console.error("Cloudinary upload error:", error);
+            throw error;
+        }
     };
     const {
         register,
@@ -150,38 +154,40 @@ const BecomeAManager: React.FC = () => {
     ];
 
     const onSubmit = async (data: ManagerFormData) => {
+        try {
+            const file = data.certificate[0];
+            const uploadToastId = toast.loading("Uploading certificate...");
+            const imageUrl = await uploadImageToCloudinary(file);
+            toast.dismiss(uploadToastId);
 
-        const file = data.certificate[0];
+            const payload = {
+                ...data,
+                certificate: imageUrl
+            };
 
-        const imageUrl = await uploadImageToCloudinary(file);
-
-        const payload = {
-            ...data,
-            certificate: imageUrl
-        };
-
-        console.log("Final Data:", payload);
-
-
-        const response = await api.post("/user/upgraderole", {
-            email: user?.email,
-            fullName: payload.fullName,
-            organizationName: payload.organizationName,
-            aboutEvents: payload.aboutEvents,
-            certificate: payload.certificate,
-            documentReference: payload.documentReference,
-            experienceLevel: payload.experienceLevel,
-            socialLinks: payload.socialLinks,
-            organizationType: payload.organizationType
-        })
-        console.log("for the chekign the checking the thingssss", response)
-
-        dispatch(
-            setAuth({
-                user: response.data.users
-            })
-        )
-        setView('success');
+            const response = await api.post("/user/upgraderole", {
+                email: user?.email,
+                fullName: payload.fullName,
+                organizationName: payload.organizationName,
+                aboutEvents: payload.aboutEvents,
+                certificate: payload.certificate,
+                documentReference: payload.documentReference,
+                experienceLevel: payload.experienceLevel,
+                socialLinks: payload.socialLinks,
+                organizationType: payload.organizationType
+            });
+            
+            dispatch(
+                setAuth({
+                    user: response.data.users
+                })
+            );
+            toast.success("Application submitted successfully!");
+            setView('success');
+        } catch (error: any) {
+            console.error("Application error:", error);
+            toast.error(error.response?.data?.message || "Failed to submit application. Please try again.");
+        }
     };
 
     const handleReapply = async () => {
@@ -194,8 +200,8 @@ const BecomeAManager: React.FC = () => {
                     user: response.data.users || response.data.user || response.data
                 })
             );
-            navigate("/applyasmanager")
-            // toast.success("Re-apply request sent successfully!");
+            toast.success("Re-apply request sent successfully!");
+            navigate("/applyasmanager");
         } catch (error: any) {
             console.error("Re-apply failed:", error);
             const errorMessage = error.response?.data?.message || "Failed to re-apply. Please try again later.";

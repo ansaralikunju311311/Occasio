@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../../services/api";
+import { toast } from "sonner";
 
 const AdminEvents = () => {
     const [searchTerm, setSearchTerm] = useState("");
@@ -46,8 +47,9 @@ const AdminEvents = () => {
                 } else {
                     setEvents([]);
                 }
-            } catch (error) {
+            } catch (error: any) {
                 console.error("Error fetching events", error)
+                toast.error(error.response?.data?.message || "Failed to load events list.");
             }
         }
         fetchEvent()

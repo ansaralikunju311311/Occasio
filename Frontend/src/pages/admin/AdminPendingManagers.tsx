@@ -65,6 +65,7 @@ const AdminPendingManagers = () => {
         setManagers(pendingManagers);
       } catch (err: any) {
         console.error("Failed to fetch users:", err);
+        toast.error("Failed to load pending managers list.");
       } finally {
         setLoading(false);
       }
@@ -100,8 +101,9 @@ const AdminPendingManagers = () => {
 
       setSelectedManager(details);
       setIsModalOpen(true);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to fetch manager details:", error);
+      toast.error(error.response?.data?.message || "Failed to load manager details.");
     } finally {
       setFetchingDetails(false);
     }

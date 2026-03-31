@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { api } from "../../services/api";
 import { UpgradeStatus } from "../../types/upgrade-status.enum";
+import { toast } from "sonner";
 
 interface User {
   _id?: string;
@@ -38,7 +39,9 @@ const AdminUsers = () => {
         setUsers(usersData.filter(user => user.role === "USER"));
       } catch (err: any) {
         console.error("Failed to fetch users:", err);
-        setError(err?.response?.data?.message || "Failed to load users. Please try again later.");
+        const errorMsg = err?.response?.data?.message || "Failed to load users. Please try again later.";
+        setError(errorMsg);
+        toast.error(errorMsg);
       } finally {
         setLoading(false);
       }
@@ -62,8 +65,9 @@ const AdminUsers = () => {
       await api.patch(`/admin/blockorunblock/${userId}`, {
         status: newstatus
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to block/unblock user:", error);
+      toast.error(error.response?.data?.message || "Failed to update user status.");
       // Revert UI on failure
       setUsers((prevUsers) =>
         prevUsers.map((user) =>
@@ -79,8 +83,9 @@ const AdminUsers = () => {
       const userData = response.data?.user || response.data?.data || response.data;
       setSelectedUser(userData);
       setIsDetailsModalOpen(true);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to fetch user details:", error);
+      toast.error(error.response?.data?.message || "Failed to load user details.");
     }
   };
 

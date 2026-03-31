@@ -1,4 +1,5 @@
 import HomeButton from "../../components/common/HomeButton";
+import { toast } from "sonner";
 
 const Settings = () => {
     return (
@@ -46,7 +47,10 @@ const Settings = () => {
                     </section>
                 </div>
 
-                <button className="mt-10 px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-indigo-600/20">
+                <button 
+                    onClick={() => toast.success("Settings saved successfully!")}
+                    className="mt-10 px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-indigo-600/20"
+                >
                     Save Changes
                 </button>
             </div>
