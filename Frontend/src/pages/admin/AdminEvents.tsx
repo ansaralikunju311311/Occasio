@@ -41,6 +41,8 @@ const AdminEvents = () => {
                 console.log(response)
                 if (response.data && response.data.events) {
                     setEvents(response.data.events);
+                } else if (Array.isArray(response.data)) {
+                    setEvents(response.data);
                 } else {
                     setEvents([]);
                 }
@@ -139,9 +141,9 @@ const AdminEvents = () => {
                                             {event.title}
                                         </div>
                                         <div className="flex items-center gap-2 text-xs">
-                                            {/* <span className="text-slate-500 font-mono" title={event.id}>
+                                            <span className="text-slate-500 font-mono" title={event.id}>
                                                 {event.id ? `${event.id.substring(0, 8)}...` : 'N/A'}
-                                            </span> */}
+                                            </span>
                                             <span className="w-1 h-1 rounded-full bg-slate-700"></span>
                                             <span className="text-slate-400 capitalize">{event.eventType?.toLowerCase() || 'Event'}</span>
                                         </div>
@@ -175,9 +177,88 @@ const AdminEvents = () => {
                                         </span>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <div className="text-sm font-medium text-emerald-400">
-                                            ${event.price || 0}
-                                        </div>
+                                        {(() => {
+                                            const type = event.eventType?.toUpperCase();
+                                            const blocks =
+                                                event?.SeatLayout?.blocks ??
+                                                event?.seatLayout?.blocks ??
+                                                event?.seatLayoutDetails?.blocks ??
+                                                event?.layout?.blocks ??
+                                                [];
+                                            const onlinePrice = event.price ?? 0;
+
+                                            if (type === "ONLINE") {
+                                                return (
+                                                    <div className="text-sm font-medium text-emerald-400">
+                                                        {onlinePrice > 0 ? `₹${onlinePrice}` : "Free"}
+                                                    </div>
+                                                );
+                                            }
+
+                                            if (type === "OFFLINE") {
+                                                if (blocks.length > 0) {
+                                                    return (
+                                                        <div className="flex flex-col gap-1">
+                                                            {blocks.map((b: any, i: number) => {
+                                                                const name = b.category?.name || b.blockName || b.blocName || `Block ${i + 1}`;
+                                                                const price = b.category?.price;
+                                                                return (
+                                                                    <div key={i} className="flex items-center gap-2 text-xs">
+                                                                        <span className="text-slate-400">{name}:</span>
+                                                                        <span className="font-semibold text-emerald-400">
+                                                                            {typeof price === "number" ? `₹${price}` : "—"}
+                                                                        </span>
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    );
+                                                }
+                                                return (
+                                                    <div className="text-sm font-medium text-emerald-400">
+                                                        {onlinePrice > 0 ? `₹${onlinePrice}` : "Free"}
+                                                    </div>
+                                                );
+                                            }
+
+                                            if (type === "HYBRID") {
+                                                return (
+                                                    <div className="flex flex-col gap-1.5">
+                                                        {/* Online ticket */}
+                                                        <div className="flex items-center gap-2 text-xs">
+                                                            <span className="px-1.5 py-0.5 rounded bg-sky-400/10 text-sky-400 font-bold text-[9px] uppercase">Online</span>
+                                                            <span className="font-semibold text-emerald-400">
+                                                                {onlinePrice > 0 ? `₹${onlinePrice}` : "Free"}
+                                                            </span>
+                                                        </div>
+                                                        {/* Offline categories */}
+                                                        {blocks.length > 0 && (
+                                                            <div className="flex flex-col gap-1 pt-1 border-t border-slate-800/50">
+                                                                {blocks.map((b: any, i: number) => {
+                                                                    const name = b.category?.name || b.blockName || b.blocName || `Block ${i + 1}`;
+                                                                    const price = b.category?.price;
+                                                                    return (
+                                                                        <div key={i} className="flex items-center gap-2 text-xs">
+                                                                            <span className="text-slate-500">{name}:</span>
+                                                                            <span className="font-semibold text-amber-400">
+                                                                                {typeof price === "number" ? `₹${price}` : "—"}
+                                                                            </span>
+                                                                        </div>
+                                                                    );
+                                                                })}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                );
+                                            }
+
+                                            // Fallback
+                                            return (
+                                                <div className="text-sm font-medium text-emerald-400">
+                                                    {onlinePrice > 0 ? `₹${onlinePrice}` : "Free"}
+                                                </div>
+                                            );
+                                        })()}
                                     </td>
                                     <td className="px-6 py-4">
                                         <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full border ${getStatusStyle(event.status)}`}>

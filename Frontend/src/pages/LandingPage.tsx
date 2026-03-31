@@ -81,6 +81,21 @@ const LandingPage = () => {
         });
     };
 
+    // Get the lowest category price from seat layout blocks
+    const getMinSeatPrice = (event: any): number | null => {
+        const blocks =
+            event?.SeatLayout?.blocks ??
+            event?.seatLayout?.blocks ??
+            event?.seatLayoutDetails?.blocks ??
+            event?.layout?.blocks ??
+            [];
+        if (!blocks.length) return null;
+        const prices = blocks
+            .map((b: any) => b.category?.price)
+            .filter((p: any) => typeof p === "number" && p > 0);
+        return prices.length > 0 ? Math.min(...prices) : null;
+    };
+
     const openInMaps = (lat: number, lng: number) => {
         const url = `https://www.google.com/maps?q=${lat},${lng}`;
         window.open(url, "_blank");
@@ -315,8 +330,52 @@ const LandingPage = () => {
                                     </p>
 
                                     <div className="flex items-center justify-between mt-auto pt-6 border-t border-slate-800/60">
-                                        <div className="text-white font-bold text-lg">
-                                            {event.price > 0 ? `$${event.price}` : <span className="text-emerald-400">Join Free</span>}
+                                        <div className="text-white font-bold text-sm">
+                                            {(() => {
+                                                const type = event.eventType?.toUpperCase();
+                                                const minSeatPrice = getMinSeatPrice(event);
+                                                const onlinePrice = event.price;
+
+                                                if (type === "ONLINE") {
+                                                    return onlinePrice > 0
+                                                        ? <span>₹{onlinePrice}</span>
+                                                        : <span className="text-emerald-400">Free</span>;
+                                                }
+
+                                                if (type === "OFFLINE") {
+                                                    if (minSeatPrice !== null) {
+                                                        return <span className="text-slate-300">Starts from <span className="text-white text-lg">₹{minSeatPrice}</span></span>;
+                                                    }
+                                                    return onlinePrice > 0
+                                                        ? <span>₹{onlinePrice}</span>
+                                                        : <span className="text-emerald-400">Free</span>;
+                                                }
+
+                                                if (type === "HYBRID") {
+                                                    return (
+                                                        <div className="flex flex-col gap-0.5">
+                                                            {minSeatPrice !== null && (
+                                                                <span className="text-slate-300 text-xs">
+                                                                    Venue: <span className="text-white font-bold">₹{minSeatPrice}+</span>
+                                                                </span>
+                                                            )}
+                                                            {onlinePrice > 0 && (
+                                                                <span className="text-slate-300 text-xs">
+                                                                    Online: <span className="text-indigo-400 font-bold">₹{onlinePrice}</span>
+                                                                </span>
+                                                            )}
+                                                            {(!minSeatPrice && !onlinePrice) && (
+                                                                <span className="text-emerald-400">Free</span>
+                                                            )}
+                                                        </div>
+                                                    );
+                                                }
+
+                                                // Fallback
+                                                return onlinePrice > 0
+                                                    ? <span>₹{onlinePrice}</span>
+                                                    : <span className="text-emerald-400">Free</span>;
+                                            })()}
                                         </div>
                                         <button
                                             onClick={() => viewEventDetails(event.id)}
