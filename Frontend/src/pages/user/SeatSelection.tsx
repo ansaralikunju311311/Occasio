@@ -17,6 +17,8 @@ interface Seat {
 /** Grouped structure built from the flat seat array */
 interface GroupedBlock {
   blockName: string;
+  categoryName: string;
+  categoryPrice: number | null;
   rows: {
     rowNumber: number;
     seats: Seat[];
@@ -63,7 +65,10 @@ const getAccent = (idx: number) =>
 
 // ─── Helper: group flat seat array into block→row hierarchy ──────────────────
 
-const groupSeats = (seats: Seat[]): GroupedBlock[] => {
+const groupSeats = (
+  seats: Seat[],
+  layoutBlocks: any[] = []
+): GroupedBlock[] => {
   const blockMap = new Map<string, Map<number, Seat[]>>();
 
   for (const seat of seats) {
@@ -76,15 +81,24 @@ const groupSeats = (seats: Seat[]): GroupedBlock[] => {
   // Sort blocks alphabetically, rows & columns numerically
   const grouped: GroupedBlock[] = Array.from(blockMap.entries())
     .sort(([a], [b]) => a.localeCompare(b))
-    .map(([blockName, rowMap]) => ({
-      blockName,
-      rows: Array.from(rowMap.entries())
-        .sort(([a], [b]) => a - b)
-        .map(([rowNumber, rowSeats]) => ({
-          rowNumber,
-          seats: [...rowSeats].sort((a, b) => a.column - b.column),
-        })),
-    }));
+    .map(([blockName, rowMap]) => {
+      // Try to find matching layout block for category info
+      const layoutBlock = layoutBlocks.find(
+        (b: any) =>
+          (b.blockName || b.blocName)?.toUpperCase() === blockName.toUpperCase()
+      );
+      return {
+        blockName,
+        categoryName: layoutBlock?.category?.name ?? "",
+        categoryPrice: layoutBlock?.category?.price ?? null,
+        rows: Array.from(rowMap.entries())
+          .sort(([a], [b]) => a - b)
+          .map(([rowNumber, rowSeats]) => ({
+            rowNumber,
+            seats: [...rowSeats].sort((a, b) => a.column - b.column),
+          })),
+      };
+    });
 
   return grouped;
 };
@@ -180,6 +194,7 @@ interface BlockPanelProps {
   blockIdx: number;
   selectedSeats: string[];
   onSeatClick: (id: string, status: string) => void;
+  categoryMap: Map<string, { name: string; price: number | null }>;
 }
 
 const BlockPanel = ({ block, blockIdx, selectedSeats, onSeatClick }: BlockPanelProps) => {
@@ -207,9 +222,28 @@ const BlockPanel = ({ block, blockIdx, selectedSeats, onSeatClick }: BlockPanelP
                 Block {block.blockName}
               </h3>
             </div>
-            <div className="flex items-center gap-2 ml-6">
+            <div className="flex flex-wrap items-center gap-2 ml-6">
+              {/* Category name badge */}
+              {block.categoryName && (
+                <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border ${
+                  blockIdx === 0 ? "bg-indigo-500/15 text-indigo-300 border-indigo-500/30" :
+                  blockIdx === 1 ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/30" :
+                  blockIdx === 2 ? "bg-rose-500/15 text-rose-300 border-rose-500/30" :
+                  blockIdx === 3 ? "bg-amber-400/15 text-amber-300 border-amber-400/30" :
+                  blockIdx === 4 ? "bg-sky-500/15 text-sky-300 border-sky-500/30" :
+                                   "bg-fuchsia-500/15 text-fuchsia-300 border-fuchsia-500/30"
+                }`}>
+                  {block.categoryName}
+                </span>
+              )}
+              {/* Price badge */}
+              {block.categoryPrice !== null && (
+                <span className="px-2 py-1 rounded-md bg-white/5 text-[9px] font-black text-white/70 border border-white/10">
+                  ${block.categoryPrice} / seat
+                </span>
+              )}
               <span className="px-2 py-0.5 rounded-md bg-white/5 text-[9px] font-black text-slate-500 uppercase tracking-widest border border-white/5">
-                {availableSeats} / {totalSeats} seats available
+                {availableSeats} / {totalSeats} available
               </span>
             </div>
           </div>
@@ -285,7 +319,13 @@ const SeatSelection = () => {
   // ── Group the flat seats array ───────────────────────────────────────────
   const groupedBlocks = useMemo<GroupedBlock[]>(() => {
     const seats: Seat[] = event?.seats ?? [];
-    return groupSeats(seats);
+    const layoutBlocks: any[] =
+      event?.SeatLayout?.blocks ??
+      event?.seatLayout?.blocks ??
+      event?.seatLayoutDetails?.blocks ??
+      event?.layout?.blocks ??
+      [];
+    return groupSeats(seats, layoutBlocks);
   }, [event]);
 
   // ── Seat selection logic ─────────────────────────────────────────────────
