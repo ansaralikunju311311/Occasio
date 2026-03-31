@@ -4,7 +4,7 @@ export interface ISeatLayout extends Document{
     eventId:Schema.Types.ObjectId,
     blocks:{
         blockName:string;
-        rows:{rowsNumber:number,columns:number}[];
+        rows:{rowNumber:number,columns:number}[];
         category:{
             name:string;
             price:number;
@@ -15,9 +15,9 @@ export interface ISeatLayout extends Document{
 const SeatLayoutSchema = new Schema<ISeatLayout>({
     eventId:{type:Schema.Types.ObjectId,ref:"Event"},
     blocks:[{
-        blocName:String,
+        blockName:String,
         rows:[{
-            rowsNumber:Number,
+            rowNumber:Number,
             columns:Number,
 
         }],

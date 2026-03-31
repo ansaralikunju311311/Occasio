@@ -36,6 +36,8 @@ const UserBookings = lazy(() => import("../pages/user/UserBookings.tsx"));
 const SavedEvents = lazy(() => import("../pages/user/SavedEvents.tsx"));
 const Settings = lazy(() => import("../pages/user/Settings.tsx"));
 const BecomeAManager = lazy(() => import("../pages/user/BecomeAManager.tsx"));
+const SeatSelection = lazy(() => import("../pages/user/SeatSelection.tsx"));
+
 
 
 import ManagerGuard from "../components/common/ManagerGuard.tsx";
@@ -53,7 +55,7 @@ export const router = createBrowserRouter([
     ),
     children: [
       { index: true, element: <LandingPage /> },
-
+      { path: "/seat-selection/:id", element: <SeatSelection /> },
     ],
   },
 

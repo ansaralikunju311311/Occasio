@@ -93,6 +93,16 @@ const eventSchema = new Schema<IEventDocument>(
     },
     { timestamps: true }
 );
+ eventSchema.virtual("seats", {
+   ref: "Seat",
+   localField: "_id",
+  foreignField: "eventId",
+ });
+
+
+
+eventSchema.set("toObject", { virtuals: true });
+ eventSchema.set("toJSON", { virtuals: true });
 
 eventSchema.index({ location: "2dsphere" });
 

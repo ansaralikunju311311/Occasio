@@ -26,7 +26,10 @@ export class Events {
         public createdBy: string,
         public status: EventStatus,
         public picture:string,
-        public creatorDetails?: any
+        public creatorDetails?: any,
+        public seatLayoutId: string,
+        public SeatLayout: any,
+        public seats?: any[]
     ) {
         this.validate();
     }

@@ -30,6 +30,9 @@ const LandingPage = () => {
 
             const response = await api.get("/events/events", { params: queryParams });
             // The backend returns an object with an 'events' property: { events: [...] }
+
+
+            console.log("foe the checking response for layout defining",response)
             const fetchedEvents = response.data.events || [];
             setEvents(Array.isArray(fetchedEvents) ? fetchedEvents : []);
             console.log("Fetched Events:", fetchedEvents);
@@ -48,6 +51,9 @@ const LandingPage = () => {
             setLoading(true);
             const response = await api.get(`/events/eventDetails/${id}`);
             // The backend returns { events: { ... } }
+
+
+            console.log("view Details click time the response",response)
             const eventData = response.data.events;
             setSelectedEvent(eventData);
             setIsDetailsModalOpen(true);
@@ -57,7 +63,10 @@ const LandingPage = () => {
         } finally {
             setLoading(false);
         }
+
+        
     };
+
     const closeDetailsModal = () => {
         setIsDetailsModalOpen(false);
         setSelectedEvent(null);
@@ -477,7 +486,13 @@ const LandingPage = () => {
 
                             <div className="mt-auto flex gap-4">
                                 <button
-                                    onClick={() => navigate(`/checkout/${selectedEvent.id}`)}
+                                    onClick={() => {
+                                        if (selectedEvent.eventType === EventType.ONLINE) {
+                                            navigate(`/checkout/${selectedEvent.id}`);
+                                        } else {
+                                            navigate(`/seat-selection/${selectedEvent.id}`);
+                                        }
+                                    }}
                                     className="flex-1 py-4 bg-linear-to-r from-indigo-500 to-purple-600 text-white font-bold rounded-2xl shadow-[0_20px_40px_-10px_rgba(99,102,241,0.4)] hover:shadow-[0_25px_50px_-12px_rgba(99,102,241,0.5)] hover:-translate-y-1 transition-all duration-300 active:scale-95"
                                 >
                                     Book This Experience
