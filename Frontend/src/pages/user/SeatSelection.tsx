@@ -447,7 +447,7 @@ const SeatSelection = () => {
                 disabled={!canCheckout}
                 onClick={() =>
                   navigate(`/checkout/${event.id || event._id}`, {
-                    state: { selectedSeats, bookingType },
+                    state: { selectedSeats, bookingType, totalPrice },
                   })
                 }
                 className={`w-full py-3.5 rounded-xl font-bold text-sm transition-all duration-200 ${

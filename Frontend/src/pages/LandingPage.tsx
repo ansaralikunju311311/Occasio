@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { api } from "../services/api"
 import EventMap from "../components/eventManager/EventMap";
-// import LocationFinder from "../components/user/LocationFinder";
 import CurrentLocation from "../components/user/CurrentLocation";
 import { EventType } from "./eventManager/CreateEvent";
 
@@ -22,8 +21,8 @@ const LandingPage = () => {
             setLoading(true);
             
             const queryParams: any = {};
-            // If the user selects "All", do not send the eventType parameter 
-            // so the backend fetches everything via `{}` query
+          
+
             if (eventType && eventType.toUpperCase() !== "ALL") {
                 queryParams.eventType = eventType;
             }
@@ -50,7 +49,6 @@ const LandingPage = () => {
         try {
             setLoading(true);
             const response = await api.get(`/events/eventDetails/${id}`);
-            // The backend returns { events: { ... } }
 
 
             console.log("view Details click time the response",response)
@@ -488,7 +486,11 @@ const LandingPage = () => {
                                 <div className="space-y-2">
                                     <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Attendance</p>
                                     <p className="text-lg font-medium text-slate-200">
-                                        {selectedEvent.eventType === 'ONLINE' ? `${selectedEvent.maxOnlineUsers} Slots` : 'In-Person'}
+                                        {(() => {
+                                            if (selectedEvent.eventType === 'ONLINE') return `${selectedEvent.maxOnlineUsers} Slots`;
+                                            if (selectedEvent.eventType === 'HYBRID') return 'Online & In-Person';
+                                            return 'In-Person';
+                                        })()}
                                     </p>
                                 </div>
                                 {selectedEvent.location && (
@@ -546,11 +548,7 @@ const LandingPage = () => {
                             <div className="mt-auto flex gap-4">
                                 <button
                                     onClick={() => {
-                                        if (selectedEvent.eventType === EventType.ONLINE) {
-                                            navigate(`/checkout/${selectedEvent.id}`);
-                                        } else {
-                                            navigate(`/seat-selection/${selectedEvent.id}`);
-                                        }
+                                        navigate(`/seat-selection/${selectedEvent.id}`);
                                     }}
                                     className="flex-1 py-4 bg-linear-to-r from-indigo-500 to-purple-600 text-white font-bold rounded-2xl shadow-[0_20px_40px_-10px_rgba(99,102,241,0.4)] hover:shadow-[0_25px_50px_-12px_rgba(99,102,241,0.5)] hover:-translate-y-1 transition-all duration-300 active:scale-95"
                                 >
