@@ -4,6 +4,7 @@ import { HttpStatus } from "../../../common/constants/http-stattus.js";
 import { GetEventsUseCase } from "../application/usecase/getEvents.usecase.js";
 import { EventDetailsUseCase } from "../application/usecase/eventDetails.usecase.js";
 import { MyEventsUseCase } from "../application/usecase/myevent.usecase.js";
+import { UserRole } from "../../../common/enums/user-role.enum.js";
 export class EventController {
 
     constructor(
@@ -29,28 +30,78 @@ export class EventController {
             next(error)
         }
     }
+    // async allEvents(req: Request, res: Response, next: NextFunction): Promise<void> {
+    //     try {
+
+    //             const user = (req as any).user;
+
+            
+    //         console.log("user for filtering the data perfeclty",user.role)
+    //         const {eventType} = req.query;
+
+
+    //         console.log("queyryyyy",req.query)
+    //         console.log("value",eventType)
+    //         const events = await this.getEventsUseCase.execute(eventType);
+
+    //          if(user.role===UserRole.ADMIN){
+    //              res.status(HttpStatus.OK).json({
+    //             events
+    //         })
+    //     }
+    //         if(user.role !== UserRole.ADMIN){
+    //                 const now = new Date();
+    //          console.log("the date",now);
+              
+    //         }
+             
+            
+            
+
+
+            
+    //     } catch (error) {
+
+    //         next(error)
+    //     }
+    // }
     async allEvents(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
+            const user = (req as any).user;
+            const eventType = req.query.eventType as string;
 
-
-            const {eventType} = req.query;
-
-
-            console.log("queyryyyy",req.query)
-            console.log("value",eventType)
             const events = await this.getEventsUseCase.execute(eventType);
-            res.status(HttpStatus.OK).json({
-                events
-            })
-        } catch (error) {
 
-            next(error)
+            if (!events) {
+                res.status(HttpStatus.OK).json({ events: [] });
+                return;
+            }
+
+            // ✅ Admin → return all
+            if (user && user.role === UserRole.ADMIN) {
+                res.status(HttpStatus.OK).json({ events });
+                return;
+            }
+
+            // ✅ Non-admin or Anonymous → filter future events only
+            const now = new Date();
+
+            const filteredEvents = events.filter((event: any) => {
+                // Return true if the event has not yet started
+                return new Date(event.startTime) > now;
+            });
+
+            res.status(HttpStatus.OK).json({
+                events: filteredEvents
+            });
+
+        } catch (error) {
+            next(error);
         }
     }
     async eventDetails(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-
-            const { id } = req.params;
+            const id = req.params.id as string;
             const events = await this.eventDetailsUseCase.execute(id);
             res.status(HttpStatus.OK).json({
                 events
