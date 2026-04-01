@@ -1,12 +1,49 @@
-
-import { useState } from "react";
-import { useAppSelector } from "../../redux/hook";
+import { useState, useEffect } from "react";
+import { useAppSelector, useAppDispatch } from "../../redux/hook";
 import ChangePasswordModal from "../../components/user/ChangePasswordModal";
 import HomeButton from "../../components/common/HomeButton";
+import { api } from "../../services/api";
+import { setAuth } from "../../redux/slices/authSlice";
 
 const Profile = () => {
     const { user } = useAppSelector((state) => state.auth);
+    const dispatch = useAppDispatch();
     const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editName, setEditName] = useState(user?.name || "");
+    const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        if (isEditing) {
+            setEditName(user?.name || "");
+        }
+    }, [isEditing, user?.name]);
+
+    const handleEditToggle = () => {
+        if (isEditing) {
+            setIsEditing(false);
+        } else {
+            setIsEditing(true);
+        }
+    };
+
+    const handleSave = async () => {
+        if (!editName.trim()) return;
+        
+        try {
+            setIsLoading(true);
+            const response = await api.patch("/user/profile", { name: editName });
+            
+            if (response.data.profile) {
+                dispatch(setAuth({ user: response.data.profile }));
+                setIsEditing(false);
+            }
+        } catch (error) {
+            console.error("Failed to update profile:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     return (
         <div className="animate-fade-in-up">
@@ -20,8 +57,8 @@ const Profile = () => {
                 </div>
             </div>
 
-            <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-2xl p-8 shadow-xl max-w-2xl">
-                <div className="flex items-center gap-6 mb-8 pb-8 border-b border-slate-800/60">
+            <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-2xl p-8 shadow-xl max-w-2xl text-accent-white">
+                <div className="flex items-center gap-6 mb-8 pb-8 border-b border-slate-800/60 ">
                     <div className="w-24 h-24 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-3xl">
                         👤
                     </div>
@@ -37,31 +74,65 @@ const Profile = () => {
                 <div className="space-y-6">
                     <div>
                         <label className="block text-sm font-semibold text-slate-400 mb-2 uppercase tracking-wider">Full Name</label>
-                        <div className="text-white font-medium p-4 bg-slate-950/50 border border-slate-800 rounded-xl">
-                            {user?.name}
-                        </div>
+                        {isEditing ? (
+                            <input
+                                type="text"
+                                value={editName}
+                                onChange={(e) => setEditName(e.target.value)}
+                                className="w-full text-white font-medium p-4 bg-slate-950/50 border border-indigo-500/40 rounded-xl focus:ring-2 focus:ring-indigo-500/20 outline-hidden transition-all"
+                                placeholder="Enter your name"
+                                autoFocus
+                            />
+                        ) : (
+                            <div className="text-white font-medium p-4 bg-slate-950/50 border border-slate-800 rounded-xl">
+                                {user?.name}
+                            </div>
+                        )}
                     </div>
                     <div>
                         <label className="block text-sm font-semibold text-slate-400 mb-2 uppercase tracking-wider">Email Address</label>
-                        <div className="text-white font-medium p-4 bg-slate-950/50 border border-slate-800 rounded-xl">
+                        <div className="text-white font-medium p-4 bg-slate-950/50 border border-slate-800 rounded-xl opacity-70">
                             {user?.email}
                         </div>
                     </div>
                 </div>
 
                 <div className="flex flex-wrap gap-4 mt-8">
-                    <button className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-indigo-600/20">
-                        Edit Profile
-                    </button>
+                    {isEditing ? (
+                        <>
+                            <button
+                                onClick={handleSave}
+                                disabled={isLoading}
+                                className={`px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-indigo-600/20 ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            >
+                                {isLoading ? "Saving..." : "Save Changes"}
+                            </button>
+                            <button
+                                onClick={() => setIsEditing(false)}
+                                className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition-all border border-slate-700"
+                            >
+                                Cancel
+                            </button>
+                        </>
+                    ) : (
+                        <button
+                            onClick={handleEditToggle}
+                            className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-indigo-600/20"
+                        >
+                            Edit Profile
+                        </button>
+                    )}
 
-                    <button
-                        onClick={() => setIsPasswordModalOpen(true)}
-                        className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition-all border border-slate-700"
-                    >
-                        Change Password
-                    </button>
+                    {!isEditing && (
+                        <button
+                            onClick={() => setIsPasswordModalOpen(true)}
+                            className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition-all border border-slate-700"
+                        >
+                            Change Password
+                        </button>
+                    )}
 
-                    {user?.role === "USER" && (
+                    {!isEditing && user?.role === "USER" && (
                         <button
                             onClick={() => window.location.href = "/applyasmanager"}
                             className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-indigo-400 font-bold rounded-xl transition-all border border-slate-700 flex items-center gap-2 group"

@@ -6,7 +6,7 @@ import { UpgradeStatus } from "../../../../common/enums/upgrade.enum.js";
 export class User {
   constructor(
     public readonly id: string | null,
-    public readonly name: string,
+    public  name: string,
     public readonly email: string,
     public password: string,
     public role: UserRole,

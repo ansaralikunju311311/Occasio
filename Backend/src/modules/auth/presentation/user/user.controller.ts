@@ -3,10 +3,12 @@ import { HttpStatus } from "../../../../common/constants/http-stattus.js";
 import { UpgradeUseCase } from "../../application/use-cases/users/upgrade.usecase.js";
 import { SuccessMessage } from "../../../../common/enums/message.enum.js";
  import { ReapplyUseCase } from "../../application/use-cases/users/reapply.usecase.js"
+import { EditProfileUseCase } from "../../application/use-cases/users/editProfileusecase.js";
 export class UserController {
     constructor(
         private UpgradeUseCase: UpgradeUseCase,
-         private ReapplyUseCase: ReapplyUseCase
+         private ReapplyUseCase: ReapplyUseCase,
+         private EditProfileUseCase:EditProfileUseCase
     ) { }
 
 
@@ -35,6 +37,26 @@ export class UserController {
             res.status(HttpStatus.OK).json({
                 message: SuccessMessage.REAPPLY_REQUEST_SENT,
                 users
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async editProfile(req:Request,res:Response,next:NextFunction){
+        const userId = req.user?.userId;
+        const {name} = req.body;
+        console.log("the name",name)
+
+        try {
+            const profile = await this.EditProfileUseCase.execute(userId,name);
+
+
+
+
+
+            res.status(HttpStatus.OK).json({
+                profile
             })
         } catch (error) {
             next(error)

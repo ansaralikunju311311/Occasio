@@ -44,7 +44,9 @@ export class UserRepository
     const doc = await super.updateOne( 
       { email: user.email },
       {
+        // email:user.email,
         status: user.status,
+        name:user.name,
         password: user.password,
         isVerified: user.isVerified,
         otp: user.otp,

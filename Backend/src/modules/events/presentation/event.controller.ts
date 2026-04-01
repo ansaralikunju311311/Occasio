@@ -30,41 +30,7 @@ export class EventController {
             next(error)
         }
     }
-    // async allEvents(req: Request, res: Response, next: NextFunction): Promise<void> {
-    //     try {
-
-    //             const user = (req as any).user;
-
-            
-    //         console.log("user for filtering the data perfeclty",user.role)
-    //         const {eventType} = req.query;
-
-
-    //         console.log("queyryyyy",req.query)
-    //         console.log("value",eventType)
-    //         const events = await this.getEventsUseCase.execute(eventType);
-
-    //          if(user.role===UserRole.ADMIN){
-    //              res.status(HttpStatus.OK).json({
-    //             events
-    //         })
-    //     }
-    //         if(user.role !== UserRole.ADMIN){
-    //                 const now = new Date();
-    //          console.log("the date",now);
-              
-    //         }
-             
-            
-            
-
-
-            
-    //     } catch (error) {
-
-    //         next(error)
-    //     }
-    // }
+    
     async allEvents(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const user = (req as any).user;
@@ -77,17 +43,16 @@ export class EventController {
                 return;
             }
 
-            // ✅ Admin → return all
+            
             if (user && user.role === UserRole.ADMIN) {
                 res.status(HttpStatus.OK).json({ events });
                 return;
             }
 
-            // ✅ Non-admin or Anonymous → filter future events only
             const now = new Date();
 
             const filteredEvents = events.filter((event: any) => {
-                // Return true if the event has not yet started
+
                 return new Date(event.startTime) > now;
             });
 

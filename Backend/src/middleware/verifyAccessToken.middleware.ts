@@ -34,7 +34,10 @@ export const verifyAccessToken =(req:Request,res:Response,next:NextFunction)=>{
     
          const decode =  tokenService.verifyAccessToken(token);
          (req as any).user = decode;
-         console.log("middlware passes",req.user)
+         console.log("middlware passes",req.user);
+
+
+         console.log("fdkjnkjenjnjdnvf;jadsnvjdnkjkfnadj")
          next();
     } catch (error) {
         
