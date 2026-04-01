@@ -177,7 +177,7 @@ const AdminPendingManagers = () => {
             </div>
             <input
               type="text"
-              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm transition duration-150 ease-in-out"
+              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm transition duration-150 ease-in-out"
               placeholder="Search pending managers..."
             />
           </div>
@@ -447,7 +447,7 @@ const AdminPendingManagers = () => {
 
             <div className="p-6">
               <textarea
-                className="w-full h-32 p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none resize-none transition-all text-sm"
+                className="w-full h-32 p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none resize-none transition-all text-sm text-gray-900"
                 placeholder="Enter the reason for rejection (optional)..."
                 value={rejectionReason}
                 onChange={(e) => setRejectionReason(e.target.value)}

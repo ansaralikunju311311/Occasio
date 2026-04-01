@@ -7,11 +7,12 @@ import cron from "node-cron";
 import { UserModel } from "../../modules/auth/infrastructure/database/user.model.js";
 
 export const clearExpiredOtpJob = () => {
-  cron.schedule("*/1 * * * *", async () => {
+  cron.schedule("*/10 * * * *", async () => {
     try {
       const now = new Date();
 
       const result = await UserModel.updateMany(
+        
         {
           otpExpires: { $ne: null, $lt: now }
         },
@@ -23,9 +24,10 @@ export const clearExpiredOtpJob = () => {
             otpSendAt: null
           }
         }
+        
       );
 
-      console.log(` OTP cleanup: ${result.modifiedCount} users updated`);
+      // console.log(` OTP cleanup: ${result.modifiedCount} users updated`);
 
     } catch (error) {
       console.error("Cron job error:", error);

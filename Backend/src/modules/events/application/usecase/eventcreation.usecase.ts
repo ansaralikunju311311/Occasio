@@ -25,9 +25,6 @@ export class EventCretionUseCase{
 
   try{
      if (data.eventType !== "ONLINE") {
-
-    // const {} = data;
-
       const { address } = data;
 
       if (!address) {
@@ -85,7 +82,6 @@ console.log("sample", status)
         data.location.coordinates = [longitude, latitude];
       }
     } else {
-      // For ONLINE events, ensure location is not sent with NaN coordinates
       data.location = undefined;
     }
 
@@ -103,7 +99,7 @@ console.log("sample", status)
       status,
       data.bannerUrl,
       undefined, // creatorDetails
-      "", // seatLayoutId (will be updated later)
+      "", // seatLayoutId 
       undefined, // SeatLayout
       undefined // seats
     );
