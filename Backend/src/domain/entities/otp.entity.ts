@@ -15,7 +15,7 @@
           public otp: string,
      public otpExpires: Date,
      public otpType: UserOtp,
-     public isUsed:boolean,
+      public isUsed:boolean,
      public otpSendAt: Date,
   
 

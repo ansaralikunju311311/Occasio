@@ -26,7 +26,7 @@ const otpSchema = new Schema<IOtp>(
     isUsed: {
       type: Boolean,
       default: false
-    },
+     },
 
     otpSendAt: {
       type: Date,
