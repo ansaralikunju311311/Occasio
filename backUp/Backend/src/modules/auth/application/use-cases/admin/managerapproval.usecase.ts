@@ -1,0 +1,30 @@
+import { IUserRepository } from "../../../domain/repositories/user/user.repository.interface.js";
+import { User } from "../../../domain/entites/user.entity.js";
+import { UserRole } from "../../../../../common/enums/user-role.enum.js";
+import { EmailSerive } from "../../../../../common/service/email.service.js";
+import { UpgradeStatus } from "../../../../../common/enums/upgrade.enum.js";
+export class ManagerApprovalUseCase{
+    constructor(
+        private userRepository : IUserRepository,
+        private emailService: EmailSerive
+    ){}
+    async execute(id:string):Promise<User | null>{
+
+        const user = await this.userRepository.findByIdUser(id);
+        console.log(user)
+
+        if(!user) return null
+  
+   user.role = UserRole.EVENT_MANAGER;
+   user.rejectedAt=null;
+   user.applyingupgrade=UpgradeStatus.APPROVED;
+   const updatedUser = await this.userRepository.updateUser(user);
+   
+   if (updatedUser) {
+       await this.emailService.sendApprovalEmail(updatedUser.email, updatedUser.name);
+   }
+   
+   return updatedUser;
+        
+        }
+    }
