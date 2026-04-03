@@ -2,6 +2,8 @@ import { IUserRepository } from "../../../domain/repositories/user.repository.in
 import { User } from "../../../domain/entities/user.entity";
 import { UserModel, IUserDocument } from "../../database/model/user.model";
 import { BaseRepository } from "../../../infrastructure/repositories/base.repository";
+// import { OTP } from "domain/entities/otp.entity";
+// import { IOtp } from "infrastructure/database/model/otp.model";
 export class UserRepository
   extends BaseRepository<IUserDocument>
   implements IUserRepository {
@@ -64,6 +66,16 @@ export class UserRepository
 
     return this.toEntity(doc); 
   }
+  // async otpStore(otp: OTP): Promise<void> {
+  //     const doc = await super.findOne(otp.email)
+  //     if(doc){
+  //       const otp = await super.create({
+  //         email:doc.email,
+  //         otp:doc.otp,
+
+  //       })
+  //     }
+  // }
 
   private toEntity(doc:any): User {
     return new User(

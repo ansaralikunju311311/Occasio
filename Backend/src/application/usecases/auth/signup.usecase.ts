@@ -12,12 +12,16 @@ import { EmailSerive } from "../../../common/services/email.service";
 import { ErrorMessage } from "../../../common/enums/message-enum.js";
 import { UpgradeStatus } from "../../../common/enums/upgrade-enums.js";
 import { ISignupUseCase } from "./signup.usecase.interface";
+import { OTP } from "domain/entities/otp.entity";
+import { UserOtp } from "common/enums/userotp-enum";
+import { IOtpRepository } from "domain/repositories/otp.repository.interface";
 export class SignupUsecase implements ISignupUseCase
 {
     constructor(
         private userRepository:IUserRepository,
         private hashService :IHashServive,
-        private emailService:EmailSerive
+        private emailService:EmailSerive,
+        private otpRespository:IOtpRepository
     ){}
 
 
@@ -40,14 +44,33 @@ export class SignupUsecase implements ISignupUseCase
         const isVerified = false ;
         const  rejectedAt = null
         const reapplyAt=null
-        // const otpSendAt = new Date();
+         const otpSendAt = new Date();
 
         const otp = generateOTP();
         
-        // const otpExpires = new Date(Date.now() + 5 * 60 * 1000);
+         const otpExpires = new Date(Date.now() + 5 * 60 * 1000);
      
-
+         const isUsed = false;
         const checkig = await this.emailService.sendOtpEmail(data.email,otp);
+       
+        //   email:string,
+//    otp:string,
+//    otpType:UserOtp,
+//    otpExpires:Date,
+//    isUsed:boolean,
+//    otpSendAt:Date
+
+
+        const Otp = new OTP(
+            null,
+            data.email,
+            otp,
+            otpExpires,
+            UserOtp.SIGNUP,
+              isUsed,
+            otpSendAt
+          
+        )
         console.log("reched here",checkig)
     
         const newUser = new User(
@@ -68,9 +91,16 @@ export class SignupUsecase implements ISignupUseCase
 
         );
 
+        const newUsers = await this.userRepository.createUser(newUser)
 
+           if(newUsers){
+              await  this.otpRespository.otpStore(Otp)
+           }
+           
+
+       return newUsers
        
-        return this.userRepository.createUser(newUser)
+       
      
     }
 }
