@@ -13,5 +13,19 @@ router.post("/verify-otp", controller.verify.bind(controller))
 router.post("/resend-otp", controller.resnedVerify.bind(controller))
 router.get("/me", verifyAccessToken, controller.getMe.bind(controller));
 router.post("/forgot-password", controller.forgotPassword.bind(controller));
+router.post("/logout", controller.logout.bind(controller));
+router.post("/refresh", controller.refreshToken.bind(controller))
+router.post("/login", controller.login.bind(controller))
+router.post("/updatepassword",controller.updatePassword.bind(controller))
+
+
+
+
+
+
+
+
+
+
 
 export default router

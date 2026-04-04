@@ -6,19 +6,24 @@ import { VerifyUseCase } from "application/usecases/auth/otp/verifyotp.usecase";
 import { ResendotpUseCase } from "application/usecases/auth/resendotp/resend.usecase";
 import { GetmeUseCase } from "application/usecases/auth/restore/getme.usecase";
 import { ForgotpasswordUsecase } from "application/usecases/auth/forgotpassword/forgot.usecase";
+import { CreateToken } from "common/services/token.service";
+import { LoginUseCase } from "application/usecases/auth/login/login.usecase";
+import { UpdatePasswordUseCase } from "application/usecases/auth/updatepassword/updatepassword.usecase";
 export class AuthController {
 constructor(
 private SignupUsecase: SignupUsecase,
-//     private LoginUseCase: LoginUseCase,
+
     private VerifyUseCase: VerifyUseCase,
     private ResendotpUseCase: ResendotpUseCase,
      private GetmeUseCase: GetmeUseCase,
      private ForgotpasswordUsecase: ForgotpasswordUsecase,
+       private tokenService: CreateToken,
+            private LoginUseCase: LoginUseCase,
 //     private ResetPasswordUseCase: ResetPasswordUseCase,
 //     private AdminLoginUseCase: AdminLoginUseCase,
    
-//     private tokenService: CreateToken,
-//     private UpdatePasswordUseCase: UpdatePasswordUseCase
+
+     private UpdatePasswordUseCase: UpdatePasswordUseCase
     //  private tokenService:ITokenService
 
   ) { }
@@ -131,7 +136,100 @@ private SignupUsecase: SignupUsecase,
     }
   }
     
+   logout = async (req: Request, res: Response) => {
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: false, // true in production (HTTPS)
+      sameSite: "lax"
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: SuccessMessage.LOGOUT_SUCCESS
+    });
+  };
 
 
+   async refreshToken(req: Request, res: Response) {
+    const refreshToken = req.cookies.refreshToken;
+
+    if (!refreshToken) {
+      return res.status(HttpStatus.UNAUTHORIZED).json({
+        message: ErrorMessage.REFRESH_TOKEN_MISSING
+      })
+    }
+
+
+    try {
+      const decode = this.tokenService.verifyRefreshToken(refreshToken) as any
+
+
+      const newaccessToken = this.tokenService.generateAccessToken({
+        userId: decode.userId,
+        role: decode.role
+      })
+
+
+      return res.json({
+        accessToken: newaccessToken
+      })
+    } catch (error) {
+
+
+      return res.status(HttpStatus.UNAUTHORIZED).json({
+        message: ErrorMessage.INVALID_REFRESH_TOKEN
+      })
+    }
+
+
+  }
+
+
+     
+  
+  async login(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+
+
+      const { email, password } = req.body;
+      console.log(req.body)
+      const { user, accessToken, refreshToken } = await this.LoginUseCase.execute({ email, password });
+
+
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000
+      })
+
+
+
+      console.log("onnn check,", user)
+      res.status(HttpStatus.OK).json({
+        message: SuccessMessage.LOGIN_SUCCESS
+        ,
+        user, accessToken
+      })
+    } catch (error: any) {
+      next(error)
+    }
+  }
+
+
+
+  
+  async updatePassword(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { email, currentPassword, newPassword, confirmPassword } = req.body;
+
+      const user = await this.UpdatePasswordUseCase.execute({ email, currentPassword, newPassword, confirmPassword });
+      res.status(HttpStatus.OK).json({
+        message: SuccessMessage.PASSWORD_UPDATED, data: user
+      })
+    } catch (error) {
+      next(error);
+    }
+  }
 
 }

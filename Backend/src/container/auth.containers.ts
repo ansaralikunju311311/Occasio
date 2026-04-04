@@ -9,8 +9,9 @@ import { VerifyUseCase } from "application/usecases/auth/otp/verifyotp.usecase"
 import { ResendotpUseCase } from "application/usecases/auth/resendotp/resend.usecase"
 import { GetmeUseCase } from "application/usecases/auth/restore/getme.usecase"
 import { ForgotpasswordUsecase } from "application/usecases/auth/forgotpassword/forgot.usecase"
-
+import { LoginUseCase } from "application/usecases/auth/login/login.usecase"
 // import  {ITokenService}  from "domain/services/token.service.interface"
+import { UpdatePasswordUseCase } from "application/usecases/auth/updatepassword/updatepassword.usecase"
 export const MakeAdminController=()=>{
 
 
@@ -19,6 +20,8 @@ const hashService = new BcryptHashService()
 const emailService = new EmailSerive()
 const otpRespository = new OtpRepository()
 const  tokenService = new CreateToken()
+  const comapreService = new BcryptHashService()
+
 
     
 
@@ -31,5 +34,17 @@ const verifyUseCase = new VerifyUseCase(
 )
 const resendotpUseCase = new ResendotpUseCase(userRepository,emailService,otpRespository)
 const forgotpasswordUsecase = new ForgotpasswordUsecase(userRepository,emailService,otpRespository)
-return new AuthController(signupUsecase,verifyUseCase,resendotpUseCase,getmeUseCase,forgotpasswordUsecase)
+  const  createtoken = new CreateToken();
+  const loginUseCase = new LoginUseCase(userRepository,comapreService,tokenService)
+ const  updatePasswordUseCase = new UpdatePasswordUseCase(userRepository,comapreService,hashService)
+return new AuthController(signupUsecase,verifyUseCase,resendotpUseCase,getmeUseCase,forgotpasswordUsecase,createtoken,loginUseCase,updatePasswordUseCase)
 }
+
+
+//   private userRepository:IUserRepository,
+//         private compareService :IHashServive,
+//         private tokenService :ITokenService
+
+//    private userRepository:IUserRepository,
+//         private compareService:IHashServive,
+//         private hashService:IHashServive
