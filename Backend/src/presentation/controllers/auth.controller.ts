@@ -4,6 +4,7 @@ import { SuccessMessage,ErrorMessage} from "common/enums/message-enum";
 import { SignupUsecase } from "application/usecases/auth/signup/signup.usecase";
 import { VerifyUseCase } from "application/usecases/auth/otp/verifyotp.usecase";
 import { ResendotpUseCase } from "application/usecases/auth/resendotp/resend.usecase";
+import { GetmeUseCase } from "application/usecases/auth/restore/getme.usecase";
 export class AuthController {
 constructor(
 private SignupUsecase: SignupUsecase,
@@ -13,7 +14,7 @@ private SignupUsecase: SignupUsecase,
 //     private ForgotpasswordUsecase: ForgotpasswordUsecase,
 //     private ResetPasswordUseCase: ResetPasswordUseCase,
 //     private AdminLoginUseCase: AdminLoginUseCase,
-//     private GetmeUseCase: GetmeUseCase,
+    private GetmeUseCase: GetmeUseCase,
 //     private tokenService: CreateToken,
 //     private UpdatePasswordUseCase: UpdatePasswordUseCase
     //  private tokenService:ITokenService
@@ -86,6 +87,26 @@ private SignupUsecase: SignupUsecase,
         next(error)
       }
     }
+
+
+
+     async getMe(req: Request, res: Response) {
+    
+        try {
+          const decode = (req as any).user;
+    
+          console.log("decoded ", decode)
+          const user = await this.GetmeUseCase.execute(decode.userId)
+          res.status(HttpStatus.OK).json({
+            user
+          })
+        } catch (error) {
+    
+    
+          console.log(error)
+        }
+      }
+    
 
 
 

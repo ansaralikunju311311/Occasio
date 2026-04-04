@@ -7,6 +7,7 @@ import { OtpRepository } from "infrastructure/repositories/user/otp.repository"
 import { VerifyUseCase } from "application/usecases/auth/otp/verifyotp.usecase"
  import { CreateToken } from "common/services/token.service"
 import { ResendotpUseCase } from "application/usecases/auth/resendotp/resend.usecase"
+import { GetmeUseCase } from "application/usecases/auth/restore/getme.usecase"
 
 // import  {ITokenService}  from "domain/services/token.service.interface"
 export const MakeAdminController=()=>{
@@ -21,7 +22,8 @@ const  tokenService = new CreateToken()
     
 
 const signupUsecase = new SignupUsecase(userRepository,hashService,emailService,otpRespository)
+const getmeUseCase =   new GetmeUseCase(userRepository)
 const verifyUseCase = new VerifyUseCase(userRepository,tokenService,otpRespository)
 const resendotpUseCase = new ResendotpUseCase(userRepository,emailService,otpRespository)
-return new AuthController(signupUsecase,verifyUseCase,resendotpUseCase)
+return new AuthController(signupUsecase,verifyUseCase,resendotpUseCase,getmeUseCase)
 }
