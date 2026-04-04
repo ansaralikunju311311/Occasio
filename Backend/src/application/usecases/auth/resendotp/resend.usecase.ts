@@ -28,9 +28,7 @@ export class ResendotpUseCase implements IResendUseCase{
         if(!user){
             throw new AppError(ErrorMessage.USER_NOT_FOUND,HttpStatus.UNAUTHORIZED)
         }
-        if(user.isVerified === true){
-            throw new AppError(ErrorMessage.USER_ALREADY_EXISTS,HttpStatus.CONFLICT)
-        }
+        
 
       
 

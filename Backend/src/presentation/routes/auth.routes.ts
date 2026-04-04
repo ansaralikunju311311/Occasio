@@ -12,5 +12,6 @@ router.post("/signup", controller.signup.bind(controller));
 router.post("/verify-otp", controller.verify.bind(controller))
 router.post("/resend-otp", controller.resnedVerify.bind(controller))
 router.get("/me", verifyAccessToken, controller.getMe.bind(controller));
+router.post("/forgot-password", controller.forgotPassword.bind(controller));
 
 export default router

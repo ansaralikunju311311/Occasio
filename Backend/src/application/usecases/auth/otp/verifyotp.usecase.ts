@@ -12,8 +12,9 @@ import { ErrorMessage } from "../../../../common/enums/message-enum";
 export class VerifyUseCase implements IVerifyOtpUseCase{
     constructor(
         private userRepository :IUserRepository,
+          private otpRepository:IOtpRepository,
          private tokenService :ITokenService,
-         private otpRepository:IOtpRepository
+       
     ){}
 
 

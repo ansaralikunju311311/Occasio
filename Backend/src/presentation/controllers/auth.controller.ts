@@ -5,16 +5,18 @@ import { SignupUsecase } from "application/usecases/auth/signup/signup.usecase";
 import { VerifyUseCase } from "application/usecases/auth/otp/verifyotp.usecase";
 import { ResendotpUseCase } from "application/usecases/auth/resendotp/resend.usecase";
 import { GetmeUseCase } from "application/usecases/auth/restore/getme.usecase";
+import { ForgotpasswordUsecase } from "application/usecases/auth/forgotpassword/forgot.usecase";
 export class AuthController {
 constructor(
 private SignupUsecase: SignupUsecase,
 //     private LoginUseCase: LoginUseCase,
     private VerifyUseCase: VerifyUseCase,
     private ResendotpUseCase: ResendotpUseCase,
-//     private ForgotpasswordUsecase: ForgotpasswordUsecase,
+     private GetmeUseCase: GetmeUseCase,
+     private ForgotpasswordUsecase: ForgotpasswordUsecase,
 //     private ResetPasswordUseCase: ResetPasswordUseCase,
 //     private AdminLoginUseCase: AdminLoginUseCase,
-    private GetmeUseCase: GetmeUseCase,
+   
 //     private tokenService: CreateToken,
 //     private UpdatePasswordUseCase: UpdatePasswordUseCase
     //  private tokenService:ITokenService
@@ -106,6 +108,28 @@ private SignupUsecase: SignupUsecase,
           console.log(error)
         }
       }
+
+
+       async forgotPassword(req: Request, res: Response, next: NextFunction): Promise<void> {
+    console.log("vjfncjfjv")
+    try {
+      const { email } = req.body;
+
+
+      console.log("fjvndfjvfhd")
+
+      const user = await this.ForgotpasswordUsecase.execute(email);
+
+      // console.log("th user here",user)
+      res.status(HttpStatus.OK).json({
+        message: SuccessMessage.OTP_SENT, data: user
+      })
+    }
+    catch (error: any) {
+      //  console.log('error')
+      next(error)
+    }
+  }
     
 
 
