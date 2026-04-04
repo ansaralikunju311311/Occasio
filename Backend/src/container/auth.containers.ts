@@ -13,6 +13,7 @@ import { LoginUseCase } from "application/usecases/auth/login/login.usecase"
 // import  {ITokenService}  from "domain/services/token.service.interface"
 import { UpdatePasswordUseCase } from "application/usecases/auth/updatepassword/updatepassword.usecase"
 import { ResetPasswordUseCase } from "application/usecases/auth/reserPassword/reset.uecase"
+import { AdminLoginUseCase } from "application/usecases/auth/adminLogin/adminLogin.usecase"
 export const MakeAdminController=()=>{
 
 
@@ -39,8 +40,9 @@ const forgotpasswordUsecase = new ForgotpasswordUsecase(userRepository,emailServ
   const loginUseCase = new LoginUseCase(userRepository,comapreService,tokenService)
  const  updatePasswordUseCase = new UpdatePasswordUseCase(userRepository,comapreService,hashService)
  const resetPasswordUseCase = new ResetPasswordUseCase(userRepository, hashService, otpRespository)
+  const adminLoginUseCase = new AdminLoginUseCase(userRepository,comapreService,tokenService)
  
-return new AuthController(signupUsecase,verifyUseCase,resendotpUseCase,getmeUseCase,forgotpasswordUsecase,createtoken,loginUseCase,resetPasswordUseCase,updatePasswordUseCase)
+return new AuthController(signupUsecase,verifyUseCase,resendotpUseCase,getmeUseCase,forgotpasswordUsecase,createtoken,loginUseCase,resetPasswordUseCase,updatePasswordUseCase,adminLoginUseCase)
 }
 
 

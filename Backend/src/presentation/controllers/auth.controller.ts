@@ -10,6 +10,7 @@ import { CreateToken } from "common/services/token.service";
 import { LoginUseCase } from "application/usecases/auth/login/login.usecase";
 import { UpdatePasswordUseCase } from "application/usecases/auth/updatepassword/updatepassword.usecase";
 import { ResetPasswordUseCase } from "application/usecases/auth/reserPassword/reset.uecase";
+import { AdminLoginUseCase } from "application/usecases/auth/adminLogin/adminLogin.usecase";
 
 export class AuthController {
 constructor(
@@ -22,9 +23,10 @@ private SignupUsecase: SignupUsecase,
        private tokenService: CreateToken,
             private LoginUseCase: LoginUseCase,
      private ResetPasswordUseCase: ResetPasswordUseCase,
-//     private AdminLoginUseCase: AdminLoginUseCase,
+  
 
-     private UpdatePasswordUseCase: UpdatePasswordUseCase
+     private UpdatePasswordUseCase: UpdatePasswordUseCase,
+     private AdminLoginUseCase: AdminLoginUseCase,
     //  private tokenService:ITokenService
 
   ) { }
@@ -278,7 +280,38 @@ private SignupUsecase: SignupUsecase,
 
     res.redirect(`http://localhost:5173/oauth-success?token=${accessToken}`);
   }
+   
 
+     
+       async adminlogin(req: Request, res: Response, next: NextFunction): Promise<void> {
+     
+         // console.log('jnjnfdjnfkdjnfljnfljdnfdljfnd')
+     
+         try {
+     
+     
+           const { email, password, role } = req.body;
+           // console.log(req.body)
+           const { user, accessToken, refreshToken } = await this.AdminLoginUseCase.execute({ email, password });
+     
+           res.cookie("refreshToken", refreshToken, {
+             httpOnly: true,
+             secure: false,
+             sameSite: "lax",
+             maxAge: 7 * 24 * 60 * 60 * 1000
+           })
+     
+     
+           // console.log("onnn check,",user,refreshToken,accessToken)
+           res.status(HttpStatus.OK).json({
+             message: SuccessMessage.LOGIN_SUCCESS
+             ,
+             user, accessToken
+           })
+         } catch (error: any) {
+           next(error)
+         }
+       }
 
 
 

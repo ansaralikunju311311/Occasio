@@ -37,6 +37,9 @@ router.get(
   "/google/callback", passport.authenticate("google", { session: false }), controller.googleLogin.bind(controller)
 );
 
+router.post("/admin/login", controller.adminlogin.bind(controller))
+
+
 
 
 
