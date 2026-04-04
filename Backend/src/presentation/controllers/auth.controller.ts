@@ -9,6 +9,8 @@ import { ForgotpasswordUsecase } from "application/usecases/auth/forgotpassword/
 import { CreateToken } from "common/services/token.service";
 import { LoginUseCase } from "application/usecases/auth/login/login.usecase";
 import { UpdatePasswordUseCase } from "application/usecases/auth/updatepassword/updatepassword.usecase";
+import { ResetPasswordUseCase } from "application/usecases/auth/reserPassword/reset.uecase";
+
 export class AuthController {
 constructor(
 private SignupUsecase: SignupUsecase,
@@ -19,9 +21,8 @@ private SignupUsecase: SignupUsecase,
      private ForgotpasswordUsecase: ForgotpasswordUsecase,
        private tokenService: CreateToken,
             private LoginUseCase: LoginUseCase,
-//     private ResetPasswordUseCase: ResetPasswordUseCase,
+     private ResetPasswordUseCase: ResetPasswordUseCase,
 //     private AdminLoginUseCase: AdminLoginUseCase,
-   
 
      private UpdatePasswordUseCase: UpdatePasswordUseCase
     //  private tokenService:ITokenService
@@ -231,5 +232,23 @@ private SignupUsecase: SignupUsecase,
       next(error);
     }
   }
+
+
+
+  async resetpassword(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { email, otp, password, confirmpassword } = req.body;
+
+
+      // console.log(req.body)
+      const user = await this.ResetPasswordUseCase.execute({ email, otp, password, confirmpassword });
+      res.status(HttpStatus.OK).json({
+        message: SuccessMessage.PASSWORD_RESET, data: user
+      })
+    } catch (error: any) {
+      next(error)
+    }
+  }
+
 
 }

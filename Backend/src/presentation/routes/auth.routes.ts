@@ -17,6 +17,7 @@ router.post("/logout", controller.logout.bind(controller));
 router.post("/refresh", controller.refreshToken.bind(controller))
 router.post("/login", controller.login.bind(controller))
 router.post("/updatepassword",controller.updatePassword.bind(controller))
+router.post("/reset-password", controller.resetpassword.bind(controller));
 
 
 
