@@ -1,5 +1,7 @@
 import express from "express";
 import { Router } from "express";
+import passport from "passport";
+
 import { verifyAccessToken } from "presentation/middlewares/verifyAccessToken.middleware";
 import { MakeAdminController } from "../../container/auth.containers";
 // const router = express.Router();
@@ -31,7 +33,9 @@ router.get(
   }
 );
 
-
+router.get(
+  "/google/callback", passport.authenticate("google", { session: false }), controller.googleLogin.bind(controller)
+);
 
 
 

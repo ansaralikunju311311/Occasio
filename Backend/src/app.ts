@@ -5,7 +5,8 @@
 // // import userRoutes from '../modules/auth/presentation/user/user.routes.js'
 // // import { errorMiddleware } from '../middleware/error.middleware.js';
 // // import eventRouter from "../modules/events/presentation/event.routes.js"
-// // import passport from 'passport';
+import "./shared/config/passport/google.strategy"
+ import passport from 'passport';
  import cors from 'cors'
 import cookieParser from 'cookie-parser';
 // const app = express();
@@ -39,7 +40,7 @@ import authRoutes from '../src/presentation/routes/auth.routes'
 const app = express();
 
 app.use(express.urlencoded({ extended: true }));
-// app.use(passport.initialize())
+app.use(passport.initialize())
 app.use(cookieParser())
 app.use(cors({
     origin: "http://localhost:5173",
