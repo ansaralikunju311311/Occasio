@@ -7,8 +7,8 @@ import { User } from "../../../../domain/entities/user.entity";
 import { UserOtp } from "../../../../common/enums/userotp-enum";
 import { EmailSerive } from "../../../../common/services/email.service";
 import { ErrorMessage } from "../../../../common/enums/message-enum";
-import { IOtpRepository } from "domain/repositories/otp.repository.interface";
-import { OTP } from "domain/entities/otp.entity";
+import { IOtpRepository } from "../../../../domain/repositories/otp.repository.interface";
+import { OTP } from "../../../../domain/entities/otp.entity";
 import { IForgotpasswordUsecase } from "./forgot.usecase.interface";
 export class ForgotpasswordUsecase implements IForgotpasswordUsecase{
     constructor(

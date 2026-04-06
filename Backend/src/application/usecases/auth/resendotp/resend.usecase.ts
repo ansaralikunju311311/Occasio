@@ -6,8 +6,8 @@ import { AppError } from "../../../../common/errors/apperror";
 import { HttpStatus } from "../../../../common/constants/http-status";
 import { EmailSerive } from "../../../../common/services/email.service";
 import { ErrorMessage } from "../../../../common/enums/message-enum";
-import { IOtpRepository } from "domain/repositories/otp.repository.interface";
-import { OTP } from "domain/entities/otp.entity";
+import { IOtpRepository } from "../../../../domain/repositories/otp.repository.interface";
+import { OTP } from "../../../../domain/entities/otp.entity";
 import { IResendUseCase } from "./resend.usecase.interface";
 
 export class ResendotpUseCase implements IResendUseCase{

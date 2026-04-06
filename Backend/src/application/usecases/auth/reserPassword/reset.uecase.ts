@@ -6,7 +6,7 @@ import { User } from "../../../../domain/entities/user.entity";
 import { AppError } from "../../../../common/errors/apperror";
 import { HttpStatus } from "../../../../common/constants/http-status";
 import { ErrorMessage } from "../../../../common/enums/message-enum";
-import { IOtpRepository } from "domain/repositories/otp.repository.interface";
+import { IOtpRepository } from "../../../../domain/repositories/otp.repository.interface";
 export class ResetPasswordUseCase{
 
      constructor(

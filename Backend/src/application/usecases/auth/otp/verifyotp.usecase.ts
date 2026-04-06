@@ -1,5 +1,5 @@
 import { IUserRepository } from "../../../../domain/repositories/user.repository.interface";
-import { IOtpRepository } from "domain/repositories/otp.repository.interface";
+import { IOtpRepository } from "../../../../domain/repositories/otp.repository.interface";
 import { VerfiyOtpDto } from "../../../dtos/verifyotp.dto";
 
 import { AppError } from "../../../../common/errors/apperror";

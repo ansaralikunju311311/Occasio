@@ -47,7 +47,7 @@ const CreateEvent = () => {
 
     const selectedEventType = watch("eventType");
     const startTimeValue = watch("startTime");
-    const isSeatLayoutEnabled = watch("isSeatLayoutEnabled");
+    // const isSeatLayoutEnabled = watch("isSeatLayoutEnabled");
     const [imagePreview, setImagePreview] = useState<string | null>(null);
 
     // Layout Builder State

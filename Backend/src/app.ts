@@ -5,6 +5,9 @@
 // // import userRoutes from '../modules/auth/presentation/user/user.routes.js'
 // // import { errorMiddleware } from '../middleware/error.middleware.js';
 // // import eventRouter from "../modules/events/presentation/event.routes.js"
+import { errorMiddleware } from "../src/presentation/middlewares/error.middleware";
+
+import userRoutes from "./presentation/routes/user.routes"
 import "./shared/config/passport/google.strategy"
  import passport from 'passport';
  import cors from 'cors'
@@ -24,8 +27,8 @@ import cookieParser from 'cookie-parser';
 // })
 // app.use("/api/auth", authRoutes);
 // app.use("/api/admin",adminRoutes);
-// app.use("/api/user",userRoutes);
-// app.use("/api/events",eventRouter)
+
+
 // app.use((_req, res) => {
 //     res.status(404).json({ message: 'the page not found' })
 // });
@@ -37,6 +40,8 @@ import cookieParser from 'cookie-parser';
 // src/app.ts
 import express from "express";
 import authRoutes from '../src/presentation/routes/auth.routes'
+import eventRoutes from "../src/presentation/routes/event.routes"
+import adminRoutes from '../src/presentation/routes/admin.routes'
 const app = express();
 
 app.use(express.urlencoded({ extended: true }));
@@ -48,6 +53,13 @@ app.use(cors({
 }))
 app.use(express.json());
 app.use("/api/auth", authRoutes);
+app.use("/api/user",userRoutes);
+app.use("/api/admin",adminRoutes);
+ app.use("/api/events",eventRoutes)
+ app.use((_req, res) => {
+   res.status(404).json({ message: 'the page not found' })
+ });
+app.use(errorMiddleware)
 app.get('/',(req,res)=>{
     res.send('the server is running proeprly')
 })

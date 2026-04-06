@@ -1,7 +1,5 @@
     // otpStore(otp:OTP):Promise<void>
-import { VerfiyOtpDto } from "application/dtos/verifyotp.dto"
-import { OTP } from "domain/entities/otp.entity"
-import { User } from "domain/entities/user.entity"
+import { OTP } from "../../domain/entities/otp.entity"
 
     export interface IOtpRepository{
             otpStore(otp:OTP):Promise<OTP | null>

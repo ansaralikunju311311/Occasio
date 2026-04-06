@@ -4,7 +4,7 @@
 //    otpExpires:Date,
 //    isUsed:boolean,
 //    otpSendAt:Date
-   import { UserOtp } from "common/enums/userotp-enum";
+   import { UserOtp } from "../../common/enums/userotp-enum";
 
 
    export class OTP{

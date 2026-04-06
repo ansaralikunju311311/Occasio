@@ -1,7 +1,7 @@
-import { IOtp, OtpModel } from "infrastructure/database/model/otp.model";
+import { IOtp, OtpModel } from "../../../infrastructure/database/model/otp.model";
 import { BaseRepository } from "../base.repository";
-import type { IOtpRepository } from "domain/repositories/otp.repository.interface";
-import { OTP } from "domain/entities/otp.entity";
+import type { IOtpRepository } from "../../../domain/repositories/otp.repository.interface";
+import { OTP } from "../../../domain/entities/otp.entity";
 // import { User } from "domain/entities/user.entity";
 export class  OtpRepository extends BaseRepository<IOtp> implements IOtpRepository{
 

@@ -1,17 +1,17 @@
 import { NextFunction,Request,Response } from "express";
-import { HttpStatus } from "common/constants/http-status";
-import { SuccessMessage,ErrorMessage} from "common/enums/message-enum";
-import { SignupUsecase } from "application/usecases/auth/signup/signup.usecase";
-import { VerifyUseCase } from "application/usecases/auth/otp/verifyotp.usecase";
-import { ResendotpUseCase } from "application/usecases/auth/resendotp/resend.usecase";
-import { GetmeUseCase } from "application/usecases/auth/restore/getme.usecase";
-import { ForgotpasswordUsecase } from "application/usecases/auth/forgotpassword/forgot.usecase";
-import { CreateToken } from "common/services/token.service";
-import { LoginUseCase } from "application/usecases/auth/login/login.usecase";
-import { UpdatePasswordUseCase } from "application/usecases/auth/updatepassword/updatepassword.usecase";
-import { ResetPasswordUseCase } from "application/usecases/auth/reserPassword/reset.uecase";
-import { AdminLoginUseCase } from "application/usecases/auth/adminLogin/adminLogin.usecase";
-
+import { HttpStatus } from "../../common/constants/http-status";
+import { SuccessMessage,ErrorMessage} from "../../common/enums/message-enum";
+import { SignupUsecase } from "../../application/usecases/auth/signup/signup.usecase";
+import { VerifyUseCase } from "../../application/usecases/auth/otp/verifyotp.usecase";
+import { ResendotpUseCase } from "../../application/usecases/auth/resendotp/resend.usecase";
+import { GetmeUseCase } from "../../application/usecases/auth/restore/getme.usecase";
+import { ForgotpasswordUsecase } from "../../application/usecases/auth/forgotpassword/forgot.usecase";
+import { CreateToken } from "../../common/services/token.service";
+import { LoginUseCase } from "../../application/usecases/auth/login/login.usecase";
+import { UpdatePasswordUseCase } from "../../application/usecases/auth/updatepassword/updatepassword.usecase";
+import { ResetPasswordUseCase } from "../../application/usecases/auth/reserPassword/reset.uecase";
+import { AdminLoginUseCase } from "../../application/usecases/auth/adminLogin/adminLogin.usecase";
+import { logger } from "@/common/logger/logger";
 export class AuthController {
 constructor(
 private SignupUsecase: SignupUsecase,
@@ -33,6 +33,7 @@ private SignupUsecase: SignupUsecase,
   async signup(req: Request, res: Response, next: NextFunction): Promise<void> {
 
     console.log("bkjbhjbchjb")
+      logger.info("Test route hit");
     try {
 
       console.log("rjfjrf", req.body)
@@ -103,10 +104,10 @@ private SignupUsecase: SignupUsecase,
      async getMe(req: Request, res: Response) {
     
         try {
-          const decode = (req as any).user;
+           const userId = req.authUser!.userId;
     
-          console.log("decoded ", decode)
-          const user = await this.GetmeUseCase.execute(decode.userId)
+          // console.log("decoded ", decode)
+          const user = await this.GetmeUseCase.execute(userId)
           res.status(HttpStatus.OK).json({
             user
           })

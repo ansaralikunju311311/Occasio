@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { HttpStatus } from "../../../../common/constants/http-stattus.js";
+import { HttpStatus } from "../../../../common/constants/http-stattus";
 import { UpgradeUseCase } from "../../application/use-cases/users/upgrade.usecase.js";
 import { SuccessMessage } from "../../../../common/enums/message.enum.js";
  import { ReapplyUseCase } from "../../application/use-cases/users/reapply.usecase.js"

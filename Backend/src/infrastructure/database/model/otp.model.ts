@@ -1,4 +1,4 @@
-import { UserOtp } from "common/enums/userotp-enum";
+import { UserOtp } from "../../../common/enums/userotp-enum";
 
 import mongoose,{ Document,Schema } from "mongoose";
 

@@ -2,6 +2,7 @@ import { NextFunction,Request,Response } from 'express'
 import { HttpStatus } from '../../common/constants/http-status';
 import { CreateToken } from '../../common/services/token.service';
 import { ErrorMessage } from '../../common/enums/message-enum';
+import { AuthUser } from '@/common/type/auth.type';
 
 
 const tokenService = new CreateToken()
@@ -33,7 +34,7 @@ export const verifyAccessToken =(req:Request,res:Response,next:NextFunction)=>{
     try {
     
          const decode =  tokenService.verifyAccessToken(token);
-         (req as any).user = decode;
+         req.authUser = decode as AuthUser;
          console.log("middlware passes",req.user);
 
 

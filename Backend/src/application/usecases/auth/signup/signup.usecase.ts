@@ -12,9 +12,9 @@ import { EmailSerive } from "../../../../common/services/email.service";
 import { ErrorMessage } from "../../../../common/enums/message-enum.js";
 import { UpgradeStatus } from "../../../../common/enums/upgrade-enums.js";
 import { ISignupUseCase } from "./signup.usecase.interface";
-import { OTP } from "domain/entities/otp.entity";
-import { UserOtp } from "common/enums/userotp-enum";
-import { IOtpRepository } from "domain/repositories/otp.repository.interface";
+import { OTP } from "../../../../domain/entities/otp.entity";
+import { UserOtp } from "../../../../common/enums/userotp-enum";
+import { IOtpRepository } from "../../../../domain/repositories/otp.repository.interface";
 export class SignupUsecase implements ISignupUseCase
 {
     constructor(
