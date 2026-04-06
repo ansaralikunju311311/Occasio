@@ -6,7 +6,9 @@ import { getLocationName } from "../../../../common/services/location.service";
 import { normalizeCoordinates } from "../../../../common/utils/geo.utils";
 import mongoose from "mongoose";
 import { SeatStatus } from "../../../../common/enums/searstatus-enum";
-export class EventCretionUseCase{
+import { IEventCreationUseCase } from "./eventcreation.usecase.interface";
+
+export class EventCretionUseCase implements IEventCreationUseCase {
 
     constructor(
         private eventRepository:IEventRepository

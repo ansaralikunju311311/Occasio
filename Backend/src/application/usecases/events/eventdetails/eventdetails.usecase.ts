@@ -1,6 +1,8 @@
 import { IEventRepository } from "../../../../domain/repositories/event/event.repository.interface";
 
-export class EventDetailsUseCase{
+import { IEventDetailsUseCase } from "./eventdetails.usecase.interface";
+
+export class EventDetailsUseCase implements IEventDetailsUseCase {
 
     constructor(
         private eventRepository:IEventRepository

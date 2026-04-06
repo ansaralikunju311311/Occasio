@@ -1,6 +1,8 @@
 import { IEventRepository } from "../../../../domain/repositories/event/event.repository.interface";
 
-export class GetEventsUseCase{
+import { IGetEventsUseCase } from "./getEvents.usecase.interface";
+
+export class GetEventsUseCase implements IGetEventsUseCase {
 
    constructor(
     private eventRepository:IEventRepository
