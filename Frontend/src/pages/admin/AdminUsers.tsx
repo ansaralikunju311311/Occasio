@@ -3,8 +3,7 @@ import { createPortal } from "react-dom";
 import { api } from "../../services/api";
 import { UpgradeStatus } from "../../types/upgrade-status.enum";
 import { toast } from "sonner";
-
-interface User {
+import { Table } from "../../components/common/Table";interface User {
   _id?: string;
   id?: string;
   name: string;
@@ -173,108 +172,91 @@ const AdminUsers = () => {
 
       {/* Table Section */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  User Details
-                </th>
-                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Role
-                </th>
-                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Verified
-                </th>
-                <th scope="col" className="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {users.length > 0 ? (
-                users.map((user, index) => {
-                  const userId = user._id || user.id || index.toString();
-
-                  return (
-                    <tr key={userId} className="hover:bg-gray-50 transition-colors duration-150">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="flex-shrink-0 h-10 w-10">
-                            <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-blue-500 to-blue-600 flex items-center justify-center text-white font-medium shadow-sm">
-                              {getInitials(user.name)}
-                            </div>
-                          </div>
-                          <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900">{user.name || "N/A"}</div>
-                            <div className="text-sm text-gray-500">{user.email}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getRoleBadgeColor(user.role)}`}>
-                          {user.role?.replace('_', ' ') || "USER"}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusBadgeColor(user.status)}`}>
-                          <span className={`h-1.5 w-1.5 rounded-full mr-1.5 ${user.status?.toUpperCase() === 'ACTIVE' ? 'bg-green-600' : 'bg-red-600'}`}></span>
-                          {user.status || "UNKNOWN"}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {user.isVerified ? (
-                          <div className="flex items-center text-green-600 bg-green-50 px-2.5 py-1 rounded-md w-fit border border-green-100">
-                            <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                            </svg>
-                            <span className="text-xs font-medium">Verified</span>
-                          </div>
-                        ) : (
-                          <div className="flex items-center text-yellow-600 bg-yellow-50 px-2.5 py-1 rounded-md w-fit border border-yellow-100">
-                            <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                            <span className="text-xs font-medium">Pending</span>
-                          </div>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button
-                          className="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md transition-colors duration-150 mr-2"
-                          onClick={() => detailsView(userId)}
-                        >
-                          View
-                        </button>
-                        <button
-                          className="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md transition-colors duration-150"
-                          onClick={() => handleUser(userId, user.status)}
-                        >
-                          {user.status?.toUpperCase() === 'ACTIVE' ? 'Block' : 'Unblock'}
-                        </button>
-                      </td>
-                    </tr>
-                  )
-                })
-              ) : (
-                <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
-                    <div className="flex flex-col items-center justify-center">
-                      <svg className="h-12 w-12 text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                      </svg>
-                      <p className="text-base font-medium text-gray-900">No users found</p>
-                      <p className="text-sm mt-1">There are currently no users registered on the platform.</p>
+        <Table
+          columns={[
+            { header: "User Details" },
+            { header: "Role" },
+            { header: "Status" },
+            { header: "Verified" },
+            { header: "Actions", className: "px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider" }
+          ]}
+          data={users}
+          emptyState={
+            <tr>
+              <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
+                <div className="flex flex-col items-center justify-center">
+                  <svg className="h-12 w-12 text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                  <p className="text-base font-medium text-gray-900">No users found</p>
+                  <p className="text-sm mt-1">There are currently no users registered on the platform.</p>
+                </div>
+              </td>
+            </tr>
+          }
+          renderRow={(user, index) => {
+            const userId = user._id || user.id || index.toString();
+            return (
+              <tr key={userId} className="hover:bg-gray-50 transition-colors duration-150">
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0 h-10 w-10">
+                      <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-blue-500 to-blue-600 flex items-center justify-center text-white font-medium shadow-sm">
+                        {getInitials(user.name)}
+                      </div>
                     </div>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+                    <div className="ml-4">
+                      <div className="text-sm font-medium text-gray-900">{user.name || "N/A"}</div>
+                      <div className="text-sm text-gray-500">{user.email}</div>
+                    </div>
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getRoleBadgeColor(user.role)}`}>
+                    {user.role?.replace('_', ' ') || "USER"}
+                  </span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusBadgeColor(user.status)}`}>
+                    <span className={`h-1.5 w-1.5 rounded-full mr-1.5 ${user.status?.toUpperCase() === 'ACTIVE' ? 'bg-green-600' : 'bg-red-600'}`}></span>
+                    {user.status || "UNKNOWN"}
+                  </span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {user.isVerified ? (
+                    <div className="flex items-center text-green-600 bg-green-50 px-2.5 py-1 rounded-md w-fit border border-green-100">
+                      <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                      </svg>
+                      <span className="text-xs font-medium">Verified</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center text-yellow-600 bg-yellow-50 px-2.5 py-1 rounded-md w-fit border border-yellow-100">
+                      <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                      <span className="text-xs font-medium">Pending</span>
+                    </div>
+                  )}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <button
+                    className="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md transition-colors duration-150 mr-2"
+                    onClick={() => detailsView(userId)}
+                  >
+                    View
+                  </button>
+                  <button
+                    className="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md transition-colors duration-150"
+                    onClick={() => handleUser(userId, user.status)}
+                  >
+                    {user.status?.toUpperCase() === 'ACTIVE' ? 'Block' : 'Unblock'}
+                  </button>
+                </td>
+              </tr>
+            );
+          }}
+        />
 
         {/* Pagination Section (Static for now) */}
         {users.length > 0 && (
