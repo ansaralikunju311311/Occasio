@@ -12,25 +12,6 @@ const EventManagerMyEvents = () => {
     const [events, setEvents] = useState<any[]>([]);
     const navigate = useNavigate();
 
-    // useEffect(() => {
-    //     const fetchEvent = async () => {
-    //         try {
-    //             const response = await api.get("/events/myevents");
-    //             console.log("response", response);
-    //             if (response.data && response.data.events) {
-    //                 setEvents(response.data.events);
-    //             } else if (Array.isArray(response.data)) {
-    //                 setEvents(response.data);
-    //             } else {
-    //                 setEvents([]);
-    //             }
-    //         } catch (error: any) {
-    //             console.error("Error fetching my events", error);
-    //             toast.error(error.response?.data?.message || "Failed to load your events.");
-    //         }
-    //     };
-    //     fetchEvent();
-    // }, []);
 
    useEffect(() => {
   const delay = setTimeout(() => {

@@ -24,11 +24,14 @@ export class AdminController{
     ){}
 
 
-    async getUsers(_req:Request,res:Response,next:NextFunction){
+    async getUsers(req:Request,res:Response,next:NextFunction){
          console.log('vannoooo arelum evide')
 
+
+         const search = req.query.search as string
+
         try {
-            const users = await this.findallUsecase.execute();
+            const users = await this.findallUsecase.execute(search);
             res.status(HttpStatus.OK).json({
                 users
             })

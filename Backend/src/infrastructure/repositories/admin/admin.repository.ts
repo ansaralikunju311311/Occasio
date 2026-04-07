@@ -6,26 +6,43 @@ import { UserModel } from "../../database/model/user.model";
 
 export class AdminRepository implements IAdminRepository {
 
-    async findAllUser(): Promise<User[] | null> {
-        const users = await UserModel.find({ role: { $ne: "ADMIN" } });
-        if (!users) return null;
 
-        return users.map((user) => (
-            new User(
-                user._id.toString(),
-                user.name,
-                user.email,
-                user.password,
-                user.role,
-                user.status,
-                user.isVerified,
-                
-                user.applyingupgrade,
-                user.rejectedAt,
-                user.reapplyAt
-            )
-        ))
-    }
+
+  
+
+    async findAllUser(search?: string): Promise<User[] | null> {
+
+  const query: any = {
+    role: { $ne: "ADMIN" } // always exclude admin
+  };
+
+  if (search) {
+    query.$or = [
+      { name: { $regex: search, $options: "i" } },
+      { email: { $regex: search, $options: "i" } },
+      { status: { $regex: search, $options: "i" } }
+    ];
+  }
+
+  const users = await UserModel.find(query);
+
+  if (!users || users.length === 0) return null;
+
+  return users.map((user) => (
+    new User(
+      user._id.toString(),
+      user.name,
+      user.email,
+      user.password,
+      user.role,
+      user.status,
+      user.isVerified,
+      user.applyingupgrade,
+      user.rejectedAt,
+      user.reapplyAt
+    )
+  ));
+}
 
     async findById(id: string): Promise<User | null> {
         const user = await UserModel.findById(id)

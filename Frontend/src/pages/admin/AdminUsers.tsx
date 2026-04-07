@@ -22,18 +22,25 @@ interface User {
 
 const AdminUsers = () => {
   const [users, setUsers] = useState<User[]>([]);
+      const [searchTerm, setSearchTerm] = useState("");
+
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState<boolean>(false);
-  const [searchQuery, setSearchQuery] = useState("");
 
-  useEffect(() => {
+ 
     const fetchUsers = async () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await api.get("/admin/users");
+        const response = await api.get("/admin/users",{
+          
+          params: {
+        search: searchTerm
+      }
+
+        });
 
         const usersData = (Array.isArray(response.data)
           ? response.data
@@ -50,8 +57,13 @@ const AdminUsers = () => {
       }
     };
 
+   useEffect(() => {
+  const delay = setTimeout(() => {
     fetchUsers();
-  }, []);
+  }, 500); // debounce 500ms
+
+  return () => clearTimeout(delay);
+}, [searchTerm]);
 
   const handleUser = async (userId: string, userStatus: string) => {
     console.log(userId, userStatus);
@@ -144,8 +156,8 @@ const AdminUsers = () => {
         </div>
 
         <SearchBar
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search users..."
         />
       </div>
@@ -153,7 +165,7 @@ const AdminUsers = () => {
       {error && (
         <div className="rounded-lg bg-red-50 p-4 border border-red-200">
           <div className="flex">
-            <div className="flex-shrink-0">
+            <div className="shrink-0">
               <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
               </svg>

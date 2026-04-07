@@ -9,8 +9,8 @@ export class FindAllUseCase implements IFindallUseCase{
     constructor(
         private adminRepository: IAdminRepository
     ){}
-    async execute():Promise<User[] | null>{
-      const user = await this.adminRepository.findAllUser()
+    async execute(search:string):Promise<User[] | null>{
+      const user = await this.adminRepository.findAllUser(search)
 
       return user
    }
