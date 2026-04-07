@@ -60,7 +60,7 @@ const AdminUsers = () => {
    useEffect(() => {
   const delay = setTimeout(() => {
     fetchUsers();
-  }, 500); // debounce 500ms
+  }, 1000); 
 
   return () => clearTimeout(delay);
 }, [searchTerm]);
@@ -207,8 +207,8 @@ const AdminUsers = () => {
               <tr key={userId} className="hover:bg-gray-50 transition-colors duration-150">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
-                    <div className="flex-shrink-0 h-10 w-10">
-                      <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-blue-500 to-blue-600 flex items-center justify-center text-white font-medium shadow-sm">
+                    <div className="shrink-0 h-10 w-10">
+                      <div className="h-10 w-10 rounded-full bg-linear-to-tr from-blue-500 to-blue-600 flex items-center justify-center text-white font-medium shadow-sm">
                         {getInitials(user.name)}
                       </div>
                     </div>
@@ -301,7 +301,7 @@ const AdminUsers = () => {
       {/* User Details Modal */}
       {isDetailsModalOpen && selectedUser && typeof document !== 'undefined' && createPortal(
         <div
-          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm"
+          className="fixed inset-0 z-9999 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm"
           onClick={closeDetailsModal}
         >
           <div
@@ -320,7 +320,7 @@ const AdminUsers = () => {
               </button>
 
               <div className="flex items-center space-x-4">
-                <div className="h-14 w-14 rounded-full bg-gradient-to-tr from-blue-500 to-blue-600 flex items-center justify-center text-white text-xl font-bold shadow-md">
+                <div className="h-14 w-14 rounded-full bg-linear-to-tr from-blue-500 to-blue-600 flex items-center justify-center text-white text-xl font-bold shadow-md">
                   {getInitials(selectedUser.name)}
                 </div>
                 <div>

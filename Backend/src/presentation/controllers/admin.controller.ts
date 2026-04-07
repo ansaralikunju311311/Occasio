@@ -103,10 +103,13 @@ export class AdminController{
            {
 
                const {userId} = req.params;
+
+                        const search = req.query.search as string
+
                console.log("ethiyooooo",userId)
                try {
                 console.log("we reached here")
-                  const user = await this.pendingmanagerDetailsUseCase.execute(userId as string);
+                  const user = await this.pendingmanagerDetailsUseCase.execute(userId as string,search);
                   console.log('the cliked manager details',user)
                   res.status(HttpStatus.OK).json({
                     user

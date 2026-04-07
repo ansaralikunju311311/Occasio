@@ -23,12 +23,18 @@ const AdminEventManagers = () => {
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  useEffect(() => {
+ 
     const fetchManagers = async () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await api.get("/admin/users");
+      const response = await api.get("/admin/users",{
+          
+          params: {
+        search: searchQuery
+      }
+
+        });
 
 
 
@@ -52,9 +58,14 @@ const AdminEventManagers = () => {
       }
     };
 
+   
+    useEffect(() => {
+  const delay = setTimeout(() => {
     fetchManagers();
-  }, []);
+  }, 1000); 
 
+  return () => clearTimeout(delay);
+}, [searchQuery]);
 
 
   const handleManager = async (userId: string, status: string) => {

@@ -63,10 +63,23 @@ export class AdminRepository implements IAdminRepository {
 
     }
 
-    async findByuserId(id: string): Promise<EventManager | null> {
+    async findByuserId(id: string,search?:string): Promise<EventManager | null> {
 
         console.log("id evide vannooo just", id)
-        const manager = await EventManagerModel.findOne({ userId: id });
+
+         const query: any = {
+    userId:id // always exclude admin
+
+  };
+       if (search) {
+    query.$or = [
+     
+      { email: { $regex: search, $options: "i" } },
+   
+    ];
+  }
+        const manager = await EventManagerModel.findOne(query);
+
 
 
 
