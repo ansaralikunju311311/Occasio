@@ -16,8 +16,8 @@ export class EventController {
 
     async eventCreation(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const user = (req as any).user;
-            const userId = user.userId;
+  const userId = req.authUser!.userId;
+            //   const userId = user.userId;
             console.log("Creating event for UserID:", userId);
             console.log("Request Body:", req.body);
             const creation = await this.eventCreationUseCase.execute(req.body, userId)
@@ -33,7 +33,7 @@ export class EventController {
     
     async allEvents(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const user = (req as any).user;
+            const user = req.authUser;
             const eventType = req.query.eventType as string;
 
             const events = await this.getEventsUseCase.execute(eventType);
@@ -79,8 +79,7 @@ export class EventController {
         try {
             
 
-            const user = (req as any).user;
-            const userId = user.userId;
+            const userId = req.authUser!.userId;
             const events = await this.myEventsUseCase.execute(userId);
             res.status(HttpStatus.OK).json({
                 events
