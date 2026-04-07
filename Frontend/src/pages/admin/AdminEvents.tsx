@@ -33,11 +33,18 @@ const AdminEvents = () => {
         }
     };
 
-    useEffect(()=>{
+    
         const fetchEvent =async ()=>{
             try {
                 setLoading(true);
-                const response = await api.get("/events/allevents");
+                const response = await api.get("/events/allevents",
+                    
+                    {
+                        params:{
+                            search:searchTerm
+                        }
+                    }
+                );
 
 
                 console.log(response)
@@ -55,8 +62,16 @@ const AdminEvents = () => {
                 setLoading(false);
             }
         }
-        fetchEvent()
-    },[])
+   
+   useEffect(() => {
+  const delay = setTimeout(() => {
+    fetchEvent();
+  }, 1000); 
+
+  return () => clearTimeout(delay);
+}, [searchTerm]);
+
+
 
     return (
         <div className="p-8 w-full min-h-screen bg-[#070b14]">

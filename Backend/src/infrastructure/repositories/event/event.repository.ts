@@ -30,20 +30,23 @@ export class EventRepository extends BaseRepository<IEventDocument> implements I
     return this.toEntity(events)
   }
 
-  async findAllEvents(eventType: string): Promise<Events[]> {
-    const query = eventType ? { eventType } : {};
-    // const searchItem = search?{search}:{}
-  //    if (eventType) {
-  //   query.eventType = eventType;
-  // }
+  async findAllEvents(eventType: string,search?:string): Promise<Events[]> {
+    const query: any = {};
+    
+     if (eventType) {
+    query.eventType = eventType;
+  }
 
-  // // 🔍 SEARCH ADD CHEYYUNNU
-  // if (search) {
-  //   query.$or = [
-  //     { title: { $regex: search, $options: "i" } },
-  //     { description: { $regex: search, $options: "i" } }
-  //   ];
-  // }
+  if (search) {
+    query.$or = [
+
+      { title: { $regex: search, $options: "i" } },
+      { description: { $regex: search, $options: "i" } },
+      {email:{$regex:search,$options:"i"}},
+            {eventType:{$regex:search,$options:"i"}},
+
+    ];
+  }
     const events = await this.model.find(query)
       .populate("createdBy")
       .populate("seatLayoutId")

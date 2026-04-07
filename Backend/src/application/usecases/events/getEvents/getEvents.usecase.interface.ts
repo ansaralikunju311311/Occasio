@@ -1,3 +1,3 @@
 export interface IGetEventsUseCase {
-    execute(eventType: string): Promise<any>;
+    execute(eventType: string,search:string): Promise<any>;
 }

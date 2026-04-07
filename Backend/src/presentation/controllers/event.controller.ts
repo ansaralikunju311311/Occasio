@@ -37,12 +37,12 @@ export class EventController {
             console.log("reachef")
             const user = req.authUser;
             const eventType = req.query.eventType as string;
-            // const search = req.query.search as string;
+             const search = req.query.search as string;
 
 
             // console.log(search,"value")
 
-            const events = await this.getEventsUseCase.execute(eventType);
+            const events = await this.getEventsUseCase.execute(eventType,search);
 
             if (!events) {
                 res.status(HttpStatus.OK).json({ events: [] });
