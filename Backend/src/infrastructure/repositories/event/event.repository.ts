@@ -32,6 +32,18 @@ export class EventRepository extends BaseRepository<IEventDocument> implements I
 
   async findAllEvents(eventType: string): Promise<Events[]> {
     const query = eventType ? { eventType } : {};
+    // const searchItem = search?{search}:{}
+  //    if (eventType) {
+  //   query.eventType = eventType;
+  // }
+
+  // // 🔍 SEARCH ADD CHEYYUNNU
+  // if (search) {
+  //   query.$or = [
+  //     { title: { $regex: search, $options: "i" } },
+  //     { description: { $regex: search, $options: "i" } }
+  //   ];
+  // }
     const events = await this.model.find(query)
       .populate("createdBy")
       .populate("seatLayoutId")
@@ -63,8 +75,17 @@ export class EventRepository extends BaseRepository<IEventDocument> implements I
     return events ? this.toEntity(events) : null;
   }
 
-  async findEvents(userId: string): Promise<Events[] | null> {
-    const events = await this.model.find({ createdBy: userId } as any)
+  async findEvents(userId: string, search?: string): Promise<Events[] | null> {
+    const query: any = { createdBy: userId as any };
+
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: "i" } },
+        { eventType: { $regex: search, $options: "i" } }
+      ];
+    }
+
+    const events = await this.model.find(query)
       .populate("createdBy")
       .populate("seatLayoutId")
       .populate("seats")

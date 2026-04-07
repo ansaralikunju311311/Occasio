@@ -1,3 +1,3 @@
 export interface IMyEventsUseCase {
-    execute(userId: string): Promise<any>;
+    execute(userId: string, search?: string): Promise<any>;
 }

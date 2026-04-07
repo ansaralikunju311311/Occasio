@@ -12,25 +12,51 @@ const EventManagerMyEvents = () => {
     const [events, setEvents] = useState<any[]>([]);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const fetchEvent = async () => {
-            try {
-                const response = await api.get("/events/myevents");
-                console.log("response", response);
-                if (response.data && response.data.events) {
-                    setEvents(response.data.events);
-                } else if (Array.isArray(response.data)) {
-                    setEvents(response.data);
-                } else {
-                    setEvents([]);
-                }
-            } catch (error: any) {
-                console.error("Error fetching my events", error);
-                toast.error(error.response?.data?.message || "Failed to load your events.");
-            }
-        };
-        fetchEvent();
-    }, []);
+    // useEffect(() => {
+    //     const fetchEvent = async () => {
+    //         try {
+    //             const response = await api.get("/events/myevents");
+    //             console.log("response", response);
+    //             if (response.data && response.data.events) {
+    //                 setEvents(response.data.events);
+    //             } else if (Array.isArray(response.data)) {
+    //                 setEvents(response.data);
+    //             } else {
+    //                 setEvents([]);
+    //             }
+    //         } catch (error: any) {
+    //             console.error("Error fetching my events", error);
+    //             toast.error(error.response?.data?.message || "Failed to load your events.");
+    //         }
+    //     };
+    //     fetchEvent();
+    // }, []);
+
+   useEffect(() => {
+  const delay = setTimeout(() => {
+    fetchEvent();
+  }, 500); // debounce 500ms
+
+  return () => clearTimeout(delay);
+}, [searchTerm]);
+    const fetchEvent = async () => {
+  try {
+    const response = await api.get("/events/myevents", {
+      params: {
+        search: searchTerm
+      }
+    });
+
+    if (response.data && response.data.events) {
+      setEvents(response.data.events);
+    } else {
+      setEvents([]);
+    }
+
+  } catch (error: any) {
+    toast.error(error.response?.data?.message || "Failed to load your events.");
+  }
+};
 
     const filteredEvents = events.filter((event) => {
         const matchesStatus = statusFilter === "ALL" || event.status === statusFilter;
@@ -149,7 +175,7 @@ const EventManagerMyEvents = () => {
                         renderRow={(event) => (
                             <tr key={event.id} className="hover:bg-slate-800/30 transition-colors group">
                                 <td className="px-6 py-4 flex flex-col justify-center">
-                                    <div className="text-white font-semibold text-sm truncate max-w-[200px] mb-1 group-hover:text-teal-400 transition-colors">
+                                    <div className="text-white font-semibold text-sm truncate max-w-50 mb-1 group-hover:text-teal-400 transition-colors">
                                         {event.title}
                                     </div>
                                     <div className="flex items-center gap-2 text-xs">

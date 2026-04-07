@@ -33,8 +33,14 @@ export class EventController {
     
     async allEvents(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
+
+            console.log("reachef")
             const user = req.authUser;
             const eventType = req.query.eventType as string;
+            // const search = req.query.search as string;
+
+
+            // console.log(search,"value")
 
             const events = await this.getEventsUseCase.execute(eventType);
 
@@ -80,7 +86,8 @@ export class EventController {
             
 
             const userId = req.authUser!.userId;
-            const events = await this.myEventsUseCase.execute(userId);
+            const search = req.query.search as string;
+            const events = await this.myEventsUseCase.execute(userId, search);
             res.status(HttpStatus.OK).json({
                 events
             })

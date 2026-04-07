@@ -8,8 +8,8 @@ export class MyEventsUseCase implements IMyEventsUseCase {
     ){}
 
 
-    async execute(userId:string){
-        const events = await this.eventRepository.findEvents(userId)
-        return events
+    async execute(userId: string, search?: string) {
+        const events = await this.eventRepository.findEvents(userId, search);
+        return events;
     }
 }
