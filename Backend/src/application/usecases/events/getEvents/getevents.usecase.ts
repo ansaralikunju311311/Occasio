@@ -10,7 +10,7 @@ export class GetEventsUseCase implements IGetEventsUseCase {
     async execute(eventType:string,search?:string){
 
 
-        const events = await this.eventRepository.findAllEvents(eventType,search);
+        const events = await this.eventRepository.findAllEvents(eventType, search || "");
         return events
     }
 }

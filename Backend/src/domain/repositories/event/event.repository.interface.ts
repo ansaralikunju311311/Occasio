@@ -19,7 +19,7 @@ export interface IEventRepository{
     layoutId: string,
     session?: mongoose.ClientSession
   ): Promise<void>;
-    findAllEvents(eventType:string):Promise<Events[] | null>
+    findAllEvents(eventType:string,search:string):Promise<Events[] | null>
     findByIdEvents(id:string):Promise<Events | null>
 
     findExactConflict(longitude:number,latitude:number,startTime:Date,endTime:Date):Promise<Events | null>

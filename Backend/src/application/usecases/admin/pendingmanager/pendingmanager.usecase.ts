@@ -10,9 +10,9 @@ export class PendingmanagerDetailsUseCase  implements IManagerDetailsUseCase {
     private adminRepository: IAdminRepository
   ) { }
 
-  async execute(userId:string,search:string): Promise<EventManager | null> {
+  async execute(userId:string,search?:string): Promise<EventManager | null> {
 
-    const user = await this.adminRepository.findByuserId(userId,search);
+    const user = await this.adminRepository.findByuserId(userId, search);
 
 
     console.log(user)
