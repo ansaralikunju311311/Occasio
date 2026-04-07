@@ -1,62 +1,14 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "../../redux/hook";
-import { api } from "../../services/api";
-import { Table } from "../../components/common/Table";
-import { toast } from "sonner";
 
 const AdminDashboard = () => {
-    const navigate = useNavigate();
-    const [recentEvents, setRecentEvents] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
     const user = useAppSelector((state) => state.auth.user);
 
     const stats = [
         { title: "Total Users", value: "0", icon: "👥", trend: "+0%" },
-        { title: "Active Events", value: recentEvents.filter(e => e.status === 'ACTIVE').length.toString(), icon: "📅", trend: "+0%" },
+        { title: "Active Events", value: "0", icon: "📅", trend: "+0%" },
         { title: "Event Managers", value: "0", icon: "👔", trend: "+0%" },
         { title: "Total Revenue", value: "₹0", icon: "💰", trend: "+0%" }
     ];
-
-    useEffect(() => {
-        const fetchAllEvents = async () => {
-            try {
-                const response = await api.get("/events");
-                if (response.data && response.data.events) {
-                    const sorted = [...response.data.events].sort((a, b) => 
-                        new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
-                    ).slice(0, 5);
-                    setRecentEvents(sorted);
-                }
-            } catch (error) {
-                console.error("Failed to fetch admin dashboard events:", error);
-                toast.error("Failed to load recent events.");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchAllEvents();
-    }, []);
-
-    const getFormatStyle = (type: string) => {
-        switch (type?.toUpperCase()) {
-            case 'ONLINE': return 'bg-sky-500/10 text-sky-400 border border-sky-500/20';
-            case 'OFFLINE': return 'bg-amber-500/10 text-amber-400 border border-amber-500/20';
-            case 'HYBRID': return 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20';
-            default: return 'bg-slate-500/10 text-slate-400 border border-slate-500/20';
-        }
-    };
-
-    const getStatusStyle = (status: string) => {
-        switch (status?.toUpperCase()) {
-            case 'ACTIVE': return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
-            case 'UPCOMING': return 'bg-blue-500/10 text-blue-400 border-blue-500/20';
-            case 'ENDED': return 'bg-rose-500/10 text-rose-400 border-rose-500/20';
-            case 'DRAFT': return 'bg-slate-500/10 text-slate-400 border-slate-500/20';
-            default: return 'bg-slate-500/10 text-slate-400 border-slate-500/20';
-        }
-    };
 
     return (
         <div className="animate-fade-in-up">
@@ -86,59 +38,6 @@ const AdminDashboard = () => {
                 ))}
             </div>
 
-            <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-2xl overflow-hidden shadow-xl">
-                <div className="p-6 border-b border-slate-800/60 flex justify-between items-center">
-                    <h3 className="text-lg font-bold text-white">Recent Platform Activity</h3>
-                    <button onClick={() => navigate('/admin/events')} className="text-emerald-400 text-sm hover:text-emerald-300 transition-colors">View All Events</button>
-                </div>
-                
-                <Table
-                    tableClassName="w-full text-left border-collapse"
-                    trHeadClassName="bg-slate-900/60 border-b border-slate-800 text-slate-400 text-xs uppercase tracking-wider font-semibold"
-                    columns={[
-                        { header: "Event Info", className: "px-6 py-4" },
-                        { header: "Format", className: "px-6 py-4" },
-                        { header: "Status", className: "px-6 py-4" },
-                        { header: "Date Created", className: "px-6 py-4 text-right" }
-                    ]}
-                    data={recentEvents}
-                    loading={loading}
-                    emptyState={
-                        <tr>
-                            <td colSpan={4} className="px-6 py-12 text-center text-slate-500">
-                                <p>No events found on the platform yet.</p>
-                            </td>
-                        </tr>
-                    }
-                    renderRow={(event) => (
-                        <tr key={event.id} className="hover:bg-slate-800/30 transition-colors group">
-                            <td className="px-6 py-4">
-                                <div className="text-white font-semibold text-sm group-hover:text-emerald-400 transition-colors">
-                                    {event.title}
-                                </div>
-                                <div className="text-xs text-slate-500 mt-0.5 capitalize">
-                                    by {event.creatorDetails?.name || 'Unknown'}
-                                </div>
-                            </td>
-                            <td className="px-6 py-4">
-                                <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${getFormatStyle(event.eventType)}`}>
-                                    {event.eventType || 'UNKNOWN'}
-                                </span>
-                            </td>
-                            <td className="px-6 py-4">
-                                <span className={`px-2.5 py-0.5 text-[10px] font-bold uppercase rounded-full border ${getStatusStyle(event.status)}`}>
-                                    {event.status || 'UNKNOWN'}
-                                </span>
-                            </td>
-                            <td className="px-6 py-4 text-right">
-                                <span className="text-sm text-slate-400 font-mono">
-                                    {event.createdAt ? new Date(event.createdAt).toLocaleDateString() : 'N/A'}
-                                </span>
-                            </td>
-                        </tr>
-                    )}
-                />
-            </div>
         </div>
     );
 };
