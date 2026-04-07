@@ -88,8 +88,11 @@ const LandingPage = () => {
             [];
         if (!blocks.length) return null;
         const prices = blocks
-            .map((b: any) => b.category?.price)
-            .filter((p: any) => typeof p === "number" && p > 0);
+            .map((b: any) => {
+                const price = b.category?.price ?? b.price;
+                return Number(price);
+            })
+            .filter((p: number) => !isNaN(p) && p > 0);
         return prices.length > 0 ? Math.min(...prices) : null;
     };
 
@@ -303,21 +306,33 @@ const LandingPage = () => {
                                             {event.eventType}
                                         </span>
                                     </div>
-                                    {event.price === 0 && (
-                                        <div className="absolute top-4 right-4">
-                                            <span className="px-3 py-1 rounded-full bg-emerald-500 text-[10px] font-bold text-white uppercase tracking-wider shadow-lg">
-                                                Free
-                                            </span>
-                                        </div>
-                                    )}
+                                    {(() => {
+                                        const type = event.eventType?.toUpperCase();
+                                        const minSeatPrice = getMinSeatPrice(event);
+                                        const onlinePrice = Number(event.price) || 0;
+                                        
+                                        let isFree = false;
+                                        if (type === 'ONLINE') isFree = onlinePrice === 0;
+                                        else if (type === 'OFFLINE') isFree = (minSeatPrice === null || minSeatPrice === 0) && onlinePrice === 0;
+                                        else if (type === 'HYBRID') isFree = onlinePrice === 0 && (minSeatPrice === null || minSeatPrice === 0);
+                                        else isFree = onlinePrice === 0;
+
+                                        return isFree && (
+                                            <div className="absolute top-4 right-4">
+                                                <span className="px-3 py-1 rounded-full bg-emerald-500 text-[10px] font-bold text-white uppercase tracking-wider shadow-lg">
+                                                    Free
+                                                </span>
+                                            </div>
+                                        );
+                                    })()}
                                 </div>
 
                                 <div className="p-8 flex flex-col flex-1">
-                                    <div className="flex items-center gap-2 text-indigo-400 text-[10px] font-bold mb-4 uppercase tracking-[0.2em]">
-                                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <div className="flex items-center gap-2 text-indigo-400 text-[10px] font-bold mb-4 uppercase tracking-[0.2em] break-words">
+                                        <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                         </svg>
-                                        {formatDate(event.startTime)}
+                                        <span>{formatDate(event.startTime)} {event.endTime && ` - ${formatDate(event.endTime)}`}</span>
                                     </div>
                                     <h3 className="text-2xl font-bold text-white mb-3 line-clamp-1 group-hover:text-indigo-400 transition-colors tracking-tight">
                                         {event.title}
@@ -478,9 +493,53 @@ const LandingPage = () => {
                             <div className="grid grid-cols-2 gap-8 mb-10">
                                 <div className="space-y-2">
                                     <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Pricing</p>
-                                    <p className="text-2xl font-bold text-white">
-                                        {selectedEvent.price > 0 ? `$${selectedEvent.price}` : <span className="text-emerald-400 font-extrabold">FREE</span>}
-                                    </p>
+                                    <div className="text-2xl font-bold text-white">
+                                        {(() => {
+                                            const type = selectedEvent.eventType?.toUpperCase();
+                                            const minSeatPrice = getMinSeatPrice(selectedEvent);
+                                            const onlinePrice = Number(selectedEvent.price) || 0;
+
+                                            if (type === "ONLINE") {
+                                                return onlinePrice > 0
+                                                    ? <span>₹{onlinePrice}</span>
+                                                    : <span className="text-emerald-400 font-extrabold">FREE</span>;
+                                            }
+
+                                            if (type === "OFFLINE") {
+                                                if (minSeatPrice !== null && minSeatPrice > 0) {
+                                                    return <span>₹{minSeatPrice}</span>;
+                                                }
+                                                return onlinePrice > 0
+                                                    ? <span>₹{onlinePrice}</span>
+                                                    : <span className="text-emerald-400 font-extrabold">FREE</span>;
+                                            }
+
+                                            if (type === "HYBRID") {
+                                                return (
+                                                    <div className="flex flex-col gap-1 text-base">
+                                                        {minSeatPrice !== null && minSeatPrice > 0 && (
+                                                            <span className="text-slate-300">
+                                                                Venue: <span className="text-white font-bold text-xl">₹{minSeatPrice}</span>
+                                                            </span>
+                                                        )}
+                                                        {onlinePrice > 0 && (
+                                                            <span className="text-slate-300">
+                                                                Online: <span className="text-indigo-400 font-bold text-xl">₹{onlinePrice}</span>
+                                                            </span>
+                                                        )}
+                                                        {(!(minSeatPrice && minSeatPrice > 0) && !onlinePrice) && (
+                                                            <span className="text-emerald-400 font-extrabold text-2xl">FREE</span>
+                                                        )}
+                                                    </div>
+                                                );
+                                            }
+
+                                            // Fallback
+                                            return onlinePrice > 0
+                                                ? <span>₹{onlinePrice}</span>
+                                                : <span className="text-emerald-400 font-extrabold">FREE</span>;
+                                        })()}
+                                    </div>
                                 </div>
                                 <div className="space-y-2">
                                     <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Attendance</p>
