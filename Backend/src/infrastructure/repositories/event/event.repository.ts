@@ -78,6 +78,16 @@ export class EventRepository extends BaseRepository<IEventDocument> implements I
     return events ? this.toEntity(events) : null;
   }
 
+
+    // async findEvents(eventType:string,startTime:Date){
+    //   const event = await this.model.find({startTime,eventType})
+
+    //     return event?this.toEntity(event):null
+      
+    // }
+
+
+
   async findEvents(userId: string, search?: string): Promise<Events[] | null> {
     const query: any = { createdBy: userId as any };
 

@@ -32,3 +32,9 @@ const managerApprovalUseCase = new ManagerApprovalUseCase(userRepository, emailS
      return new AdminController(findAllUseCase,userManageUseCase,userDetailsUseCase,pendingmanagerDetailsUseCase,managerApprovalUseCase,managerRejectionUseCase,managerDetailsUseCase
      )
 }
+
+
+
+
+
+
