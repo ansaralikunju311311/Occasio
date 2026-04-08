@@ -1,62 +1,56 @@
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../redux/hook';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { api } from '../services/api';
 import EventMap from '../components/eventManager/EventMap';
 import CurrentLocation from '../components/user/CurrentLocation';
 import { EventType } from './eventManager/CreateEvent';
 
+import { useQuery, useMutation } from '@tanstack/react-query';
+
 const LandingPage = () => {
-  const [events, setEvents] = useState<any[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [eventFilter, setEventFilter] = useState('ALL');
   const navigate = useNavigate();
   const user = useAppSelector((state) => state.auth.user);
 
-  const fetchEvents = async (eventType: string = 'ALL') => {
-    try {
-      setLoading(true);
-
+  const {
+    data: events = [],
+    isLoading: loading,
+    error,
+  } = useQuery({
+    queryKey: ['events', eventFilter],
+    queryFn: async () => {
       const queryParams: any = {};
-
-      if (eventType && eventType.toUpperCase() !== 'ALL') {
-        queryParams.eventType = eventType;
+      if (eventFilter && eventFilter.toUpperCase() !== 'ALL') {
+        queryParams.eventType = eventFilter;
       }
-
       const response = await api.get('/events/events', { params: queryParams });
-
-      console.log('foe the checking response for layout defining', response);
       const fetchedEvents = response.data.events || [];
-      setEvents(Array.isArray(fetchedEvents) ? fetchedEvents : []);
-      console.log('Fetched Events:', fetchedEvents);
-    } catch (err: any) {
-      setError('Failed to fetch events');
-    } finally {
-      setLoading(false);
-    }
-  };
+      return Array.isArray(fetchedEvents) ? fetchedEvents : [];
+    },
+  });
 
-  useEffect(() => {
-    fetchEvents();
-  }, []);
-  const viewEventDetails = async (id: string) => {
-    try {
-      setLoading(true);
-      const response = await api.get(`/events/eventDetails/${id}`);
-
-      console.log('view Details click time the response', response);
+  const detailMutation = useMutation({
+    mutationFn: (id: string) => api.get(`/events/eventDetails/${id}`),
+    onSuccess: (response) => {
       const eventData = response.data.events;
       setSelectedEvent(eventData);
       setIsDetailsModalOpen(true);
-    } catch (err: any) {
+    },
+    onError: (err: any) => {
       console.error('Failed to fetch event details:', err);
-      setError('Could not load event details. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+    },
+  });
+
+  const fetchEvents = (eventType: string = 'ALL') => {
+    setEventFilter(eventType);
+  };
+
+  const viewEventDetails = (id: string) => {
+    detailMutation.mutate(id);
   };
 
   const closeDetailsModal = () => {
@@ -320,7 +314,9 @@ const LandingPage = () => {
         </div>
         {error && (
           <div className="text-center py-10 bg-red-500/10 border border-red-500/20 rounded-2xl mb-12">
-            <p className="text-red-400 font-light">{error}</p>
+            <p className="text-red-400 font-light">
+              {error instanceof Error ? error.message : String(error)}
+            </p>
             <button
               onClick={() => window.location.reload()}
               className="text-indigo-400 text-sm mt-2 hover:underline"

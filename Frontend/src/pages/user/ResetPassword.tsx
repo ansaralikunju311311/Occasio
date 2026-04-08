@@ -13,10 +13,13 @@ type ResetPasswordForm = {
   confirmpassword: string;
 };
 
+import { useMutation } from '@tanstack/react-query';
+
 const ResetPassword: React.FC = () => {
   const [timeleft, setTimeleft] = useState(60);
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('user') || '{}');
+
   const {
     register,
     handleSubmit,
@@ -26,16 +29,42 @@ const ResetPassword: React.FC = () => {
     mode: 'onBlur',
   });
 
+  const resetMutation = useMutation({
+    mutationFn: (data: ResetPasswordForm) =>
+      api.post('/auth/reset-password', {
+        otp: data.otp,
+        password: data.password,
+        confirmpassword: data.confirmpassword,
+        email: user.email,
+      }),
+    onSuccess: () => {
+      toast.success('Password reset successfully! Please login.');
+      localStorage.removeItem('user');
+      navigate('/login');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Something went wrong');
+    },
+  });
+
+  const resendMutation = useMutation({
+    mutationFn: () => api.post('/auth/resend-otp', { email: user.email }),
+    onSuccess: () => {
+      toast.success('New OTP sent to your email!');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Something went wrong');
+    },
+  });
+
   useEffect(() => {
     if (!user?.otpSendAt) return;
 
     const sentTime = new Date(user.otpSendAt).getTime();
-
     const resendTime = sentTime + 60 * 1000;
 
     const timer = setInterval(() => {
       const now = new Date().getTime();
-
       const remaining = Math.floor((resendTime - now) / 1000);
 
       if (remaining <= 0) {
@@ -49,48 +78,14 @@ const ResetPassword: React.FC = () => {
     return () => clearInterval(timer);
   }, [user.otpSendAt]);
 
-  const onSubmit = async (data: ResetPasswordForm) => {
-    try {
-      const response = await api.post('/auth/reset-password', {
-        otp: data.otp,
-        password: data.password,
-        confirmpassword: data.confirmpassword,
-        email: user.email,
-      });
-
-      console.log('re', response);
-
-      console.log('Reset password data:', data);
-      toast.success('Password reset successfully! Please login.');
-      localStorage.removeItem('user');
-      navigate('/login');
-    } catch (error: any) {
-      // localStorage.removeItem("user");
-
-      if (error.response) {
-        toast.error(error.response.data.message);
-      } else {
-        toast.error('Something went wrong');
-      }
-    }
+  const onSubmit = (data: ResetPasswordForm) => {
+    resetMutation.mutate(data);
   };
 
-  const resendOtp = async () => {
-    try {
-      const response = await api.post('/auth/resend-otp', {
-        email: user.email,
-      });
-
-      console.log(response);
-      toast.success('New OTP sent to your email!');
-    } catch (error: any) {
-      if (error.response) {
-        toast.error(error.response.data.message);
-      } else {
-        toast.error('Something went wrong');
-      }
-    }
+  const resendOtp = () => {
+    resendMutation.mutate();
   };
+
 
   return (
     <div className="min-h-screen flex bg-gray-50">

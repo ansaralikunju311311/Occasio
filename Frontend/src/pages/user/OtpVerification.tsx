@@ -8,74 +8,38 @@ import { useAppDispatch } from '../../redux/hook';
 import { setAuth } from '../../redux/slices/authSlice';
 import { toast } from 'sonner';
 import HomeButton from '../../components/common/HomeButton';
+import { useMutation } from '@tanstack/react-query';
+
 const OtpVerification = () => {
   const [timeleft, setTimeLeft] = useState(60);
   const [userData, setUserData] = useState(() => JSON.parse(localStorage.getItem('user') || '{}'));
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<OtpData>({
-    mode: 'onBlur',
-  });
 
-  // console.log(user.email);
-
-  useEffect(() => {
-    if (!userData?.otpSendAt) return;
-
-    const sentTime = new Date(userData.otpSendAt).getTime();
-
-    const resendTime = sentTime + 60 * 1000;
-
-    const timer = setInterval(() => {
-      const now = new Date().getTime();
-
-      const remaining = Math.floor((resendTime - now) / 1000);
-
-      if (remaining <= 0) {
-        setTimeLeft(0);
-        clearInterval(timer);
-      } else {
-        setTimeLeft(remaining);
-      }
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [userData.otpSendAt]);
-
-  const resendOtp = async () => {
-    try {
-      const details = await api.post('/auth/resend-otp', {
-        email: userData.email,
-      });
-
-      console.log(details);
+  // Resend OTP Mutation
+  const resendMutation = useMutation({
+    mutationFn: () => api.post('/auth/resend-otp', { email: userData.email }),
+    onSuccess: (response) => {
+      console.log(response);
       toast.success('OTP resent successfully!');
-
       const updatedUser = { ...userData, otpSendAt: new Date().toISOString() };
       localStorage.setItem('user', JSON.stringify(updatedUser));
       setUserData(updatedUser);
       setTimeLeft(60);
-    } catch (error: any) {
-      if (error.response) {
-        toast.error(error.response.data.message);
-      } else {
-        toast.error('Something went wrong');
-      }
-    }
-  };
-  const onSubmit = async (data: OtpData) => {
-    console.log(data);
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Something went wrong');
+    },
+  });
 
-    try {
-      const response = await api.post('/auth/verify-otp', {
+  // Verify OTP Mutation
+  const verifyMutation = useMutation({
+    mutationFn: (otp: string) =>
+      api.post('/auth/verify-otp', {
         email: userData.email,
-        otp: data.otp,
-      });
-      console.log(response);
+        otp: otp,
+      }),
+    onSuccess: (response) => {
       toast.success('OTP verified!');
       localStorage.removeItem('user');
       localStorage.setItem('accessToken', response.data.accessToken);
@@ -91,16 +55,47 @@ const OtpVerification = () => {
       } else if (response.data.user.role === 'USER') {
         navigate('/');
       }
-    } catch (error: any) {
-      console.log('error happen incorrect  otp');
-      // localStorage.removeItem("user");
-      if (error.response) {
-        toast.error(error.response.data.message);
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Something went wrong');
+    },
+  });
+
+  useEffect(() => {
+    if (!userData?.otpSendAt) return;
+
+    const sentTime = new Date(userData.otpSendAt).getTime();
+    const resendTime = sentTime + 60 * 1000;
+
+    const timer = setInterval(() => {
+      const now = new Date().getTime();
+      const remaining = Math.floor((resendTime - now) / 1000);
+
+      if (remaining <= 0) {
+        setTimeLeft(0);
+        clearInterval(timer);
       } else {
-        toast.error('Something went wrong');
+        setTimeLeft(remaining);
       }
-    }
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [userData.otpSendAt]);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<OtpData>({
+    mode: 'onBlur',
+  });
+
+  const resendOtp = () => resendMutation.mutate();
+
+  const onSubmit = (data: OtpData) => {
+    verifyMutation.mutate(data.otp);
   };
+
   return (
     <div className="min-h-screen flex bg-gray-50">
       {/* Left Side Image Section */}

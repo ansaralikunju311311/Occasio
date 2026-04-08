@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { api } from '../../services/api';
 import HomeButton from '../../components/common/HomeButton';
 import { toast } from 'sonner';
@@ -10,34 +11,36 @@ import EventDetailsModal from '../../components/admin/EventDetailsModal';
 const EventManagerMyEvents = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
-  const [events, setEvents] = useState<any[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const delay = setTimeout(() => {
-      fetchEvent();
-    }, 500); // debounce 500ms
-
-    return () => clearTimeout(delay);
-  }, [searchTerm]);
-  const fetchEvent = async () => {
-    try {
+  const {
+    data: events = [],
+    isLoading: loading,
+    error,
+  } = useQuery<any[]>({
+    queryKey: ['myEvents', searchTerm],
+    queryFn: async () => {
       const response = await api.get('/events/myevents', {
         params: {
           search: searchTerm,
         },
       });
+      return response.data?.events || [];
+    },
+  });
 
-      if (response.data && response.data.events) {
-        setEvents(response.data.events);
-      } else {
-        setEvents([]);
-      }
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to load your events.');
-    }
-  };
+  if (error) {
+    toast.error('Failed to load your events.');
+  }
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-full min-h-[60vh] bg-[#070b14]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500"></div>
+      </div>
+    );
+  }
 
   const filteredEvents = events.filter((event) => {
     const matchesStatus = statusFilter === 'ALL' || event.status === statusFilter;

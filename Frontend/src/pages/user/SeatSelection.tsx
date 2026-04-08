@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../../services/api';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
@@ -224,28 +224,28 @@ const OnlinePassCard = ({ price }: { price: number }) => (
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
+import { useQuery } from '@tanstack/react-query';
+
 const SeatSelection = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [event, setEvent] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
   const [bookingType, setBookingType] = useState<'physical' | 'online'>('physical');
 
-  useEffect(() => {
-    const fetchEventDetails = async () => {
+  const { data: event, isLoading: loading } = useQuery({
+    queryKey: ['eventSeats', id],
+    queryFn: async () => {
       try {
         const response = await api.get(`/events/eventDetails/${id}`);
-        setEvent(response.data.events);
+        return response.data.events;
       } catch {
         toast.error('Failed to load event details');
         navigate('/');
-      } finally {
-        setLoading(false);
+        return null;
       }
-    };
-    fetchEventDetails();
-  }, [id, navigate]);
+    },
+    enabled: !!id,
+  });
 
   // Group flat seat array
   const groupedBlocks = useMemo<GroupedBlock[]>(() => {

@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { api } from '../../services/api';
 import { toast } from 'sonner';
 import { Table } from '../../components/common/Table';
@@ -8,9 +9,31 @@ import EventDetailsModal from '../../components/admin/EventDetailsModal';
 const AdminEvents = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
-  const [events, setEvents] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
+
+  const {
+    data: events = [],
+    isLoading: loading,
+    error,
+  } = useQuery<any[]>({
+    queryKey: ['adminEvents', searchTerm],
+    queryFn: async () => {
+      const response = await api.get('/events/allevents', {
+        params: { search: searchTerm },
+      });
+
+      if (response.data && response.data.events) {
+        return response.data.events;
+      } else if (Array.isArray(response.data)) {
+        return response.data;
+      }
+      return [];
+    },
+  });
+
+  if (error) {
+    toast.error('Failed to load events list.');
+  }
 
   const filteredEvents = events.filter((event) => {
     const matchesStatus = statusFilter === 'ALL' || event.status === statusFilter;
@@ -42,43 +65,6 @@ const AdminEvents = () => {
         return 'text-slate-400 bg-slate-400/10';
     }
   };
-
-  const fetchEvent = async () => {
-    try {
-      setLoading(true);
-      const response = await api.get(
-        '/events/allevents',
-
-        {
-          params: {
-            search: searchTerm,
-          },
-        }
-      );
-
-      console.log(response);
-      if (response.data && response.data.events) {
-        setEvents(response.data.events);
-      } else if (Array.isArray(response.data)) {
-        setEvents(response.data);
-      } else {
-        setEvents([]);
-      }
-    } catch (error: any) {
-      console.error('Error fetching events', error);
-      toast.error(error.response?.data?.message || 'Failed to load events list.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    const delay = setTimeout(() => {
-      fetchEvent();
-    }, 1000);
-
-    return () => clearTimeout(delay);
-  }, [searchTerm]);
 
   return (
     <div className="p-8 w-full min-h-screen bg-[#070b14]">

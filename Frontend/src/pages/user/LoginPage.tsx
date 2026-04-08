@@ -9,25 +9,20 @@ import { useAppDispatch } from '../../redux/hook';
 import { setAuth } from '../../redux/slices/authSlice';
 import { toast } from 'sonner';
 // import { useDispatch } from "react-redux";
+import { useMutation } from '@tanstack/react-query';
+
 const LoginPage = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<LoginDataType>({
-    mode: 'onBlur',
-  });
 
-  console.log('user');
-  const onSubmit = async (data: LoginDataType) => {
-    try {
-      const response = await api.post('/auth/login', {
+  const loginMutation = useMutation({
+    mutationFn: (data: LoginDataType) =>
+      api.post('/auth/login', {
         email: data.email,
         password: data.password,
         role: 'USER',
-      });
+      }),
+    onSuccess: (response) => {
       console.log('response', response.data.accessToken);
       localStorage.setItem('accessToken', response.data.accessToken);
 
@@ -39,15 +34,26 @@ const LoginPage = () => {
 
       toast.success('Login successful!');
       navigate('/');
-    } catch (error: any) {
+    },
+    onError: (error: any) => {
       if (error.response) {
         toast.error(error.response.data.message || 'Login failed');
       } else {
         toast.error('Something went wrong');
       }
-    }
+    },
+  });
 
-    // console.log("Submitted Data:", data);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginDataType>({
+    mode: 'onBlur',
+  });
+
+  const onSubmit = (data: LoginDataType) => {
+    loginMutation.mutate(data);
   };
 
   return (

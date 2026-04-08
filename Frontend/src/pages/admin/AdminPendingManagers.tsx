@@ -1,19 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { UpgradeStatus } from '../../types/upgrade-status.enum';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { api } from '../../services/api';
 import { toast } from 'sonner';
 import { Table } from '../../components/common/Table';
 import { SearchBar } from '../../components/common/SearchBar';
-interface PendingManager {
-  _id?: string;
-  id?: string;
-  name: string;
-  email: string;
-  status: string;
-  createdAt?: string;
-  applyingupgrade?: UpgradeStatus;
-}
 
 interface ManagerDetails {
   _id: string;
@@ -29,8 +21,7 @@ interface ManagerDetails {
 }
 
 const AdminPendingManagers = () => {
-  const [managers, setManagers] = useState<PendingManager[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const queryClient = useQueryClient();
   const [selectedManager, setSelectedManager] = useState<ManagerDetails | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [fetchingDetails, setFetchingDetails] = useState(false);
@@ -39,57 +30,63 @@ const AdminPendingManagers = () => {
   const [rejectionId, setRejectionId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const fetchUsers = async () => {
-    try {
-      setLoading(true);
-
+  // Fetching Managers
+  const { data: managers = [], isLoading: loading } = useQuery({
+    queryKey: ['pendingManagers', searchQuery],
+    queryFn: async () => {
       const response = await api.get('/admin/users', {
-        params: {
-          search: searchQuery,
-        },
+        params: { search: searchQuery },
       });
-
-      console.log('users are coming', response);
 
       const usersData: any[] = Array.isArray(response.data)
         ? response.data
         : response.data?.users || response.data?.data || [];
 
-      const pendingManagers = usersData.filter(
-        (user) => user.applyingupgrade === UpgradeStatus.PENDING
-      );
+      return usersData.filter((user) => user.applyingupgrade === UpgradeStatus.PENDING);
+    },
+    // Adding staleTime or other options if needed, but default is fine
+  });
 
-      console.log('pendingManager', pendingManagers);
-      setManagers(pendingManagers);
-    } catch (err: any) {
-      console.error('Failed to fetch users:', err);
-      toast.error('Failed to load pending managers list.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Approval Mutation
+  const approveMutation = useMutation({
+    mutationFn: (id: string) => api.patch(`admin/approval/${id}`),
+    onSuccess: () => {
+      toast.success('Manager application approved successfully!');
+      queryClient.invalidateQueries({ queryKey: ['pendingManagers'] });
+      setIsModalOpen(false);
+    },
+    onError: (error: any) => {
+      console.error('Approval failed:', error);
+      toast.error('Failed to approve manager application.');
+    },
+  });
 
-  useEffect(() => {
-    const delay = setTimeout(() => {
-      fetchUsers();
-    }, 1000);
-
-    return () => clearTimeout(delay);
-  }, [searchQuery]);
+  // Rejection Mutation
+  const rejectMutation = useMutation({
+    mutationFn: ({ id, reason }: { id: string; reason?: string }) =>
+      api.patch(`admin/rejection/${id}`, { reason }),
+    onSuccess: () => {
+      toast.success('Manager application rejected.');
+      queryClient.invalidateQueries({ queryKey: ['pendingManagers'] });
+      setIsModalOpen(false);
+      setIsRejectionModalOpen(false);
+      setRejectionReason('');
+    },
+    onError: (error: any) => {
+      console.error('Rejection failed:', error);
+      toast.error('Failed to reject manager application.');
+    },
+  });
 
   const handleManagerDetails = async (userId: string) => {
     try {
       setFetchingDetails(true);
       const response = await api.get(`/admin/pendingmanagers/${userId}`);
-      console.log('manager details get  for the checking purpose', response);
 
-      // Extract the manager details object safely
       let details = response.data;
       if (details.data?.user) details = details.data.user;
       else if (details.user) details = details.user;
       else if (details.data) details = details.data;
-
-      console.log('Extracted details:', details);
 
       if (typeof details.socialLinks === 'string') {
         details.socialLinks = details.socialLinks
@@ -110,35 +107,10 @@ const AdminPendingManagers = () => {
     }
   };
 
-  const handleApproval = async (id: string) => {
-    try {
-      const response = await api.patch(`admin/approval/${id}`);
+  const handleApproval = (id: string) => approveMutation.mutate(id);
 
-      console.log(response);
-      toast.success('Manager application approved successfully!');
-      setManagers((prev) => prev.filter((m) => (m._id || m.id) !== id));
-      setIsModalOpen(false);
-    } catch (error) {
-      console.error('Approval failed:', error);
-      toast.error('Failed to approve manager application.');
-    }
-  };
+  const handleRejection = (id: string, reason?: string) => rejectMutation.mutate({ id, reason });
 
-  const handleRejection = async (id: string, reason?: string) => {
-    try {
-      const response = await api.patch(`admin/rejection/${id}`, { reason });
-      console.log(response);
-
-      toast.success('Manager application rejected.');
-      setManagers((prev) => prev.filter((m) => (m._id || m.id) !== id));
-      setIsModalOpen(false);
-      setIsRejectionModalOpen(false);
-      setRejectionReason('');
-    } catch (error) {
-      console.error('Rejection failed:', error);
-      toast.error('Failed to reject manager application.');
-    }
-  };
   const getInitials = (name: string) => {
     if (!name) return 'M';
     return name.substring(0, 2).toUpperCase();

@@ -8,8 +8,23 @@ type ForgotPasswordForm = {
   email: string;
 };
 
+import { useMutation } from '@tanstack/react-query';
+
 const Forgotpassword = () => {
   const navigate = useNavigate();
+
+  const forgotMutation = useMutation({
+    mutationFn: (email: string) => api.post('/auth/forgot-password', { email }),
+    onSuccess: (response) => {
+      toast.success('Recovery OTP sent to your email!');
+      localStorage.setItem('user', JSON.stringify(response.data.data));
+      navigate('/resetpassword');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to send OTP');
+    },
+  });
+
   const {
     register,
     handleSubmit,
@@ -18,30 +33,8 @@ const Forgotpassword = () => {
     mode: 'onBlur',
   });
 
-  const onSubmit = async (data: ForgotPasswordForm) => {
-    // For now we just log; integrate API to send OTP here later
-    console.log('Forgot password email:', data.email);
-
-    try {
-      console.log('requessssss');
-      const response = await api.post('/auth/forgot-password', {
-        email: data.email,
-      });
-
-      console.log(response);
-      toast.success('Recovery OTP sent to your email!');
-
-      localStorage.setItem('user', JSON.stringify(response.data.data));
-
-      navigate('/resetpassword');
-      console.log(response);
-    } catch (error: any) {
-      if (error.response) {
-        toast.error(error.response.data.message || 'Failed to send OTP');
-      } else {
-        toast.error('Something went wrong');
-      }
-    }
+  const onSubmit = (data: ForgotPasswordForm) => {
+    forgotMutation.mutate(data.email);
   };
 
   return (

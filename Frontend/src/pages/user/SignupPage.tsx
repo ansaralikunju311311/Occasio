@@ -6,8 +6,33 @@ import { api } from '../../services/api';
 import { Link } from 'react-router-dom';
 import PasswordInput from '../../components/common/PasswordInput';
 import { toast } from 'sonner';
+import { useMutation } from '@tanstack/react-query';
+
 const SignupPage = () => {
   const navigate = useNavigate();
+
+  const signupMutation = useMutation({
+    mutationFn: (data: SignDataType) =>
+      api.post('/auth/signup', {
+        name: data.name,
+        email: data.email,
+        password: data.password,
+        confirmpassword: data.confirmpassword,
+        role: 'USER',
+      }),
+    onSuccess: (response) => {
+      localStorage.setItem('user', JSON.stringify(response.data.data));
+      toast.success('Account created! Please verify your email.');
+      navigate('/otpverification');
+    },
+    onError: (error: any) => {
+      if (error.response) {
+        toast.error(error.response.data.message || 'Signup failed');
+      } else {
+        toast.error('Something went wrong');
+      }
+    },
+  });
 
   const {
     register,
@@ -18,27 +43,8 @@ const SignupPage = () => {
     mode: 'onBlur',
   });
 
-  const onSubmit = async (data: SignDataType) => {
-    try {
-      console.log('Submitting signup...');
-      const response = await api.post('/auth/signup', {
-        name: data.name,
-        email: data.email,
-        password: data.password,
-        confirmpassword: data.confirmpassword,
-        role: 'USER',
-      });
-
-      localStorage.setItem('user', JSON.stringify(response.data.data));
-      toast.success('Account created! Please verify your email.');
-      navigate('/otpverification');
-    } catch (error: any) {
-      if (error.response) {
-        toast.error(error.response.data.message || 'Signup failed');
-      } else {
-        toast.error('Something went wrong');
-      }
-    }
+  const onSubmit = (data: SignDataType) => {
+    signupMutation.mutate(data);
   };
 
   return (

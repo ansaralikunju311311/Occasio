@@ -4,44 +4,40 @@ import { useAppDispatch } from '../../redux/hook';
 import { setAuth } from '../../redux/slices/authSlice';
 import { api } from '../../services/api';
 
+import { useQuery } from '@tanstack/react-query';
+
 const OAuthSuccess = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const token = searchParams.get('token');
 
   useEffect(() => {
-    const token = searchParams.get('token');
-
     if (token) {
       localStorage.setItem('accessToken', token);
-
-      const fetchUser = async () => {
-        try {
-          const response = await api.get('/auth/me');
-          if (response.data && response.data.user) {
-            dispatch(
-              setAuth({
-                user: response.data.user,
-              })
-            );
-
-            if (response.data.user.role === 'EVENT_MANAGER') {
-              navigate('/eventmanager');
-            } else {
-              navigate('/');
-            }
-          }
-        } catch (error) {
-          console.error('Failed to fetch user after OAuth:', error);
-          navigate('/login');
-        }
-      };
-
-      fetchUser();
     } else {
       navigate('/login');
     }
-  }, [searchParams, navigate, dispatch]);
+  }, [token, navigate]);
+
+  useQuery({
+    queryKey: ['me'],
+    queryFn: async () => {
+      const response = await api.get('/auth/me');
+      if (response.data && response.data.user) {
+        dispatch(setAuth({ user: response.data.user }));
+        if (response.data.user.role === 'EVENT_MANAGER') {
+          navigate('/eventmanager');
+        } else {
+          navigate('/');
+        }
+        return response.data.user;
+      }
+      throw new Error('User not found');
+    },
+    enabled: !!token,
+    retry: false,
+  });
 
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center text-white">

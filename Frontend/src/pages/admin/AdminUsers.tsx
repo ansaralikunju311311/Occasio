@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { api } from '../../services/api';
 import { UpgradeStatus } from '../../types/upgrade-status.enum';
@@ -20,87 +20,64 @@ interface User {
   rejectedAt?: Date | null;
 }
 
-const AdminUsers = () => {
-  const [users, setUsers] = useState<User[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+const AdminUsers = () => {
+  const queryClient = useQueryClient();
+  const [searchTerm, setSearchTerm] = useState('');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState<boolean>(false);
 
-  const fetchUsers = async () => {
-    try {
-      setLoading(true);
-      setError(null);
+  const {
+    data: users = [],
+    isLoading: loading,
+    error,
+  } = useQuery<User[]>({
+    queryKey: ['adminUsers', searchTerm],
+    queryFn: async () => {
       const response = await api.get('/admin/users', {
-        params: {
-          search: searchTerm,
-        },
+        params: { search: searchTerm },
       });
-
       const usersData = (
         Array.isArray(response.data)
           ? response.data
           : response.data?.users || response.data?.data || []
       ) as User[];
+      return usersData.filter((user) => user.role === 'USER');
+    },
+  });
 
-      setUsers(usersData.filter((user) => user.role === 'USER'));
-    } catch (err: any) {
-      console.error('Failed to fetch users:', err);
-      const errorMsg =
-        err?.response?.data?.message || 'Failed to load users. Please try again later.';
-      setError(errorMsg);
-      toast.error(errorMsg);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    const delay = setTimeout(() => {
-      fetchUsers();
-    }, 1000);
-
-    return () => clearTimeout(delay);
-  }, [searchTerm]);
-
-  const handleUser = async (userId: string, userStatus: string) => {
-    console.log(userId, userStatus);
-    const newstatus = userStatus === 'ACTIVE' ? 'BLOCK' : 'ACTIVE';
-
-    setUsers((prevUsers) =>
-      prevUsers.map((user) =>
-        (user._id || user.id) === userId ? { ...user, status: newstatus } : user
-      )
-    );
-
-    try {
-      await api.patch(`/admin/blockorunblock/${userId}`, {
-        status: newstatus,
-      });
-    } catch (error: any) {
-      console.error('Failed to block/unblock user:', error);
+  const blockMutation = useMutation({
+    mutationFn: ({ userId, status }: { userId: string; status: string }) =>
+      api.patch(`/admin/blockorunblock/${userId}`, { status }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminUsers'] });
+      toast.success('User status updated successfully.');
+    },
+    onError: (error: any) => {
       toast.error(error.response?.data?.message || 'Failed to update user status.');
-      // Revert UI on failure
-      setUsers((prevUsers) =>
-        prevUsers.map((user) =>
-          (user._id || user.id) === userId ? { ...user, status: userStatus } : user
-        )
-      );
-    }
-  };
+    },
+  });
 
-  const detailsView = async (userId: string) => {
-    try {
-      const response = await api.get(`/admin/userDetails/${userId}`);
+  const detailsMutation = useMutation({
+    mutationFn: (userId: string) => api.get(`/admin/userDetails/${userId}`),
+    onSuccess: (response) => {
       const userData = response.data?.user || response.data?.data || response.data;
       setSelectedUser(userData);
       setIsDetailsModalOpen(true);
-    } catch (error: any) {
-      console.error('Failed to fetch user details:', error);
+    },
+    onError: (error: any) => {
       toast.error(error.response?.data?.message || 'Failed to load user details.');
-    }
+    },
+  });
+
+  const handleUser = async (userId: string, userStatus: string) => {
+    const newstatus = userStatus === 'ACTIVE' ? 'BLOCK' : 'ACTIVE';
+    blockMutation.mutate({ userId, status: newstatus });
+  };
+
+  const detailsView = (userId: string) => {
+    detailsMutation.mutate(userId);
   };
 
   const closeDetailsModal = () => {
@@ -174,7 +151,9 @@ const AdminUsers = () => {
               </svg>
             </div>
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">{error}</h3>
+              <h3 className="text-sm font-medium text-red-800">
+                {error instanceof Error ? error.message : String(error)}
+              </h3>
             </div>
           </div>
         </div>

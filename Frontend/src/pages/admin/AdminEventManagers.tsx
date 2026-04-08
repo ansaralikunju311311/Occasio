@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { api } from '../../services/api';
 import { toast } from 'sonner';
@@ -15,90 +15,68 @@ interface EventManager {
   isEventManger: boolean;
 }
 
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
 const AdminEventManagers = () => {
-  const [managers, setManagers] = useState<EventManager[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
   const [selectedManager, setSelectedManager] = useState<any | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const fetchManagers = async () => {
-    try {
-      setLoading(true);
-      setError(null);
+  const {
+    data: managers = [],
+    isLoading: loading,
+    error,
+  } = useQuery<EventManager[]>({
+    queryKey: ['adminManagers', searchQuery],
+    queryFn: async () => {
       const response = await api.get('/admin/users', {
-        params: {
-          search: searchQuery,
-        },
+        params: { search: searchQuery },
       });
-
-      console.log('console.log', response);
       const usersData: any[] = Array.isArray(response.data)
         ? response.data
         : response.data?.users || response.data?.data || [];
 
-      const eventManagersData = usersData.filter(
+      return usersData.filter(
         (user) => user.role === 'EVENT_MANAGER' || user.isEventManger === true
       );
+    },
+  });
 
-      setManagers(eventManagersData);
-    } catch (err: any) {
-      console.error('Failed to fetch event managers:', err);
-      setError(
-        err?.response?.data?.message || 'Failed to load event managers. Please try again later.'
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    const delay = setTimeout(() => {
-      fetchManagers();
-    }, 1000);
-
-    return () => clearTimeout(delay);
-  }, [searchQuery]);
-
-  const handleManager = async (userId: string, status: string) => {
-    const newstatus = status === 'ACTIVE' ? 'BLOCK' : 'ACTIVE';
-
-    setManagers((prevManagers) =>
-      prevManagers.map((manager) =>
-        (manager._id || manager.id) === userId ? { ...manager, status: newstatus } : manager
-      )
-    );
-
-    try {
-      await api.patch(`/admin/blockorunblock/${userId}`, {
-        status: newstatus,
-      });
-    } catch (error: any) {
-      console.error('Failed to block/unblock manager:', error);
+  const blockMutation = useMutation({
+    mutationFn: ({ userId, status }: { userId: string; status: string }) =>
+      api.patch(`/admin/blockorunblock/${userId}`, { status }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminManagers'] });
+      toast.success('Manager status updated successfully.');
+    },
+    onError: (error: any) => {
       toast.error(error.response?.data?.message || 'Failed to update manager status.');
-      // Revert UI on failure
-      setManagers((prevManagers) =>
-        prevManagers.map((manager) =>
-          (manager._id || manager.id) === userId ? { ...manager, status: status } : manager
-        )
-      );
-    }
-  };
+    },
+  });
 
-  const detailView = async (id: string, email: string) => {
-    try {
-      const response = await api.get(`/admin/managerDetails/${id}`);
-      const managerData = response.data?.manager || response.data?.data || response.data;
-
+  const detailMutation = useMutation({
+    mutationFn: ({ id, email }: { id: string; email: string }) =>
+      api.get(`/admin/managerDetails/${id}`).then((res) => ({ ...res.data, authEmail: email })),
+    onSuccess: (data) => {
+      const managerData = data?.manager || data?.data || data;
       if (managerData) {
-        setSelectedManager({ ...managerData, authEmail: email });
+        setSelectedManager(managerData);
         setIsDetailsModalOpen(true);
       }
-    } catch (error: any) {
-      console.error('Failed to fetch manager details:', error);
+    },
+    onError: (error: any) => {
       toast.error(error.response?.data?.message || 'Failed to load manager details.');
-    }
+    },
+  });
+
+  const handleManager = (userId: string, status: string) => {
+    const newstatus = status === 'ACTIVE' ? 'BLOCK' : 'ACTIVE';
+    blockMutation.mutate({ userId, status: newstatus });
+  };
+
+  const detailView = (id: string, email: string) => {
+    detailMutation.mutate({ id, email });
   };
 
   const closeDetailsModal = () => {
@@ -171,7 +149,9 @@ const AdminEventManagers = () => {
               </svg>
             </div>
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">{error}</h3>
+              <h3 className="text-sm font-medium text-red-800">
+                {error instanceof Error ? error.message : String(error)}
+              </h3>
             </div>
           </div>
         </div>

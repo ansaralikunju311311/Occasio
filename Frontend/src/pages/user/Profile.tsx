@@ -5,13 +5,27 @@ import HomeButton from '../../components/common/HomeButton';
 import { api } from '../../services/api';
 import { setAuth } from '../../redux/slices/authSlice';
 
+import { useMutation } from '@tanstack/react-query';
+
 const Profile = () => {
   const { user } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(user?.name || '');
-  const [isLoading, setIsLoading] = useState(false);
+
+  const profileMutation = useMutation({
+    mutationFn: (name: string) => api.patch('/user/profile', { name }),
+    onSuccess: (response) => {
+      if (response.data.profile) {
+        dispatch(setAuth({ user: response.data.profile }));
+        setIsEditing(false);
+      }
+    },
+    onError: (error: any) => {
+      console.error('Failed to update profile:', error);
+    },
+  });
 
   useEffect(() => {
     if (isEditing) {
@@ -20,30 +34,15 @@ const Profile = () => {
   }, [isEditing, user?.name]);
 
   const handleEditToggle = () => {
-    if (isEditing) {
-      setIsEditing(false);
-    } else {
-      setIsEditing(true);
-    }
+    setIsEditing(!isEditing);
   };
 
-  const handleSave = async () => {
+  const handleSave = () => {
     if (!editName.trim()) return;
-
-    try {
-      setIsLoading(true);
-      const response = await api.patch('/user/profile', { name: editName });
-
-      if (response.data.profile) {
-        dispatch(setAuth({ user: response.data.profile }));
-        setIsEditing(false);
-      }
-    } catch (error) {
-      console.error('Failed to update profile:', error);
-    } finally {
-      setIsLoading(false);
-    }
+    profileMutation.mutate(editName);
   };
+
+  const isLoading = profileMutation.isPending;
 
   return (
     <div className="animate-fade-in-up">
