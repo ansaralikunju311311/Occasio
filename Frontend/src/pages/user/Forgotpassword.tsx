@@ -1,29 +1,30 @@
+import React from 'react';
 import SideImage from '../../assets/SideImage.jpg';
 import { useForm } from 'react-hook-form';
-import { api } from '../../services/api';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import HomeButton from '../../components/common/HomeButton';
+import { useForgotPassword } from '../../hooks/useAuth';
+
 type ForgotPasswordForm = {
   email: string;
 };
 
-import { useMutation } from '@tanstack/react-query';
-
 const Forgotpassword = () => {
   const navigate = useNavigate();
+  const forgotMutation = useForgotPassword();
 
-  const forgotMutation = useMutation({
-    mutationFn: (email: string) => api.post('/auth/forgot-password', { email }),
-    onSuccess: (response) => {
+  React.useEffect(() => {
+    if (forgotMutation.isSuccess) {
       toast.success('Recovery OTP sent to your email!');
-      localStorage.setItem('user', JSON.stringify(response.data.data));
+      localStorage.setItem('user', JSON.stringify(forgotMutation.data?.data.data));
       navigate('/resetpassword');
-    },
-    onError: (error: any) => {
+    }
+    if (forgotMutation.isError) {
+      const error = forgotMutation.error as any;
       toast.error(error.response?.data?.message || 'Failed to send OTP');
-    },
-  });
+    }
+  }, [forgotMutation.isSuccess, forgotMutation.isError, forgotMutation.data, forgotMutation.error, navigate]);
 
   const {
     register,

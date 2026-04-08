@@ -1,10 +1,9 @@
+import { useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { api } from '../../services/api';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { toast } from 'sonner';
 import HomeButton from '../../components/common/HomeButton';
-
-import { useQuery } from '@tanstack/react-query';
+import { useEventDetails } from '../../hooks/useEvents';
 
 const Checkout = () => {
   const { id } = useParams();
@@ -13,20 +12,14 @@ const Checkout = () => {
 
   const { selectedSeats = [], bookingType = 'physical' } = location.state || {};
 
-  const { data: event, isLoading: loading } = useQuery({
-    queryKey: ['checkoutEvent', id],
-    queryFn: async () => {
-      try {
-        const response = await api.get(`/events/eventDetails/${id}`);
-        return response.data.events;
-      } catch {
-        toast.error('Failed to load event details');
-        navigate('/');
-        return null;
-      }
-    },
-    enabled: !!id,
-  });
+  const { data: event, isLoading: loading, isError } = useEventDetails(id);
+
+  useEffect(() => {
+    if (isError) {
+      toast.error('Failed to load event details');
+      navigate('/');
+    }
+  }, [isError, navigate]);
 
   if (loading) return <LoadingSpinner />;
   if (!event) return null;

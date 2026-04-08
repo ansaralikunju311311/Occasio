@@ -1,11 +1,9 @@
 import { useState } from 'react';
-import { UpgradeStatus } from '../../types/upgrade-status.enum';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-
-import { api } from '../../services/api';
+import { adminService } from '../../services/admin.service';
 import { toast } from 'sonner';
 import { Table } from '../../components/common/Table';
 import { SearchBar } from '../../components/common/SearchBar';
+import { usePendingManagers, useApproveManager, useRejectManager, useAdminPendingManagerDetails } from '../../hooks/useAdmin';
 
 interface ManagerDetails {
   _id: string;
@@ -21,7 +19,6 @@ interface ManagerDetails {
 }
 
 const AdminPendingManagers = () => {
-  const queryClient = useQueryClient();
   const [selectedManager, setSelectedManager] = useState<ManagerDetails | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [fetchingDetails, setFetchingDetails] = useState(false);
@@ -31,57 +28,20 @@ const AdminPendingManagers = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   // Fetching Managers
-  const { data: managers = [], isLoading: loading } = useQuery({
-    queryKey: ['pendingManagers', searchQuery],
-    queryFn: async () => {
-      const response = await api.get('/admin/users', {
-        params: { search: searchQuery },
-      });
-
-      const usersData: any[] = Array.isArray(response.data)
-        ? response.data
-        : response.data?.users || response.data?.data || [];
-
-      return usersData.filter((user) => user.applyingupgrade === UpgradeStatus.PENDING);
-    },
-    // Adding staleTime or other options if needed, but default is fine
-  });
+  const { data: managers = [], isLoading: loading } = usePendingManagers({ search: searchQuery });
 
   // Approval Mutation
-  const approveMutation = useMutation({
-    mutationFn: (id: string) => api.patch(`admin/approval/${id}`),
-    onSuccess: () => {
-      toast.success('Manager application approved successfully!');
-      queryClient.invalidateQueries({ queryKey: ['pendingManagers'] });
-      setIsModalOpen(false);
-    },
-    onError: (error: any) => {
-      console.error('Approval failed:', error);
-      toast.error('Failed to approve manager application.');
-    },
-  });
+  const approveMutation = useApproveManager();
 
   // Rejection Mutation
-  const rejectMutation = useMutation({
-    mutationFn: ({ id, reason }: { id: string; reason?: string }) =>
-      api.patch(`admin/rejection/${id}`, { reason }),
-    onSuccess: () => {
-      toast.success('Manager application rejected.');
-      queryClient.invalidateQueries({ queryKey: ['pendingManagers'] });
-      setIsModalOpen(false);
-      setIsRejectionModalOpen(false);
-      setRejectionReason('');
-    },
-    onError: (error: any) => {
-      console.error('Rejection failed:', error);
-      toast.error('Failed to reject manager application.');
-    },
-  });
+  const rejectMutation = useRejectManager();
 
   const handleManagerDetails = async (userId: string) => {
     try {
       setFetchingDetails(true);
-      const response = await api.get(`/admin/pendingmanagers/${userId}`);
+      // Using service directly for one-off detail fetch for simplicity in current UI flow
+      // but we could also use useAdminPendingManagerDetails if we managed the ID state
+      const response = await adminService.getPendingManagerDetails(userId);
 
       let details = response.data;
       if (details.data?.user) details = details.data.user;
@@ -107,9 +67,33 @@ const AdminPendingManagers = () => {
     }
   };
 
-  const handleApproval = (id: string) => approveMutation.mutate(id);
+  const handleApproval = (id: string) => {
+    approveMutation.mutate(id, {
+      onSuccess: () => {
+        toast.success('Manager application approved successfully!');
+        setIsModalOpen(false);
+      },
+      onError: (error: any) => {
+        console.error('Approval failed:', error);
+        toast.error('Failed to approve manager application.');
+      },
+    });
+  };
 
-  const handleRejection = (id: string, reason?: string) => rejectMutation.mutate({ id, reason });
+  const handleRejection = (id: string, reason: string) => {
+    rejectMutation.mutate({ id, reason }, {
+      onSuccess: () => {
+        toast.success('Manager application rejected.');
+        setIsModalOpen(false);
+        setIsRejectionModalOpen(false);
+        setRejectionReason('');
+      },
+      onError: (error: any) => {
+        console.error('Rejection failed:', error);
+        toast.error('Failed to reject manager application.');
+      },
+    });
+  };
 
   const getInitials = (name: string) => {
     if (!name) return 'M';

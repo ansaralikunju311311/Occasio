@@ -2,9 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAppDispatch } from '../../redux/hook';
 import { setAuth } from '../../redux/slices/authSlice';
-import { api } from '../../services/api';
-
-import { useQuery } from '@tanstack/react-query';
+import { useMe } from '../../hooks/useAuth';
 
 const OAuthSuccess = () => {
   const [searchParams] = useSearchParams();
@@ -20,24 +18,18 @@ const OAuthSuccess = () => {
     }
   }, [token, navigate]);
 
-  useQuery({
-    queryKey: ['me'],
-    queryFn: async () => {
-      const response = await api.get('/auth/me');
-      if (response.data && response.data.user) {
-        dispatch(setAuth({ user: response.data.user }));
-        if (response.data.user.role === 'EVENT_MANAGER') {
-          navigate('/eventmanager');
-        } else {
-          navigate('/');
-        }
-        return response.data.user;
+  const { data: userData, isSuccess } = useMe(!!token);
+
+  useEffect(() => {
+    if (isSuccess && userData?.user) {
+      dispatch(setAuth({ user: userData.user }));
+      if (userData.user.role === 'EVENT_MANAGER') {
+        navigate('/eventmanager');
+      } else {
+        navigate('/');
       }
-      throw new Error('User not found');
-    },
-    enabled: !!token,
-    retry: false,
-  });
+    }
+  }, [isSuccess, userData, dispatch, navigate]);
 
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center text-white">

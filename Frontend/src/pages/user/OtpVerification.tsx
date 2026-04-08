@@ -1,14 +1,13 @@
+import React, { useEffect, useState } from 'react';
 import SideImage from '../../assets/SideImage.jpg';
 import type { OtpData } from '../../types/auth.type';
 import { useForm } from 'react-hook-form';
-import { api } from '../../services/api';
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
 import { useAppDispatch } from '../../redux/hook';
 import { setAuth } from '../../redux/slices/authSlice';
 import { toast } from 'sonner';
 import HomeButton from '../../components/common/HomeButton';
-import { useMutation } from '@tanstack/react-query';
+import { useVerifyOtp, useResendOtp } from '../../hooks/useAuth';
 
 const OtpVerification = () => {
   const [timeleft, setTimeLeft] = useState(60);
@@ -17,49 +16,45 @@ const OtpVerification = () => {
   const dispatch = useAppDispatch();
 
   // Resend OTP Mutation
-  const resendMutation = useMutation({
-    mutationFn: () => api.post('/auth/resend-otp', { email: userData.email }),
-    onSuccess: (response) => {
-      console.log(response);
+  const resendMutation = useResendOtp();
+
+  React.useEffect(() => {
+    if (resendMutation.isSuccess) {
       toast.success('OTP resent successfully!');
       const updatedUser = { ...userData, otpSendAt: new Date().toISOString() };
       localStorage.setItem('user', JSON.stringify(updatedUser));
       setUserData(updatedUser);
       setTimeLeft(60);
-    },
-    onError: (error: any) => {
+    }
+    if (resendMutation.isError) {
+      const error = resendMutation.error as any;
       toast.error(error.response?.data?.message || 'Something went wrong');
-    },
-  });
+    }
+  }, [resendMutation.isSuccess, resendMutation.isError, resendMutation.error, userData]);
 
   // Verify OTP Mutation
-  const verifyMutation = useMutation({
-    mutationFn: (otp: string) =>
-      api.post('/auth/verify-otp', {
-        email: userData.email,
-        otp: otp,
-      }),
-    onSuccess: (response) => {
+  const verifyMutation = useVerifyOtp();
+
+  React.useEffect(() => {
+    if (verifyMutation.isSuccess) {
+      const response = verifyMutation.data;
       toast.success('OTP verified!');
       localStorage.removeItem('user');
       localStorage.setItem('accessToken', response.data.accessToken);
 
-      dispatch(
-        setAuth({
-          user: response.data.user,
-        })
-      );
+      dispatch(setAuth({ user: response.data.user }));
 
       if (response.data.user.role === 'EVENT_MANAGER') {
         navigate('/eventmanager');
       } else if (response.data.user.role === 'USER') {
         navigate('/');
       }
-    },
-    onError: (error: any) => {
+    }
+    if (verifyMutation.isError) {
+      const error = verifyMutation.error as any;
       toast.error(error.response?.data?.message || 'Something went wrong');
-    },
-  });
+    }
+  }, [verifyMutation.isSuccess, verifyMutation.isError, verifyMutation.data, verifyMutation.error, dispatch, navigate]);
 
   useEffect(() => {
     if (!userData?.otpSendAt) return;

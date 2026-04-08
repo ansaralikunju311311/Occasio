@@ -1,10 +1,11 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import { api } from '../../services/api';
 import type { ResetPassword } from '../../types/auth.type';
 import { useAppSelector } from '../../redux/hook';
 import PasswordInput from '../common/PasswordInput';
+import { useUpdatePassword } from '../../hooks/useAuth';
+
 interface ChangePasswordModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -13,7 +14,6 @@ interface ChangePasswordModalProps {
 const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, onClose }) => {
   const user = useAppSelector((state) => state.auth.user);
 
-  // console.log(alert(user?.email))
   const {
     register,
     handleSubmit,
@@ -24,24 +24,28 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, onClo
     mode: 'onBlur',
   });
 
-  const onSubmit = async (data: ResetPassword) => {
-    try {
-      const response = await api.post('/auth/updatepassword', {
-        email: user?.email,
-        currentPassword: data.currentPassword,
-        newPassword: data.newPassword,
-        confirmPassword: data.confirmPassword,
-      });
-      console.log(response);
-      console.log('Password change requested:', data);
+  const updatePasswordMutation = useUpdatePassword();
+
+  React.useEffect(() => {
+    if (updatePasswordMutation.isSuccess) {
       toast.success('Password updated successfully');
       reset();
       onClose();
-    } catch (error: any) {
+    }
+    if (updatePasswordMutation.isError) {
+      const error = updatePasswordMutation.error as any;
       const message = error.response?.data?.message || 'Something went wrong. Please try again.';
       toast.error(message);
-      console.error('Password update error:', error);
     }
+  }, [updatePasswordMutation.isSuccess, updatePasswordMutation.isError, updatePasswordMutation.error, reset, onClose]);
+
+  const onSubmit = (data: ResetPassword) => {
+    updatePasswordMutation.mutate({
+      email: user?.email,
+      currentPassword: data.currentPassword,
+      newPassword: data.newPassword,
+      confirmPassword: data.confirmPassword,
+    });
   };
 
   if (!isOpen) return null;

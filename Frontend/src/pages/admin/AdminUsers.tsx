@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { api } from '../../services/api';
 import { UpgradeStatus } from '../../types/upgrade-status.enum';
 import { toast } from 'sonner';
 import { Table } from '../../components/common/Table';
 import { SearchBar } from '../../components/common/SearchBar';
+import { useAllUsers, useBlockUser } from '../../hooks/useAdmin';
+import { adminService } from '../../services/admin.service';
 
 interface User {
   _id?: string;
@@ -20,10 +21,7 @@ interface User {
   rejectedAt?: Date | null;
 }
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-
 const AdminUsers = () => {
-  const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState<boolean>(false);
@@ -32,52 +30,31 @@ const AdminUsers = () => {
     data: users = [],
     isLoading: loading,
     error,
-  } = useQuery<User[]>({
-    queryKey: ['adminUsers', searchTerm],
-    queryFn: async () => {
-      const response = await api.get('/admin/users', {
-        params: { search: searchTerm },
-      });
-      const usersData = (
-        Array.isArray(response.data)
-          ? response.data
-          : response.data?.users || response.data?.data || []
-      ) as User[];
-      return usersData.filter((user) => user.role === 'USER');
-    },
-  });
+  } = useAllUsers({ search: searchTerm });
 
-  const blockMutation = useMutation({
-    mutationFn: ({ userId, status }: { userId: string; status: string }) =>
-      api.patch(`/admin/blockorunblock/${userId}`, { status }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['adminUsers'] });
-      toast.success('User status updated successfully.');
-    },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to update user status.');
-    },
-  });
+  const blockMutation = useBlockUser();
 
-  const detailsMutation = useMutation({
-    mutationFn: (userId: string) => api.get(`/admin/userDetails/${userId}`),
-    onSuccess: (response) => {
+  const handleUser = (userId: string, userStatus: string) => {
+    const newstatus = userStatus === 'ACTIVE' ? 'BLOCK' : 'ACTIVE';
+    blockMutation.mutate({ id: userId, status: newstatus }, {
+      onSuccess: () => {
+        toast.success('User status updated successfully.');
+      },
+      onError: (error: any) => {
+        toast.error(error.response?.data?.message || 'Failed to update user status.');
+      },
+    });
+  };
+
+  const detailsView = async (userId: string) => {
+    try {
+      const response = await adminService.getUserDetails(userId);
       const userData = response.data?.user || response.data?.data || response.data;
       setSelectedUser(userData);
       setIsDetailsModalOpen(true);
-    },
-    onError: (error: any) => {
+    } catch (error: any) {
       toast.error(error.response?.data?.message || 'Failed to load user details.');
-    },
-  });
-
-  const handleUser = async (userId: string, userStatus: string) => {
-    const newstatus = userStatus === 'ACTIVE' ? 'BLOCK' : 'ACTIVE';
-    blockMutation.mutate({ userId, status: newstatus });
-  };
-
-  const detailsView = (userId: string) => {
-    detailsMutation.mutate(userId);
+    }
   };
 
   const closeDetailsModal = () => {

@@ -2,10 +2,8 @@ import { useState, useEffect } from 'react';
 import { useAppSelector, useAppDispatch } from '../../redux/hook';
 import ChangePasswordModal from '../../components/user/ChangePasswordModal';
 import HomeButton from '../../components/common/HomeButton';
-import { api } from '../../services/api';
 import { setAuth } from '../../redux/slices/authSlice';
-
-import { useMutation } from '@tanstack/react-query';
+import { useUpdateProfile } from '../../hooks/useUser';
 
 const Profile = () => {
   const { user } = useAppSelector((state) => state.auth);
@@ -14,18 +12,17 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(user?.name || '');
 
-  const profileMutation = useMutation({
-    mutationFn: (name: string) => api.patch('/user/profile', { name }),
-    onSuccess: (response) => {
+  const profileMutation = useUpdateProfile();
+
+  useEffect(() => {
+    if (profileMutation.isSuccess) {
+      const response = profileMutation.data;
       if (response.data.profile) {
         dispatch(setAuth({ user: response.data.profile }));
         setIsEditing(false);
       }
-    },
-    onError: (error: any) => {
-      console.error('Failed to update profile:', error);
-    },
-  });
+    }
+  }, [profileMutation.isSuccess, profileMutation.data, dispatch]);
 
   useEffect(() => {
     if (isEditing) {

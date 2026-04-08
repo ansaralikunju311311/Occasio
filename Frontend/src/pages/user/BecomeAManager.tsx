@@ -1,11 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { api } from '../../services/api';
 import { useAppSelector, useAppDispatch } from '../../redux/hook';
 import { setAuth } from '../../redux/slices/authSlice';
 import { UpgradeStatus } from '../../types/upgrade-status.enum';
 import { toast } from 'sonner';
+import { useUpgradeRole, useReapply } from '../../hooks/useUser';
 
 interface ManagerFormData {
   fullName: string;
@@ -69,8 +69,6 @@ const CheckIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-import { useMutation } from '@tanstack/react-query';
-
 const BecomeAManager: React.FC = () => {
   const user = useAppSelector((state) => state.auth.user);
   const dispatch = useAppDispatch();
@@ -93,29 +91,35 @@ const BecomeAManager: React.FC = () => {
 
   const [preview, setPreview] = React.useState<string | null>(null);
 
-  const upgradeMutation = useMutation({
-    mutationFn: async (payload: any) => api.post('/user/upgraderole', payload),
-    onSuccess: (response) => {
+  const upgradeMutation = useUpgradeRole();
+
+  React.useEffect(() => {
+    if (upgradeMutation.isSuccess) {
+      const response = upgradeMutation.data;
       dispatch(setAuth({ user: response.data.users }));
       toast.success('Application submitted successfully!');
       setView('success');
-    },
-    onError: (error: any) => {
+    }
+    if (upgradeMutation.isError) {
+      const error = upgradeMutation.error as any;
       toast.error(error.response?.data?.message || 'Failed to submit application.');
-    },
-  });
+    }
+  }, [upgradeMutation.isSuccess, upgradeMutation.isError, upgradeMutation.data, upgradeMutation.error, dispatch]);
 
-  const reapplyMutation = useMutation({
-    mutationFn: () => api.patch('/user/reapply'),
-    onSuccess: (response) => {
+  const reapplyMutation = useReapply();
+
+  React.useEffect(() => {
+    if (reapplyMutation.isSuccess) {
+      const response = reapplyMutation.data;
       dispatch(setAuth({ user: response.data.users || response.data.user || response.data }));
       toast.success('Re-apply request sent successfully!');
       navigate('/applyasmanager');
-    },
-    onError: (error: any) => {
+    }
+    if (reapplyMutation.isError) {
+      const error = reapplyMutation.error as any;
       toast.error(error.response?.data?.message || 'Failed to re-apply.');
-    },
-  });
+    }
+  }, [reapplyMutation.isSuccess, reapplyMutation.isError, reapplyMutation.data, reapplyMutation.error, dispatch, navigate]);
 
   const uploadImageToCloudinary = async (file: File) => {
     const formData = new FormData();

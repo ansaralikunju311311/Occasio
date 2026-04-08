@@ -1,19 +1,17 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import SideImage from '../../assets/SideImage.jpg';
 import { useForm } from 'react-hook-form';
-import { api } from '../../services/api';
 import { useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
 import PasswordInput from '../../components/common/PasswordInput';
 import { toast } from 'sonner';
 import HomeButton from '../../components/common/HomeButton';
+import { useResetPassword, useResendOtp } from '../../hooks/useAuth';
+
 type ResetPasswordForm = {
   otp: string;
   password: string;
   confirmpassword: string;
 };
-
-import { useMutation } from '@tanstack/react-query';
 
 const ResetPassword: React.FC = () => {
   const [timeleft, setTimeleft] = useState(60);
@@ -29,33 +27,30 @@ const ResetPassword: React.FC = () => {
     mode: 'onBlur',
   });
 
-  const resetMutation = useMutation({
-    mutationFn: (data: ResetPasswordForm) =>
-      api.post('/auth/reset-password', {
-        otp: data.otp,
-        password: data.password,
-        confirmpassword: data.confirmpassword,
-        email: user.email,
-      }),
-    onSuccess: () => {
+  const resetMutation = useResetPassword();
+  const resendMutation = useResendOtp();
+
+  React.useEffect(() => {
+    if (resetMutation.isSuccess) {
       toast.success('Password reset successfully! Please login.');
       localStorage.removeItem('user');
       navigate('/login');
-    },
-    onError: (error: any) => {
+    }
+    if (resetMutation.isError) {
+      const error = resetMutation.error as any;
       toast.error(error.response?.data?.message || 'Something went wrong');
-    },
-  });
+    }
+  }, [resetMutation.isSuccess, resetMutation.isError, resetMutation.error, navigate]);
 
-  const resendMutation = useMutation({
-    mutationFn: () => api.post('/auth/resend-otp', { email: user.email }),
-    onSuccess: () => {
+  React.useEffect(() => {
+    if (resendMutation.isSuccess) {
       toast.success('New OTP sent to your email!');
-    },
-    onError: (error: any) => {
+    }
+    if (resendMutation.isError) {
+      const error = resendMutation.error as any;
       toast.error(error.response?.data?.message || 'Something went wrong');
-    },
-  });
+    }
+  }, [resendMutation.isSuccess, resendMutation.isError, resendMutation.error]);
 
   useEffect(() => {
     if (!user?.otpSendAt) return;

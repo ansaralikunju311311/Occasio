@@ -1,48 +1,36 @@
+import React from 'react';
 import SideImage from '../../assets/SideImage.jpg';
 import { useForm } from 'react-hook-form';
 import type { LoginDataType } from '../../types/auth.type';
-import { api } from '../../services/api';
-import { useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import PasswordInput from '../../components/common/PasswordInput';
 import { useAppDispatch } from '../../redux/hook';
 import { setAuth } from '../../redux/slices/authSlice';
 import { toast } from 'sonner';
-// import { useDispatch } from "react-redux";
-import { useMutation } from '@tanstack/react-query';
+import { useLogin } from '../../hooks/useAuth';
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const loginMutation = useLogin();
 
-  const loginMutation = useMutation({
-    mutationFn: (data: LoginDataType) =>
-      api.post('/auth/login', {
-        email: data.email,
-        password: data.password,
-        role: 'USER',
-      }),
-    onSuccess: (response) => {
-      console.log('response', response.data.accessToken);
+  React.useEffect(() => {
+    if (loginMutation.isSuccess) {
+      const response = loginMutation.data;
       localStorage.setItem('accessToken', response.data.accessToken);
-
-      dispatch(
-        setAuth({
-          user: response.data.user,
-        })
-      );
-
+      dispatch(setAuth({ user: response.data.user }));
       toast.success('Login successful!');
       navigate('/');
-    },
-    onError: (error: any) => {
+    }
+    if (loginMutation.isError) {
+      const error = loginMutation.error as any;
       if (error.response) {
         toast.error(error.response.data.message || 'Login failed');
       } else {
         toast.error('Something went wrong');
       }
-    },
-  });
+    }
+  }, [loginMutation.isSuccess, loginMutation.isError, loginMutation.data, loginMutation.error, dispatch, navigate]);
 
   const {
     register,
