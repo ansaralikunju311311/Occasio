@@ -1,90 +1,85 @@
-import mongoose, { Document, Schema } from "mongoose";
-import { UserRole } from "../../../common/enums/userrole-enum";
-import { UserStatus } from "../../../common/enums/userstatus-enum";
+import mongoose, { Document, Schema } from 'mongoose';
+import { UserRole } from '../../../common/enums/userrole-enum';
+import { UserStatus } from '../../../common/enums/userstatus-enum';
 // import { UserOtp } from "../../../../common/enums/user-otp.enum.js";
-import { UpgradeStatus } from "../../../common/enums/upgrade-enums";
+import { UpgradeStatus } from '../../../common/enums/upgrade-enums';
 // import { devNull } from "node:os";
 
 export interface IUserDocument extends Document {
-    name: string,
-    email: string,
-    password: string,
-    role: UserRole,
-    status: UserStatus,
-    isVerified: boolean,
-    // otp: string | null,
-    // otpExpires: Date | null,
-    // otpType: UserOtp | null,
-    // otpSendAt: Date | null,
+  name: string;
+  email: string;
+  password: string;
+  role: UserRole;
+  status: UserStatus;
+  isVerified: boolean;
+  // otp: string | null,
+  // otpExpires: Date | null,
+  // otpType: UserOtp | null,
+  // otpSendAt: Date | null,
 
-    applyingupgrade: UpgradeStatus,
-    rejectedAt: Date | null,
-    reapplyAt: Date | null
+  applyingupgrade: UpgradeStatus;
+  rejectedAt: Date | null;
+  reapplyAt: Date | null;
 }
 
 const userSchema = new Schema<IUserDocument>(
-    {
-        name: {
-            type: String,
-            required: true
-        },
-        email: {
-            type: String,
-            required: true,
-            unique: true
-        },
-        password: {
-            type: String,
-            required: true,
-
-        },
-
-        role: {
-            type: String,
-            enum: Object.values(UserRole) as string[],
-            default: UserRole.USER
-
-        },
-        status: {
-            type: String,
-            enum: Object.values(UserStatus) as string[],
-            default: UserStatus.ACTIVE
-        },
-        isVerified: {
-            type: Boolean,
-            default: false
-
-        },
-        // otp: {
-        //     type: String
-        // },
-        // otpExpires: {
-        //     type: Date
-        // },
-        // otpType: {
-        //     type: String,
-        //     enum: Object.values(UserOtp) as string[],
-        //     default: null
-        // },
-        // otpSendAt: {
-        //     type: Date
-        // },
-        applyingupgrade: {
-            type: String,
-            enum: Object.values(UpgradeStatus),
-            default: UpgradeStatus.NONE
-        },
-        rejectedAt: {
-            type: Date,
-            default: null
-        },
-        reapplyAt: {
-            type: Date,
-            default: null
-        }
-
-
+  {
+    name: {
+      type: String,
+      required: true,
     },
-    { timestamps: true }
-)
-export const UserModel = mongoose.model<IUserDocument>("User", userSchema);
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+
+    role: {
+      type: String,
+      enum: Object.values(UserRole) as string[],
+      default: UserRole.USER,
+    },
+    status: {
+      type: String,
+      enum: Object.values(UserStatus) as string[],
+      default: UserStatus.ACTIVE,
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    // otp: {
+    //     type: String
+    // },
+    // otpExpires: {
+    //     type: Date
+    // },
+    // otpType: {
+    //     type: String,
+    //     enum: Object.values(UserOtp) as string[],
+    //     default: null
+    // },
+    // otpSendAt: {
+    //     type: Date
+    // },
+    applyingupgrade: {
+      type: String,
+      enum: Object.values(UpgradeStatus),
+      default: UpgradeStatus.NONE,
+    },
+    rejectedAt: {
+      type: Date,
+      default: null,
+    },
+    reapplyAt: {
+      type: Date,
+      default: null,
+    },
+  },
+  { timestamps: true },
+);
+export const UserModel = mongoose.model<IUserDocument>('User', userSchema);

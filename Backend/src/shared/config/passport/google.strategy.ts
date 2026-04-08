@@ -1,14 +1,14 @@
-import passport from "passport";
-import { Strategy as GoogleStrategy } from "passport-google-oauth20";
-import { UserModel } from "../../../infrastructure/database/model/user.model"
-import { UserRole } from "../../../common/enums/userrole-enum";
+import passport from 'passport';
+import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
+import { UserModel } from '../../../infrastructure/database/model/user.model';
+import { UserRole } from '../../../common/enums/userrole-enum';
 
 passport.use(
   new GoogleStrategy(
     {
       clientID: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      callbackURL: "/api/auth/google/callback",
+      callbackURL: '/api/auth/google/callback',
       passReqToCallback: true,
     },
     async (req, accessToken, refreshToken, profile, done) => {
@@ -25,7 +25,7 @@ passport.use(
               role = state.role;
             }
           } catch (e) {
-            console.error("Error parsing profile state:", e);
+            console.error('Error parsing profile state:', e);
           }
         }
 
@@ -35,17 +35,16 @@ passport.use(
           user = await UserModel.create({
             name,
             email,
-            password: "GOOGLE_AUTH", // dummy password
+            password: 'GOOGLE_AUTH', // dummy password
             role: role,
-            isVerified: true
+            isVerified: true,
           });
         }
 
         return done(null, user);
-
       } catch (error) {
         return done(error);
       }
-    }
-  )
+    },
+  ),
 );

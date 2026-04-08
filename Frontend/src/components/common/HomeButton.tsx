@@ -1,12 +1,12 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const HomeButton: React.FC = () => {
   const navigate = useNavigate();
 
   return (
     <button
-      onClick={() => navigate("/")}
+      onClick={() => navigate('/')}
       className="flex items-center gap-2 px-4 py-2 bg-slate-800/50 hover:bg-slate-700/50 text-slate-300 hover:text-white rounded-xl border border-slate-700/50 transition-all duration-300 group shadow-lg backdrop-blur-sm"
     >
       <svg

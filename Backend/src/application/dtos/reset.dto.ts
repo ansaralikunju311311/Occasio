@@ -1,6 +1,6 @@
-export interface ResetPasswordDTO{
-    email:string,
-    otp:string,
-    password:string,
-    confirmpassword:string
+export interface ResetPasswordDTO {
+  email: string;
+  otp: string;
+  password: string;
+  confirmpassword: string;
 }

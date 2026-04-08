@@ -1,70 +1,54 @@
-import SideImage from "../../assets/SideImage.jpg"
-import { useForm } from "react-hook-form";
-import type { LoginDataType } from "../../types/auth.type";
-import { api } from '../../services/api'
-import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
-import PasswordInput from "../../components/common/PasswordInput";
-import { useAppDispatch } from "../../redux/hook";
-import { setAuth } from "../../redux/slices/authSlice";
-import { toast } from "sonner";
+import SideImage from '../../assets/SideImage.jpg';
+import { useForm } from 'react-hook-form';
+import type { LoginDataType } from '../../types/auth.type';
+import { api } from '../../services/api';
+import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import PasswordInput from '../../components/common/PasswordInput';
+import { useAppDispatch } from '../../redux/hook';
+import { setAuth } from '../../redux/slices/authSlice';
+import { toast } from 'sonner';
 // import { useDispatch } from "react-redux";
 const LoginPage = () => {
   const navigate = useNavigate();
-  const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<LoginDataType>({
-    mode: "onBlur",
+    mode: 'onBlur',
   });
 
-  console.log("user")
+  console.log('user');
   const onSubmit = async (data: LoginDataType) => {
-
-
     try {
-
-      const response = await api.post("/auth/login", {
+      const response = await api.post('/auth/login', {
         email: data.email,
         password: data.password,
-        role: "USER"
-      })
-      console.log("response", response.data.accessToken)
-      localStorage.setItem("accessToken", response.data.accessToken)
+        role: 'USER',
+      });
+      console.log('response', response.data.accessToken);
+      localStorage.setItem('accessToken', response.data.accessToken);
 
       dispatch(
         setAuth({
-          user: response.data.user
+          user: response.data.user,
         })
-      )
+      );
 
-      toast.success("Login successful!");
-      navigate("/");
-
-
-
+      toast.success('Login successful!');
+      navigate('/');
     } catch (error: any) {
-
       if (error.response) {
-        toast.error(error.response.data.message || "Login failed");
+        toast.error(error.response.data.message || 'Login failed');
       } else {
-        toast.error("Something went wrong");
+        toast.error('Something went wrong');
       }
-
-
     }
-
-
-
-
-
 
     // console.log("Submitted Data:", data);
   };
-
-
 
   return (
     <div className="min-h-screen flex bg-slate-950">
@@ -90,69 +74,57 @@ const LoginPage = () => {
       <div className="flex flex-1 items-center justify-center p-6 md:p-12">
         <div className="bg-slate-900/60 backdrop-blur-xl p-8 md:p-12 rounded-4xl shadow-2xl shadow-indigo-500/10 border border-slate-800 w-full max-w-md transition-all">
           <div className="text-center mb-10">
-            <h1 className="text-3xl font-bold text-white tracking-tight">
-              Log In
-            </h1>
+            <h1 className="text-3xl font-bold text-white tracking-tight">Log In</h1>
             <p className="mt-2 text-sm text-slate-400">Welcome back! Please enter your details.</p>
           </div>
 
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-
             {/* EMAIL */}
             <div>
-              <label className="block text-sm font-semibold text-slate-300 mb-2">
-                Email
-              </label>
+              <label className="block text-sm font-semibold text-slate-300 mb-2">Email</label>
               <input
                 type="email"
                 placeholder="Enter your email"
-                {...register("email", {
-                  required: "Email is required",
+                {...register('email', {
+                  required: 'Email is required',
                   pattern: {
                     value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                    message: "Enter a valid email address",
+                    message: 'Enter a valid email address',
                   },
                 })}
                 className="block w-full px-4 py-3 bg-slate-950/50 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
               />
-              {errors.email && (
-                <p className="text-red-400 text-sm mt-1">
-                  {errors.email.message}
-                </p>
-              )}
+              {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email.message}</p>}
             </div>
 
             {/* PASSWORD */}
             <div>
-              <label className="block text-sm font-semibold text-slate-300 mb-2">
-                Password
-              </label>
+              <label className="block text-sm font-semibold text-slate-300 mb-2">Password</label>
               <PasswordInput
                 placeholder="Enter your password"
-                {...register("password", {
-                  required: "Password is required",
+                {...register('password', {
+                  required: 'Password is required',
                   pattern: {
-                    value:
-                      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+                    value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
                     message:
-                      "Min 8 chars, include uppercase, lowercase, number & special character",
+                      'Min 8 chars, include uppercase, lowercase, number & special character',
                   },
                 })}
                 className="block w-full px-4 py-3 bg-slate-950/50 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
               />
               {errors.password && (
-                <p className="text-red-400 text-sm mt-1">
-                  {errors.password.message}
-                </p>
+                <p className="text-red-400 text-sm mt-1">{errors.password.message}</p>
               )}
             </div>
 
             {/* REMEMBER & FORGOT */}
             <div className="flex items-center justify-between mt-2">
-              <div className="flex items-center">
-              </div>
+              <div className="flex items-center"></div>
 
-              <Link to="/forgotpassword" className="text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors">
+              <Link
+                to="/forgotpassword"
+                className="text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors"
+              >
                 Forgot password?
               </Link>
             </div>
@@ -178,8 +150,6 @@ const LoginPage = () => {
           <button
             type="button"
             className="w-full flex items-center justify-center gap-3 py-3 px-4 bg-slate-950 hover:bg-slate-900 text-white rounded-xl font-medium border border-slate-800 transition-all duration-200"
-
-
             onClick={() => {
               window.location.href = `http://localhost:3001/api/auth/google?role=USER`;
             }}
@@ -206,8 +176,11 @@ const LoginPage = () => {
           </button>
 
           <p className="mt-8 text-center text-sm text-slate-400">
-            Don't have an account?{" "}
-            <Link to="/signup" className="font-semibold text-indigo-400 hover:text-indigo-300 transition-colors">
+            Don't have an account?{' '}
+            <Link
+              to="/signup"
+              className="font-semibold text-indigo-400 hover:text-indigo-300 transition-colors"
+            >
               Sign up
             </Link>
           </p>

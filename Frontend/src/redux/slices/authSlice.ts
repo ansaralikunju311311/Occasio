@@ -1,6 +1,6 @@
-import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
-import { UpgradeStatus } from "../../types/upgrade-status.enum";
+import { UpgradeStatus } from '../../types/upgrade-status.enum';
 
 interface User {
   _id: string;
@@ -23,13 +23,10 @@ const initialState: AuthState = {
 };
 
 const authSlice = createSlice({
-  name: "auth",
+  name: 'auth',
   initialState,
   reducers: {
-    setAuth: (
-      state,
-      action: PayloadAction<{ user: User }>
-    ) => {
+    setAuth: (state, action: PayloadAction<{ user: User }>) => {
       state.user = action.payload.user;
       state.isAuthenticated = true;
     },

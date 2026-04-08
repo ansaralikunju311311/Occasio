@@ -1,19 +1,19 @@
-import { IUserRepository } from "../../../domain/repositories/user.repository.interface";
-import { User } from "../../../domain/entities/user.entity";
-import { UserModel, IUserDocument } from "../../database/model/user.model";
-import { BaseRepository } from "../../../infrastructure/repositories/base.repository";
+import { IUserRepository } from '../../../domain/repositories/user.repository.interface';
+import { User } from '../../../domain/entities/user.entity';
+import { UserModel, IUserDocument } from '../../database/model/user.model';
+import { BaseRepository } from '../../../infrastructure/repositories/base.repository';
 // import { OTP } from "domain/entities/otp.entity";
 // import { IOtp } from "infrastructure/database/model/otp.model";
 export class UserRepository
   extends BaseRepository<IUserDocument>
-  implements IUserRepository {
-
+  implements IUserRepository
+{
   constructor() {
-    super(UserModel); 
+    super(UserModel);
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    const doc = await this.findOne({ email }); 
+    const doc = await this.findOne({ email });
     return doc ? this.toEntity(doc) : null;
   }
 
@@ -23,32 +23,32 @@ export class UserRepository
   }
 
   async createUser(user: User): Promise<User> {
-    const doc = await super.create({ 
+    const doc = await super.create({
       name: user.name,
       email: user.email,
       password: user.password,
       role: user.role,
       status: user.status,
       isVerified: user.isVerified,
-    //   otp: user.otp,
-    //   otpExpires: user.otpExpires,
-    //   otpType: user.otpType,
-    //   otpSendAt: user.otpSendAt,
+      //   otp: user.otp,
+      //   otpExpires: user.otpExpires,
+      //   otpType: user.otpType,
+      //   otpSendAt: user.otpSendAt,
       applyingupgrade: user.applyingupgrade,
       rejectedAt: user.rejectedAt,
-      reapplyAt: user.reapplyAt
-    } );
+      reapplyAt: user.reapplyAt,
+    });
 
     return this.toEntity(doc);
   }
 
   async updateUser(user: User): Promise<User> {
-    const doc = await super.updateOne( 
+    const doc = await super.updateOne(
       { email: user.email },
       {
         // email:user.email,
         status: user.status,
-        name:user.name,
+        name: user.name,
         password: user.password,
         isVerified: user.isVerified,
         // otp: user.otp,
@@ -58,13 +58,13 @@ export class UserRepository
         applyingupgrade: user.applyingupgrade,
         role: user.role,
         rejectedAt: user.rejectedAt,
-        reapplyAt: user.reapplyAt
-      }
+        reapplyAt: user.reapplyAt,
+      },
     );
 
-    if (!doc) throw new Error("User not found");
+    if (!doc) throw new Error('User not found');
 
-    return this.toEntity(doc); 
+    return this.toEntity(doc);
   }
   // async otpStore(otp: OTP): Promise<void> {
   //     const doc = await super.findOne(otp.email)
@@ -77,7 +77,7 @@ export class UserRepository
   //     }
   // }
 
-  private toEntity(doc:any): User {
+  private toEntity(doc: any): User {
     return new User(
       doc._id.toString(),
       doc.name,
@@ -86,13 +86,13 @@ export class UserRepository
       doc.role,
       doc.status,
       doc.isVerified,
-    //   doc.otp,
-    //   doc.otpExpires,
-    //   doc.otpType,
-    //   doc.otpSendAt,
+      //   doc.otp,
+      //   doc.otpExpires,
+      //   doc.otpType,
+      //   doc.otpSendAt,
       doc.applyingupgrade,
       doc.rejectedAt,
-      doc.reapplyAt
+      doc.reapplyAt,
     );
   }
 }

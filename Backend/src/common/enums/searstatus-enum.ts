@@ -1,5 +1,5 @@
-export enum SeatStatus{
-    AVAILABLE="AVAILABLE",
-    HELD="HELD",
-    BOOKED="BOOKED"
+export enum SeatStatus {
+  AVAILABLE = 'AVAILABLE',
+  HELD = 'HELD',
+  BOOKED = 'BOOKED',
 }

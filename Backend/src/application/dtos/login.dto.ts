@@ -1,6 +1,6 @@
-import { User } from "../../domain/entities/user.entity";
+import { User } from '../../domain/entities/user.entity';
 
-export interface LoginDto{
-   email:string,
-   password:string
+export interface LoginDto {
+  email: string;
+  password: string;
 }

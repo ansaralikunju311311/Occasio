@@ -1,46 +1,45 @@
-import SideImage from '../../assets/SideImage.jpg'
-import { useForm } from 'react-hook-form'
-import type { SignDataType } from '../../types/auth.type'
-import { useNavigate } from 'react-router-dom'
-import { api } from '../../services/api'
-import { Link } from 'react-router-dom'
-import PasswordInput from '../../components/common/PasswordInput'
-import { toast } from 'sonner'
+import SideImage from '../../assets/SideImage.jpg';
+import { useForm } from 'react-hook-form';
+import type { SignDataType } from '../../types/auth.type';
+import { useNavigate } from 'react-router-dom';
+import { api } from '../../services/api';
+import { Link } from 'react-router-dom';
+import PasswordInput from '../../components/common/PasswordInput';
+import { toast } from 'sonner';
 const SignupPage = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const {
     register,
     handleSubmit,
     getValues,
-    formState: { errors }
+    formState: { errors },
   } = useForm<SignDataType>({
-    mode: "onBlur"
-  })
-
+    mode: 'onBlur',
+  });
 
   const onSubmit = async (data: SignDataType) => {
     try {
-      console.log("Submitting signup...")
-      const response = await api.post("/auth/signup", {
+      console.log('Submitting signup...');
+      const response = await api.post('/auth/signup', {
         name: data.name,
         email: data.email,
         password: data.password,
         confirmpassword: data.confirmpassword,
-        role: "USER"
-      })
+        role: 'USER',
+      });
 
-      localStorage.setItem("user", JSON.stringify(response.data.data));
-      toast.success("Account created! Please verify your email.");
-      navigate("/otpverification")
+      localStorage.setItem('user', JSON.stringify(response.data.data));
+      toast.success('Account created! Please verify your email.');
+      navigate('/otpverification');
     } catch (error: any) {
       if (error.response) {
-        toast.error(error.response.data.message || "Signup failed");
+        toast.error(error.response.data.message || 'Signup failed');
       } else {
-        toast.error("Something went wrong");
+        toast.error('Something went wrong');
       }
     }
-  }
+  };
 
   return (
     <div className="min-h-screen flex bg-slate-950">
@@ -66,84 +65,66 @@ const SignupPage = () => {
       <div className="flex flex-1 items-center justify-center p-6 md:p-12">
         <div className="bg-slate-900/60 backdrop-blur-xl p-8 md:p-12 rounded-[2rem] shadow-2xl shadow-indigo-500/10 border border-slate-800 w-full max-w-md transition-all h-full max-h-screen overflow-y-auto custom-scrollbar">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-white tracking-tight">
-              Create Account
-            </h1>
+            <h1 className="text-3xl font-bold text-white tracking-tight">Create Account</h1>
             <p className="mt-2 text-sm text-slate-400">Sign up to get started with Occasio.</p>
           </div>
 
           <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
             {/* NAME */}
             <div>
-              <label className="block text-sm font-semibold text-slate-300 mb-1.5">
-                Name
-              </label>
+              <label className="block text-sm font-semibold text-slate-300 mb-1.5">Name</label>
               <input
                 type="text"
                 placeholder="Enter your name"
-                {...register("name", {
-                  required: "Name is required",
-                  validate: (value) => value.trim().length >= 3 || "Name must contain at least 3 valid characters",
+                {...register('name', {
+                  required: 'Name is required',
+                  validate: (value) =>
+                    value.trim().length >= 3 || 'Name must contain at least 3 valid characters',
                   minLength: {
                     value: 3,
-                    message: "Name must be at least 3 characters"
-                  }
-                })}
-                className="block w-full px-4 py-2.5 bg-slate-950/50 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-              />
-              {errors.name && (
-                <p className="text-red-400 text-sm mt-1">
-                  {errors.name.message}
-                </p>
-              )}
-            </div>
-
-            {/* EMAIL */}
-            <div>
-              <label className="block text-sm font-semibold text-slate-300 mb-1.5">
-                Email
-              </label>
-              <input
-                type="email"
-                placeholder="Enter your email"
-                {...register("email", {
-                  required: "Email is required",
-                  pattern: {
-                    value: /^[^\s@]{3,}@[^\s@]+\.[^\s@]+$/,
-                    message: "Enter a valid email with at least 3 characters before @",
+                    message: 'Name must be at least 3 characters',
                   },
                 })}
                 className="block w-full px-4 py-2.5 bg-slate-950/50 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
               />
-              {errors.email && (
-                <p className="text-red-400 text-sm mt-1">
-                  {errors.email.message}
-                </p>
-              )}
+              {errors.name && <p className="text-red-400 text-sm mt-1">{errors.name.message}</p>}
+            </div>
+
+            {/* EMAIL */}
+            <div>
+              <label className="block text-sm font-semibold text-slate-300 mb-1.5">Email</label>
+              <input
+                type="email"
+                placeholder="Enter your email"
+                {...register('email', {
+                  required: 'Email is required',
+                  pattern: {
+                    value: /^[^\s@]{3,}@[^\s@]+\.[^\s@]+$/,
+                    message: 'Enter a valid email with at least 3 characters before @',
+                  },
+                })}
+                className="block w-full px-4 py-2.5 bg-slate-950/50 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+              />
+              {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email.message}</p>}
             </div>
 
             {/* PASSWORD */}
             <div>
-              <label className="block text-sm font-semibold text-slate-300 mb-1.5">
-                Password
-              </label>
+              <label className="block text-sm font-semibold text-slate-300 mb-1.5">Password</label>
               <PasswordInput
                 placeholder="Enter password"
-                {...register("password", {
-                  required: "Password is required",
+                {...register('password', {
+                  required: 'Password is required',
                   pattern: {
-                    value:
-                      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+                    value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
                     message:
-                      "Min 8 chars, include uppercase, lowercase, number & special character",
+                      'Min 8 chars, include uppercase, lowercase, number & special character',
                   },
                 })}
                 className="block w-full px-4 py-2.5 bg-slate-950/50 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
               />
               {errors.password && (
-                <p className="text-red-400 text-sm mt-1">
-                  {errors.password.message}
-                </p>
+                <p className="text-red-400 text-sm mt-1">{errors.password.message}</p>
               )}
             </div>
 
@@ -154,17 +135,14 @@ const SignupPage = () => {
               </label>
               <PasswordInput
                 placeholder="Confirm password"
-                {...register("confirmpassword", {
-                  required: "Confirm password is required",
-                  validate: (value) =>
-                    value === getValues("password") || "Passwords do not match"
+                {...register('confirmpassword', {
+                  required: 'Confirm password is required',
+                  validate: (value) => value === getValues('password') || 'Passwords do not match',
                 })}
                 className="block w-full px-4 py-2.5 bg-slate-950/50 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
               />
               {errors.confirmpassword && (
-                <p className="text-red-400 text-sm mt-1">
-                  {errors.confirmpassword.message}
-                </p>
+                <p className="text-red-400 text-sm mt-1">{errors.confirmpassword.message}</p>
               )}
             </div>
 
@@ -215,8 +193,11 @@ const SignupPage = () => {
           </button>
 
           <p className="mt-8 text-center text-sm text-slate-400">
-            Already have an account?{" "}
-            <Link to="/login" className="font-semibold text-indigo-400 hover:text-indigo-300 transition-colors">
+            Already have an account?{' '}
+            <Link
+              to="/login"
+              className="font-semibold text-indigo-400 hover:text-indigo-300 transition-colors"
+            >
               Sign In
             </Link>
           </p>
@@ -224,6 +205,6 @@ const SignupPage = () => {
       </div>
     </div>
   );
-}
+};
 
-export default SignupPage
+export default SignupPage;

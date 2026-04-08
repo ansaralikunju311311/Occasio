@@ -1,9 +1,9 @@
-import axios from "axios";
-import { store } from "../redux/store";
-import { logout } from "../redux/slices/authSlice";
+import axios from 'axios';
+import { store } from '../redux/store';
+import { logout } from '../redux/slices/authSlice';
 
 export const api = axios.create({
-  baseURL: "http://localhost:3001/api",
+  baseURL: 'http://localhost:3001/api',
   withCredentials: true,
 });
 
@@ -23,7 +23,7 @@ const processQueue = (error: any, token: string | null = null) => {
 
 /* REQUEST INTERCEPTOR */
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("accessToken");
+  const token = localStorage.getItem('accessToken');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -37,20 +37,18 @@ api.interceptors.response.use(
     const originalRequest = error.config;
 
     const authEndpoints = [
-      "/auth/login",
-      "/auth/verify-otp",
-      "/auth/signup",
-      "/auth/resend-otp",
-      "/auth/forgot-password",
-      "/auth/reset-password",
-      "/auth/admin/login",
-      "/auth/refresh",
-      "/auth/logout"
+      '/auth/login',
+      '/auth/verify-otp',
+      '/auth/signup',
+      '/auth/resend-otp',
+      '/auth/forgot-password',
+      '/auth/reset-password',
+      '/auth/admin/login',
+      '/auth/refresh',
+      '/auth/logout',
     ];
 
-    const isAuthRequest = authEndpoints.some((endpoint) =>
-      originalRequest.url?.includes(endpoint)
-    );
+    const isAuthRequest = authEndpoints.some((endpoint) => originalRequest.url?.includes(endpoint));
 
     if (error.response?.status === 401 && !originalRequest._retry && !isAuthRequest) {
       if (isRefreshing) {
@@ -70,39 +68,39 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        console.log("Access token expired → trying refresh");
-        const res = await api.post("/auth/refresh");
+        console.log('Access token expired → trying refresh');
+        const res = await api.post('/auth/refresh');
         const newAccessToken = res.data.accessToken;
 
-        localStorage.setItem("accessToken", newAccessToken);
+        localStorage.setItem('accessToken', newAccessToken);
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 
         processQueue(null, newAccessToken);
-        console.log("New access token received → retrying original request");
+        console.log('New access token received → retrying original request');
         return api(originalRequest);
       } catch (refreshError) {
-        console.log("Refresh token failed → logging out");
+        console.log('Refresh token failed → logging out');
         processQueue(refreshError, null);
-        
-        localStorage.removeItem("accessToken");
+
+        localStorage.removeItem('accessToken');
         store.dispatch(logout());
 
         const skipRedirectPages = [
-          "/",
-          "/login",
-          "/adminlogin",
-          "/signup",
-          "/otpverification",
-          "/forgotpassword",
-          "/resetpassword",
+          '/',
+          '/login',
+          '/adminlogin',
+          '/signup',
+          '/otpverification',
+          '/forgotpassword',
+          '/resetpassword',
         ];
 
         const currentPath = window.location.pathname;
         if (!skipRedirectPages.includes(currentPath)) {
-          if (currentPath.startsWith("/admin")) {
-            window.location.href = "/adminlogin";
+          if (currentPath.startsWith('/admin')) {
+            window.location.href = '/adminlogin';
           } else {
-            window.location.href = "/login";
+            window.location.href = '/login';
           }
         }
 

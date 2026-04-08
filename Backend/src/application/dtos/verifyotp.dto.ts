@@ -1,4 +1,4 @@
-export interface VerfiyOtpDto{
-    email:string,
-    otp:string,
+export interface VerfiyOtpDto {
+  email: string;
+  otp: string;
 }

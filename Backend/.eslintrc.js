@@ -1,22 +1,22 @@
 module.exports = {
-  parser: "@typescript-eslint/parser",
+  parser: '@typescript-eslint/parser',
   parserOptions: {
-    ecmaVersion: "latest",
-    sourceType: "module",
+    ecmaVersion: 'latest',
+    sourceType: 'module',
   },
-  plugins: ["@typescript-eslint", "import"],
+  plugins: ['@typescript-eslint', 'import'],
   extends: [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "prettier",
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
+    'prettier',
   ],
   rules: {
-    "no-console": "warn",
-    "@typescript-eslint/no-unused-vars": "warn",
-    "import/order": [
-      "warn",
+    'no-console': 'warn',
+    '@typescript-eslint/no-unused-vars': 'warn',
+    'import/order': [
+      'warn',
       {
-        groups: [["builtin", "external"], "internal"],
+        groups: [['builtin', 'external'], 'internal'],
       },
     ],
   },

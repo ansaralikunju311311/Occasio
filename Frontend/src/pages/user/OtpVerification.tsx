@@ -1,19 +1,16 @@
-
-import SideImage from '../../assets/SideImage.jpg'
-import type { OtpData } from "../../types/auth.type";
-import { useForm } from "react-hook-form";
-import { api } from '../../services/api'
-import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import SideImage from '../../assets/SideImage.jpg';
+import type { OtpData } from '../../types/auth.type';
+import { useForm } from 'react-hook-form';
+import { api } from '../../services/api';
+import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { useAppDispatch } from '../../redux/hook';
 import { setAuth } from '../../redux/slices/authSlice';
 import { toast } from 'sonner';
 import HomeButton from '../../components/common/HomeButton';
 const OtpVerification = () => {
-
-
-  const [timeleft, setTimeLeft] = useState(60)
-  const [userData, setUserData] = useState(() => JSON.parse(localStorage.getItem("user") || "{}"));
+  const [timeleft, setTimeLeft] = useState(60);
+  const [userData, setUserData] = useState(() => JSON.parse(localStorage.getItem('user') || '{}'));
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const {
@@ -21,105 +18,89 @@ const OtpVerification = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<OtpData>({
-    mode: "onBlur", 
+    mode: 'onBlur',
   });
 
   // console.log(user.email);
 
-
-
-
   useEffect(() => {
-
     if (!userData?.otpSendAt) return;
 
-    const sentTime = new Date(userData.otpSendAt).getTime()
+    const sentTime = new Date(userData.otpSendAt).getTime();
 
-    const resendTime = sentTime + 60 * 1000
+    const resendTime = sentTime + 60 * 1000;
 
     const timer = setInterval(() => {
+      const now = new Date().getTime();
 
-      const now = new Date().getTime()
-
-      const remaining = Math.floor((resendTime - now) / 1000)
+      const remaining = Math.floor((resendTime - now) / 1000);
 
       if (remaining <= 0) {
-        setTimeLeft(0)
-        clearInterval(timer)
+        setTimeLeft(0);
+        clearInterval(timer);
       } else {
-        setTimeLeft(remaining)
+        setTimeLeft(remaining);
       }
+    }, 1000);
 
-    }, 1000)
-
-    return () => clearInterval(timer)
-
-  }, [userData.otpSendAt])
+    return () => clearInterval(timer);
+  }, [userData.otpSendAt]);
 
   const resendOtp = async () => {
-
     try {
-      const details = await api.post("/auth/resend-otp", {
-        email: userData.email
-      })
+      const details = await api.post('/auth/resend-otp', {
+        email: userData.email,
+      });
 
-      console.log(details)
-      toast.success("OTP resent successfully!");
+      console.log(details);
+      toast.success('OTP resent successfully!');
 
       const updatedUser = { ...userData, otpSendAt: new Date().toISOString() };
-      localStorage.setItem("user", JSON.stringify(updatedUser));
+      localStorage.setItem('user', JSON.stringify(updatedUser));
       setUserData(updatedUser);
       setTimeLeft(60);
-
     } catch (error: any) {
-
-
-
       if (error.response) {
         toast.error(error.response.data.message);
       } else {
-        toast.error("Something went wrong");
+        toast.error('Something went wrong');
       }
     }
-
-  }
+  };
   const onSubmit = async (data: OtpData) => {
-    console.log(data)
+    console.log(data);
 
     try {
-      const response = await api.post("/auth/verify-otp", {
+      const response = await api.post('/auth/verify-otp', {
         email: userData.email,
-        otp: data.otp
-      })
+        otp: data.otp,
+      });
       console.log(response);
-      toast.success("OTP verified!");
-      localStorage.removeItem("user");
-      localStorage.setItem("accessToken", response.data.accessToken)
+      toast.success('OTP verified!');
+      localStorage.removeItem('user');
+      localStorage.setItem('accessToken', response.data.accessToken);
 
       dispatch(
         setAuth({
-          user: response.data.user
+          user: response.data.user,
         })
-      )
+      );
 
-
-      if (response.data.user.role === "EVENT_MANAGER") {
-        navigate("/eventmanager")
+      if (response.data.user.role === 'EVENT_MANAGER') {
+        navigate('/eventmanager');
+      } else if (response.data.user.role === 'USER') {
+        navigate('/');
       }
-      else if (response.data.user.role === "USER") {
-        navigate("/")
-      }
-
     } catch (error: any) {
-      console.log("error happen incorrect  otp")
+      console.log('error happen incorrect  otp');
       // localStorage.removeItem("user");
       if (error.response) {
         toast.error(error.response.data.message);
       } else {
-        toast.error("Something went wrong");
+        toast.error('Something went wrong');
       }
     }
-  }
+  };
   return (
     <div className="min-h-screen flex bg-gray-50">
       {/* Left Side Image Section */}
@@ -132,16 +113,25 @@ const OtpVerification = () => {
         />
         <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-white p-12 text-center">
           <div className="w-16 h-16 bg-white/10 rounded-2xl backdrop-blur-md flex items-center justify-center mb-6 shadow-xl border border-white/20">
-            <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            <svg
+              className="w-8 h-8 text-white"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+              />
             </svg>
           </div>
           <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4 text-transparent bg-clip-text bg-linear-to-r from-white to-gray-300">
             Verify Your Account
           </h2>
           <p className="mt-3 text-lg text-gray-200 font-light max-w-md">
-            Enter the one-time password sent to your email to complete your
-            registration securely.
+            Enter the one-time password sent to your email to complete your registration securely.
           </p>
         </div>
       </div>
@@ -153,9 +143,7 @@ const OtpVerification = () => {
             <HomeButton />
           </div>
           <div className="text-center mb-10">
-            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
-              OTP Verification
-            </h1>
+            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">OTP Verification</h1>
             <p className="mt-2 text-sm text-gray-500">
               We have sent a 6-digit verification code to your email.
             </p>
@@ -164,27 +152,23 @@ const OtpVerification = () => {
           <form className="space-y-8" onSubmit={handleSubmit(onSubmit)}>
             {/* OTP INPUT */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Enter OTP
-              </label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Enter OTP</label>
 
               <input
                 type="text"
                 maxLength={6}
                 placeholder="000000"
                 className="block w-full text-center tracking-[0.5em] text-3xl px-4 py-4 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all font-mono"
-                {...register("otp", {
-                  required: "OTP is required",
+                {...register('otp', {
+                  required: 'OTP is required',
                   minLength: {
                     value: 6,
-                    message: "OTP must be exactly 6 digits"
-                  }
+                    message: 'OTP must be exactly 6 digits',
+                  },
                 })}
               />
               {errors.otp && (
-                <p className="text-red-500 text-sm mt-2 text-center">
-                  {errors.otp.message}
-                </p>
+                <p className="text-red-500 text-sm mt-2 text-center">{errors.otp.message}</p>
               )}
 
               <div className="mt-6 text-center text-sm flex items-center justify-center gap-2">

@@ -1,12 +1,12 @@
- import { EventManager } from "../../../domain/entities/manager.entity";
- import { IEventManagerRepository } from "../../../domain/repositories/manger.repository.interface";
- import { EventManagerModel } from "../../database/model/manager.model";
-import { BaseRepository } from "../base.repository";
-import { IEventManagerDocument } from "../../database/model/manager.model";
+import { EventManager } from '../../../domain/entities/manager.entity';
+import { IEventManagerRepository } from '../../../domain/repositories/manger.repository.interface';
+import { EventManagerModel } from '../../database/model/manager.model';
+import { BaseRepository } from '../base.repository';
+import { IEventManagerDocument } from '../../database/model/manager.model';
 export class ManagerRepository
   extends BaseRepository<IEventManagerDocument>
-  implements IEventManagerRepository {
-
+  implements IEventManagerRepository
+{
   constructor() {
     super(EventManagerModel);
   }
@@ -20,15 +20,15 @@ export class ManagerRepository
       socialLinks: user.socialLinks,
       experienceLevel: user.experienceLevel,
       documentReference: user.documentReference,
-      organizationName: user.organizationName
+      organizationName: user.organizationName,
     } as any);
 
     return this.toEntity(doc);
   }
   async findByIdManager(id: string): Promise<EventManager | null> {
-      const manager = await super.findOne({ userId: id } as any);
-      if (!manager) return null;
-      return this.toEntity(manager);
+    const manager = await super.findOne({ userId: id } as any);
+    if (!manager) return null;
+    return this.toEntity(manager);
   }
   private toEntity(doc: any): EventManager {
     return new EventManager(
@@ -41,7 +41,7 @@ export class ManagerRepository
       doc.documentReference,
       doc.experienceLevel,
       doc.socialLinks,
-      doc.organizationType
+      doc.organizationType,
     );
   }
 }

@@ -1,5 +1,5 @@
-import { EventStatus } from "../../common/enums/eventstatus-enum";
-import { EventType } from "../../common/enums/event-type";
+import { EventStatus } from '../../common/enums/eventstatus-enum';
+import { EventType } from '../../common/enums/event-type';
 
 export interface EventDto {
   title: string;
@@ -18,7 +18,7 @@ export interface EventDto {
   maxOnlineUsers?: number;
 
   location?: {
-    type: "Point";
+    type: 'Point';
     coordinates: [number, number];
     address: string;
   } | null;

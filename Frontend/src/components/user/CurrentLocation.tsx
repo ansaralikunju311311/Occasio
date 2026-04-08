@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 
 const CurrentLocation = () => {
-  const [location, setLocation] = useState("Detecting location...");
+  const [location, setLocation] = useState('Detecting location...');
 
   useEffect(() => {
     if (!navigator.geolocation) {
-      setLocation("Geolocation not supported");
+      setLocation('Geolocation not supported');
       return;
     }
 
@@ -15,8 +15,7 @@ const CurrentLocation = () => {
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
 
-
-        console.log("lat",lat, "lng0",lng)
+        console.log('lat', lat, 'lng0', lng);
 
         try {
           const res = await axios.get(
@@ -25,24 +24,20 @@ const CurrentLocation = () => {
 
           const c = res.data.results[0]?.components;
 
-          const name = [
-            c.city || c.town || c.village,
-            c.state,
-            c.country
-          ]
+          const name = [c.city || c.town || c.village, c.state, c.country]
             .filter(Boolean)
-            .join(", ");
+            .join(', ');
 
           setLocation(name);
         } catch {
-          setLocation("Unable to fetch location");
+          setLocation('Unable to fetch location');
         }
       },
       () => {
-        setLocation("Permission denied");
+        setLocation('Permission denied');
       },
       {
-        enableHighAccuracy: true
+        enableHighAccuracy: true,
       }
     );
   }, []);

@@ -1,16 +1,18 @@
-import { BaseRepository } from "../../repositories/base.repository";
-import { Events } from "../../../domain/entities/event.entity";
-import { IEventRepository } from "../../../domain/repositories/event/event.repository.interface";
-import { IEventDocument } from "../../../infrastructure/database/model/events/event.model";
-import { EventModel } from "../../../infrastructure/database/model/events/event.model";
-import mongoose from "mongoose";
-import { SeatModel } from "../../../infrastructure/database/model/events/seat.model";
-import { SeatLayoutModel } from "../../../infrastructure/database/model/events/seatLayout.model";
+import { BaseRepository } from '../../repositories/base.repository';
+import { Events } from '../../../domain/entities/event.entity';
+import { IEventRepository } from '../../../domain/repositories/event/event.repository.interface';
+import { IEventDocument } from '../../../infrastructure/database/model/events/event.model';
+import { EventModel } from '../../../infrastructure/database/model/events/event.model';
+import mongoose from 'mongoose';
+import { SeatModel } from '../../../infrastructure/database/model/events/seat.model';
+import { SeatLayoutModel } from '../../../infrastructure/database/model/events/seatLayout.model';
 
-export class EventRepository extends BaseRepository<IEventDocument> implements IEventRepository {
-
+export class EventRepository
+  extends BaseRepository<IEventDocument>
+  implements IEventRepository
+{
   constructor() {
-    super(EventModel)
+    super(EventModel);
   }
 
   async createEvent(event: Events): Promise<Events> {
@@ -26,92 +28,100 @@ export class EventRepository extends BaseRepository<IEventDocument> implements I
       price: event.price,
       startTime: event.startTime,
       status: event.status,
-    })
-    return this.toEntity(events)
+    });
+    return this.toEntity(events);
   }
 
-  async findAllEvents(eventType: string,search?:string): Promise<Events[]> {
+  async findAllEvents(eventType: string, search?: string): Promise<Events[]> {
     const query: any = {};
-    
-     if (eventType) {
-    query.eventType = eventType;
-  }
 
-  if (search) {
-    query.$or = [
+    if (eventType) {
+      query.eventType = eventType;
+    }
 
-      { title: { $regex: search, $options: "i" } },
-      { description: { $regex: search, $options: "i" } },
-      {email:{$regex:search,$options:"i"}},
-            {eventType:{$regex:search,$options:"i"}},
-
-    ];
-  }
-    const events = await this.model.find(query)
-      .populate("createdBy")
-      .populate("seatLayoutId")
-      .populate("seats")
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } },
+        { eventType: { $regex: search, $options: 'i' } },
+      ];
+    }
+    const events = await this.model
+      .find(query)
+      .populate('createdBy')
+      .populate('seatLayoutId')
+      .populate('seats')
       .sort({ createdAt: -1 });
 
     return events.map((event) => this.toEntity(event));
   }
 
   async findByIdEvents(id: string): Promise<Events | null> {
-    const event = await this.model.findById(id)
-      .populate("createdBy")
-      .populate("seatLayoutId")
-      .populate("seats");
+    const event = await this.model
+      .findById(id)
+      .populate('createdBy')
+      .populate('seatLayoutId')
+      .populate('seats');
     return event ? this.toEntity(event) : null;
   }
 
-  async findExactConflict(longitude: number, latitude: number, startTime: Date, endTime: Date): Promise<Events | null> {
-    const events = await this.model.findOne({
-      "location.coordinates": [longitude, latitude],
-      startTime: { $lt: endTime },
-      endTime: { $gt: startTime }
-    })
-    .populate("createdBy")
-    .populate("seatLayoutId")
-    .populate("seats");
+  async findExactConflict(
+    longitude: number,
+    latitude: number,
+    startTime: Date,
+    endTime: Date,
+  ): Promise<Events | null> {
+    const events = await this.model
+      .findOne({
+        'location.coordinates': [longitude, latitude],
+        startTime: { $lt: endTime },
+        endTime: { $gt: startTime },
+      })
+      .populate('createdBy')
+      .populate('seatLayoutId')
+      .populate('seats');
 
-    console.log("events are coming in this area", events)
+    console.log('events are coming in this area', events);
     return events ? this.toEntity(events) : null;
   }
 
+  // async findEvents(eventType:string,startTime:Date){
+  //   const event = await this.model.find({startTime,eventType})
 
-    // async findEvents(eventType:string,startTime:Date){
-    //   const event = await this.model.find({startTime,eventType})
+  //     return event?this.toEntity(event):null
 
-    //     return event?this.toEntity(event):null
-      
-    // }
-
-
+  // }
 
   async findEvents(userId: string, search?: string): Promise<Events[] | null> {
     const query: any = { createdBy: userId as any };
 
     if (search) {
       query.$or = [
-        { title: { $regex: search, $options: "i" } },
-        { eventType: { $regex: search, $options: "i" } }
+        { title: { $regex: search, $options: 'i' } },
+        { eventType: { $regex: search, $options: 'i' } },
       ];
     }
 
-    const events = await this.model.find(query)
-      .populate("createdBy")
-      .populate("seatLayoutId")
-      .populate("seats")
+    const events = await this.model
+      .find(query)
+      .populate('createdBy')
+      .populate('seatLayoutId')
+      .populate('seats')
       .sort({ createdAt: -1 });
 
     return events.map((event) => this.toEntity(event));
   }
 
-  async updateEventLayout(eventId: string, layoutId: string, session?: mongoose.ClientSession) {
+  async updateEventLayout(
+    eventId: string,
+    layoutId: string,
+    session?: mongoose.ClientSession,
+  ) {
     await this.model.findByIdAndUpdate(
       eventId,
       { seatLayoutId: layoutId },
-      { session }
+      { session },
     );
   }
 
@@ -128,21 +138,23 @@ export class EventRepository extends BaseRepository<IEventDocument> implements I
     let createdById: string;
     let creatorDetails: any;
 
-    if (manager.createdBy && typeof manager.createdBy === "object") {
-      createdById = manager.createdBy._id?.toString() || manager.createdBy.toString();
+    if (manager.createdBy && typeof manager.createdBy === 'object') {
+      createdById =
+        manager.createdBy._id?.toString() || manager.createdBy.toString();
       creatorDetails = manager.createdBy;
     } else {
-      createdById = manager.createdBy?.toString() || "";
+      createdById = manager.createdBy?.toString() || '';
     }
 
-    let seatLayoutId: string = "";
+    let seatLayoutId: string = '';
     let seatLayoutDetails: any = null;
 
-    if (manager.seatLayoutId && typeof manager.seatLayoutId === "object") {
-      seatLayoutId = manager.seatLayoutId._id?.toString() || manager.seatLayoutId.toString();
+    if (manager.seatLayoutId && typeof manager.seatLayoutId === 'object') {
+      seatLayoutId =
+        manager.seatLayoutId._id?.toString() || manager.seatLayoutId.toString();
       seatLayoutDetails = manager.seatLayoutId;
     } else {
-      seatLayoutId = manager.seatLayoutId?.toString() || "";
+      seatLayoutId = manager.seatLayoutId?.toString() || '';
       seatLayoutDetails = manager.seatLayoutId;
     }
 
@@ -162,7 +174,7 @@ export class EventRepository extends BaseRepository<IEventDocument> implements I
       creatorDetails,
       seatLayoutId,
       seatLayoutDetails,
-      manager.seats
+      manager.seats,
     );
   }
 }

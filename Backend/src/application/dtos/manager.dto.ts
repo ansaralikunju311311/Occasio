@@ -1,4 +1,4 @@
-export interface ManageDto{
-    userId:string,
-    status:string
+export interface ManageDto {
+  userId: string;
+  status: string;
 }

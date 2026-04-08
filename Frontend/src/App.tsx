@@ -1,5 +1,5 @@
-import { RouterWrapper } from "./app/router";
-import { Toaster } from "sonner";
+import { RouterWrapper } from './app/router';
+import { Toaster } from 'sonner';
 
 function App() {
   return (

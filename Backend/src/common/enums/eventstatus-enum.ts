@@ -1,5 +1,5 @@
-export enum EventStatus{
-    ACTIVE="ACTIVE",
-    COMPLETED="COMPLETED",
-    CANCELED="CANCELED"
+export enum EventStatus {
+  ACTIVE = 'ACTIVE',
+  COMPLETED = 'COMPLETED',
+  CANCELED = 'CANCELED',
 }
