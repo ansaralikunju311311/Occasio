@@ -4,11 +4,14 @@ import { UpgradeUseCase } from '../../application/usecases/user/upgraderole/upgr
 import { SuccessMessage } from '../../common/enums/message-enum';
 import { ReapplyUseCase } from '../../application/usecases/user/reapply/reapply.usecase';
 import { EditProfileUseCase } from '../../application/usecases/user/editProfile/editprofile.usecase';
+import { IUpgradeUseCase } from '@/application/usecases/user/upgraderole/upgaradeRole.usecase.interface';
+import { IReapplyUseCase } from '@/application/usecases/user/reapply/reapply.usecase.interface';
+import { IEditProfileUseCase } from '@/application/usecases/user/editProfile/editprofile.usecase.interface';
 export class UserController {
   constructor(
-    private UpgradeUseCase: UpgradeUseCase,
-    private ReapplyUseCase: ReapplyUseCase,
-    private EditProfileUseCase: EditProfileUseCase,
+    private UpgradeUseCase: IUpgradeUseCase,
+    private ReapplyUseCase: IReapplyUseCase,
+    private EditProfileUseCase: IEditProfileUseCase,
   ) {}
 
   async upgraderole(req: Request, res: Response, next: NextFunction) {

@@ -5,18 +5,24 @@ import { UserManageUseCase } from '../../application/usecases/admin/usermanage/u
 // import { PendingManagerUsecase } from '../application/use-cases/admin/pending.usecase.js';
 import { UserDetailsUseCase } from '../../application/usecases/admin/userDetails/userdetails.usecase';
 import { PendingmanagerDetailsUseCase } from '../../application/usecases/admin/pendingmanager/pendingmanager.usecase';
+
 import { ManagerApprovalUseCase } from '../../application/usecases/admin/manageApproval/managerapproval.usecase';
 import { ManagerRejectionUseCase } from '../../application/usecases/admin/managerRejection/managerRejection.usecase';
 import { ManagerDetailsUseCase } from '../../application/usecases/admin/managerDetails/managerdetails.usecase';
+import { IFindallUseCase } from '@/application/usecases/admin/allUsers/findall.usecase.interface';
+import { IUserManageUseCase } from '@/application/usecases/admin/usermanage/usermanage.usecase.interface';
+import { IManagerDetailsUseCase } from '@/application/usecases/admin/managerDetails/managerdetails.usecase.interface';
+import { IApprovalUseCase } from '@/application/usecases/admin/manageApproval/managerapproval.usecase.interface';
+import { IManagerRejectionUseCase } from '@/application/usecases/admin/managerRejection/managerRejection.usecase.interface';
 export class AdminController {
   constructor(
-    private findallUsecase: FindAllUseCase,
-    private userManageUseCase: UserManageUseCase,
+    private findallUsecase: IFindallUseCase,
+    private userManageUseCase: IUserManageUseCase,
     private userDetailsUseCase: UserDetailsUseCase,
-    private pendingmanagerDetailsUseCase: PendingmanagerDetailsUseCase,
-    private managerApprovalUseCase: ManagerApprovalUseCase,
-    private managerRejectionUseCase: ManagerRejectionUseCase,
-    private managerDetailsUseCase: ManagerDetailsUseCase,
+    private pendingmanagerDetailsUseCase: IManagerDetailsUseCase,
+    private managerApprovalUseCase: IApprovalUseCase,
+    private managerRejectionUseCase: IManagerRejectionUseCase,
+    private managerDetailsUseCase: IManagerDetailsUseCase,
 
     //    private pendingManagerUsecase : PendingManagerUsecase
   ) {}

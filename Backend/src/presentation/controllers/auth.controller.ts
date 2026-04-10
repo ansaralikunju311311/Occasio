@@ -1,31 +1,29 @@
 import { NextFunction, Request, Response } from 'express';
 import { HttpStatus } from '../../common/constants/http-status';
 import { SuccessMessage, ErrorMessage } from '../../common/enums/message-enum';
-import { SignupUsecase } from '../../application/usecases/auth/signup/signup.usecase';
-import { VerifyUseCase } from '../../application/usecases/auth/otp/verifyotp.usecase';
-import { ResendotpUseCase } from '../../application/usecases/auth/resendotp/resend.usecase';
-import { GetmeUseCase } from '../../application/usecases/auth/restore/getme.usecase';
-import { ForgotpasswordUsecase } from '../../application/usecases/auth/forgotpassword/forgot.usecase';
-import { CreateToken } from '../../common/services/token.service';
-import { LoginUseCase } from '../../application/usecases/auth/login/login.usecase';
-import { UpdatePasswordUseCase } from '../../application/usecases/auth/updatepassword/updatepassword.usecase';
-import { ResetPasswordUseCase } from '../../application/usecases/auth/reserPassword/reset.uecase';
-import { AdminLoginUseCase } from '../../application/usecases/auth/adminLogin/adminLogin.usecase';
 import { logger } from '@/common/logger/logger';
+import { ISignupUseCase } from '@/application/usecases/auth/signup/signup.usecase.interface';
+import { IVerifyOtpUseCase } from '@/application/usecases/auth/otp/verifyotp.usecase.interface';
+import { IResendUseCase } from '@/application/usecases/auth/resendotp/resend.usecase.interface';
+import { IApprovalUseCase } from '@/application/usecases/admin/manageApproval/managerapproval.usecase.interface';
+import { IForgotpasswordUsecase } from '@/application/usecases/auth/forgotpassword/forgot.usecase.interface';
+import { ITokenService } from '@/domain/services/token.service.interface';
+import { ILoginUsecase } from '@/application/usecases/auth/login/login.usecase.interface';
+import { IUpdateUseCase } from '@/application/usecases/auth/updatepassword/update.usecase.interface';
 export class AuthController {
   constructor(
-    private SignupUsecase: SignupUsecase,
+    private SignupUsecase: ISignupUseCase,
 
-    private VerifyUseCase: VerifyUseCase,
-    private ResendotpUseCase: ResendotpUseCase,
-    private GetmeUseCase: GetmeUseCase,
-    private ForgotpasswordUsecase: ForgotpasswordUsecase,
-    private tokenService: CreateToken,
-    private LoginUseCase: LoginUseCase,
-    private ResetPasswordUseCase: ResetPasswordUseCase,
+    private VerifyUseCase: IVerifyOtpUseCase,
+    private ResendotpUseCase: IResendUseCase,
+    private GetmeUseCase: IApprovalUseCase,
+    private ForgotpasswordUsecase: IForgotpasswordUsecase,
+    private tokenService: ITokenService,
+    private LoginUseCase: ILoginUsecase,
+    private ResetPasswordUseCase: IResendUseCase,
 
-    private UpdatePasswordUseCase: UpdatePasswordUseCase,
-    private AdminLoginUseCase: AdminLoginUseCase,
+    private UpdatePasswordUseCase: IUpdateUseCase,
+    private AdminLoginUseCase: ILoginUsecase,
     //  private tokenService:ITokenService
   ) {}
   async signup(req: Request, res: Response, next: NextFunction): Promise<void> {

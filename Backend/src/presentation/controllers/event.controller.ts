@@ -1,16 +1,17 @@
 import { NextFunction, Request, Response } from 'express-serve-static-core';
-import { EventCretionUseCase } from '../../application/usecases/events/eventcreation/eventcreation.usecase';
 import { HttpStatus } from '../../common/constants/http-status';
-import { GetEventsUseCase } from '../../application/usecases/events/getEvents/getevents.usecase';
-import { EventDetailsUseCase } from '../../application/usecases/events/eventdetails/eventdetails.usecase';
-import { MyEventsUseCase } from '../../application/usecases/events/myevents/myevents.usecase';
+
 import { UserRole } from '../../common/enums/userrole-enum';
+import { IEventCreationUseCase } from '@/application/usecases/events/eventcreation/eventcreation.usecase.interface';
+import { IGetEventsUseCase } from '@/application/usecases/events/getEvents/getEvents.usecase.interface';
+import { IEventDetailsUseCase } from '@/application/usecases/events/eventdetails/eventdetails.usecase.interface';
+import { IMyEventsUseCase } from '@/application/usecases/events/myevents/myevents.usecase.interface';
 export class EventController {
   constructor(
-    private eventCreationUseCase: EventCretionUseCase,
-    private getEventsUseCase: GetEventsUseCase,
-    private eventDetailsUseCase: EventDetailsUseCase,
-    private myEventsUseCase: MyEventsUseCase,
+    private eventCreationUseCase: IEventCreationUseCase,
+    private getEventsUseCase: IGetEventsUseCase,
+    private eventDetailsUseCase: IEventDetailsUseCase,
+    private myEventsUseCase: IMyEventsUseCase,
   ) {}
 
   async eventCreation(

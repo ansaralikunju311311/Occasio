@@ -2,7 +2,8 @@ import { IUserRepository } from '../../../../domain/repositories/user.repository
 import { User } from '../../../../domain/entities/user.entity';
 import { EmailSerive } from '../../../../common/services/email.service';
 import { UpgradeStatus } from '../../../../common/enums/upgrade-enums';
-export class ManagerRejectionUseCase {
+import { IManagerRejectionUseCase } from './managerRejection.usecase.interface';
+export class ManagerRejectionUseCase implements IManagerRejectionUseCase{
   constructor(
     private userRepository: IUserRepository,
     private emailService: EmailSerive,

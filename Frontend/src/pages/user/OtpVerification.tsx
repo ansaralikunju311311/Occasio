@@ -85,10 +85,23 @@ const OtpVerification = () => {
     mode: 'onBlur',
   });
 
-  const resendOtp = () => resendMutation.mutate();
+  const resendOtp = () => {
+    if (userData?.email) {
+      resendMutation.mutate(userData.email);
+    } else {
+      toast.error('User email not found. Please try signing up again.');
+    }
+  };
 
   const onSubmit = (data: OtpData) => {
-    verifyMutation.mutate(data.otp);
+    if (userData?.email) {
+      verifyMutation.mutate({
+        email: userData.email,
+        otp: data.otp,
+      });
+    } else {
+      toast.error('User email not found. Please try signing up again.');
+    }
   };
 
   return (
