@@ -12,3 +12,35 @@
     }
   }
 }
+// {
+//   "compilerOptions": {
+//     "rootDir": "./src",
+//     "outDir": "./dist",
+//     "module": "ESNext",
+//     "target": "ES2020",
+//     "moduleResolution": "node",  // ✅ FIXED
+//     "esModuleInterop": true,
+//     "strict": true,
+//     "baseUrl": ".",
+//     "paths": {
+//       "@/*": ["./src/*"]
+//     }
+//   }
+// }
+// {
+//   "compilerOptions": {
+//     "rootDir": "./src",
+//     "outDir": "./dist",
+
+//     "module": "NodeNext",
+//     "moduleResolution": "NodeNext",
+
+//     "target": "ES2020",
+//     "esModuleInterop": true,
+//     "strict": true,
+
+//     "paths": {
+//       "@/*": ["./src/*"]
+//     }
+//   }
+// }
