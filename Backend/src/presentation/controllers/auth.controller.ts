@@ -10,6 +10,8 @@ import { IForgotpasswordUsecase } from '@/application/usecases/auth/forgotpasswo
 import { ITokenService } from '@/domain/services/token.service.interface';
 import { ILoginUsecase } from '@/application/usecases/auth/login/login.usecase.interface';
 import { IUpdateUseCase } from '@/application/usecases/auth/updatepassword/update.usecase.interface';
+import { IResetPasswordUseCase } from '@/application/usecases/auth/resetPassword/reset.usecase.interface';
+
 export class AuthController {
   constructor(
     private SignupUsecase: ISignupUseCase,
@@ -20,7 +22,7 @@ export class AuthController {
     private ForgotpasswordUsecase: IForgotpasswordUsecase,
     private tokenService: ITokenService,
     private LoginUseCase: ILoginUsecase,
-    private ResetPasswordUseCase: IResendUseCase,
+    private ResetPasswordUseCase: IResetPasswordUseCase,
 
     private UpdatePasswordUseCase: IUpdateUseCase,
     private AdminLoginUseCase: ILoginUsecase,

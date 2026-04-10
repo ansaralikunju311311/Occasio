@@ -7,7 +7,9 @@ import { AppError } from '../../../../common/errors/apperror';
 import { HttpStatus } from '../../../../common/constants/http-status';
 import { ErrorMessage } from '../../../../common/enums/message-enum';
 import { IOtpRepository } from '../../../../domain/repositories/otp.repository.interface';
-export class ResetPasswordUseCase {
+import { IResetPasswordUseCase } from './reset.usecase.interface';
+
+export class ResetPasswordUseCase implements IResetPasswordUseCase {
   constructor(
     private userRespository: IUserRepository,
     private hashService: IHashServive,

@@ -12,7 +12,7 @@ import { ForgotpasswordUsecase } from '../application/usecases/auth/forgotpasswo
 import { LoginUseCase } from '../application/usecases/auth/login/login.usecase';
 // import  {ITokenService}  from "domain/services/token.service.interface"
 import { UpdatePasswordUseCase } from '../application/usecases/auth/updatepassword/updatepassword.usecase';
-import { ResetPasswordUseCase } from '../application/usecases/auth/reserPassword/reset.uecase';
+import { ResetPasswordUseCase } from '../application/usecases/auth/resetPassword/reset.usecase';
 import { AdminLoginUseCase } from '../application/usecases/auth/adminLogin/adminLogin.usecase';
 export const MakeAdminController = () => {
   const userRepository = new UserRepository();
