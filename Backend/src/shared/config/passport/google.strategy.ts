@@ -24,8 +24,8 @@ passport.use(
             if (state.role) {
               role = state.role;
             }
-          } catch (e) {
-            console.error('Error parsing profile state:', e);
+          } catch (error: unknown) {
+            console.error('Error parsing profile state:', error);
           }
         }
 
@@ -42,7 +42,7 @@ passport.use(
         }
 
         return done(null, user);
-      } catch (error) {
+      } catch (error: unknown) {
         return done(error);
       }
     },

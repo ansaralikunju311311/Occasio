@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express';
+import { Request, Response } from 'express';
 import { HttpStatus } from '../../common/constants/http-status';
 import { SuccessMessage, ErrorMessage } from '../../common/enums/message-enum';
 import { logger } from '@/common/logger/logger';
@@ -11,11 +11,11 @@ import { ITokenService } from '@/domain/services/token.service.interface';
 import { ILoginUsecase } from '@/application/usecases/auth/login/login.usecase.interface';
 import { IUpdateUseCase } from '@/application/usecases/auth/updatepassword/update.usecase.interface';
 import { IResetPasswordUseCase } from '@/application/usecases/auth/resetPassword/reset.usecase.interface';
+import { catchAsync } from '@/common/utils/catchAsync';
 
 export class AuthController {
   constructor(
     private SignupUsecase: ISignupUseCase,
-
     private VerifyUseCase: IVerifyOtpUseCase,
     private ResendotpUseCase: IResendUseCase,
     private GetmeUseCase: IApprovalUseCase,
@@ -23,133 +23,91 @@ export class AuthController {
     private tokenService: ITokenService,
     private LoginUseCase: ILoginUsecase,
     private ResetPasswordUseCase: IResetPasswordUseCase,
-
     private UpdatePasswordUseCase: IUpdateUseCase,
     private AdminLoginUseCase: ILoginUsecase,
-    //  private tokenService:ITokenService
   ) {}
-  async signup(req: Request, res: Response, next: NextFunction): Promise<void> {
-    console.log('bkjbhjbchjb');
-    logger.info('Test route hit');
-    try {
-      console.log('rjfjrf', req.body);
-      const { name, email, password, confirmpassword, isVerified } = req.body;
 
-      const user = await this.SignupUsecase.execute({
-        name,
-        email,
-        password,
-        confirmpassword,
-        isVerified,
-      });
-      console.log(user);
-      res.status(HttpStatus.CREATED).json({
-        message: SuccessMessage.USER_CREATED,
-        data: user,
-      });
-    } catch (error: any) {
-      console.log(error.message);
-      next(error);
-    }
-  }
+  signup = catchAsync(async (req: Request, res: Response) => {
+    logger.info('Signup route hit');
+    const { name, email, password, confirmpassword, isVerified } = req.body;
 
-  async verify(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-      const { email, otp } = req.body;
+    const user = await this.SignupUsecase.execute({
+      name,
+      email,
+      password,
+      confirmpassword,
+      isVerified,
+    });
 
-      console.log('opt verification come data', req.body);
-      const { user, accessToken, refreshToken } =
-        await this.VerifyUseCase.execute({ email, otp });
+    res.status(HttpStatus.CREATED).json({
+      message: SuccessMessage.USER_CREATED,
+      data: user,
+    });
+  });
 
-      res.cookie('refreshToken', refreshToken, {
-        httpOnly: true,
-        secure: false,
-        sameSite: 'lax',
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-      });
+  verify = catchAsync(async (req: Request, res: Response) => {
+    const { email, otp } = req.body;
+    logger.info(`Verifying OTP for email: ${email}`);
 
-      //  console.log("checking",user,refreshToken,accessToken)
-      res.status(HttpStatus.OK).json({
-        message: SuccessMessage.OTP_VERIFIED,
-        user,
-        accessToken,
-      });
-    } catch (error: any) {
-      next(error);
-    }
-  }
+    const { user, accessToken, refreshToken } = await this.VerifyUseCase.execute({ email, otp });
 
-  async resnedVerify(
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> {
-    try {
-      const { email } = req.body;
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
 
-      const verifyOtp = await this.ResendotpUseCase.execute(email);
-      res.status(HttpStatus.OK).json({
-        message: SuccessMessage.OTP_RESENT,
-        data: verifyOtp,
-      });
-    } catch (error: any) {
-      console.log(error);
-      next(error);
-    }
-  }
+    res.status(HttpStatus.OK).json({
+      message: SuccessMessage.OTP_VERIFIED,
+      user,
+      accessToken,
+    });
+  });
 
-  async getMe(req: Request, res: Response) {
-    try {
-      const userId = req.authUser!.userId;
+  resnedVerify = catchAsync(async (req: Request, res: Response) => {
+    const { email } = req.body;
+    const verifyOtp = await this.ResendotpUseCase.execute(email);
+    
+    res.status(HttpStatus.OK).json({
+      message: SuccessMessage.OTP_RESENT,
+      data: verifyOtp,
+    });
+  });
 
-      // console.log("decoded ", decode)
-      const user = await this.GetmeUseCase.execute(userId);
-      res.status(HttpStatus.OK).json({
-        user,
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  }
+  getMe = catchAsync(async (req: Request, res: Response) => {
+    const userId = req.authUser!.userId;
+    const user = await this.GetmeUseCase.execute(userId);
+    
+    res.status(HttpStatus.OK).json({
+      user,
+    });
+  });
 
-  async forgotPassword(
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> {
-    console.log('vjfncjfjv');
-    try {
-      const { email } = req.body;
+  forgotPassword = catchAsync(async (req: Request, res: Response) => {
+    const { email } = req.body;
+    const user = await this.ForgotpasswordUsecase.execute(email);
 
-      console.log('fjvndfjvfhd');
+    res.status(HttpStatus.OK).json({
+      message: SuccessMessage.OTP_SENT,
+      data: user,
+    });
+  });
 
-      const user = await this.ForgotpasswordUsecase.execute(email);
-
-      // console.log("th user here",user)
-      res.status(HttpStatus.OK).json({
-        message: SuccessMessage.OTP_SENT,
-        data: user,
-      });
-    } catch (error: any) {
-      //  console.log('error')
-      next(error);
-    }
-  }
-
-  logout = async (req: Request, res: Response) => {
+  logout = (req: Request, res: Response) => {
     res.clearCookie('refreshToken', {
       httpOnly: true,
-      secure: false, // true in production (HTTPS)
+      secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
     });
 
-    return res.status(200).json({
+    return res.status(HttpStatus.OK).json({
       success: true,
       message: SuccessMessage.LOGOUT_SUCCESS,
     });
   };
 
-  async refreshToken(req: Request, res: Response) {
+  refreshToken = catchAsync(async (req: Request, res: Response) => {
     const refreshToken = req.cookies.refreshToken;
 
     if (!refreshToken) {
@@ -158,93 +116,66 @@ export class AuthController {
       });
     }
 
-    try {
-      const decode = this.tokenService.verifyRefreshToken(refreshToken) as any;
+    const decode = this.tokenService.verifyRefreshToken(refreshToken) as any;
+    const newaccessToken = this.tokenService.generateAccessToken({
+      userId: decode.userId,
+      role: decode.role,
+    });
 
-      const newaccessToken = this.tokenService.generateAccessToken({
-        userId: decode.userId,
-        role: decode.role,
-      });
+    return res.json({
+      accessToken: newaccessToken,
+    });
+  });
 
-      return res.json({
-        accessToken: newaccessToken,
-      });
-    } catch (error) {
-      return res.status(HttpStatus.UNAUTHORIZED).json({
-        message: ErrorMessage.INVALID_REFRESH_TOKEN,
-      });
-    }
-  }
+  login = catchAsync(async (req: Request, res: Response) => {
+    const { email, password } = req.body;
+    const { user, accessToken, refreshToken } = await this.LoginUseCase.execute({ email, password });
 
-  async login(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-      const { email, password } = req.body;
-      console.log(req.body);
-      const { user, accessToken, refreshToken } =
-        await this.LoginUseCase.execute({ email, password });
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
 
-      res.cookie('refreshToken', refreshToken, {
-        httpOnly: true,
-        secure: false,
-        sameSite: 'lax',
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-      });
+    res.status(HttpStatus.OK).json({
+      message: SuccessMessage.LOGIN_SUCCESS,
+      user,
+      accessToken,
+    });
+  });
 
-      console.log('onnn check,', user);
-      res.status(HttpStatus.OK).json({
-        message: SuccessMessage.LOGIN_SUCCESS,
-        user,
-        accessToken,
-      });
-    } catch (error: any) {
-      next(error);
-    }
-  }
+  updatePassword = catchAsync(async (req: Request, res: Response) => {
+    const { email, currentPassword, newPassword, confirmPassword } = req.body;
+    const user = await this.UpdatePasswordUseCase.execute({
+      email,
+      currentPassword,
+      newPassword,
+      confirmPassword,
+    });
 
-  async updatePassword(req: Request, res: Response, next: NextFunction) {
-    try {
-      const { email, currentPassword, newPassword, confirmPassword } = req.body;
+    res.status(HttpStatus.OK).json({
+      message: SuccessMessage.PASSWORD_UPDATED,
+      data: user,
+    });
+  });
 
-      const user = await this.UpdatePasswordUseCase.execute({
-        email,
-        currentPassword,
-        newPassword,
-        confirmPassword,
-      });
-      res.status(HttpStatus.OK).json({
-        message: SuccessMessage.PASSWORD_UPDATED,
-        data: user,
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
+  resetpassword = catchAsync(async (req: Request, res: Response) => {
+    const { email, otp, password, confirmpassword } = req.body;
+    const user = await this.ResetPasswordUseCase.execute({
+      email,
+      otp,
+      password,
+      confirmpassword,
+    });
 
-  async resetpassword(
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> {
-    try {
-      const { email, otp, password, confirmpassword } = req.body;
+    res.status(HttpStatus.OK).json({
+      message: SuccessMessage.PASSWORD_RESET,
+      data: user,
+    });
+  });
 
-      // console.log(req.body)
-      const user = await this.ResetPasswordUseCase.execute({
-        email,
-        otp,
-        password,
-        confirmpassword,
-      });
-      res.status(HttpStatus.OK).json({
-        message: SuccessMessage.PASSWORD_RESET,
-        data: user,
-      });
-    } catch (error: any) {
-      next(error);
-    }
-  }
-
-  async googleLogin(req: Request, res: Response) {
+  googleLogin = (req: Request, res: Response) => {
     const user = req.user as any;
 
     if (!user || !user.id) {
@@ -264,41 +195,28 @@ export class AuthController {
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      secure: false,
+      secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
     });
 
     res.redirect(`http://localhost:5173/oauth-success?token=${accessToken}`);
-  }
+  };
 
-  async adminlogin(
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> {
-    // console.log('jnjnfdjnfkdjnfljnfljdnfdljfnd')
+  adminlogin = catchAsync(async (req: Request, res: Response) => {
+    const { email, password } = req.body;
+    const { user, accessToken, refreshToken } = await this.AdminLoginUseCase.execute({ email, password });
 
-    try {
-      const { email, password, role } = req.body;
-      // console.log(req.body)
-      const { user, accessToken, refreshToken } =
-        await this.AdminLoginUseCase.execute({ email, password });
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
 
-      res.cookie('refreshToken', refreshToken, {
-        httpOnly: true,
-        secure: false,
-        sameSite: 'lax',
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-      });
-
-      // console.log("onnn check,",user,refreshToken,accessToken)
-      res.status(HttpStatus.OK).json({
-        message: SuccessMessage.LOGIN_SUCCESS,
-        user,
-        accessToken,
-      });
-    } catch (error: any) {
-      next(error);
-    }
-  }
+    res.status(HttpStatus.OK).json({
+      message: SuccessMessage.LOGIN_SUCCESS,
+      user,
+      accessToken,
+    });
+  });
 }

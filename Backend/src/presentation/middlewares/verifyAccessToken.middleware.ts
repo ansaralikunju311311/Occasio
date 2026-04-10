@@ -34,7 +34,7 @@ export const verifyAccessToken = (
 
     console.log('fdkjnkjenjnjdnvf;jadsnvjdnkjkfnadj');
     next();
-  } catch (error) {
+  } catch (error: unknown) {
     console.log('error', error);
     return res
       .status(HttpStatus.UNAUTHORIZED)

@@ -10,7 +10,7 @@ const startServer = async (): Promise<void> => {
     app.listen(3001, () => {
       console.log(`the server is running propelrly`);
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.log(error);
   }
 };

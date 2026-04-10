@@ -35,7 +35,7 @@ export class EmailSerive {
                 `,
       });
       console.log(`OTP successfully sent to ${to}`);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(`Failed to send OTP to ${to}:`, error);
     }
   }
@@ -55,7 +55,7 @@ export class EmailSerive {
                 `,
       });
       console.log(`Approval email successfully sent to ${to}`);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(`Failed to send approval email to ${to}:`, error);
     }
   }
@@ -88,7 +88,7 @@ export class EmailSerive {
                 `,
       });
       console.log(`Rejection email successfully sent to ${to}`);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(`Failed to send rejection email to ${to}:`, error);
     }
   }
