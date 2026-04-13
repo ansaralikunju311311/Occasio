@@ -4,6 +4,7 @@ import { adminService } from '../../services/admin.service';
 import { toast } from 'sonner';
 import { Table } from '../../components/common/Table';
 import { SearchBar } from '../../components/common/SearchBar';
+import { Pagination } from '../../components/common/Pagination';
 import { useEventManagers, useBlockUser } from '../../hooks/useAdmin';
 
 interface EventManager {
@@ -21,12 +22,27 @@ const AdminEventManagers = () => {
   const [selectedManager, setSelectedManager] = useState<any | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const {
-    data: managers = [],
+    data: responseData,
     isLoading: loading,
     error,
-  } = useEventManagers({ search: searchQuery });
+  } = useEventManagers({ search: searchQuery, page: currentPage, limit: itemsPerPage });
+
+  const managers = responseData?.users || [];
+  const metadata = responseData?.metadata;
+
+  const handleSearch = (term: string) => {
+    setSearchQuery(term);
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const blockMutation = useBlockUser();
 
@@ -89,7 +105,7 @@ const AdminEventManagers = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-full min-h-[60vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
       </div>
     );
   }
@@ -108,7 +124,7 @@ const AdminEventManagers = () => {
         {/* Search bar */}
         <SearchBar
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={(e) => handleSearch(e.target.value)}
           placeholder="Search event managers..."
         />
       </div>
@@ -176,8 +192,7 @@ const AdminEventManagers = () => {
               </td>
             </tr>
           }
-          renderRow={(manager, index) => {
-            console.log('checking', manager);
+          renderRow={(manager: EventManager, index: number) => {
             const managerId = manager._id || manager.id || index.toString();
 
             return (
@@ -264,6 +279,17 @@ const AdminEventManagers = () => {
             );
           }}
         />
+
+        {/* Pagination Section */}
+        {metadata && metadata.total > 0 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={metadata.totalPages}
+            totalItems={metadata.total}
+            itemsPerPage={itemsPerPage}
+            onPageChange={handlePageChange}
+          />
+        )}
       </div>
 
       {/* Manager Details Modal */}

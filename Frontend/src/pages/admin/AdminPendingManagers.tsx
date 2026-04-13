@@ -3,7 +3,8 @@ import { adminService } from '../../services/admin.service';
 import { toast } from 'sonner';
 import { Table } from '../../components/common/Table';
 import { SearchBar } from '../../components/common/SearchBar';
-import { usePendingManagers, useApproveManager, useRejectManager, useAdminPendingManagerDetails } from '../../hooks/useAdmin';
+import { Pagination } from '../../components/common/Pagination';
+import { usePendingManagers, useApproveManager, useRejectManager } from '../../hooks/useAdmin';
 
 interface ManagerDetails {
   _id: string;
@@ -21,14 +22,33 @@ interface ManagerDetails {
 const AdminPendingManagers = () => {
   const [selectedManager, setSelectedManager] = useState<ManagerDetails | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [fetchingDetails, setFetchingDetails] = useState(false);
   const [isRejectionModalOpen, setIsRejectionModalOpen] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
   const [rejectionId, setRejectionId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [fetchingDetails, setFetchingDetails] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
 
   // Fetching Managers
-  const { data: managers = [], isLoading: loading } = usePendingManagers({ search: searchQuery });
+  const { data: responseData, isLoading: loading } = usePendingManagers({
+    search: searchQuery,
+    page: currentPage,
+    limit: itemsPerPage,
+  });
+
+  const managers = responseData?.users || [];
+  const metadata = responseData?.metadata;
+
+  const handleSearch = (term: string) => {
+    setSearchQuery(term);
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   // Approval Mutation
   const approveMutation = useApproveManager();
@@ -131,18 +151,17 @@ const AdminPendingManagers = () => {
 
         <SearchBar
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={(e) => handleSearch(e.target.value)}
           placeholder="Search pending managers..."
         />
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <Table
-          theadClassName="bg-gray-50 border-b border-gray-200"
-          tbodyClassName="bg-white divide-y divide-gray-100"
           columns={[
             { header: 'Manager Details' },
             { header: 'Status' },
+            { header: 'Applied At' },
             {
               header: 'Actions',
               className:
@@ -152,38 +171,37 @@ const AdminPendingManagers = () => {
           data={managers}
           emptyState={
             <tr>
-              <td colSpan={3} className="px-6 py-16 text-center text-gray-500">
+              <td colSpan={4} className="px-6 py-12 text-center text-gray-500">
                 <div className="flex flex-col items-center justify-center">
                   <svg
-                    className="h-16 w-16 text-gray-300 mb-4"
+                    className="h-12 w-12 text-gray-300 mb-4"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
-                    aria-hidden="true"
                   >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      strokeWidth="1.5"
+                      strokeWidth="2"
                       d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                     />
                   </svg>
-                  <p className="text-lg font-medium text-gray-900">No pending requests</p>
-                  <p className="text-sm mt-1 text-gray-500">
-                    There are currently no users waiting to be approved.
+                  <p className="text-base font-medium text-gray-900">No pending requests</p>
+                  <p className="text-sm mt-1">
+                    There are currently no new manager upgrade applications to review.
                   </p>
                 </div>
               </td>
             </tr>
           }
-          renderRow={(manager, index) => {
+          renderRow={(manager: any, index: number) => {
             const managerId = manager._id || manager.id || index.toString();
             return (
               <tr key={managerId} className="hover:bg-gray-50 transition-colors duration-150">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
-                    <div className="shrink-0 h-10 w-10">
-                      <div className="h-10 w-10 rounded-full bg-linear-to-tr from-emerald-500 to-emerald-600 flex items-center justify-center text-white font-medium shadow-sm">
+                    <div className="flex-shrink-0 h-10 w-10">
+                      <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-emerald-500 to-emerald-600 flex items-center justify-center text-white font-medium shadow-sm">
                         {getInitials(manager.name)}
                       </div>
                     </div>
@@ -196,83 +214,41 @@ const AdminPendingManagers = () => {
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border bg-amber-50 text-amber-600 border-amber-200 shadow-sm">
-                    <span className="h-1.5 w-1.5 rounded-full mr-1.5 bg-amber-500 animate-pulse"></span>
-                    {manager.status || 'PENDING'}
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-100">
+                    <span className="h-1.5 w-1.5 rounded-full bg-amber-600 mr-1.5 animte-pulse"></span>
+                    Pending Review
                   </span>
                 </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {manager.createdAt
+                    ? new Date(manager.createdAt).toLocaleDateString()
+                    : 'Recent'}
+                </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <div className="flex justify-end gap-2">
-                    <button
-                      className={`inline-flex items-center text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-all duration-200 shadow-sm border border-indigo-100 ${fetchingDetails ? 'opacity-70 cursor-not-allowed' : ''}`}
-                      onClick={() => handleManagerDetails(managerId)}
-                      disabled={fetchingDetails}
-                    >
-                      {fetchingDetails ? (
-                        <svg
-                          className="animate-spin h-4 w-4 mr-1.5 text-indigo-600"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          ></circle>
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          ></path>
-                        </svg>
-                      ) : (
-                        <svg
-                          className="w-4 h-4 mr-1.5"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                          />
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                          />
-                        </svg>
-                      )}
-                      {fetchingDetails ? 'Loading...' : 'View'}
-                    </button>
-                    {/* <button
-                      className="inline-flex items-center text-teal-600 hover:text-teal-900 bg-teal-50 hover:bg-teal-100 px-3 py-1.5 rounded-lg transition-all duration-200 shadow-sm border border-teal-100"
-                      onClick={() => handleApproval(managerId)}
-                    >
-                      <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-                      Approve
-                    </button>
-                    <button
-                      className="inline-flex items-center text-rose-600 hover:text-rose-900 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-lg transition-all duration-200 shadow-sm border border-rose-100"
-                      onClick={() => handleRejection(managerId)}
-                    >
-                      <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                      Reject
-                    </button> */}
-                  </div>
+                  <button
+                    onClick={() => handleManagerDetails(managerId)}
+                    className="text-emerald-600 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-md transition-colors duration-150"
+                  >
+                    View Application
+                  </button>
                 </td>
               </tr>
             );
           }}
         />
+
+        {/* Pagination Section */}
+        {metadata && metadata.total > 0 && (
+          <div className="border-t border-gray-100 p-4">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={metadata.totalPages}
+              totalItems={metadata.total}
+              itemsPerPage={itemsPerPage}
+              onPageChange={handlePageChange}
+            />
+          </div>
+        )}
       </div>
 
       {/* Modal */}
@@ -546,9 +522,10 @@ const AdminPendingManagers = () => {
           </div>
         </div>
       )}
+
       {/* Rejection Reason Modal */}
       {isRejectionModalOpen && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden flex flex-col">
             <div className="px-6 py-4 border-b border-gray-100 bg-rose-50/30">
               <h2 className="text-xl font-bold text-gray-900">Provide Rejection Reason</h2>

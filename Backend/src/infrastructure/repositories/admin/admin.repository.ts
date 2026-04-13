@@ -1,14 +1,24 @@
-import { EventManager } from '../../../domain/entities/manager.entity';
 import { User } from '../../../domain/entities/user.entity';
 import { IAdminRepository } from '../../../domain/repositories/admin/admin.repository.interface';
-import { EventManagerModel } from '../../database/model/manager.model';
 import { UserModel } from '../../database/model/user.model';
+import { PaginationParams, PaginatedResponse } from '../../../common/interfaces/pagination.interface';
+import { EventManager } from '../../../domain/entities/manager.entity';
+import { EventManagerModel } from '../../database/model/manager.model';
 
 export class AdminRepository implements IAdminRepository {
-  async findAllUser(search?: string): Promise<User[] | null> {
+  async findAllUser(params: PaginationParams): Promise<PaginatedResponse<User> | null> {
+    const { page = 1, limit = 10, search, role, applyingupgrade } = params;
     const query: any = {
       role: { $ne: 'ADMIN' }, // always exclude admin
     };
+
+    if (role) {
+      query.role = role;
+    }
+
+    if (applyingupgrade) {
+      query.applyingupgrade = applyingupgrade;
+    }
 
     if (search) {
       query.$or = [
@@ -18,11 +28,25 @@ export class AdminRepository implements IAdminRepository {
       ];
     }
 
-    const users = await UserModel.find(query);
+    const skip = (page - 1) * limit;
+    const [users, total] = await Promise.all([
+      UserModel.find(query).skip(skip).limit(limit).exec(),
+      UserModel.countDocuments(query).exec(),
+    ]);
 
-    if (!users || users.length === 0) return null;
+    if (!users || users.length === 0) {
+      return {
+        data: [],
+        metadata: {
+          total: 0,
+          page,
+          limit,
+          totalPages: 0,
+        },
+      };
+    }
 
-    return users.map(
+    const data = users.map(
       (user) =>
         new User(
           user._id.toString(),
@@ -37,6 +61,16 @@ export class AdminRepository implements IAdminRepository {
           user.reapplyAt,
         ),
     );
+
+    return {
+      data,
+      metadata: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
   async findById(id: string): Promise<User | null> {

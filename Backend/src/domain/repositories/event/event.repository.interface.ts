@@ -1,5 +1,7 @@
 import { Events } from '../../../domain/entities/event.entity';
 import mongoose from 'mongoose';
+import { PaginationParams, PaginatedResponse } from '@/common/interfaces/pagination.interface';
+
 export interface IEventRepository {
   createEvent(event: Events, session?: mongoose.ClientSession): Promise<Events>;
   createSeatLayout(data: any, session?: mongoose.ClientSession): Promise<any>;
@@ -11,7 +13,7 @@ export interface IEventRepository {
     layoutId: string,
     session?: mongoose.ClientSession,
   ): Promise<void>;
-  findAllEvents(eventType: string, search: string): Promise<Events[] | null>;
+  findAllEvents(params: PaginationParams): Promise<PaginatedResponse<Events> | null>;
   findByIdEvents(id: string): Promise<Events | null>;
 
   findExactConflict(
@@ -20,5 +22,5 @@ export interface IEventRepository {
     startTime: Date,
     endTime: Date,
   ): Promise<Events | null>;
-  findEvents(userId: string, search?: string): Promise<Events[] | null>;
+  findEvents(userId: string, params: PaginationParams): Promise<PaginatedResponse<Events> | null>;
 }

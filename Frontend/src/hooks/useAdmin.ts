@@ -11,12 +11,10 @@ export const useAdminUsers = (params?: any) => {
 export const usePendingManagers = (params?: any) => {
   return useQuery({
     queryKey: ['pendingManagers', params],
-    queryFn: () => adminService.getUsers(params).then((res) => {
-      const usersData: any[] = Array.isArray(res.data)
-        ? res.data
-        : res.data?.users || res.data?.data || [];
-      return usersData.filter((user: any) => user.applyingupgrade === 'PENDING');
-    }),
+    queryFn: () =>
+      adminService
+        .getUsers({ ...params, applyingupgrade: 'PENDING' })
+        .then((res) => res.data),
   });
 };
 
@@ -39,26 +37,20 @@ export const useAdminPendingManagerDetails = (id: string) => {
 export const useEventManagers = (params?: any) => {
   return useQuery({
     queryKey: ['adminManagers', params],
-    queryFn: () => adminService.getUsers(params).then((res) => {
-      const usersData: any[] = Array.isArray(res.data)
-        ? res.data
-        : res.data?.users || res.data?.data || [];
-      return usersData.filter(
-        (user: any) => user.role === 'EVENT_MANAGER' || user.isEventManger === true
-      );
-    }),
+    queryFn: () =>
+      adminService
+        .getUsers({ ...params, role: 'EVENT_MANAGER' })
+        .then((res) => res.data),
   });
 };
 
 export const useAllUsers = (params?: any) => {
   return useQuery({
     queryKey: ['adminUsers', params],
-    queryFn: () => adminService.getUsers(params).then((res) => {
-      const usersData: any[] = Array.isArray(res.data)
-        ? res.data
-        : res.data?.users || res.data?.data || [];
-      return usersData.filter((user: any) => user.role === 'USER');
-    }),
+    queryFn: () =>
+      adminService
+        .getUsers({ ...params, role: 'USER' })
+        .then((res) => res.data),
   });
 };
 

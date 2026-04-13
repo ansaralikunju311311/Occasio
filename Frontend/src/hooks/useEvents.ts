@@ -4,7 +4,7 @@ import { eventService } from '../services/event.service';
 export const useEvents = (params?: any) => {
   return useQuery({
     queryKey: ['events', params],
-    queryFn: () => eventService.getEvents(params).then((res) => res.data.events || []),
+    queryFn: () => eventService.getEvents(params).then((res) => res.data),
   });
 };
 
@@ -38,13 +38,13 @@ export const useCreateEvent = () => {
 export const useAllEventsAdmin = (params?: any) => {
   return useQuery({
     queryKey: ['allEventsAdmin', params],
-    queryFn: () => eventService.getAllEvents(params).then((res) => res.data.events || []),
+    queryFn: () => eventService.getAllEvents(params).then((res) => res.data),
   });
 };
 
 export const useMyEvents = (params?: any) => {
   return useQuery({
     queryKey: ['myEvents', params],
-    queryFn: () => eventService.getMyEvents(params).then((res) => res.data.events || []),
+    queryFn: () => eventService.getMyEvents(params).then((res) => res.data),
   });
 };

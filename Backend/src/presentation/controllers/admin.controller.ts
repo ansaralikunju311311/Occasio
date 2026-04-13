@@ -21,9 +21,21 @@ export class AdminController {
 
   getUsers = catchAsync(async (req: Request, res: Response) => {
     const search = req.query.search as string;
-    const users = await this.findallUsecase.execute(search);
+    const role = req.query.role as string;
+    const applyingupgrade = req.query.applyingupgrade as string;
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+
+    const result = await this.findallUsecase.execute({
+      search,
+      role,
+      applyingupgrade,
+      page,
+      limit,
+    });
     res.status(HttpStatus.OK).json({
-      users,
+      users: result?.data || [],
+      metadata: result?.metadata,
     });
   });
 

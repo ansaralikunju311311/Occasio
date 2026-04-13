@@ -78,7 +78,11 @@ const ResetPassword: React.FC = () => {
   };
 
   const resendOtp = () => {
-    resendMutation.mutate();
+    if (user?.email) {
+      resendMutation.mutate(user.email);
+    } else {
+      toast.error('User email not found. Please try the forgot password flow again.');
+    }
   };
 
 

@@ -1,42 +1,58 @@
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../redux/hook';
 import { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import { createPortal } from 'react-dom';
-import { api } from '../services/api';
 import EventMap from '../components/eventManager/EventMap';
 import CurrentLocation from '../components/user/CurrentLocation';
 import { EventType } from './eventManager/CreateEvent';
 
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { Pagination } from '../components/common/Pagination';
+import { useEvents } from '../hooks/useEvents';
+import { api } from '../services/api';
 
 const LandingPage = () => {
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [eventFilter, setEventFilter] = useState('ALL');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
   const navigate = useNavigate();
   const user = useAppSelector((state) => state.auth.user);
 
   const {
-    data: events = [],
+    data: responseData,
     isLoading: loading,
     error,
-  } = useQuery({
-    queryKey: ['events', eventFilter],
-    queryFn: async () => {
-      const queryParams: any = {};
-      if (eventFilter && eventFilter.toUpperCase() !== 'ALL') {
-        queryParams.eventType = eventFilter;
-      }
-      const response = await api.get('/events/events', { params: queryParams });
-      const fetchedEvents = response.data.events || [];
-      return Array.isArray(fetchedEvents) ? fetchedEvents : [];
-    },
+  } = useEvents({
+    eventType: eventFilter && eventFilter.toUpperCase() !== 'ALL' ? eventFilter : undefined,
+    page: currentPage,
+    limit: itemsPerPage,
   });
+
+  const events = responseData?.events || [];
+  const metadata = responseData?.metadata;
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // Smooth scroll to top of events section, or just top of page
+    const eventsSection = document.getElementById('events-section');
+    if (eventsSection) {
+      eventsSection.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const fetchEvents = (eventType: string = 'ALL') => {
+    setEventFilter(eventType);
+    setCurrentPage(1);
+  };
 
   const detailMutation = useMutation({
     mutationFn: (id: string) => api.get(`/events/eventDetails/${id}`),
-    onSuccess: (response) => {
-      const eventData = response.data.events;
+    onSuccess: (response: any) => {
+      const eventData = response.data.events || response.data.data?.events || response.data;
       setSelectedEvent(eventData);
       setIsDetailsModalOpen(true);
     },
@@ -45,9 +61,6 @@ const LandingPage = () => {
     },
   });
 
-  const fetchEvents = (eventType: string = 'ALL') => {
-    setEventFilter(eventType);
-  };
 
   const viewEventDetails = (id: string) => {
     detailMutation.mutate(id);
@@ -270,7 +283,7 @@ const LandingPage = () => {
         </div>
       </section>
       {/* EVENTS SECTION */}
-      <section className="py-24 px-6 max-w-7xl mx-auto relative z-10">
+      <section id="events-section" className="py-24 px-6 max-w-7xl mx-auto relative z-10">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
           <div>
             <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-4 text-center md:text-left">
@@ -333,8 +346,9 @@ const LandingPage = () => {
             </p>
           </div>
         ) : events.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {events.map((event) => (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {events.map((event: any) => (
               <div
                 key={event.id}
                 className="group relative bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-[2rem] overflow-hidden hover:border-indigo-500/40 hover:shadow-[0_20px_50px_-12px_rgba(99,102,241,0.2)] transition-all duration-500 flex flex-col h-full"
@@ -490,6 +504,20 @@ const LandingPage = () => {
               </div>
             ))}
           </div>
+
+          {/* Pagination Section */}
+          {metadata && metadata.total > 0 && (
+            <div className="mt-12 flex justify-center">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={metadata.totalPages}
+                totalItems={metadata.total}
+                itemsPerPage={itemsPerPage}
+                onPageChange={handlePageChange}
+              />
+            </div>
+          )}
+        </>
         ) : (
           <div className="text-center py-24 bg-slate-900/20 backdrop-blur-sm border border-slate-800/40 rounded-[3rem]">
             <div className="w-20 h-20 bg-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-8 border border-slate-700 shadow-inner">

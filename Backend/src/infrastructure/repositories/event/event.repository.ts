@@ -6,6 +6,7 @@ import { EventModel } from '../../../infrastructure/database/model/events/event.
 import mongoose from 'mongoose';
 import { SeatModel } from '../../../infrastructure/database/model/events/seat.model';
 import { SeatLayoutModel } from '../../../infrastructure/database/model/events/seatLayout.model';
+import { PaginationParams, PaginatedResponse } from '../../../common/interfaces/pagination.interface';
 
 export class EventRepository
   extends BaseRepository<IEventDocument>
@@ -32,7 +33,8 @@ export class EventRepository
     return this.toEntity(events);
   }
 
-  async findAllEvents(eventType: string, search?: string): Promise<Events[]> {
+  async findAllEvents(params: PaginationParams): Promise<PaginatedResponse<Events>> {
+    const { page = 1, limit = 10, search, eventType } = params;
     const query: any = {};
 
     if (eventType) {
@@ -43,18 +45,35 @@ export class EventRepository
       query.$or = [
         { title: { $regex: search, $options: 'i' } },
         { description: { $regex: search, $options: 'i' } },
-        { email: { $regex: search, $options: 'i' } },
         { eventType: { $regex: search, $options: 'i' } },
       ];
     }
-    const events = await this.model
-      .find(query)
-      .populate('createdBy')
-      .populate('seatLayoutId')
-      .populate('seats')
-      .sort({ createdAt: -1 });
 
-    return events.map((event) => this.toEntity(event));
+    const skip = (page - 1) * limit;
+    const [events, total] = await Promise.all([
+      this.model
+        .find(query)
+        .populate('createdBy')
+        .populate('seatLayoutId')
+        .populate('seats')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .exec(),
+      this.model.countDocuments(query).exec(),
+    ]);
+
+    const data = events.map((event) => this.toEntity(event));
+
+    return {
+      data,
+      metadata: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
   async findByIdEvents(id: string): Promise<Events | null> {
@@ -86,14 +105,8 @@ export class EventRepository
     return events ? this.toEntity(events) : null;
   }
 
-  // async findEvents(eventType:string,startTime:Date){
-  //   const event = await this.model.find({startTime,eventType})
-
-  //     return event?this.toEntity(event):null
-
-  // }
-
-  async findEvents(userId: string, search?: string): Promise<Events[] | null> {
+  async findEvents(userId: string, params: PaginationParams): Promise<PaginatedResponse<Events>> {
+    const { page = 1, limit = 10, search } = params;
     const query: any = { createdBy: userId as any };
 
     if (search) {
@@ -103,14 +116,31 @@ export class EventRepository
       ];
     }
 
-    const events = await this.model
-      .find(query)
-      .populate('createdBy')
-      .populate('seatLayoutId')
-      .populate('seats')
-      .sort({ createdAt: -1 });
+    const skip = (page - 1) * limit;
+    const [events, total] = await Promise.all([
+      this.model
+        .find(query)
+        .populate('createdBy')
+        .populate('seatLayoutId')
+        .populate('seats')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .exec(),
+      this.model.countDocuments(query).exec(),
+    ]);
 
-    return events.map((event) => this.toEntity(event));
+    const data = events.map((event) => this.toEntity(event));
+
+    return {
+      data,
+      metadata: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
   async updateEventLayout(

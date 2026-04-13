@@ -26,6 +26,20 @@ export abstract class BaseRepository<T> {
     return this.model.find(filter).exec();
   }
 
+  async findWithPagination(
+    filter: FilterQuery<T> = {},
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<{ data: HydratedDocument<T>[]; total: number }> {
+    const skip = (page - 1) * limit;
+    const [data, total] = await Promise.all([
+      this.model.find(filter).skip(skip).limit(limit).exec(),
+      this.model.countDocuments(filter).exec(),
+    ]);
+
+    return { data, total };
+  }
+
   async updateOne(
     filter: FilterQuery<T>,
     data: UpdateQuery<T>,

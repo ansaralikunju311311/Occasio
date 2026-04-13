@@ -1,41 +1,58 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { api } from '../../services/api';
 import { toast } from 'sonner';
 import { Table } from '../../components/common/Table';
 import { SearchBar } from '../../components/common/SearchBar';
+import { Pagination } from '../../components/common/Pagination';
 import EventDetailsModal from '../../components/admin/EventDetailsModal';
+import { useAllEventsAdmin } from '../../hooks/useEvents';
+
+interface Event {
+  id: string;
+  _id?: string;
+  title: string;
+  category: string;
+  status: string;
+  date?: string;
+  price?: number;
+  location?: string;
+  managerName?: string;
+}
 
 const AdminEvents = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
 
   const {
-    data: events = [],
+    data: responseData,
     isLoading: loading,
     error,
-  } = useQuery<any[]>({
-    queryKey: ['adminEvents', searchTerm],
-    queryFn: async () => {
-      const response = await api.get('/events/allevents', {
-        params: { search: searchTerm },
-      });
-
-      if (response.data && response.data.events) {
-        return response.data.events;
-      } else if (Array.isArray(response.data)) {
-        return response.data;
-      }
-      return [];
-    },
+  } = useAllEventsAdmin({
+    search: searchTerm,
+    page: currentPage,
+    limit: itemsPerPage,
   });
+
+  const events = responseData?.events || [];
+  const metadata = responseData?.metadata;
+
+  const handleSearch = (term: string) => {
+    setSearchTerm(term);
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   if (error) {
     toast.error('Failed to load events list.');
   }
 
-  const filteredEvents = events.filter((event) => {
+  const filteredEvents = events.filter((event: Event) => {
     const matchesStatus = statusFilter === 'ALL' || event.status === statusFilter;
     return matchesStatus;
   });
@@ -100,7 +117,7 @@ const AdminEvents = () => {
       <div className="bg-[#0a0f16]/80 backdrop-blur-xl border border-slate-800/60 rounded-2xl p-4 mb-6 flex flex-col md:flex-row gap-4 justify-between items-center shadow-lg">
         <SearchBar
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => handleSearch(e.target.value)}
           placeholder="Search events by ID or Title..."
         />
 
@@ -160,7 +177,7 @@ const AdminEvents = () => {
               </td>
             </tr>
           }
-          renderRow={(event) => (
+          renderRow={(event: any) => (
             <tr key={event.id} className="hover:bg-slate-800/30 transition-colors group">
               <td className="px-6 py-4 flex flex-col justify-center">
                 <div className="text-white font-semibold text-sm truncate max-w-[200px] mb-1 group-hover:text-emerald-400 transition-colors">
@@ -357,6 +374,19 @@ const AdminEvents = () => {
             </tr>
           )}
         />
+
+        {/* Pagination Section */}
+        {metadata && metadata.total > 0 && (
+          <div className="border-t border-slate-800/60">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={metadata.totalPages}
+              totalItems={metadata.total}
+              itemsPerPage={itemsPerPage}
+              onPageChange={handlePageChange}
+            />
+          </div>
+        )}
       </div>
 
       {/* Event Details Modal */}

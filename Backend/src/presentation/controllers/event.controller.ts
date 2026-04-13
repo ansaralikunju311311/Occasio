@@ -28,15 +28,22 @@ export class EventController {
     const user = req.authUser;
     const eventType = req.query.eventType as string;
     const search = req.query.search as string;
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
 
-    const events = await this.getEventsUseCase.execute(eventType, search);
+    const result = await this.getEventsUseCase.execute({ eventType, search, page, limit });
 
-    if (!events) {
-      return res.status(HttpStatus.OK).json({ events: [] });
+    if (!result) {
+      return res.status(HttpStatus.OK).json({ events: [], metadata: { total: 0, page, limit, totalPages: 0 } });
     }
 
+    let events = result.data;
+
     if (user && user.role === UserRole.ADMIN) {
-      return res.status(HttpStatus.OK).json({ events });
+      return res.status(HttpStatus.OK).json({
+        events,
+        metadata: result.metadata,
+      });
     }
 
     const now = new Date();
@@ -46,6 +53,7 @@ export class EventController {
 
     res.status(HttpStatus.OK).json({
       events: filteredEvents,
+      metadata: result.metadata,
     });
   });
 
@@ -60,9 +68,13 @@ export class EventController {
   myEvents = catchAsync(async (req: Request, res: Response) => {
     const userId = req.authUser!.userId;
     const search = req.query.search as string;
-    const events = await this.myEventsUseCase.execute(userId, search);
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+
+    const result = await this.myEventsUseCase.execute(userId, { search, page, limit });
     res.status(HttpStatus.OK).json({
-      events,
+      events: result?.data || [],
+      metadata: result?.metadata,
     });
   });
 }
