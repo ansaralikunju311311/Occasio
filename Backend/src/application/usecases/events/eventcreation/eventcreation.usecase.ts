@@ -116,29 +116,9 @@ export class EventCretionUseCase implements IEventCreationUseCase {
           session,
         );
 
-        const seats: any[] = [];
-
-        for (const block of data.layout.blocks) {
-          for (const row of block.rows) {
-            for (let c = 1; c <= row.columns; c++) {
-              seats.push({
-                eventId: event.id,
-                layoutId: layout._id,
-                block: block.blockName,
-                row: row.rowNumber,
-                column: c,
-                seatNumber: `${block.blockName}-${row.rowNumber}-${c}`,
-                categoryName: block.category.name,
-                price: block.category.price,
-                status: SeatStatus.AVAILABLE,
-                holdExpiresAt: null,
-              });
-            }
-          }
-        }
-
-        await this.eventRepository.createSeats(seats, session);
-
+        // STOP: Individual seat documents for the entire layout are no longer pre-generated.
+        // Seats will only be created when they are actually locked, booked, or canceled.
+        
         if (!event.id) {
           throw new Error('Event ID not generated');
         }

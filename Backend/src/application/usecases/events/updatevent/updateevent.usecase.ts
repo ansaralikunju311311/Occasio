@@ -91,41 +91,9 @@ export class UpdateEventUseCase implements IUpdateEventUseCase {
             session,
           );
 
-          const seats: any[] = [];
-
-          for (const block of data.layout.blocks) {
-            for (const row of block.rows) {
-              const totalColumns = Number(row.columns);
-
-              if (!totalColumns || totalColumns <= 0) {
-                console.log("Skipping row due to invalid columns:", row);
-                continue;
-              }
-
-              for (let c = 1; c <= totalColumns; c++) {
-                seats.push({
-                  eventId: eventId,
-                  layoutId: layout._id,
-                  block: block.blockName,
-                  row: row.rowNumber,
-                  column: c,
-                  seatNumber: `${block.blockName}-${row.rowNumber}-${c}`,
-
-                  categoryName: block.category?.name || "General",
-                  price: Number(block.category?.price) || 0,
-
-                  status: SeatStatus.AVAILABLE,
-                  holdExpiresAt: null,
-                });
-              }
-            }
-          }
-
-          // Insert seats
-          if (seats.length > 0) {
-            await this.eventRepository.createSeats(seats, session);
-          }
-
+          // STOP: Individual seat documents for the entire layout are no longer pre-generated.
+          // Seats will only be created when they are actually locked, booked, or canceled.
+          
           // Update event with layout id
           await this.eventRepository.updateEventLayout(
             eventId,

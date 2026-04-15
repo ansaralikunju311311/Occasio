@@ -21,36 +21,59 @@ interface GroupedBlock {
   rows: { rowNumber: number; seats: Seat[] }[];
 }
 
-// ─── Helper: group flat seats by block → row ──────────────────────────────────
+// ─── Helper: group seats by block → row based on LAYOUT structure ─────────────
 
-const groupSeats = (seats: Seat[], layoutBlocks: any[] = []): GroupedBlock[] => {
-  const blockMap = new Map<string, Map<number, Seat[]>>();
-  for (const seat of seats) {
-    if (!blockMap.has(seat.block)) blockMap.set(seat.block, new Map());
-    const rowMap = blockMap.get(seat.block)!;
-    if (!rowMap.has(seat.row)) rowMap.set(seat.row, []);
-    rowMap.get(seat.row)!.push(seat);
+const groupSeats = (existingSeats: Seat[], layoutBlocks: any[] = []): GroupedBlock[] => {
+  // 1. Create a lookup map for existing (busy/held) seats: "block-row-column" -> Seat
+  const busySeatMap = new Map<string, Seat>();
+  for (const s of existingSeats) {
+    const key = `${s.block}-${s.row}-${s.column}`.toUpperCase();
+    busySeatMap.set(key, s);
   }
-  // Build blocks, then sort by price ascending:
-  // cheapest at top (far from stage) → most expensive at bottom (near stage)
-  const blocks = Array.from(blockMap.entries()).map(([blockName, rowMap]) => {
-    const lb = layoutBlocks.find(
-      (b: any) => (b.blockName || b.blocName)?.toUpperCase() === blockName.toUpperCase()
-    );
+
+  // 2. Iterate over the layout definition and build the grouped structure
+  const blocks = layoutBlocks.map((lb) => {
+    const blockName = lb.blockName || lb.blocName || 'Unknown';
+    const trimmedBlockName = blockName.trim();
+
     return {
-      blockName,
-      categoryName: lb?.category?.name ?? '',
-      categoryPrice: lb?.category?.price ?? null,
-      rows: Array.from(rowMap.entries())
-        .sort(([a], [b]) => a - b)
-        .map(([rowNumber, rowSeats]) => ({
+      blockName: trimmedBlockName,
+      categoryName: lb.category?.name ?? '',
+      categoryPrice: lb.category?.price ?? null,
+      rows: (lb.rows || []).map((lr: any) => {
+        const rowNumber = Number(lr.rowNumber);
+        const totalColumns = Number(lr.columns);
+        const seats: Seat[] = [];
+
+        for (let c = 1; c <= totalColumns; c++) {
+          const key = `${trimmedBlockName}-${rowNumber}-${c}`.toUpperCase();
+          const existing = busySeatMap.get(key);
+
+          if (existing) {
+            seats.push(existing);
+          } else {
+            // Virtual seat - not in DB yet
+            const seatNumber = `${trimmedBlockName}-${rowNumber}-${c}`;
+            seats.push({
+              _id: `v-${key}`, // Synthetic ID
+              block: trimmedBlockName,
+              row: rowNumber,
+              column: c,
+              seatNumber: seatNumber,
+              status: 'AVAILABLE',
+            });
+          }
+        }
+
+        return {
           rowNumber,
-          seats: [...rowSeats].sort((a, b) => a.column - b.column),
-        })),
+          seats,
+        };
+      }),
     };
   });
 
-  // Sort: highest price at top (far from stage) → lowest price at bottom (near stage/screen)
+  // 3. Sort: highest price at top (far from stage) → lowest price at bottom (near stage/screen)
   blocks.sort((a, b) => {
     const priceA = a.categoryPrice ?? 0;
     const priceB = b.categoryPrice ?? 0;
