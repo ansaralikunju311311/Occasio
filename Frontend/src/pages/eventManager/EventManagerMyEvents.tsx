@@ -6,7 +6,7 @@ import { Table } from '../../components/common/Table';
 import { SearchBar } from '../../components/common/SearchBar';
 import { Pagination } from '../../components/common/Pagination';
 import EventDetailsModal from '../../components/admin/EventDetailsModal';
-import { useMyEvents } from '../../hooks/useEvents';
+import { useMyEvents, useDeleteEvent } from '../../hooks/useEvents';
 
 const EventManagerMyEvents = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -15,6 +15,8 @@ const EventManagerMyEvents = () => {
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const navigate = useNavigate();
+  const deleteMutation = useDeleteEvent();
+  const [isDeletingId, setIsDeletingId] = useState<string | null>(null);
 
   const {
     data: responseData,
@@ -37,6 +39,24 @@ const EventManagerMyEvents = () => {
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleEdit = (id: string) => {
+    navigate(`/eventmanager/edit-event/${id}`);
+  };
+
+  const handleCancel = async (id: string) => {
+    if (window.confirm('Are you sure you want to cancel (delete) this event? This action cannot be undone.')) {
+      setIsDeletingId(id);
+      try {
+        await deleteMutation.mutateAsync(id);
+        toast.success('Event cancelled successfully.');
+      } catch (err) {
+        toast.error('Failed to cancel event.');
+      } finally {
+        setIsDeletingId(null);
+      }
+    }
   };
 
   if (error) {
@@ -210,185 +230,229 @@ const EventManagerMyEvents = () => {
                 </td>
               </tr>
             }
-            renderRow={(event: any) => (
-              <tr key={event.id} className="hover:bg-slate-800/30 transition-colors group">
-                <td className="px-6 py-4 flex flex-col justify-center">
-                  <div className="text-white font-semibold text-sm truncate max-w-50 mb-1 group-hover:text-teal-400 transition-colors">
-                    {event.title}
-                  </div>
-                  <div className="flex items-center gap-2 text-xs">
-                    <span className="text-slate-500 font-mono" title={event.id}>
-                      {event.id ? `${event.id.substring(0, 8)}...` : 'N/A'}
-                    </span>
-                    <span className="w-1 h-1 rounded-full bg-slate-700"></span>
-                    <span className="text-slate-400 capitalize">
-                      {event.eventType?.toLowerCase() || 'Event'}
-                    </span>
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="text-sm text-slate-300 mb-2 flex items-start gap-2">
-                    <svg
-                      className="w-3.5 h-3.5 text-slate-500 mt-0.5 shrink-0"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                      />
-                    </svg>
-                    <div className="flex flex-col">
-                      <span>
-                        {event.startTime
-                          ? `${new Date(event.startTime).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} at ${new Date(event.startTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`
-                          : 'N/A'}
-                      </span>
-                      {event.endTime && (
-                        <span className="text-xs text-slate-500 mt-0.5">
-                          to{' '}
-                          {new Date(event.endTime).toLocaleDateString('en-US', {
-                            month: 'short',
-                            day: 'numeric',
-                            year: 'numeric',
-                          })}{' '}
-                          at{' '}
-                          {new Date(event.endTime).toLocaleTimeString('en-US', {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
-                        </span>
-                      )}
+            renderRow={(event: any) => {
+              const isStarted = new Date(event.startTime) <= new Date();
+              return (
+                <tr key={event.id} className="hover:bg-slate-800/30 transition-colors group">
+                  <td className="px-6 py-4 flex flex-col justify-center">
+                    <div className="text-white font-semibold text-sm truncate max-w-50 mb-1 group-hover:text-teal-400 transition-colors">
+                      {event.title}
                     </div>
-                  </div>
-                  <span
-                    className={`inline-flex px-2 py-0.5 rounded-md text-[10px] font-bold ${getFormatStyle(event.eventType)}`}
-                  >
-                    {event.eventType || 'UNKNOWN'}
-                  </span>
-                </td>
-                <td className="px-6 py-4">
-                  {(() => {
-                    const type = event.eventType?.toUpperCase();
-                    const blocks =
-                      event?.SeatLayout?.blocks ??
-                      event?.seatLayout?.blocks ??
-                      event?.seatLayoutDetails?.blocks ??
-                      event?.layout?.blocks ??
-                      [];
-                    const onlinePrice = event.price ?? 0;
-
-                    if (type === 'ONLINE') {
-                      return (
-                        <div className="text-sm font-medium text-emerald-400">
-                          {onlinePrice > 0 ? `₹${onlinePrice}` : 'Free'}
-                        </div>
-                      );
-                    }
-
-                    if (type === 'OFFLINE') {
-                      if (blocks.length > 0) {
-                        return (
-                          <div className="flex flex-col gap-1">
-                            {blocks.map((b: any, i: number) => {
-                              const name =
-                                b.category?.name || b.blockName || b.blocName || `Block ${i + 1}`;
-                              const price = b.category?.price;
-                              return (
-                                <div key={i} className="flex items-center gap-2 text-xs">
-                                  <span className="text-slate-400">{name}:</span>
-                                  <span className="font-semibold text-emerald-400">
-                                    {typeof price === 'number' ? `₹${price}` : '—'}
-                                  </span>
-                                </div>
-                              );
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="text-slate-500 font-mono" title={event.id}>
+                        {event.id ? `${event.id.substring(0, 8)}...` : 'N/A'}
+                      </span>
+                      <span className="w-1 h-1 rounded-full bg-slate-700"></span>
+                      <span className="text-slate-400 capitalize">
+                        {event.eventType?.toLowerCase() || 'Event'}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="text-sm text-slate-300 mb-2 flex items-start gap-2">
+                      <svg
+                        className="w-3.5 h-3.5 text-slate-500 mt-0.5 shrink-0"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
+                      </svg>
+                      <div className="flex flex-col">
+                        <span>
+                          {event.startTime
+                            ? `${new Date(event.startTime).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} at ${new Date(event.startTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`
+                            : 'N/A'}
+                        </span>
+                        {event.endTime && (
+                          <span className="text-xs text-slate-500 mt-0.5">
+                            to{' '}
+                            {new Date(event.endTime).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              year: 'numeric',
+                            })}{' '}
+                            at{' '}
+                            {new Date(event.endTime).toLocaleTimeString('en-US', {
+                              hour: '2-digit',
+                              minute: '2-digit',
                             })}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <span
+                      className={`inline-flex px-2 py-0.5 rounded-md text-[10px] font-bold ${getFormatStyle(event.eventType)}`}
+                    >
+                      {event.eventType || 'UNKNOWN'}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    {(() => {
+                      const type = event.eventType?.toUpperCase();
+                      const blocks =
+                        event?.SeatLayout?.blocks ??
+                        event?.seatLayout?.blocks ??
+                        event?.seatLayoutDetails?.blocks ??
+                        event?.layout?.blocks ??
+                        [];
+                      const onlinePrice = event.price ?? 0;
+
+                      if (type === 'ONLINE') {
+                        return (
+                          <div className="text-sm font-medium text-emerald-400">
+                            {onlinePrice > 0 ? `₹${onlinePrice}` : 'Free'}
                           </div>
                         );
                       }
-                      return (
-                        <div className="text-sm font-medium text-emerald-400">
-                          {onlinePrice > 0 ? `₹${onlinePrice}` : 'Free'}
-                        </div>
-                      );
-                    }
 
-                    if (type === 'HYBRID') {
-                      return (
-                        <div className="flex flex-col gap-1.5">
-                          {/* Online ticket */}
-                          <div className="flex items-center gap-2 text-xs">
-                            <span className="px-1.5 py-0.5 rounded bg-sky-400/10 text-sky-400 font-bold text-[9px] uppercase">
-                              Online
-                            </span>
-                            <span className="font-semibold text-emerald-400">
-                              {onlinePrice > 0 ? `₹${onlinePrice}` : 'Free'}
-                            </span>
-                          </div>
-                          {/* Offline categories */}
-                          {blocks.length > 0 && (
-                            <div className="flex flex-col gap-1 pt-1 border-t border-slate-800/50">
+                      if (type === 'OFFLINE') {
+                        if (blocks.length > 0) {
+                          return (
+                            <div className="flex flex-col gap-1">
                               {blocks.map((b: any, i: number) => {
                                 const name =
                                   b.category?.name || b.blockName || b.blocName || `Block ${i + 1}`;
                                 const price = b.category?.price;
                                 return (
                                   <div key={i} className="flex items-center gap-2 text-xs">
-                                    <span className="text-slate-500">{name}:</span>
-                                    <span className="font-semibold text-amber-400">
+                                    <span className="text-slate-400">{name}:</span>
+                                    <span className="font-semibold text-emerald-400">
                                       {typeof price === 'number' ? `₹${price}` : '—'}
                                     </span>
                                   </div>
                                 );
                               })}
                             </div>
-                          )}
+                          );
+                        }
+                        return (
+                          <div className="text-sm font-medium text-emerald-400">
+                            {onlinePrice > 0 ? `₹${onlinePrice}` : 'Free'}
+                          </div>
+                        );
+                      }
+
+                      if (type === 'HYBRID') {
+                        return (
+                          <div className="flex flex-col gap-1.5">
+                            {/* Online ticket */}
+                            <div className="flex items-center gap-2 text-xs">
+                              <span className="px-1.5 py-0.5 rounded bg-sky-400/10 text-sky-400 font-bold text-[9px] uppercase">
+                                Online
+                              </span>
+                              <span className="font-semibold text-emerald-400">
+                                {onlinePrice > 0 ? `₹${onlinePrice}` : 'Free'}
+                              </span>
+                            </div>
+                            {/* Offline categories */}
+                            {blocks.length > 0 && (
+                              <div className="flex flex-col gap-1 pt-1 border-t border-slate-800/50">
+                                {blocks.map((b: any, i: number) => {
+                                  const name =
+                                    b.category?.name || b.blockName || b.blocName || `Block ${i + 1}`;
+                                  const price = b.category?.price;
+                                  return (
+                                    <div key={i} className="flex items-center gap-2 text-xs">
+                                      <span className="text-slate-500">{name}:</span>
+                                      <span className="font-semibold text-amber-400">
+                                        {typeof price === 'number' ? `₹${price}` : '—'}
+                                      </span>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      }
+
+                      // Fallback
+                      return (
+                        <div className="text-sm font-medium text-emerald-400">
+                          {onlinePrice > 0 ? `₹${onlinePrice}` : 'Free'}
                         </div>
                       );
-                    }
+                    })()}
+                  </td>
+                  <td className="px-6 py-4">
+                    <span
+                      className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full border ${getStatusStyle(event.status)}`}
+                    >
+                      {event.status || 'UNKNOWN'}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-right space-x-2 whitespace-nowrap">
+                    <button
+                      onClick={() => setSelectedEvent(event)}
+                      className="p-2 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-lg transition-colors inline-block"
+                      title="View details"
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                        />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                        />
+                      </svg>
+                    </button>
 
-                    // Fallback
-                    return (
-                      <div className="text-sm font-medium text-emerald-400">
-                        {onlinePrice > 0 ? `₹${onlinePrice}` : 'Free'}
-                      </div>
-                    );
-                  })()}
-                </td>
-                <td className="px-6 py-4">
-                  <span
-                    className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full border ${getStatusStyle(event.status)}`}
-                  >
-                    {event.status || 'UNKNOWN'}
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-right space-x-2 whitespace-nowrap">
-                  <button
-                    onClick={() => setSelectedEvent(event)}
-                    className="p-2 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-lg transition-colors inline-block"
-                    title="View details"
-                  >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                      />
-                    </svg>
-                  </button>
-                </td>
-              </tr>
-            )}
+                    <button
+                      onClick={() => handleEdit(event.id)}
+                      disabled={isStarted}
+                      className="p-2 text-indigo-400 hover:text-white hover:bg-indigo-700/50 rounded-lg transition-colors inline-block disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                      title={isStarted ? "Cannot edit event after it has started" : "Edit event"}
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                        />
+                      </svg>
+                    </button>
+
+                    <button
+                      onClick={() => handleCancel(event.id)}
+                      disabled={isStarted || isDeletingId === event.id}
+                      className="p-2 text-rose-400 hover:text-white hover:bg-rose-700/50 rounded-lg transition-colors inline-block disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                      title={isStarted ? "Cannot cancel event after it has started" : "Cancel (Delete) event"}
+                    >
+                      {isDeletingId === event.id ? (
+                        <div className="w-4 h-4 border-2 border-rose-400/20 border-t-rose-400 rounded-full animate-spin" />
+                      ) : (
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                          />
+                        </svg>
+                      )}
+                    </button>
+                  </td>
+                </tr>
+              );
+            }}
           />
 
           {/* Pagination Section */}

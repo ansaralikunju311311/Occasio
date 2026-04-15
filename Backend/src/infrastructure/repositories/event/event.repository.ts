@@ -7,6 +7,8 @@ import mongoose from 'mongoose';
 import { SeatModel } from '../../../infrastructure/database/model/events/seat.model';
 import { SeatLayoutModel } from '../../../infrastructure/database/model/events/seatLayout.model';
 import { PaginationParams, PaginatedResponse } from '../../../common/interfaces/pagination.interface';
+import { UpdateEventDTO } from '@/application/dtos/updateevent.dto';
+import { EventStatus } from '../../../common/enums/eventstatus-enum';
 
 export class EventRepository
   extends BaseRepository<IEventDocument>
@@ -34,11 +36,16 @@ export class EventRepository
   }
 
   async findAllEvents(params: PaginationParams): Promise<PaginatedResponse<Events>> {
-    const { page = 1, limit = 10, search, eventType } = params;
+    const { page = 1, limit = 10, search, eventType, upcoming } = params;
     const query: any = {};
 
     if (eventType) {
       query.eventType = eventType;
+    }
+
+    if (upcoming) {
+      query.endTime = { $gt: new Date() };
+      query.status = EventStatus.ACTIVE;
     }
 
     if (search) {
@@ -148,11 +155,19 @@ export class EventRepository
     layoutId: string,
     session?: mongoose.ClientSession,
   ) {
-    await this.model.findByIdAndUpdate(
-      eventId,
-      { seatLayoutId: layoutId },
-      { session },
-    );
+    if (!layoutId) {
+      await this.model.findByIdAndUpdate(
+        eventId,
+        { $unset: { seatLayoutId: '' } },
+        { session },
+      );
+    } else {
+      await this.model.findByIdAndUpdate(
+        eventId,
+        { seatLayoutId: layoutId },
+        { session },
+      );
+    }
   }
 
   async createSeats(seats: any[], session?: mongoose.ClientSession) {
@@ -162,6 +177,38 @@ export class EventRepository
   async createSeatLayout(data: any, session?: mongoose.ClientSession) {
     const [layout] = await SeatLayoutModel.create([data], { session });
     return layout;
+  }
+
+  async deleteSeatsByEventId(eventId: string, session?: mongoose.ClientSession) {
+    await SeatModel.deleteMany({ eventId }, { session });
+  }
+
+  async deleteLayoutByEventId(eventId: string, session?: mongoose.ClientSession) {
+    await SeatLayoutModel.deleteMany({ eventId }, { session });
+  }
+
+
+
+  async updateEvent(
+    eventId: string,
+    data: UpdateEventDTO,
+    session?: mongoose.ClientSession,
+    unsetData?: any,
+  ): Promise<Events | null> {
+    const updateQuery: any = { $set: data };
+    if (unsetData) {
+      updateQuery.$unset = unsetData;
+    }
+    const updated = await this.model.findByIdAndUpdate(
+      eventId,
+      updateQuery,
+      { new: true, session },
+    );
+    return updated ? this.toEntity(updated) : null;
+  }
+  async deleteEvent(id: string): Promise<boolean> {
+    const result = await this.model.findByIdAndDelete(id);
+    return !!result;
   }
 
   private toEntity(manager: any): Events {
@@ -175,6 +222,8 @@ export class EventRepository
     } else {
       createdById = manager.createdBy?.toString() || '';
     }
+
+
 
     let seatLayoutId: string = '';
     let seatLayoutDetails: any = null;
