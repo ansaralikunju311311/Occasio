@@ -22,6 +22,9 @@ export interface IEventDocument extends Document {
   status: EventStatus;
   picture: string;
   seatLayoutId: Schema.Types.ObjectId;
+
+  isDeleted: boolean;
+  deletedAt: Date;
 }
 
 const eventSchema = new Schema<IEventDocument>(
@@ -88,6 +91,14 @@ const eventSchema = new Schema<IEventDocument>(
       type: Schema.Types.ObjectId,
       ref: 'SeatLayout',
       required: false,
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
+    deletedAt: {
+      type: Date,
+      default: null,
     },
   },
   { timestamps: true },

@@ -37,7 +37,7 @@ export class EventRepository
 
   async findAllEvents(params: PaginationParams): Promise<PaginatedResponse<Events>> {
     const { page = 1, limit = 10, search, eventType, upcoming } = params;
-    const query: any = {};
+    const query: any = { isDeleted: { $ne: true } };
 
     if (eventType) {
       query.eventType = eventType;
@@ -85,7 +85,7 @@ export class EventRepository
 
   async findByIdEvents(id: string): Promise<Events | null> {
     const event = await this.model
-      .findById(id)
+      .findOne({ _id: id, isDeleted: { $ne: true } })
       .populate('createdBy')
       .populate('seatLayoutId')
       .populate('seats');
@@ -103,6 +103,7 @@ export class EventRepository
         'location.coordinates': [longitude, latitude],
         startTime: { $lt: endTime },
         endTime: { $gt: startTime },
+        isDeleted: { $ne: true },
       })
       .populate('createdBy')
       .populate('seatLayoutId')
@@ -207,7 +208,10 @@ export class EventRepository
     return updated ? this.toEntity(updated) : null;
   }
   async deleteEvent(id: string): Promise<boolean> {
-    const result = await this.model.findByIdAndDelete(id);
+    const result = await this.model.findByIdAndUpdate(id, {
+      isDeleted: true,
+      deletedAt: new Date(),
+    });
     return !!result;
   }
 
@@ -254,6 +258,8 @@ export class EventRepository
       seatLayoutId,
       seatLayoutDetails,
       manager.seats,
+      manager.isDeleted,
+      manager.deletedAt,
     );
   }
 }
