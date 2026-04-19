@@ -91,10 +91,7 @@ export class UpdateEventUseCase implements IUpdateEventUseCase {
             session,
           );
 
-          // STOP: Individual seat documents for the entire layout are no longer pre-generated.
-          // Seats will only be created when they are actually locked, booked, or canceled.
           
-          // Update event with layout id
           await this.eventRepository.updateEventLayout(
             eventId,
             layout._id,

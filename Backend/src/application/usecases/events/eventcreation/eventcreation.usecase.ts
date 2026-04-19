@@ -116,8 +116,7 @@ export class EventCretionUseCase implements IEventCreationUseCase {
           session,
         );
 
-        // STOP: Individual seat documents for the entire layout are no longer pre-generated.
-        // Seats will only be created when they are actually locked, booked, or canceled.
+      
         
         if (!event.id) {
           throw new Error('Event ID not generated');
