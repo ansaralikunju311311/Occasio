@@ -1,9 +1,9 @@
 import { IEventRepository } from '../../../../domain/repositories/event/event.repository.interface';
-import { Events } from '@/domain/entities/event.entity';
+import { Events } from '../../../../domain/entities/event.entity';
 import { IUpdateEventUseCase } from './updatevent.usecase.interface';
-import { UpdateEventDTO } from '@/application/dtos/updateevent.dto';
+import { UpdateEventDTO } from '../../../../application/dtos/updateevent.dto';
 import mongoose from 'mongoose';
-import { SeatStatus } from '../../../../common/enums/searstatus-enum';
+// import { SeatStatus } from '../../../../common/enums/searstatus-enum';
 import { EventType } from '../../../../common/enums/event-type';
 import { getLocationName } from '../../../../common/services/location.service';
 import { normalizeCoordinates } from '../../../../common/utils/geo.utils';

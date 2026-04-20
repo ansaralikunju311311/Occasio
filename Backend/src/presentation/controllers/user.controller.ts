@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import { HttpStatus } from '../../common/constants/http-status';
 import { SuccessMessage } from '../../common/enums/message-enum';
-import { IUpgradeUseCase } from '@/application/usecases/user/upgraderole/upgaradeRole.usecase.interface';
-import { IReapplyUseCase } from '@/application/usecases/user/reapply/reapply.usecase.interface';
-import { IEditProfileUseCase } from '@/application/usecases/user/editProfile/editprofile.usecase.interface';
-import { catchAsync } from '@/common/utils/catchAsync';
+import { IUpgradeUseCase } from '../../application/usecases/user/upgraderole/upgaradeRole.usecase.interface';
+import { IReapplyUseCase } from '../../application/usecases/user/reapply/reapply.usecase.interface';
+import { IEditProfileUseCase } from '../../application/usecases/user/editProfile/editprofile.usecase.interface';
+import { catchAsync } from '../../common/utils/catchAsync';
 
 export class UserController {
   constructor(

@@ -7,7 +7,7 @@ import mongoose from 'mongoose';
 import { SeatModel } from '../../../infrastructure/database/model/events/seat.model';
 import { SeatLayoutModel } from '../../../infrastructure/database/model/events/seatLayout.model';
 import { PaginationParams, PaginatedResponse } from '../../../common/interfaces/pagination.interface';
-import { UpdateEventDTO } from '@/application/dtos/updateevent.dto';
+import { UpdateEventDTO } from '../../../application/dtos/updateevent.dto';
 import { EventStatus } from '../../../common/enums/eventstatus-enum';
 
 export class EventRepository

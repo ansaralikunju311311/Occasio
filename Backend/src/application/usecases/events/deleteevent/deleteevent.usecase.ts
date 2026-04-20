@@ -1,4 +1,4 @@
-import { IEventRepository } from '@/domain/repositories/event/event.repository.interface';
+import { IEventRepository } from '../../../../domain/repositories/event/event.repository.interface';
 import { IDeleteEventUseCase } from './deleteevent.usecase.interface';
 
 export class DeleteEventUseCase implements IDeleteEventUseCase {

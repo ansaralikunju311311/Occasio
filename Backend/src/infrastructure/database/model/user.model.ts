@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema } from 'mongoose';
 import { UserRole } from '../../../common/enums/userrole-enum';
 import { UserStatus } from '../../../common/enums/userstatus-enum';
-// import { UserOtp } from "../../../../common/enums/user-otp.enum.js";
+// import { UserOtp } from "../../../../common/enums/user-otp.enum";
 import { UpgradeStatus } from '../../../common/enums/upgrade-enums';
 // import { devNull } from "node:os";
 

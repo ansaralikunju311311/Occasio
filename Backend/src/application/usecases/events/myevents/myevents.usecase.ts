@@ -1,7 +1,7 @@
 import { IEventRepository } from '../../../../domain/repositories/event/event.repository.interface';
 import { IMyEventsUseCase } from './myevents.usecase.interface';
-import { PaginationParams, PaginatedResponse } from '@/common/interfaces/pagination.interface';
-import { Events } from '@/domain/entities/event.entity';
+import { PaginationParams, PaginatedResponse } from '../../../../common/interfaces/pagination.interface';
+import { Events } from '../../../../domain/entities/event.entity';
 
 export class MyEventsUseCase implements IMyEventsUseCase {
   constructor(private eventRepository: IEventRepository) {}

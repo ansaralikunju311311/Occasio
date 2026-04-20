@@ -1,4 +1,4 @@
-import { ITokenService } from '@/domain/services/token.service.interface';
+import { ITokenService } from '../../domain/services/token.service.interface';
 import jwt, { SignOptions } from 'jsonwebtoken';
 import { StringValue } from 'ms';
 

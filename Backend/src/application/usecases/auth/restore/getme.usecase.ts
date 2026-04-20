@@ -1,7 +1,7 @@
 import { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
 import { HttpStatus } from '../../../../common/constants/http-status';
 import { AppError } from '../../../../common/errors/apperror';
-import { User } from '@/domain/entities/user.entity';
+import { User } from '../../../../domain/entities/user.entity';
 import { IApprovalUseCase } from '../../admin/manageApproval/managerapproval.usecase.interface';
 export class GetmeUseCase implements IApprovalUseCase {
   constructor(private userRepository: IUserRepository) {}

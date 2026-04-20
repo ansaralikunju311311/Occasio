@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { verifyAccessToken } from '../middlewares/verifyAccessToken.middleware';
-// import { makeAuthController } from "../../../container/auth.container.js";
+// import { makeAuthController } from "../../../container/auth.container";
 import { requireRole } from '../middlewares/requireRole.middleware';
 import { makeAdminController } from '../../container/admin.containers';
 import { UserRole } from '../../common/enums/userrole-enum';

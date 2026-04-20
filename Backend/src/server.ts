@@ -1,8 +1,8 @@
-// import "../shared/config/env.js"
-import '../src/shared/loader/env.js';
-import app from './app.js';
-import { initializaApp } from './shared/loader/index.js';
-// import { clearExpiredOtpJob } from "../shared/loaders/index.js"
+// import "../shared/config/env"
+import '../src/shared/loader/env';
+import app from './app';
+import { initializaApp } from './shared/loader/index';
+// import { clearExpiredOtpJob } from "../shared/loaders/index"
 const startServer = async (): Promise<void> => {
   try {
     await initializaApp();

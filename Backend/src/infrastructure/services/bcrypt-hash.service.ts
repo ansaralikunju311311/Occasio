@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import { IHashServive } from '../../domain/services/hash.service.interface.js';
+import { IHashServive } from '../../domain/services/hash.service.interface';
 export class BcryptHashService implements IHashServive {
   async hash(value: string): Promise<string> {
     return bcrypt.hash(value, 10);

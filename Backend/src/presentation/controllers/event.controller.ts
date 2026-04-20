@@ -1,13 +1,13 @@
 import { Request, Response } from 'express-serve-static-core';
 import { HttpStatus } from '../../common/constants/http-status';
 import { UserRole } from '../../common/enums/userrole-enum';
-import { IEventCreationUseCase } from '@/application/usecases/events/eventcreation/eventcreation.usecase.interface';
-import { IGetEventsUseCase } from '@/application/usecases/events/getEvents/getEvents.usecase.interface';
-import { IEventDetailsUseCase } from '@/application/usecases/events/eventdetails/eventdetails.usecase.interface';
-import { IMyEventsUseCase } from '@/application/usecases/events/myevents/myevents.usecase.interface';
-import { catchAsync } from '@/common/utils/catchAsync';
-import { IDeleteEventUseCase } from '@/application/usecases/events/deleteevent/deleteevent.usecase.interface';
-import { IUpdateEventUseCase } from '@/application/usecases/events/updatevent/updatevent.usecase.interface';
+import { IEventCreationUseCase } from '../../application/usecases/events/eventcreation/eventcreation.usecase.interface';
+import { IGetEventsUseCase } from '../../application/usecases/events/getEvents/getEvents.usecase.interface';
+import { IEventDetailsUseCase } from '../../application/usecases/events/eventdetails/eventdetails.usecase.interface';
+import { IMyEventsUseCase } from '../../application/usecases/events/myevents/myevents.usecase.interface';
+import { catchAsync } from '../../common/utils/catchAsync';
+import { IDeleteEventUseCase } from '../../application/usecases/events/deleteevent/deleteevent.usecase.interface';
+import { IUpdateEventUseCase } from '../../application/usecases/events/updatevent/updatevent.usecase.interface';
 
 export class EventController {
   constructor(

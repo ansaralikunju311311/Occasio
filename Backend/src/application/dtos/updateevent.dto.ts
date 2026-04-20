@@ -19,7 +19,7 @@
 //   layout?: any; // later restrict
 // }
 
-import { EventType } from '@/common/enums/event-type';
+import { EventType } from '../../common/enums/event-type';
 
 export interface UpdateEventDTO {
   title?: string;

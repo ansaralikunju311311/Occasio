@@ -5,7 +5,7 @@ import { HttpStatus } from '../../../../common/constants/http-status';
 import { AppError } from '../../../../common/errors/apperror';
 import { UserStatus } from '../../../../common/enums/userstatus-enum';
 import { UserRole } from '../../../../common/enums/userrole-enum';
-// import { AdminLoginDto } from "../../dtos/adminlogin.dto.js";
+// import { AdminLoginDto } from "../../dtos/adminlogin.dto";
 import { LoginDto } from '../../../../application/dtos/login.dto';
 import { LoginResponseDto } from '../../../dtos/loginResponse.dto';
 import { ITokenService } from '../../../../domain/services/token.service.interface';

@@ -1,11 +1,11 @@
-// import { UserRepository } from "../modules/auth/infrastructure/database/user.repository.js"
+// import { UserRepository } from "../modules/auth/infrastructure/database/user.repository"
 import { FindAllUseCase } from '../application/usecases/admin/allUsers/findall.usecase';
 import { AdminController } from '../presentation/controllers/admin.controller';
 import { AdminRepository } from '../infrastructure/repositories/admin/admin.repository';
 import { UserManageUseCase } from '../application/usecases/admin/usermanage/usermanage.usecase';
 import { UserRepository } from '../infrastructure/repositories/user/user.repository';
 import { UserDetailsUseCase } from '../application/usecases/admin/userDetails/userdetails.usecase';
-// import { ManagerRepository } from "../modules/auth/infrastructure/database/user/manager.repository.js"
+// import { ManagerRepository } from "../modules/auth/infrastructure/database/user/manager.repository"
 import { ManagerApprovalUseCase } from '../application/usecases/admin/manageApproval/managerapproval.usecase';
 import { PendingmanagerDetailsUseCase } from '../application/usecases/admin/pendingmanager/pendingmanager.usecase';
 import { ManagerRejectionUseCase } from '../application/usecases/admin/managerRejection/managerRejection.usecase';

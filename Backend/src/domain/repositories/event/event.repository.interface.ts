@@ -1,7 +1,7 @@
 import { Events } from '../../../domain/entities/event.entity';
 import mongoose from 'mongoose';
-import { PaginationParams, PaginatedResponse } from '@/common/interfaces/pagination.interface';
-import { UpdateEventDTO } from '@/application/dtos/updateevent.dto';
+import { PaginationParams, PaginatedResponse } from '../../../common/interfaces/pagination.interface';
+import { UpdateEventDTO } from '../../../application/dtos/updateevent.dto';
 
 export interface IEventRepository {
   createEvent(event: Events, session?: mongoose.ClientSession): Promise<Events>;

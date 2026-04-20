@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { AuthUser } from '@/common/type/auth.type';
+import { AuthUser } from '../../common/type/auth.type';
 
 export const requireAuth = (
   req: Request,

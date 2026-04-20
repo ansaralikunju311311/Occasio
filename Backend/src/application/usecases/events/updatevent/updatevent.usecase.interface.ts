@@ -1,5 +1,5 @@
-import { UpdateEventDTO } from '@/application/dtos/updateevent.dto';
-import { Events } from '@/domain/entities/event.entity';
+import { UpdateEventDTO } from '../../../../application/dtos/updateevent.dto';
+import { Events } from '../../../../domain/entities/event.entity';
 
 
 export interface IUpdateEventUseCase {

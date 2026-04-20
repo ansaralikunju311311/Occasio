@@ -1,17 +1,17 @@
 import { Request, Response } from 'express';
 import { HttpStatus } from '../../common/constants/http-status';
 import { SuccessMessage, ErrorMessage } from '../../common/enums/message-enum';
-import { logger } from '@/common/logger/logger';
-import { ISignupUseCase } from '@/application/usecases/auth/signup/signup.usecase.interface';
-import { IVerifyOtpUseCase } from '@/application/usecases/auth/otp/verifyotp.usecase.interface';
-import { IResendUseCase } from '@/application/usecases/auth/resendotp/resend.usecase.interface';
-import { IApprovalUseCase } from '@/application/usecases/admin/manageApproval/managerapproval.usecase.interface';
-import { IForgotpasswordUsecase } from '@/application/usecases/auth/forgotpassword/forgot.usecase.interface';
-import { ITokenService } from '@/domain/services/token.service.interface';
-import { ILoginUsecase } from '@/application/usecases/auth/login/login.usecase.interface';
-import { IUpdateUseCase } from '@/application/usecases/auth/updatepassword/update.usecase.interface';
-import { IResetPasswordUseCase } from '@/application/usecases/auth/resetPassword/reset.usecase.interface';
-import { catchAsync } from '@/common/utils/catchAsync';
+import { logger } from '../../common/logger/logger';
+import { ISignupUseCase } from '../../application/usecases/auth/signup/signup.usecase.interface';
+import { IVerifyOtpUseCase } from '../../application/usecases/auth/otp/verifyotp.usecase.interface';
+import { IResendUseCase } from '../../application/usecases/auth/resendotp/resend.usecase.interface';
+import { IApprovalUseCase } from '../../application/usecases/admin/manageApproval/managerapproval.usecase.interface';
+import { IForgotpasswordUsecase } from '../../application/usecases/auth/forgotpassword/forgot.usecase.interface';
+import { ITokenService } from '../../domain/services/token.service.interface';
+import { ILoginUsecase } from '../../application/usecases/auth/login/login.usecase.interface';
+import { IUpdateUseCase } from '../../application/usecases/auth/updatepassword/update.usecase.interface';
+import { IResetPasswordUseCase } from '../../application/usecases/auth/resetPassword/reset.usecase.interface';
+import { catchAsync } from '../../common/utils/catchAsync';
 
 export class AuthController {
   constructor(

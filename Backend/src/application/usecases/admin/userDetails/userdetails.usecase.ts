@@ -1,6 +1,6 @@
 import { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
 import { User } from '../../../../domain/entities/user.entity';
-import { IApprovalUseCase } from '../manageApproval/managerapproval.usecase.interface.js';
+import { IApprovalUseCase } from '../manageApproval/managerapproval.usecase.interface';
 
 export class UserDetailsUseCase implements IApprovalUseCase {
   constructor(private userRepository: IUserRepository) {}
