@@ -2,14 +2,15 @@ import { IUserRepository } from '../../../../domain/repositories/user.repository
 import { AppError } from '../../../../common/errors/apperror';
 import { ErrorMessage } from '../../../../common/enums/message-enum';
 import { HttpStatus } from '../../../../common/constants/http-status';
+import { userMapper } from '../../../../common/mappers/user.mapper';
 import { UserStatus } from '../../../../common/enums/userstatus-enum';
 import { UpgradeStatus } from '../../../../common/enums/upgrade-enums';
-import { User } from '../../../../domain/entities/user.entity';
+import { UserResponseDto } from '../../../../application/dtos/responses/user-response.dto';
 import { IReapplyUseCase } from './reapply.usecase.interface';
 export class ReapplyUseCase implements IReapplyUseCase {
   constructor(private userRepository: IUserRepository) {}
 
-  async execute(userId: string): Promise<User | null> {
+  async execute(userId: string): Promise<UserResponseDto | null> {
     console.log(userId);
 
     const user = await this.userRepository.findByIdUser(userId);
@@ -46,7 +47,6 @@ export class ReapplyUseCase implements IReapplyUseCase {
     user.rejectedAt = null;
     user.reapplyAt = null;
     const updated = await this.userRepository.updateUser(user);
-
-    return updated;
+    return updated ? userMapper.toResponse(updated) : null;
   }
 }

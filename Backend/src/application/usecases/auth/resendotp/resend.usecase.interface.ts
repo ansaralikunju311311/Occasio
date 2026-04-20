@@ -1,5 +1,5 @@
-import { OTP } from '../../../../domain/entities/otp.entity';
+import { OtpResponseDto } from '../../../../application/dtos/responses/otp-response.dto';
 
 export interface IResendUseCase {
-  execute(email: string): Promise<OTP | null>;
+  execute(email: string): Promise<OtpResponseDto | null>;
 }

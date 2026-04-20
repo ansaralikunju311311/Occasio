@@ -1,7 +1,7 @@
-import { User } from '../../domain/entities/user.entity';
+import { UserResponseDto } from './responses/user-response.dto';
 
 export interface LoginResponseDto {
-  user: User;
+  user: UserResponseDto;
   accessToken: string;
   refreshToken?: string;
 }

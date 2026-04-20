@@ -1,4 +1,4 @@
-import { User } from '../../../../domain/entities/user.entity';
+import { UserResponseDto } from '../../../../application/dtos/responses/user-response.dto';
 export interface IManagerRejectionUseCase {
-  execute(id: string, search?: string): Promise<User | null>;
+  execute(id: string, reason?: string): Promise<UserResponseDto | null>;
 }

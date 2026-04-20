@@ -1,6 +1,6 @@
 import { signupDTO } from '../../../../application/dtos/signup.dto';
-import { OTP } from '../../../../domain/entities/otp.entity';
+import { OtpResponseDto } from '../../../../application/dtos/responses/otp-response.dto';
 
 export interface ISignupUseCase {
-  execute(data: signupDTO): Promise<OTP | null>;
+  execute(data: signupDTO): Promise<OtpResponseDto | null>;
 }

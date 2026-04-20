@@ -193,7 +193,7 @@ const AdminEventManagers = () => {
             </tr>
           }
           renderRow={(manager: EventManager, index: number) => {
-            const managerId = manager._id || manager.id || index.toString();
+            const managerId = manager.id || index.toString();
 
             return (
               <tr key={managerId} className="hover:bg-gray-50 transition-colors duration-150">

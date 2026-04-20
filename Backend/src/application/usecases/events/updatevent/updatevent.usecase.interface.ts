@@ -1,7 +1,10 @@
 import { UpdateEventDTO } from '../../../../application/dtos/updateevent.dto';
-import { Events } from '../../../../domain/entities/event.entity';
-
+import { EventResponseDto } from '../../../../application/dtos/responses/event-response.dto';
 
 export interface IUpdateEventUseCase {
-  execute(eventId: string, managerId: string, data: UpdateEventDTO): Promise<Events | null>;
+  execute(
+    eventId: string,
+    managerId: string,
+    data: UpdateEventDTO,
+  ): Promise<EventResponseDto | null>;
 }

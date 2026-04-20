@@ -1,17 +1,22 @@
 import { EventStatus } from '../../../../common/enums/eventstatus-enum';
 import { Events } from '../../../../domain/entities/event.entity';
 import { IEventRepository } from '../../../../domain/repositories/event/event.repository.interface';
+import { eventMapper } from '../../../../common/mappers/event.mapper';
 import { EventDto } from '../../../dtos/event.dto';
+import { EventResponseDto } from '../../../../application/dtos/responses/event-response.dto';
 import { getLocationName } from '../../../../common/services/location.service';
 import { normalizeCoordinates } from '../../../../common/utils/geo.utils';
-import mongoose from 'mongoose';
 import { SeatStatus } from '../../../../common/enums/searstatus-enum';
+import mongoose from 'mongoose';
 import { IEventCreationUseCase } from './eventcreation.usecase.interface';
 
 export class EventCretionUseCase implements IEventCreationUseCase {
   constructor(private eventRepository: IEventRepository) {}
 
-  async execute(data: EventDto, userId: string) {
+  async execute(
+    data: EventDto,
+    userId: string,
+  ): Promise<EventResponseDto | null> {
     const session = await mongoose.startSession();
     session.startTransaction();
 
@@ -131,7 +136,7 @@ export class EventCretionUseCase implements IEventCreationUseCase {
 
       await session.commitTransaction();
       session.endSession();
-      return event;
+      return event ? eventMapper.toResponse(event) : null;
     } catch (error) {
       await session.abortTransaction();
       session.endSession();

@@ -7,7 +7,7 @@ import { useEventSeats } from '../../hooks/useEvents';
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface Seat {
-  _id: string;
+  id: string;
   block: string;
   row: number;
   column: number;
@@ -55,7 +55,7 @@ const groupSeats = (existingSeats: Seat[], layoutBlocks: any[] = []): GroupedBlo
             // Virtual seat - not in DB yet
             const seatNumber = `${trimmedBlockName}-${rowNumber}-${c}`;
             seats.push({
-              _id: `v-${key}`, // Synthetic ID
+              id: `v-${key}`, // Synthetic ID
               block: trimmedBlockName,
               row: rowNumber,
               column: c,
@@ -108,11 +108,11 @@ const SeatBtn = ({ seat, isSelected, onClick }: SeatBtnProps) => {
 
   return (
     <button
-      id={`seat-${seat._id}`}
+      id={`seat-${seat.id}`}
       aria-label={`Seat ${seat.block}-${seat.row}-${seat.column} ${seat.status}`}
       title={`${seat.block}-${seat.row}-${seat.column}`}
       disabled={seat.status !== 'AVAILABLE'}
-      onClick={() => onClick(seat._id, seat.status)}
+      onClick={() => onClick(seat.id, seat.status)}
       className={`w-8 h-8 rounded border text-[10px] font-bold transition-all duration-150 select-none flex items-center justify-center ${cls}`}
     >
       {col}
@@ -159,9 +159,9 @@ const BlockSection = ({ block, selectedSeats, onSeatClick }: BlockSectionProps) 
               <div className="flex gap-1">
                 {left.map((seat) => (
                   <SeatBtn
-                    key={seat._id}
+                    key={seat.id}
                     seat={seat}
-                    isSelected={selectedSeats.includes(seat._id)}
+                    isSelected={selectedSeats.includes(seat.id)}
                     onClick={onSeatClick}
                   />
                 ))}
@@ -172,9 +172,9 @@ const BlockSection = ({ block, selectedSeats, onSeatClick }: BlockSectionProps) 
               <div className="flex gap-1">
                 {right.map((seat) => (
                   <SeatBtn
-                    key={seat._id}
+                    key={seat.id}
                     seat={seat}
-                    isSelected={selectedSeats.includes(seat._id)}
+                    isSelected={selectedSeats.includes(seat.id)}
                     onClick={onSeatClick}
                   />
                 ))}
@@ -283,7 +283,7 @@ const SeatSelection = () => {
 
   const selectedSeatDetails = useMemo(() => {
     const all = groupedBlocks.flatMap((b) => b.rows.flatMap((r) => r.seats));
-    return selectedSeats.map((sid) => all.find((s) => s._id === sid)).filter(Boolean) as Seat[];
+    return selectedSeats.map((sid) => all.find((s) => s.id === sid)).filter(Boolean) as Seat[];
   }, [selectedSeats, groupedBlocks]);
 
   // ── All hooks MUST be called before any early returns ────────────────────
@@ -427,7 +427,7 @@ const SeatSelection = () => {
                     const block = groupedBlocks.find((b) => b.blockName === seat.block);
                     return (
                       <div
-                        key={seat._id}
+                        key={seat.id}
                         className="flex justify-between items-center p-2.5 bg-gray-50 rounded-lg group"
                       >
                         <div>
@@ -445,7 +445,7 @@ const SeatSelection = () => {
                             </span>
                           )}
                           <button
-                            onClick={() => handleSeatClick(seat._id, 'AVAILABLE')}
+                            onClick={() => handleSeatClick(seat.id, 'AVAILABLE')}
                             className="text-gray-300 hover:text-red-400 transition-colors"
                             title="Remove"
                           >
@@ -506,7 +506,7 @@ const SeatSelection = () => {
                 id="checkout-btn"
                 disabled={!canCheckout}
                 onClick={() =>
-                  navigate(`/checkout/${event.id || event._id}`, {
+                  navigate(`/checkout/${event.id}`, {
                     state: { selectedSeats, bookingType, totalPrice },
                   })
                 }

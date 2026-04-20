@@ -1,5 +1,6 @@
 import { IHashServive } from '../../../../domain/services/hash.service.interface';
 import { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
+import { userMapper } from '../../../../common/mappers/user.mapper';
 import { LoginDto } from '../../../dtos/login.dto';
 import { UserStatus } from '../../../../common/enums/userstatus-enum';
 import { AppError } from '../../../../common/errors/apperror';
@@ -55,7 +56,7 @@ export class LoginUseCase implements ILoginUsecase {
     });
 
     return {
-      user,
+      user: userMapper.toResponse(user),
       accessToken,
       refreshToken,
     };

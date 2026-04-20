@@ -1,6 +1,11 @@
-import { User } from '../../../../domain/entities/user.entity';
-import { PaginationParams, PaginatedResponse } from '../../../../common/interfaces/pagination.interface';
+import { UserResponseDto } from '../../../../application/dtos/responses/user-response.dto';
+import {
+  PaginationParams,
+  PaginatedResponse,
+} from '../../../../common/interfaces/pagination.interface';
 
 export interface IFindallUseCase {
-  execute(params: PaginationParams): Promise<PaginatedResponse<User> | null>;
+  execute(
+    params: PaginationParams,
+  ): Promise<PaginatedResponse<UserResponseDto> | null>;
 }

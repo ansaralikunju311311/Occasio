@@ -1,5 +1,6 @@
 import { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
-import { User } from '../../../../domain/entities/user.entity';
+import { userMapper } from '../../../../common/mappers/user.mapper';
+import { UserResponseDto } from '../../../../application/dtos/responses/user-response.dto';
 import { UserRole } from '../../../../common/enums/userrole-enum';
 import { EmailSerive } from '../../../../common/services/email.service';
 import { UpgradeStatus } from '../../../../common/enums/upgrade-enums';
@@ -9,7 +10,7 @@ export class ManagerApprovalUseCase implements IApprovalUseCase {
     private userRepository: IUserRepository,
     private emailService: EmailSerive,
   ) {}
-  async execute(id: string): Promise<User | null> {
+  async execute(id: string): Promise<UserResponseDto | null> {
     const user = await this.userRepository.findByIdUser(id);
     console.log(user);
 
@@ -27,6 +28,6 @@ export class ManagerApprovalUseCase implements IApprovalUseCase {
       );
     }
 
-    return updatedUser;
+    return updatedUser ? userMapper.toResponse(updatedUser) : null;
   }
 }

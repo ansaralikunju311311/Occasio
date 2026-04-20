@@ -1,4 +1,4 @@
-import { User } from '../../../../domain/entities/user.entity';
+import { UserResponseDto } from '../../../../application/dtos/responses/user-response.dto';
 export interface IReapplyUseCase {
-  execute(data: string): Promise<User | null>;
+  execute(data: string): Promise<UserResponseDto | null>;
 }

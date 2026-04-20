@@ -7,8 +7,10 @@ import { User } from '../../../../domain/entities/user.entity';
 import { UserOtp } from '../../../../common/enums/userotp-enum';
 import { EmailSerive } from '../../../../common/services/email.service';
 import { ErrorMessage } from '../../../../common/enums/message-enum';
+import { otpMapper } from '../../../../common/mappers/otp.mapper';
 import { IOtpRepository } from '../../../../domain/repositories/otp.repository.interface';
 import { OTP } from '../../../../domain/entities/otp.entity';
+import { OtpResponseDto } from '../../../../application/dtos/responses/otp-response.dto';
 import { IForgotpasswordUsecase } from './forgot.usecase.interface';
 export class ForgotpasswordUsecase implements IForgotpasswordUsecase {
   constructor(
@@ -16,7 +18,7 @@ export class ForgotpasswordUsecase implements IForgotpasswordUsecase {
     private emailService: EmailSerive,
     private otpRepository: IOtpRepository,
   ) {}
-  async execute(email: string): Promise<OTP | null> {
+  async execute(email: string): Promise<OtpResponseDto | null> {
     const data = await this.userRepository.findByEmail(email);
 
     if (!data) {
@@ -71,6 +73,7 @@ export class ForgotpasswordUsecase implements IForgotpasswordUsecase {
       otpSendAt,
     );
 
-    return this.otpRepository.otpStore(newUser);
+    const storedOtp = await this.otpRepository.otpStore(newUser);
+    return storedOtp ? otpMapper.toResponse(storedOtp) : null;
   }
 }

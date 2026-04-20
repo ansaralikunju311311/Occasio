@@ -6,8 +6,10 @@ import { AppError } from '../../../../common/errors/apperror';
 import { HttpStatus } from '../../../../common/constants/http-status';
 import { EmailSerive } from '../../../../common/services/email.service';
 import { ErrorMessage } from '../../../../common/enums/message-enum';
+import { otpMapper } from '../../../../common/mappers/otp.mapper';
 import { IOtpRepository } from '../../../../domain/repositories/otp.repository.interface';
 import { OTP } from '../../../../domain/entities/otp.entity';
+import { OtpResponseDto } from '../../../../application/dtos/responses/otp-response.dto';
 import { IResendUseCase } from './resend.usecase.interface';
 
 export class ResendotpUseCase implements IResendUseCase {
@@ -17,7 +19,7 @@ export class ResendotpUseCase implements IResendUseCase {
     private otpRepository: IOtpRepository,
   ) {}
 
-  async execute(email: string): Promise<OTP | null> {
+  async execute(email: string): Promise<OtpResponseDto | null> {
     const user = await this.userRepository.findByEmail(email);
 
     console.log('user', user);
@@ -78,6 +80,7 @@ export class ResendotpUseCase implements IResendUseCase {
 
     await this.emailService.sendOtpEmail(user.email, newOtp);
 
-    return this.otpRepository.otpStore(otpUser);
+    const storedOtp = await this.otpRepository.otpStore(otpUser);
+    return storedOtp ? otpMapper.toResponse(storedOtp) : null;
   }
 }

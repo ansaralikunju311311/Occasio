@@ -1,5 +1,6 @@
 import { UpdatePasswordDto } from '../../../../application/dtos/updatepassword.dto';
+import { UserResponseDto } from '../../../../application/dtos/responses/user-response.dto';
 
 export interface IUpdateUseCase {
-  execute(data: UpdatePasswordDto): Promise<void>;
+  execute(data: UpdatePasswordDto): Promise<UserResponseDto>;
 }

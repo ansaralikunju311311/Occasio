@@ -4,15 +4,16 @@ import { signupDTO } from '../../../dtos/signup.dto';
 import { User } from '../../../../domain/entities/user.entity';
 import { UserRole } from '../../../../common/enums/userrole-enum';
 import { UserStatus } from '../../../../common/enums/userstatus-enum';
-// import { UserOtp } from "../../../../../common/enums/user-otp.enum";
 import { generateOTP } from '../../../../common/utils/generateotp';
 import { AppError } from '../../../../common/errors/apperror';
 import { HttpStatus } from '../../../../common/constants/http-status';
 import { EmailSerive } from '../../../../common/services/email.service';
 import { ErrorMessage } from '../../../../common/enums/message-enum';
 import { UpgradeStatus } from '../../../../common/enums/upgrade-enums';
+import { otpMapper } from '../../../../common/mappers/otp.mapper';
 import { ISignupUseCase } from './signup.usecase.interface';
 import { OTP } from '../../../../domain/entities/otp.entity';
+import { OtpResponseDto } from '../../../../application/dtos/responses/otp-response.dto';
 import { UserOtp } from '../../../../common/enums/userotp-enum';
 import { IOtpRepository } from '../../../../domain/repositories/otp.repository.interface';
 export class SignupUsecase implements ISignupUseCase {
@@ -23,7 +24,7 @@ export class SignupUsecase implements ISignupUseCase {
     private otpRespository: IOtpRepository,
   ) {}
 
-  async execute(data: signupDTO): Promise<OTP | null> {
+  async execute(data: signupDTO): Promise<OtpResponseDto | null> {
     console.log('Incoming signup data:', data);
     const existingUser = await this.userRepository.findByEmail(data.email);
     if (existingUser) {
@@ -102,6 +103,6 @@ export class SignupUsecase implements ISignupUseCase {
 
     const otpDetails = await this.otpRespository.otpStore(Otp);
 
-    return otpDetails;
+    return otpDetails ? otpMapper.toResponse(otpDetails) : null;
   }
 }

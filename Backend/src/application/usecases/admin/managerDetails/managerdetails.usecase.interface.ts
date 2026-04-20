@@ -1,4 +1,4 @@
-import { EventManager } from '../../../../domain/entities/manager.entity';
+import { ManagerResponseDto } from '../../../../application/dtos/responses/manager-response.dto';
 export interface IManagerDetailsUseCase {
-  execute(id: string, search?: string): Promise<EventManager | null>;
+  execute(id: string, search?: string): Promise<ManagerResponseDto | null>;
 }

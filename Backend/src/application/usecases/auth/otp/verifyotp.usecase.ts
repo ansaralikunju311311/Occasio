@@ -1,5 +1,6 @@
 import { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
 import { IOtpRepository } from '../../../../domain/repositories/otp.repository.interface';
+import { userMapper } from '../../../../common/mappers/user.mapper';
 import { VerfiyOtpDto } from '../../../dtos/verifyotp.dto';
 
 import { AppError } from '../../../../common/errors/apperror';
@@ -64,8 +65,10 @@ export class VerifyUseCase implements IVerifyOtpUseCase {
       role: updateUser.role,
     });
 
-    return { user: updateUser, accessToken, refreshToken };
-    //    accessToken,
-    //    refreshToken
+    return {
+      user: userMapper.toResponse(updateUser),
+      accessToken,
+      refreshToken,
+    };
   }
 }

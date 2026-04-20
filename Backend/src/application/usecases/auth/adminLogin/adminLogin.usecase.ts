@@ -1,5 +1,6 @@
 import { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
 import { IHashServive } from '../../../../domain/services/hash.service.interface';
+import { userMapper } from '../../../../common/mappers/user.mapper';
 
 import { HttpStatus } from '../../../../common/constants/http-status';
 import { AppError } from '../../../../common/errors/apperror';
@@ -71,9 +72,10 @@ export class AdminLoginUseCase implements ILoginUsecase {
     // console.log("refresf",refreshToken);
     // console.log("access",accessToken)
 
-    return { user, accessToken, refreshToken };
-    //   accessToken,
-    //   refreshToken
-    // }
+    return {
+      user: userMapper.toResponse(user),
+      accessToken,
+      refreshToken,
+    };
   }
 }

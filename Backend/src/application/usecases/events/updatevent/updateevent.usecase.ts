@@ -1,5 +1,6 @@
 import { IEventRepository } from '../../../../domain/repositories/event/event.repository.interface';
-import { Events } from '../../../../domain/entities/event.entity';
+import { eventMapper } from '../../../../common/mappers/event.mapper';
+import { EventResponseDto } from '../../../../application/dtos/responses/event-response.dto';
 import { IUpdateEventUseCase } from './updatevent.usecase.interface';
 import { UpdateEventDTO } from '../../../../application/dtos/updateevent.dto';
 import mongoose from 'mongoose';
@@ -11,7 +12,11 @@ import { normalizeCoordinates } from '../../../../common/utils/geo.utils';
 export class UpdateEventUseCase implements IUpdateEventUseCase {
   constructor(private eventRepository: IEventRepository) {}
 
-  async execute(eventId: string, managerId: string, data: UpdateEventDTO): Promise<Events | null> {
+  async execute(
+    eventId: string,
+    managerId: string,
+    data: UpdateEventDTO,
+  ): Promise<EventResponseDto | null> {
     const session = await mongoose.startSession();
     session.startTransaction();
 
@@ -103,7 +108,8 @@ export class UpdateEventUseCase implements IUpdateEventUseCase {
       await session.commitTransaction();
       session.endSession();
 
-      return await this.eventRepository.findByIdEvents(eventId);
+      const updatedEvent = await this.eventRepository.findByIdEvents(eventId);
+      return updatedEvent ? eventMapper.toResponse(updatedEvent) : null;
 
     } catch (error) {
       await session.abortTransaction();

@@ -1,5 +1,6 @@
 import { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
-import { User } from '../../../../domain/entities/user.entity';
+import { userMapper } from '../../../../common/mappers/user.mapper';
+import { UserResponseDto } from '../../../../application/dtos/responses/user-response.dto';
 import { EmailSerive } from '../../../../common/services/email.service';
 import { UpgradeStatus } from '../../../../common/enums/upgrade-enums';
 import { IManagerRejectionUseCase } from './managerRejection.usecase.interface';
@@ -8,7 +9,7 @@ export class ManagerRejectionUseCase implements IManagerRejectionUseCase{
     private userRepository: IUserRepository,
     private emailService: EmailSerive,
   ) {}
-  async execute(id: string, reason?: string): Promise<User | null> {
+  async execute(id: string, reason?: string): Promise<UserResponseDto | null> {
     const user = await this.userRepository.findByIdUser(id);
     console.log('user', user);
     if (!user) return null;
@@ -26,6 +27,6 @@ export class ManagerRejectionUseCase implements IManagerRejectionUseCase{
       );
     }
 
-    return updatedUser;
+    return updatedUser ? userMapper.toResponse(updatedUser) : null;
   }
 }

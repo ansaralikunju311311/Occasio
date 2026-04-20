@@ -1,8 +1,9 @@
 import { UserOtp } from '../../../../common/enums/userotp-enum';
 import { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
 import { IHashServive } from '../../../../domain/services/hash.service.interface';
+import { userMapper } from '../../../../common/mappers/user.mapper';
 import { ResetPasswordDTO } from '../../../dtos/reset.dto';
-import { User } from '../../../../domain/entities/user.entity';
+import { UserResponseDto } from '../../../../application/dtos/responses/user-response.dto';
 import { AppError } from '../../../../common/errors/apperror';
 import { HttpStatus } from '../../../../common/constants/http-status';
 import { ErrorMessage } from '../../../../common/enums/message-enum';
@@ -16,7 +17,7 @@ export class ResetPasswordUseCase implements IResetPasswordUseCase {
     private otpRepository: IOtpRepository,
   ) {}
 
-  async execute(data: ResetPasswordDTO): Promise<User> {
+  async execute(data: ResetPasswordDTO): Promise<UserResponseDto> {
     const user = await this.userRespository.findByEmail(data.email);
     if (!user)
       throw new AppError(ErrorMessage.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
@@ -62,6 +63,7 @@ export class ResetPasswordUseCase implements IResetPasswordUseCase {
     otpUser.isUsed = true;
     await this.otpRepository.otpStore(otpUser);
 
-    return this.userRespository.updateUser(user);
+    const updatedUser = await this.userRespository.updateUser(user);
+    return userMapper.toResponse(updatedUser);
   }
 }

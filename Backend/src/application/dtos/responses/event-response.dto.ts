@@ -1,5 +1,8 @@
 import { EventType } from '../../../common/enums/event-type';
 import { EventStatus } from '../../../common/enums/eventstatus-enum';
+import { UserResponseDto } from './user-response.dto';
+import { SeatResponseDto } from './seat-response.dto';
+import { SeatLayoutResponseDto } from './seat-layout-response.dto';
 
 export interface EventResponseDto {
   id: string;
@@ -18,10 +21,10 @@ export interface EventResponseDto {
   createdBy: string;
   status: EventStatus;
   picture: string;
-  creatorDetails?: any;
+  creatorDetails?: UserResponseDto;
   seatLayoutId?: string;
-  SeatLayout?: any;
-  seats?: any[];
+  SeatLayout?: SeatLayoutResponseDto;
+  seats?: SeatResponseDto[];
   isDeleted?: boolean;
   deletedAt?: Date;
   createdAt?: Date;

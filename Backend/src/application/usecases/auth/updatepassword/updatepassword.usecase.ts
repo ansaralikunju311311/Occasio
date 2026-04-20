@@ -4,8 +4,10 @@ import { ErrorMessage } from '../../../../common/enums/message-enum';
 import { AppError } from '../../../../common/errors/apperror';
 import { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
 import { IHashServive } from '../../../../domain/services/hash.service.interface';
+import { userMapper } from '../../../../common/mappers/user.mapper';
 import { UserStatus } from '../../../../common/enums/userstatus-enum';
 import { User } from '../../../../domain/entities/user.entity';
+import { UserResponseDto } from '../../../../application/dtos/responses/user-response.dto';
 import { IUpdateUseCase } from './update.usecase.interface';
 export class UpdatePasswordUseCase implements IUpdateUseCase {
   constructor(
@@ -14,7 +16,7 @@ export class UpdatePasswordUseCase implements IUpdateUseCase {
     private hashService: IHashServive,
   ) {}
 
-  async execute(data: UpdatePasswordDto): Promise<void> {
+  async execute(data: UpdatePasswordDto): Promise<UserResponseDto> {
     const user = await this.userRepository.findByEmail(data.email);
     if (!user) {
       throw new AppError(ErrorMessage.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
@@ -51,6 +53,7 @@ export class UpdatePasswordUseCase implements IUpdateUseCase {
       user.reapplyAt,
     );
 
-    await this.userRepository.updateUser(newUser);
+    const updatedUser = await this.userRepository.updateUser(newUser);
+    return userMapper.toResponse(updatedUser);
   }
 }

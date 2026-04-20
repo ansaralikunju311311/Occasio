@@ -194,7 +194,7 @@ const AdminUsers = () => {
             </tr>
           }
           renderRow={(user: User, index: number) => {
-            const userId = user._id || user.id || index.toString();
+            const userId = user.id || index.toString();
             return (
               <tr key={userId} className="hover:bg-gray-50 transition-colors duration-150">
                 <td className="px-6 py-4 whitespace-nowrap">
@@ -379,7 +379,7 @@ const AdminUsers = () => {
                   {/* <div className="col-span-2 sm:col-span-1">
                   <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-1">User ID</label>
                   <div className="text-[10px] font-mono text-gray-500 bg-gray-50 px-2 py-1 rounded border border-gray-100 truncate">
-                    {selectedUser._id || selectedUser.id || "N/A"}
+                    {selectedUser.id || "N/A"}
                   </div>
                 </div> */}
 
