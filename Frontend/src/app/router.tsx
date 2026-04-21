@@ -32,6 +32,7 @@ const EventManagerPlaceholder = lazy(
 const EventManagerMyEvents = lazy(() => import('../pages/eventManager/EventManagerMyEvents.tsx'));
 const CreateEvent = lazy(() => import('../pages/eventManager/CreateEvent.tsx'));
 const EditEvent = lazy(() => import('../pages/eventManager/EditEvent.tsx'));
+const Subscriptions = lazy(() => import('../pages/eventManager/Subscriptions.tsx'));
 
 // New Personal Dashboard Pages
 const Profile = lazy(() => import('../pages/user/Profile.tsx'));
@@ -195,6 +196,14 @@ export const router = createBrowserRouter([
         element: (
           <ManagerGuard>
             <EventManagerPlaceholder />
+          </ManagerGuard>
+        ),
+      },
+      {
+        path: 'subscriptions',
+        element: (
+          <ManagerGuard>
+            <Subscriptions />
           </ManagerGuard>
         ),
       },

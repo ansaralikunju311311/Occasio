@@ -1,0 +1,170 @@
+import React from 'react';
+
+const Subscriptions = () => {
+  const plans = [
+    {
+      name: 'Free',
+      price: '₹0',
+      period: '/per month',
+      commission: '10%',
+      limit: 'Pay per event created',
+      description: 'Ideal for those just starting out or hosting irregular events. Pay only when you create an event.',
+      features: [
+        'Pay-per-event creation',
+        'Standard dashboard access',
+        'Basic event analytics',
+        'Community support',
+      ],
+      color: 'slate',
+      buttonText: 'Current Plan',
+      isCurrent: true,
+    },
+    {
+      name: 'Pro',
+      price: '₹4,999',
+      period: '/per month',
+      commission: '5%',
+      limit: 'Up to 10 events/month',
+      description: 'Perfect for active managers hosting regular events with lower commission rates.',
+      features: [
+        'Up to 10 events per month',
+        'Priority support',
+        'Advanced event analytics',
+        'Custom social sharing',
+      ],
+      color: 'teal',
+      buttonText: 'Upgrade to Pro',
+      isCurrent: false,
+      popular: true,
+    },
+    {
+      name: 'Elite',
+      price: '₹14,999',
+      period: '/per month',
+      commission: '2%',
+      limit: 'Unlimited events',
+      description: 'For power users and professional event agencies requiring maximum flexibility and lowest rates.',
+      features: [
+        'Unlimited event creation',
+        '24/7 Premium support',
+        'Full data exports',
+        'Early access to new features',
+      ],
+      color: 'indigo',
+      buttonText: 'Go Elite',
+      isCurrent: false,
+    },
+  ];
+
+  return (
+    <div className="relative min-h-full pb-20">
+      {/* Header section */}
+      <div className="text-center mb-16 animation-slide-up">
+        <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-6 tracking-tight">
+          Manager <span className="bg-linear-to-r from-teal-400 to-indigo-500 bg-clip-text text-transparent">Subscription Plans</span>
+        </h2>
+        <p className="text-slate-400 text-lg max-w-2xl mx-auto font-light">
+          Scale your event management business with our flexible pricing tiers. Choose the plan that best fits your event frequency and volume.
+        </p>
+      </div>
+
+      {/* Plans grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto px-4">
+        {plans.map((plan, index) => (
+          <div
+            key={plan.name}
+            className={`relative group bg-[#0a0f16] border rounded-[2.5rem] p-8 transition-all duration-500 flex flex-col h-full hover:-translate-y-2
+              ${plan.popular ? 'border-teal-500/50 shadow-[0_0_40px_-10px_rgb(20,184,166,0.2)]' : 'border-slate-800 hover:border-slate-700 shadow-xl'}
+              ${index === 0 ? 'animation-slide-up' : index === 1 ? 'animation-slide-up-delay' : 'stagger-animation'}
+            `}
+          >
+            {plan.popular && (
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-teal-500 text-[#070b14] text-[10px] font-bold uppercase tracking-widest rounded-full shadow-lg">
+                Most Popular
+              </div>
+            )}
+
+            <div className="mb-8">
+              <h3 className={`text-xl font-bold uppercase tracking-[0.2em] mb-2 ${plan.color === 'teal' ? 'text-teal-400' : plan.color === 'indigo' ? 'text-indigo-400' : 'text-slate-400'
+                }`}>
+                {plan.name}
+              </h3>
+              <div className="flex items-baseline gap-1 mb-4">
+                <span className="text-4xl font-extrabold text-white">{plan.price}</span>
+                <span className="text-slate-500 text-sm">{plan.period}</span>
+              </div>
+              <p className="text-slate-400 text-sm font-light leading-relaxed min-h-[3rem]">
+                {plan.description}
+              </p>
+            </div>
+
+            <div className="space-y-6 mb-10 flex-1">
+              {/* Key Metrics */}
+              <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-slate-500 uppercase tracking-wider font-bold">Commission</span>
+                  <span className="text-sm text-white font-bold">{plan.commission} per ticket</span>
+                </div>
+                <div className="w-full h-1 bg-slate-800 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all duration-1000 ${plan.color === 'teal' ? 'bg-teal-500' : plan.color === 'indigo' ? 'bg-indigo-500' : 'bg-slate-500'
+                      }`}
+                    style={{ width: plan.name === 'Free' ? '30%' : plan.name === 'Pro' ? '60%' : '90%' }}
+                  ></div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-slate-500 uppercase tracking-wider font-bold">Volume</span>
+                  <span className="text-sm text-white font-bold">{plan.limit}</span>
+                </div>
+              </div>
+
+              {/* Features List */}
+              <ul className="space-y-4">
+                {plan.features.map((feature) => (
+                  <li key={feature} className="flex items-center gap-3 text-sm text-slate-300">
+                    <div className={`shrink-0 w-5 h-5 rounded-full flex items-center justify-center border ${plan.color === 'teal' ? 'bg-teal-500/10 border-teal-500/30 text-teal-400' :
+                        plan.color === 'indigo' ? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-400' :
+                          'bg-slate-500/10 border-slate-500/30 text-slate-400'
+                      }`}>
+                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <button
+              disabled={plan.isCurrent}
+              className={`w-full py-4 rounded-2xl text-sm font-bold transition-all duration-300 active:scale-95
+                ${plan.isCurrent
+                  ? 'bg-slate-800/50 text-slate-500 border border-slate-700 cursor-default'
+                  : plan.color === 'teal'
+                    ? 'bg-teal-500 text-[#070b14] hover:bg-teal-400 hover:shadow-[0_10px_25px_-5px_rgb(20,184,166,0.4)]'
+                    : 'bg-white text-[#070b14] hover:bg-slate-200 hover:shadow-[0_10px_25px_-5px_rgb(255,255,255,0.2)]'
+                }
+              `}
+            >
+              {plan.buttonText}
+            </button>
+          </div>
+        ))}
+      </div>
+
+      {/* Bottom Info Section */}
+      <div className="mt-20 max-w-4xl mx-auto p-8 rounded-[2.5rem] bg-indigo-500/5 border border-indigo-500/10 backdrop-blur-sm text-center animation-slide-up-delay">
+        <h4 className="text-white font-bold mb-4">Need a Custom Enterprise Solution?</h4>
+        <p className="text-slate-400 text-sm font-light mb-6">
+          If you're hosting large-scale festivals or managing a stadium with over 50,000 capacity, contact our team for a tailored commission structure and infrastructure.
+        </p>
+        <button className="text-indigo-400 text-sm font-bold hover:text-indigo-300 transition-colors uppercase tracking-widest">
+          Contact Support →
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default Subscriptions;
