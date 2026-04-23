@@ -20,6 +20,6 @@ export class GetEventsUseCase implements IGetEventsUseCase {
         data: eventMapper.toResponseArray(result.data),
       };
     }
-    return result;
+    return null;
   }
 }

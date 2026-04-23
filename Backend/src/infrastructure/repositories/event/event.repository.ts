@@ -153,7 +153,7 @@ export class EventRepository
 
   async updateEventLayout(
     eventId: string,
-    layoutId: string,
+    layoutId: string | null,
     session?: mongoose.ClientSession,
   ) {
     if (!layoutId) {

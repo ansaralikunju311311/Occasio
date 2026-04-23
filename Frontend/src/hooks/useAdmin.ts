@@ -95,3 +95,30 @@ export const useRejectManager = () => {
     },
   });
 };
+
+export const usePlans = () => {
+  return useQuery({
+    queryKey: ['adminPlans'],
+    queryFn: () => adminService.getPlans().then((res) => res.data),
+  });
+};
+
+export const useCreatePlan = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: any) => adminService.createPlan(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminPlans'] });
+    },
+  });
+};
+
+export const useUpdatePlan = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) => adminService.updatePlan(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminPlans'] });
+    },
+  });
+};

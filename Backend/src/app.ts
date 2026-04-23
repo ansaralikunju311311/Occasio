@@ -10,6 +10,7 @@ import express from 'express';
 import authRoutes from '../src/presentation/routes/auth.routes';
 import eventRoutes from '../src/presentation/routes/event.routes';
 import adminRoutes from '../src/presentation/routes/admin.routes';
+import planRoutes from "../src/presentation/routes/plans.routes"
 const app = express();
 
 app.use(express.urlencoded({ extended: true }));
@@ -26,6 +27,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/events', eventRoutes);
+app.use('/api/plans', planRoutes);
 app.use((_req, res) => {
   res.status(404).json({ message: 'the page not found' });
 });

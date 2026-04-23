@@ -39,6 +39,11 @@ export class AdminController {
     });
   });
 
+
+
+
+
+
   userManage = catchAsync(async (req: Request, res: Response) => {
     const { status } = req.body;
     const { userId } = req.params;
@@ -97,4 +102,8 @@ export class AdminController {
       users,
     });
   });
+  
+
+
+
 }

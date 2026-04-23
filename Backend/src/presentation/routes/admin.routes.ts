@@ -54,4 +54,11 @@ router.get(
   requireRole([UserRole.ADMIN]),
   controller.managerDetails.bind(controller),
 );
+
+
+
+// router.post('/createplans',
+//   verifyAccessToken,
+//   requireRole([UserRole.ADMIN]),
+//   controller.createPlans.bind(controller))
 export default router;

@@ -11,6 +11,7 @@ interface Seat {
   block: string;
   row: number;
   column: number;
+  seatNumber?: string;
   status: 'AVAILABLE' | 'HELD' | 'BOOKED';
 }
 

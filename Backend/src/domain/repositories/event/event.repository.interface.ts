@@ -11,7 +11,7 @@ export interface IEventRepository {
 
   updateEventLayout(
     eventId: string,
-    layoutId: string,
+    layoutId: string | null,
     session?: mongoose.ClientSession,
   ): Promise<void>;
   findAllEvents(params: PaginationParams): Promise<PaginatedResponse<Events> | null>;

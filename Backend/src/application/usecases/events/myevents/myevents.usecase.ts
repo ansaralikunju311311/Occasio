@@ -22,6 +22,6 @@ export class MyEventsUseCase implements IMyEventsUseCase {
         data: eventMapper.toResponseArray(result.data),
       };
     }
-    return result;
+    return null;
   }
 }

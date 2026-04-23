@@ -21,6 +21,6 @@ export class FindAllUseCase implements IFindallUseCase {
       };
     }
 
-    return result;
+    return null;
   }
 }

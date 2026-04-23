@@ -78,7 +78,7 @@ export class EventController {
   });
 
   updateEvents = catchAsync(async (req: Request, res: Response) => {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const managerId = req.authUser!.userId;
 
 
@@ -92,7 +92,7 @@ export class EventController {
   });
 
   deleteEvent = catchAsync(async (req: Request, res: Response) => {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const result = await this.deleteEventUseCase.execute(id);
     res.status(HttpStatus.OK).json({
       success: result,

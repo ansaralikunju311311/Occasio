@@ -1,60 +1,27 @@
-import React from 'react';
+import { usePlans } from '../../hooks/useAdmin';
+import LoadingSpinner from '../../components/common/LoadingSpinner';
 
 const Subscriptions = () => {
-  const plans = [
-    {
-      name: 'Free',
-      price: '₹0',
-      period: '/per month',
-      commission: '10%',
-      limit: 'Pay per event created',
-      description: 'Ideal for those just starting out or hosting irregular events. Pay only when you create an event.',
-      features: [
-        'Pay-per-event creation',
-        'Standard dashboard access',
-        'Basic event analytics',
-        'Community support',
-      ],
-      color: 'slate',
-      buttonText: 'Current Plan',
-      isCurrent: true,
-    },
-    {
-      name: 'Pro',
-      price: '₹4,999',
-      period: '/per month',
-      commission: '5%',
-      limit: 'Up to 10 events/month',
-      description: 'Perfect for active managers hosting regular events with lower commission rates.',
-      features: [
-        'Up to 10 events per month',
-        'Priority support',
-        'Advanced event analytics',
-        'Custom social sharing',
-      ],
-      color: 'teal',
-      buttonText: 'Upgrade to Pro',
-      isCurrent: false,
-      popular: true,
-    },
-    {
-      name: 'Elite',
-      price: '₹14,999',
-      period: '/per month',
-      commission: '2%',
-      limit: 'Unlimited events',
-      description: 'For power users and professional event agencies requiring maximum flexibility and lowest rates.',
-      features: [
-        'Unlimited event creation',
-        '24/7 Premium support',
-        'Full data exports',
-        'Early access to new features',
-      ],
-      color: 'indigo',
-      buttonText: 'Go Elite',
-      isCurrent: false,
-    },
-  ];
+  const { data: plansData, isLoading, error } = usePlans();
+
+  if (isLoading) return <LoadingSpinner />;
+  if (error) return <div className="text-white text-center py-20">Error loading plans</div>;
+
+  const apiPlans = plansData?.plans || [];
+
+  const plans = apiPlans.map((plan: any) => ({
+    name: plan.name,
+    price: `₹${plan.price}`,
+    period: '/per month',
+    commission: `${plan.commissionPercentage}%`,
+    limit: plan.eventLimit === 0 ? 'Unlimited events' : `Up to ${plan.eventLimit} events/month`,
+    description: `Get ${plan.eventLimit === 0 ? 'unlimited' : plan.eventLimit} events per month with a low ${plan.commissionPercentage}% commission rate.`,
+    features: plan.features,
+    color: plan.name === 'PRO' ? 'teal' : plan.name === 'ELITE' ? 'indigo' : 'slate',
+    buttonText: plan.name === 'FREE' ? 'Current Plan' : `Upgrade to ${plan.name}`,
+    isCurrent: plan.name === 'FREE', // Logic for current plan can be improved later
+    popular: plan.name === 'PRO',
+  }));
 
   return (
     <div className="relative min-h-full pb-20">
@@ -70,7 +37,7 @@ const Subscriptions = () => {
 
       {/* Plans grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto px-4">
-        {plans.map((plan, index) => (
+        {plans.map((plan: any, index: number) => (
           <div
             key={plan.name}
             className={`relative group bg-[#0a0f16] border rounded-[2.5rem] p-8 transition-all duration-500 flex flex-col h-full hover:-translate-y-2
@@ -120,7 +87,7 @@ const Subscriptions = () => {
 
               {/* Features List */}
               <ul className="space-y-4">
-                {plan.features.map((feature) => (
+                {plan.features.map((feature: string) => (
                   <li key={feature} className="flex items-center gap-3 text-sm text-slate-300">
                     <div className={`shrink-0 w-5 h-5 rounded-full flex items-center justify-center border ${plan.color === 'teal' ? 'bg-teal-500/10 border-teal-500/30 text-teal-400' :
                         plan.color === 'indigo' ? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-400' :

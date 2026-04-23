@@ -8,4 +8,9 @@ export const adminService = {
   blockUnblockUser: (id: string, status: boolean) => api.patch(`/admin/blockorunblock/${id}`, { status }),
   approveManager: (id: string) => api.patch(`/admin/approval/${id}`),
   rejectManager: (id: string, reason: string) => api.patch(`/admin/rejection/${id}`, { reason }),
+  
+  // Subscription Plans
+  getPlans: () => api.get('/plans/getplans'),
+  createPlan: (data: any) => api.post('/plans/createplans', data),
+  updatePlan: (id: string, data: any) => api.patch(`/plans/updateplan/${id}`, data),
 };

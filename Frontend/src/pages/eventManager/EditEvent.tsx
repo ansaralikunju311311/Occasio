@@ -45,13 +45,11 @@ const EditEvent = () => {
     watch,
     reset,
     formState: { errors },
-    trigger,
   } = useForm<IEventFormInput>({
     mode: 'onChange',
   });
 
   const selectedEventType = watch('eventType');
-  const startTimeValue = watch('startTime');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   // Layout Builder State
@@ -189,8 +187,6 @@ const EditEvent = () => {
     const tzOffset = date.getTimezoneOffset() * 60000;
     return new Date(date.getTime() - tzOffset).toISOString().slice(0, 16);
   };
-
-  const minDateTime = getLocalISOString(new Date());
 
   const uploadImageToCloudinary = async (file: File) => {
     const formData = new FormData();

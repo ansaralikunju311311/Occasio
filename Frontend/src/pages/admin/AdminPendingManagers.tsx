@@ -26,7 +26,7 @@ const AdminPendingManagers = () => {
   const [rejectionReason, setRejectionReason] = useState('');
   const [rejectionId, setRejectionId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [fetchingDetails, setFetchingDetails] = useState(false);
+
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
@@ -58,7 +58,7 @@ const AdminPendingManagers = () => {
 
   const handleManagerDetails = async (userId: string) => {
     try {
-      setFetchingDetails(true);
+
       // Using service directly for one-off detail fetch for simplicity in current UI flow
       // but we could also use useAdminPendingManagerDetails if we managed the ID state
       const response = await adminService.getPendingManagerDetails(userId);
@@ -83,7 +83,7 @@ const AdminPendingManagers = () => {
       console.error('Failed to fetch manager details:', error);
       toast.error(error.response?.data?.message || 'Failed to load manager details.');
     } finally {
-      setFetchingDetails(false);
+
     }
   };
 
