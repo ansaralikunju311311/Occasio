@@ -3,7 +3,7 @@ import { store } from '../redux/store';
 import { logout } from '../redux/slices/authSlice';
 
 export const api = axios.create({
-  baseURL: 'http://localhost:3001/api',
+  baseURL: 'http://localhost:5000/api',
   withCredentials: true,
 });
 

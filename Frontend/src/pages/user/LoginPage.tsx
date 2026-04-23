@@ -145,7 +145,7 @@ const LoginPage = () => {
             type="button"
             className="w-full flex items-center justify-center gap-3 py-3 px-4 bg-slate-950 hover:bg-slate-900 text-white rounded-xl font-medium border border-slate-800 transition-all duration-200"
             onClick={() => {
-              window.location.href = `http://localhost:3001/api/auth/google?role=USER`;
+              window.location.href = `http://localhost:5000/api/auth/google?role=USER`;
             }}
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">

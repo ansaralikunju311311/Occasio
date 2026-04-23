@@ -1,0 +1,16 @@
+services:
+  backend:
+    build: ./Backend
+    container_name: occasio_backend
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./Backend/.env
+
+  frontend:
+    build: ./Frontend
+    container_name: occasio_frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend

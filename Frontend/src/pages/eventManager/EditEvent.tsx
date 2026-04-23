@@ -183,11 +183,6 @@ const EditEvent = () => {
   });
 };
 
-  const getLocalISOString = (date: Date) => {
-    const tzOffset = date.getTimezoneOffset() * 60000;
-    return new Date(date.getTime() - tzOffset).toISOString().slice(0, 16);
-  };
-
   const uploadImageToCloudinary = async (file: File) => {
     const formData = new FormData();
     formData.append('file', file);

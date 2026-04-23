@@ -7,8 +7,9 @@ const startServer = async (): Promise<void> => {
   try {
     await initializaApp();
     //    clearExpiredOtpJob()
-    app.listen(3001, () => {
-      console.log(`the server is running propelrly`);
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => {
+      console.log(`the server is running properly on port ${PORT}`);
     });
   } catch (error: unknown) {
     console.log(error);
