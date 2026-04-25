@@ -65,6 +65,10 @@ const AdminEvents = () => {
         return 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20';
       case 'ENDED':
         return 'bg-slate-500/10 text-slate-400 border-slate-500/20';
+      case 'DRAFT':
+        return 'bg-amber-500/10 text-amber-400 border-amber-500/20';
+      case 'LIVE':
+        return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
       default:
         return 'bg-slate-500/10 text-slate-400 border-slate-500/20';
     }
@@ -110,7 +114,6 @@ const AdminEvents = () => {
             Monitor, manage, and analyze all events across the Occasio platform.
           </p>
         </div>
-        a
       </div>
 
       {/* Filters & Search */}

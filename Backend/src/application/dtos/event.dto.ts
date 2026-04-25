@@ -4,7 +4,7 @@ import { EventType } from '../../common/enums/event-type';
 export interface EventDto {
   title: string;
   description: string;
-  bannerUrl: string;
+  picture: string;
   eventType: EventType;
 
   startTime: string | Date;

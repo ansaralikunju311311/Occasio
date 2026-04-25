@@ -1,0 +1,12 @@
+import { Router } from 'express';
+import { verifyAccessToken } from '../middlewares/verifyAccessToken.middleware';
+import { MakePaymentController } from '../../container/payment.containers';
+
+const router = Router();
+const controller = MakePaymentController();
+
+router.post('/order', verifyAccessToken, controller.createOrder);
+router.post('/ticket-order', verifyAccessToken, controller.createTicketOrder);
+router.post('/verify', verifyAccessToken, controller.verifyPayment);
+
+export default router;

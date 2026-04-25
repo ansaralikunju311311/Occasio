@@ -4,11 +4,14 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { toast } from 'sonner';
 import HomeButton from '../../components/common/HomeButton';
 import { useEventDetails } from '../../hooks/useEvents';
+import { paymentService } from '../../services/payment.service';
+import { useState } from 'react';
 
 const Checkout = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const [isPaying, setIsPaying] = useState(false);
 
   const { selectedSeats = [], bookingType = 'physical' } = location.state || {};
 
@@ -37,9 +40,36 @@ const Checkout = () => {
     total = location.state?.totalPrice || 0;
   }
 
-  const handlePayment = () => {
-    // UI Only - no functionality
-    toast.success('Ready for payment integration!');
+  const handlePayment = async () => {
+    if (!event || !id) return;
+    
+    setIsPaying(true);
+    try {
+      const amountToPay = total || location.state?.totalPrice;
+      if (!amountToPay || amountToPay <= 0) {
+        toast.error('Invalid amount for payment');
+        setIsPaying(false);
+        return;
+      }
+
+      const orderResponse = await paymentService.createTicketOrder(id, amountToPay);
+      paymentService.openRazorpayCheckout(
+        orderResponse.order,
+        id,
+        () => {
+          toast.success('Payment successful! Your tickets are booked.');
+          // In a real app, redirect to a success page or user bookings
+          navigate('/profile');
+        },
+        (err: any) => {
+          toast.error(err.message || 'Payment failed');
+          setIsPaying(false);
+        }
+      );
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to initiate payment');
+      setIsPaying(false);
+    }
   };
 
   return (
@@ -121,8 +151,8 @@ const Checkout = () => {
                     </svg>
                   </div>
                   <div>
-                    <p className="font-bold text-sm">Credit / Debit Card</p>
-                    <p className="text-[10px] text-slate-400">Secure payment via Stripe</p>
+                    <p className="font-bold text-sm">Online Payment</p>
+                    <p className="text-[10px] text-slate-400">Secure payment via Razorpay</p>
                   </div>
                 </div>
                 <div className="w-5 h-5 rounded-full border-4 border-indigo-500 bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]"></div>
@@ -154,9 +184,10 @@ const Checkout = () => {
 
               <button
                 onClick={handlePayment}
-                className="w-full py-4 bg-linear-to-r from-indigo-500 to-purple-600 rounded-2xl font-black text-lg shadow-[0_20px_40px_-10px_rgba(99,102,241,0.4)] hover:shadow-[0_25px_50px_-12px_rgba(99,102,241,0.5)] active:scale-95 transition-all duration-300"
+                disabled={isPaying}
+                className="w-full py-4 bg-linear-to-r from-indigo-500 to-purple-600 rounded-2xl font-black text-lg shadow-[0_20px_40px_-10px_rgba(99,102,241,0.4)] hover:shadow-[0_25px_50px_-12px_rgba(99,102,241,0.5)] active:scale-95 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Pay Now
+                {isPaying ? 'Processing...' : 'Pay Now'}
               </button>
 
               <p className="text-[10px] text-center text-slate-500 mt-4 leading-relaxed">

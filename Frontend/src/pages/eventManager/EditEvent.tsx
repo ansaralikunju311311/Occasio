@@ -34,6 +34,7 @@ const EditEvent = () => {
   const navigate = useNavigate();
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [initialDataLoaded, setInitialDataLoaded] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   const { data: event, isLoading: isFetching } = useEventDetails(id);
   const updateMutation = useUpdateEvent();
@@ -229,6 +230,7 @@ const EditEvent = () => {
     }
 
     try {
+      setIsUploading(true);
       let bannerUrl = imagePreview || '';
       if (data.banner && data.banner.length > 0) {
         bannerUrl = await uploadImageToCloudinary(data.banner[0]);
@@ -239,6 +241,7 @@ const EditEvent = () => {
         for (const block of layoutBlocks) {
           if (!block.blockName.trim() || !block.category.name || block.category.price === '' || Number(block.category.price) < 0) {
             toast.error('Please complete all block details!');
+            setIsUploading(false);
             return;
           }
         }
@@ -263,6 +266,7 @@ const EditEvent = () => {
           },
         },
         {
+          onSettled: () => setIsUploading(false),
           onSuccess: () => {
             toast.success('Event updated successfully!');
             setShowSuccessModal(true);
@@ -274,10 +278,11 @@ const EditEvent = () => {
       );
     } catch (err) {
       toast.error('Image upload failed');
+      setIsUploading(false);
     }
   };
 
-  const isSubmitting = updateMutation.isPending;
+  const isSubmitting = updateMutation.isPending || isUploading;
 
   if (isFetching) {
     return (

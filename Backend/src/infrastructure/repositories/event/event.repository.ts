@@ -215,6 +215,36 @@ export class EventRepository
     return !!result;
   }
 
+  async validateOwnershipAndDraft(eventId: string, userId: string): Promise<Events> {
+    const event = await this.model.findOne({
+      _id: eventId,
+      createdBy: userId,
+      status: EventStatus.DRAFT,
+    });
+
+    if (!event) {
+      throw new Error('Event not found or not eligible for payment');
+    }
+
+    return this.toEntity(event);
+  }
+
+  async publishEvent(eventId: string): Promise<Events> {
+    const event = await this.model.findById(eventId);
+    if (!event) {
+      throw new Error('Event not found during publishing');
+    }
+
+    if (event.status === EventStatus.LIVE && event.isPublished) {
+      return this.toEntity(event); // Already published
+    }
+
+    event.status = EventStatus.LIVE;
+    event.isPublished = true;
+    const updated = await event.save();
+    return this.toEntity(updated);
+  }
+
   private toEntity(manager: any): Events {
     let createdById: string;
     let creatorDetails: any;
@@ -258,6 +288,7 @@ export class EventRepository
       seatLayoutId,
       seatLayoutDetails,
       manager.seats,
+      manager.isPublished,
       manager.isDeleted,
       manager.deletedAt,
     );

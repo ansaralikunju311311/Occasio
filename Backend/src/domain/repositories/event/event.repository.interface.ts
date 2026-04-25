@@ -30,4 +30,7 @@ export interface IEventRepository {
   deleteEvent(id: string): Promise<boolean>;
   deleteSeatsByEventId(eventId: string, session?: mongoose.ClientSession): Promise<void>;
   deleteLayoutByEventId(eventId: string, session?: mongoose.ClientSession): Promise<void>;
+
+  validateOwnershipAndDraft(eventId: string, userId: string): Promise<Events>;
+  publishEvent(eventId: string): Promise<Events>;
 }

@@ -13,7 +13,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-
   "devDependencies": {
     "@types/axios": "^0.9.36",
     "@types/bcrypt": "^6.0.0",
@@ -48,6 +47,7 @@
     "nodemailer": "^8.0.4",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
+    "razorpay": "^2.9.6",
     "winston": "^3.19.0"
   }
 }

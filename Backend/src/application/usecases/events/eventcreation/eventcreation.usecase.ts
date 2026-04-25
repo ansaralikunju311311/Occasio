@@ -53,7 +53,7 @@ export class EventCretionUseCase implements IEventCreationUseCase {
 
       console.log('thehhehe location', data.location);
 
-      const status = EventStatus.ACTIVE;
+      const status = EventStatus.DRAFT;
 
       console.log('sample', status);
 
@@ -96,7 +96,7 @@ export class EventCretionUseCase implements IEventCreationUseCase {
         data.price,
         userId,
         status,
-        data.bannerUrl,
+        data.picture,
         undefined, // creatorDetails
         '', // seatLayoutId
         undefined, // SeatLayout

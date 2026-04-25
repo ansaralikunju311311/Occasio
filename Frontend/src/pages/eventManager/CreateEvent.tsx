@@ -3,6 +3,7 @@ import { useForm, type SubmitHandler } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { api } from '../../services/api';
+import { paymentService } from '../../services/payment.service';
 import HomeButton from '../../components/common/HomeButton';
 
 export const EventType = {
@@ -34,6 +35,9 @@ import { useMutation } from '@tanstack/react-query';
 const CreateEvent = () => {
   const navigate = useNavigate();
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [createdEventId, setCreatedEventId] = useState<string | null>(null);
+  const [isPaying, setIsPaying] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const {
     register,
     handleSubmit,
@@ -68,8 +72,9 @@ const CreateEvent = () => {
 
   const eventMutation = useMutation({
     mutationFn: (payload: any) => api.post('/events/creation', payload),
-    onSuccess: () => {
-      toast.success('Event created successfully!');
+    onSuccess: (response: any) => {
+      toast.success('Event draft created successfully!');
+      setCreatedEventId(response.data.creation.id);
       setShowSuccessModal(true);
     },
     onError: (error: any) => {
@@ -189,13 +194,21 @@ const CreateEvent = () => {
     }
 
     try {
+      setIsUploading(true);
       let bannerUrl = '';
       if (data.banner && data.banner.length > 0) {
         bannerUrl = await uploadImageToCloudinary(data.banner[0]);
       }
 
+      if (!bannerUrl) {
+        toast.error('Event banner is required!');
+        setIsUploading(false);
+        return;
+      }
+
       if ((data.eventType === EventType.ONLINE || data.eventType === EventType.HYBRID) && (!data.maxOnlineUsers || data.maxOnlineUsers <= 0)) {
         toast.error('Online capacity is required!');
+        setIsUploading(false);
         return;
       }
 
@@ -205,6 +218,7 @@ const CreateEvent = () => {
         for (const block of layoutBlocks) {
           if (!block.blockName.trim() || !block.category.name || block.category.price === '' || Number(block.category.price) < 0) {
             toast.error('Please complete all block details!');
+            setIsUploading(false);
             return;
           }
         }
@@ -215,15 +229,43 @@ const CreateEvent = () => {
         location: isOfflineOrHybrid ? { type: 'Point', coordinates: [Number(data.longitude), Number(data.latitude)], address: null } : null,
         startTime: new Date(data.startTime),
         endTime: new Date(data.endTime),
-        bannerUrl: bannerUrl,
+        picture: bannerUrl,
         layout: isOfflineOrHybrid ? { blocks: layoutBlocks } : undefined,
+      }, {
+        onSettled: () => setIsUploading(false)
       });
     } catch (err) {
       toast.error('Image upload failed');
+      setIsUploading(false);
     }
   };
 
-  const isSubmitting = eventMutation.isPending;
+  const handlePayment = async () => {
+    if (!createdEventId) return;
+
+    setIsPaying(true);
+    try {
+      const orderResponse = await paymentService.createOrder(createdEventId);
+      paymentService.openRazorpayCheckout(
+        orderResponse.order,
+        createdEventId,
+        () => {
+          toast.success('Payment successful! Event is now LIVE.');
+          setShowSuccessModal(false);
+          navigate('/eventmanager/my-events');
+        },
+        (err: any) => {
+          toast.error(err.message || 'Payment failed or verification error');
+          setIsPaying(false);
+        }
+      );
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to initiate payment');
+      setIsPaying(false);
+    }
+  };
+
+  const isSubmitting = eventMutation.isPending || isUploading;
 
   const onFormError = (errors: any) => {
     const errorMessages = Object.values(errors);
@@ -931,39 +973,51 @@ const CreateEvent = () => {
               </div>
 
               <h2 className="text-2xl font-bold text-white mb-2 underline decoration-teal-500/50 decoration-4 underline-offset-4">
-                Event Created!
+                Draft Created!
               </h2>
               <p className="text-slate-400 mb-8 mt-4">
-                Your event has been successfully scheduled and published. It's now active on our
-                platform.
+                Your event is currently a <strong>DRAFT</strong>. To make it <strong>LIVE</strong> and publish it to the platform, you need to complete the scheduling payment.
               </p>
 
               <div className="grid grid-cols-1 gap-3 w-full">
                 <button
-                  onClick={() => navigate('/eventmanager/stats')}
-                  className="w-full bg-teal-500 hover:bg-teal-400 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-teal-500/20 flex items-center justify-center"
+                  onClick={handlePayment}
+                  disabled={isPaying}
+                  className="w-full bg-teal-500 hover:bg-teal-400 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-teal-500/20 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Go to Dashboard
-                  <svg
-                    className="w-5 h-5 ml-2"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                    />
-                  </svg>
+                  {isPaying ? (
+                    <span className="flex items-center">
+                      <svg className="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Processing...
+                    </span>
+                  ) : (
+                    <>
+                      Pay ₹99 & Schedule
+                      <svg
+                        className="w-5 h-5 ml-2"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
+                        />
+                      </svg>
+                    </>
+                  )}
                 </button>
 
                 <button
                   onClick={() => navigate('/eventmanager/my-events')}
                   className="w-full bg-slate-800 hover:bg-slate-700 text-white font-semibold py-4 rounded-2xl border border-slate-700 transition-all flex items-center justify-center"
                 >
-                  View My Events
+                  View My Drafts
                   <svg
                     className="w-5 h-5 ml-2"
                     fill="none"

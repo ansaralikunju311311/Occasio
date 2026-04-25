@@ -29,6 +29,7 @@ export class Events {
     public seatLayoutId?: string,
     public SeatLayout?: any,
     public seats?: any[],
+    public isPublished?: boolean,
     public isDeleted?: boolean,
     public deletedAt?: Date,
   ) {

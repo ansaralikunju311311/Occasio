@@ -23,6 +23,7 @@ export interface IEventDocument extends Document {
   picture: string;
   seatLayoutId: Schema.Types.ObjectId;
 
+  isPublished: boolean;
   isDeleted: boolean;
   deletedAt: Date;
 }
@@ -81,7 +82,11 @@ const eventSchema = new Schema<IEventDocument>(
     status: {
       type: String,
       enum: Object.values(EventStatus),
-      default: EventStatus.ACTIVE,
+      default: EventStatus.DRAFT,
+    },
+    isPublished: {
+      type: Boolean,
+      default: false,
     },
     picture: {
       type: String,
@@ -113,5 +118,14 @@ eventSchema.set('toObject', { virtuals: true });
 eventSchema.set('toJSON', { virtuals: true });
 
 eventSchema.index({ location: '2dsphere' });
+
+// TTL index to delete DRAFT events after 24 hours
+eventSchema.index(
+  { createdAt: 1 },
+  {
+    expireAfterSeconds: 86400, // 24 hours
+    partialFilterExpression: { status: EventStatus.DRAFT },
+  },
+);
 
 export const EventModel = model<IEventDocument>('Event', eventSchema);

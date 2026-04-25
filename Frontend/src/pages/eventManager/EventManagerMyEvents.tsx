@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import HomeButton from '../../components/common/HomeButton';
 import { toast } from 'sonner';
+import { paymentService } from '../../services/payment.service';
 import { Table } from '../../components/common/Table';
 import { SearchBar } from '../../components/common/SearchBar';
 import { Pagination } from '../../components/common/Pagination';
@@ -17,6 +18,7 @@ const EventManagerMyEvents = () => {
   const navigate = useNavigate();
   const deleteMutation = useDeleteEvent();
   const [isDeletingId, setIsDeletingId] = useState<string | null>(null);
+  const [isSchedulingId, setIsSchedulingId] = useState<string | null>(null);
 
   const {
     data: responseData,
@@ -59,6 +61,29 @@ const EventManagerMyEvents = () => {
     }
   };
 
+  const handleScheduleClick = async (event: any) => {
+    setIsSchedulingId(event.id);
+    try {
+      const orderResponse = await paymentService.createOrder(event.id);
+      paymentService.openRazorpayCheckout(
+        orderResponse.order,
+        event.id,
+        () => {
+          toast.success('Payment successful! Event is now LIVE.');
+          setIsSchedulingId(null);
+          window.location.reload();
+        },
+        (err: any) => {
+          toast.error(err.message || 'Payment failed');
+          setIsSchedulingId(null);
+        }
+      );
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to initiate payment');
+      setIsSchedulingId(null);
+    }
+  };
+
   if (error) {
     toast.error('Failed to load your events.');
   }
@@ -86,6 +111,10 @@ const EventManagerMyEvents = () => {
         return 'bg-slate-500/10 text-slate-400 border-slate-500/20';
       case 'CANCELLED':
         return 'bg-rose-500/10 text-rose-400 border-rose-500/20';
+      case 'DRAFT':
+        return 'bg-amber-500/10 text-amber-400 border-amber-500/20';
+      case 'LIVE':
+        return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
       default:
         return 'bg-slate-500/10 text-slate-400 border-slate-500/20';
     }
@@ -308,6 +337,7 @@ const EventManagerMyEvents = () => {
                       const blocks =
                         event?.SeatLayout?.blocks ??
                         event?.seatLayout?.blocks ??
+                        event?.seatLayoutId?.blocks ??
                         event?.seatLayoutDetails?.blocks ??
                         event?.layout?.blocks ??
                         [];
@@ -406,6 +436,25 @@ const EventManagerMyEvents = () => {
                       </span>
                     ) : (
                       <>
+                        {event.status === 'DRAFT' && (
+                          <button
+                            onClick={() => {
+                              handleScheduleClick(event);
+                            }}
+                            disabled={isSchedulingId === event.id}
+                            className="px-3 py-1 bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-bold rounded-lg transition-all flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                            title="Complete payment to publish"
+                          >
+                            {isSchedulingId === event.id ? (
+                              <>
+                                <div className="w-3 h-3 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                                Scheduling...
+                              </>
+                            ) : (
+                              'Schedule'
+                            )}
+                          </button>
+                        )}
                         <button
                           onClick={() => setSelectedEvent(event)}
                           className="p-2 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-lg transition-colors inline-block"
