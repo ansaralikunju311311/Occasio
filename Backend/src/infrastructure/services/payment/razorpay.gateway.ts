@@ -3,12 +3,10 @@ import { razorpayInstance } from '../../config/razorpay';
 import crypto from 'crypto';
 
 export class RazorpayGateway implements IPaymentGateway {
-  /**
-   * Create a Razorpay order for an event fee
-   */
+ 
   async createOrder(eventId: string, amount: number) {
     const options = {
-      amount: amount * 100, // amount in paise
+      amount: amount * 100, 
       currency: 'INR',
       receipt: `receipt_event_${eventId}`,
       notes: {
@@ -26,9 +24,7 @@ export class RazorpayGateway implements IPaymentGateway {
     }
   }
 
-  /**
-   * Verify the Razorpay payment signature
-   */
+  
   verifySignature(orderId: string, paymentId: string, signature: string): boolean {
     const text = orderId + '|' + paymentId;
     const generated_signature = crypto

@@ -34,9 +34,7 @@ const Checkout = () => {
   if (isOnline) {
     total = event.price || 0;
   } else {
-    // This is a simple calculation; in a real app, we'd match seat IDs to blocks
-    // For now, let's assume SeatSelection passed the correct context or we'd re-calculate.
-    // Actually, we should probably pass the total from SeatSelection state to be safe.
+    
     total = location.state?.totalPrice || 0;
   }
 

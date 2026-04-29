@@ -4,7 +4,7 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { toast } from 'sonner';
 import { useEventSeats } from '../../hooks/useEvents';
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+
 
 interface Seat {
   id: string;
@@ -22,17 +22,14 @@ interface GroupedBlock {
   rows: { rowNumber: number; seats: Seat[] }[];
 }
 
-// ─── Helper: group seats by block → row based on LAYOUT structure ─────────────
 
 const groupSeats = (existingSeats: Seat[], layoutBlocks: any[] = []): GroupedBlock[] => {
-  // 1. Create a lookup map for existing (busy/held) seats: "block-row-column" -> Seat
   const busySeatMap = new Map<string, Seat>();
   for (const s of existingSeats) {
     const key = `${s.block}-${s.row}-${s.column}`.toUpperCase();
     busySeatMap.set(key, s);
   }
 
-  // 2. Iterate over the layout definition and build the grouped structure
   const blocks = layoutBlocks.map((lb) => {
     const blockName = lb.blockName || lb.blocName || 'Unknown';
     const trimmedBlockName = blockName.trim();
@@ -53,10 +50,9 @@ const groupSeats = (existingSeats: Seat[], layoutBlocks: any[] = []): GroupedBlo
           if (existing) {
             seats.push(existing);
           } else {
-            // Virtual seat - not in DB yet
             const seatNumber = `${trimmedBlockName}-${rowNumber}-${c}`;
             seats.push({
-              id: `v-${key}`, // Synthetic ID
+              id: `v-${key}`, 
               block: trimmedBlockName,
               row: rowNumber,
               column: c,
@@ -74,7 +70,6 @@ const groupSeats = (existingSeats: Seat[], layoutBlocks: any[] = []): GroupedBlo
     };
   });
 
-  // 3. Sort: highest price at top (far from stage) → lowest price at bottom (near stage/screen)
   blocks.sort((a, b) => {
     const priceA = a.categoryPrice ?? 0;
     const priceB = b.categoryPrice ?? 0;
@@ -84,7 +79,6 @@ const groupSeats = (existingSeats: Seat[], layoutBlocks: any[] = []): GroupedBlo
   return blocks;
 };
 
-// ─── Seat Button ──────────────────────────────────────────────────────────────
 
 interface SeatBtnProps {
   seat: Seat;
@@ -121,7 +115,6 @@ const SeatBtn = ({ seat, isSelected, onClick }: SeatBtnProps) => {
   );
 };
 
-// ─── Block Section ────────────────────────────────────────────────────────────
 
 interface BlockSectionProps {
   block: GroupedBlock;
@@ -130,7 +123,6 @@ interface BlockSectionProps {
 }
 
 const BlockSection = ({ block, selectedSeats, onSeatClick }: BlockSectionProps) => {
-  // Figure out aisle position: split after ~40% of columns
   const maxCols = Math.max(...block.rows.map((r) => r.seats.length), 1);
   const aisleAfter = Math.floor(maxCols * 0.35); // aisle after this many seats
 
@@ -206,7 +198,6 @@ const Legend = () => (
   </div>
 );
 
-// ─── Stage graphic ────────────────────────────────────────────────────────────
 
 const Stage = () => (
   <div className="flex flex-col items-center mt-10 mb-2">
@@ -216,7 +207,6 @@ const Stage = () => (
   </div>
 );
 
-// ─── Online Pass Card ─────────────────────────────────────────────────────────
 
 const OnlinePassCard = ({ price }: { price: number }) => (
   <div className="flex flex-col items-center justify-center py-20 px-8 bg-white rounded-2xl border border-gray-100 shadow-sm text-center">
@@ -246,7 +236,6 @@ const OnlinePassCard = ({ price }: { price: number }) => (
   </div>
 );
 
-// ─── Main Component ───────────────────────────────────────────────────────────
 
 const SeatSelection = () => {
   const { id } = useParams();
@@ -263,7 +252,6 @@ const SeatSelection = () => {
     }
   }, [isError, navigate]);
 
-  // Group flat seat array
   const groupedBlocks = useMemo<GroupedBlock[]>(() => {
     const seats: Seat[] = event?.seats ?? [];
     const layoutBlocks: any[] =
@@ -287,11 +275,9 @@ const SeatSelection = () => {
     return selectedSeats.map((sid) => all.find((s) => s.id === sid)).filter(Boolean) as Seat[];
   }, [selectedSeats, groupedBlocks]);
 
-  // ── All hooks MUST be called before any early returns ────────────────────
   const isOnlineMode = event?.eventType === 'ONLINE' || bookingType === 'online';
   const canCheckout = isOnlineMode || selectedSeats.length > 0;
 
-  // Total price calculated from category prices or flat event price
   const totalPrice = useMemo(() => {
     if (isOnlineMode) return event?.price ?? 0;
     return selectedSeatDetails.reduce((sum, seat) => {
@@ -300,7 +286,6 @@ const SeatSelection = () => {
     }, 0);
   }, [isOnlineMode, selectedSeatDetails, groupedBlocks, event]);
 
-  // Guards — after all hooks
   if (loading) return <LoadingSpinner />;
   if (!event) return null;
 

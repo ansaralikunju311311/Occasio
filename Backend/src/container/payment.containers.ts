@@ -3,13 +3,15 @@ import { RazorpayGateway } from '../infrastructure/services/payment/razorpay.gat
 import { EventRepository } from '../infrastructure/repositories/event/event.repository';
 import { CreateOrderUseCase } from '../application/usecases/payment/createOrder/createOrder.usecase';
 import { VerifyPaymentUseCase } from '../application/usecases/payment/verifyPayment/verifyPayment.usecase';
+import { PaymentRepository } from '../infrastructure/repositories/payment/payment.repository';
 
 export const MakePaymentController = () => {
   const paymentGateway = new RazorpayGateway();
   const eventRepository = new EventRepository();
+  const paymentRepository = new PaymentRepository();
 
   const createOrderUseCase = new CreateOrderUseCase(paymentGateway, eventRepository);
-  const verifyPaymentUseCase = new VerifyPaymentUseCase(paymentGateway, eventRepository);
+  const verifyPaymentUseCase = new VerifyPaymentUseCase(paymentGateway, eventRepository, paymentRepository);
 
   return new PaymentController(createOrderUseCase, verifyPaymentUseCase);
 };
