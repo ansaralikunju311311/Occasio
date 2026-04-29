@@ -122,3 +122,10 @@ export const useUpdatePlan = () => {
     },
   });
 };
+
+export const usePaymentHistory = (params?: any) => {
+  return useQuery({
+    queryKey: ['adminPayments', params],
+    queryFn: () => adminService.getPaymentHistory(params).then((res) => res.data),
+  });
+};

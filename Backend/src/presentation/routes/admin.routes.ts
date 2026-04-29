@@ -61,4 +61,12 @@ router.get(
 //   verifyAccessToken,
 //   requireRole([UserRole.ADMIN]),
 //   controller.createPlans.bind(controller))
+
+router.get(
+  '/payments',
+  verifyAccessToken,
+  requireRole([UserRole.ADMIN]),
+  controller.getAllPayments.bind(controller),
+);
+
 export default router;

@@ -13,4 +13,7 @@ export const adminService = {
   getPlans: () => api.get('/plans/getplans'),
   createPlan: (data: any) => api.post('/plans/createplans', data),
   updatePlan: (id: string, data: any) => api.patch(`/plans/updateplan/${id}`, data),
+
+  // Payments
+  getPaymentHistory: (params?: any) => api.get('/admin/payments', { params }),
 };

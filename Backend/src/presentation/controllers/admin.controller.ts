@@ -6,6 +6,7 @@ import { IUserManageUseCase } from '../../application/usecases/admin/usermanage/
 import { IManagerDetailsUseCase } from '../../application/usecases/admin/managerDetails/managerdetails.usecase.interface';
 import { IApprovalUseCase } from '../../application/usecases/admin/manageApproval/managerapproval.usecase.interface';
 import { IManagerRejectionUseCase } from '../../application/usecases/admin/managerRejection/managerRejection.usecase.interface';
+import { IGetAllPaymentsUseCase } from '../../application/usecases/payment/getAllPayments/getAllPayments.usecase.interface';
 import { catchAsync } from '../../common/utils/catchAsync';
 
 export class AdminController {
@@ -17,6 +18,7 @@ export class AdminController {
     private managerApprovalUseCase: IApprovalUseCase,
     private managerRejectionUseCase: IManagerRejectionUseCase,
     private managerDetailsUseCase: IManagerDetailsUseCase,
+    private getAllPaymentsUseCase: IGetAllPaymentsUseCase,
   ) {}
 
   getUsers = catchAsync(async (req: Request, res: Response) => {
@@ -103,7 +105,14 @@ export class AdminController {
     });
   });
   
+  getAllPayments = catchAsync(async (req: Request, res: Response) => {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
 
-
-
+    const result = await this.getAllPaymentsUseCase.execute({ page, limit });
+    res.status(HttpStatus.OK).json({
+      payments: result?.data || [],
+      metadata: result?.metadata,
+    });
+  });
 }
