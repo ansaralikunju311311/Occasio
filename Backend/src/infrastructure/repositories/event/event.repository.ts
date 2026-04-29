@@ -45,7 +45,7 @@ export class EventRepository
 
     if (upcoming) {
       query.endTime = { $gt: new Date() };
-      query.status = EventStatus.ACTIVE;
+      query.status = { $in: [EventStatus.LIVE, EventStatus.ACTIVE] };
     }
 
     if (search) {
