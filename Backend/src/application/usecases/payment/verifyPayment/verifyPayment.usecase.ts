@@ -3,6 +3,9 @@ import { IPaymentGateway } from '../../../../domain/services/payment-gateway.int
 import { IEventRepository } from '../../../../domain/repositories/event/event.repository.interface';
 import { IPaymentRepository } from '../../../../domain/repositories/payment/payment.repository.interface';
 import { Payment } from '../../../../domain/entities/payment.entity';
+import { PaymentPurpose } from '../../../../common/enums/payment-purpose.enum';
+import { PaymentStatus } from '../../../../common/enums/payment-status.enum';
+import { PaymentMethod } from '../../../../common/enums/payment-method.enum';
 
 export class VerifyPaymentUseCase implements IVerifyPaymentUseCase {
   constructor(
@@ -37,11 +40,11 @@ export class VerifyPaymentUseCase implements IVerifyPaymentUseCase {
     const payment = new Payment(
       null,
       userId,
-      'EVENT_PUBLISH',
+      PaymentPurpose.EVENT_PUBLISH,
       99, // default fixed price for publishing an event
       'INR',
-      'RAZORPAY',
-      'SUCCESS',
+      PaymentMethod.RAZORPAY,
+      PaymentStatus.SUCCESS,
       razorpay_payment_id,
       eventId,
       undefined,

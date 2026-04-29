@@ -1,0 +1,5 @@
+export enum PaymentPurpose {
+  EVENT_PUBLISH = 'EVENT_PUBLISH',
+  BOOKING = 'BOOKING',
+  SUBSCRIPTION = 'SUBSCRIPTION',
+}

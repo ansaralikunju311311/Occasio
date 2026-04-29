@@ -1,12 +1,16 @@
+import { PaymentPurpose } from '../../common/enums/payment-purpose.enum';
+import { PaymentStatus } from '../../common/enums/payment-status.enum';
+import { PaymentMethod } from '../../common/enums/payment-method.enum';
+
 export class Payment {
   constructor(
     public readonly id: string | null,
     public userId: string,
-    public purpose: 'EVENT_PUBLISH' | 'BOOKING' | 'SUBSCRIPTION',
+    public purpose: PaymentPurpose,
     public amount: number,
     public currency: string,
-    public paymentMethod: string,
-    public paymentStatus: 'PENDING' | 'SUCCESS' | 'FAILED',
+    public paymentMethod: PaymentMethod | string,
+    public paymentStatus: PaymentStatus,
     public transactionId: string,
     public eventId?: string,
     public bookingId?: string,
