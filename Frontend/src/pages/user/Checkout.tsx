@@ -1,21 +1,39 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { toast } from 'sonner';
 import HomeButton from '../../components/common/HomeButton';
 import { useEventDetails } from '../../hooks/useEvents';
 import { paymentService } from '../../services/payment.service';
-import { useState } from 'react';
+
+interface PriceBreakdown {
+  commissionPercentage: number;
+  commissionAmount: number;
+  organizerRevenue: number;
+  planName: string;
+}
 
 const Checkout = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const [isPaying, setIsPaying] = useState(false);
+  const [breakdown, setBreakdown] = useState<PriceBreakdown | null>(null);
+  const [loadingBreakdown, setLoadingBreakdown] = useState(true);
 
   const { selectedSeats = [], bookingType = 'physical' } = location.state || {};
-
   const { data: event, isLoading: loading, isError } = useEventDetails(id);
+
+  const isOnline = event?.eventType === 'ONLINE' || bookingType === 'online';
+
+  let total = 0;
+  if (event) {
+    if (isOnline) {
+      total = event.price || 0;
+    } else {
+      total = location.state?.totalPrice || 0;
+    }
+  }
 
   useEffect(() => {
     if (isError) {
@@ -24,40 +42,57 @@ const Checkout = () => {
     }
   }, [isError, navigate]);
 
-  if (loading) return <LoadingSpinner />;
+  useEffect(() => {
+    const fetchBreakdown = async () => {
+      if (!id || total <= 0) return;
+      try {
+        setLoadingBreakdown(true);
+        const res = await paymentService.getPriceBreakdown(id, total);
+        if (res.success) {
+          setBreakdown(res.breakdown);
+        }
+      } catch (err) {
+        console.error('Failed to load pricing breakdown:', err);
+      } finally {
+        setLoadingBreakdown(false);
+      }
+    };
+
+    if (id && total > 0) {
+      fetchBreakdown();
+    }
+  }, [id, total]);
+
+  if (loading || (total > 0 && loadingBreakdown)) return <LoadingSpinner />;
   if (!event) return null;
-
-  const isOnline = event.eventType === 'ONLINE' || bookingType === 'online';
-
-  // Calculate total
-  let total = 0;
-  if (isOnline) {
-    total = event.price || 0;
-  } else {
-    
-    total = location.state?.totalPrice || 0;
-  }
 
   const handlePayment = async () => {
     if (!event || !id) return;
-    
+
     setIsPaying(true);
     try {
-      const amountToPay = total || location.state?.totalPrice;
+      const amountToPay = total;
       if (!amountToPay || amountToPay <= 0) {
         toast.error('Invalid amount for payment');
         setIsPaying(false);
         return;
       }
 
-      const orderResponse = await paymentService.createTicketOrder(id, amountToPay);
+      // Pass eventId, amount, selectedSeats, bookingType to create ticket order
+      const orderResponse = await paymentService.createTicketOrder(
+        id,
+        amountToPay,
+        selectedSeats,
+        bookingType
+      );
+
       paymentService.openRazorpayCheckout(
         orderResponse.order,
         id,
         () => {
           toast.success('Payment successful! Your tickets are booked.');
-          // In a real app, redirect to a success page or user bookings
-          navigate('/profile');
+          // Redirect to user's personal bookings page
+          navigate('/eventmanager/user-bookings');
         },
         (err: any) => {
           toast.error(err.message || 'Payment failed');
@@ -118,17 +153,35 @@ const Checkout = () => {
                       <span className="text-slate-300">
                         In-Person Seats ({selectedSeats.length})
                       </span>
-                      <span className="font-bold">₹{location.state?.totalPrice}</span>
+                      <span className="font-bold">₹{total}</span>
                     </div>
                     <div className="text-xs text-slate-500 italic">
                       Seats: {selectedSeats.join(', ')}
                     </div>
                   </>
                 )}
+
+                {/* Separate Commission Details card */}
+                {breakdown && (
+                  <div className="mt-6 p-5 rounded-2xl bg-slate-950/50 border border-slate-800/80 space-y-3">
+                    <div className="flex justify-between text-xs text-slate-400">
+                      <span>Platform Commission ({breakdown.commissionPercentage}%)</span>
+                      <span className="text-purple-400 font-semibold">₹{breakdown.commissionAmount}</span>
+                    </div>
+                    <div className="flex justify-between text-xs text-slate-400">
+                      <span>Organizer Revenue</span>
+                      <span className="text-teal-400 font-semibold">₹{breakdown.organizerRevenue}</span>
+                    </div>
+                    <div className="text-[10px] text-slate-500 italic">
+                      Split policy applied based on Creator tier: {breakdown.planName}
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex justify-between items-center pt-4 text-xl">
                   <span className="font-bold">Total Amount</span>
                   <span className="font-black text-indigo-400">
-                    ₹{total || location.state?.totalPrice}
+                    ₹{total}
                   </span>
                 </div>
               </div>

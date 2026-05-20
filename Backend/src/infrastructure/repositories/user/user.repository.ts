@@ -93,6 +93,7 @@ export class UserRepository
       doc.applyingupgrade,
       doc.rejectedAt,
       doc.reapplyAt,
+      doc.activeSubscription ? (doc.activeSubscription._id?.toString() || doc.activeSubscription.toString()) : undefined,
     );
   }
 }

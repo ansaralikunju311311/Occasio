@@ -11,8 +11,16 @@ export const paymentService = {
     const response = await api.post('/payments/order', { eventId });
     return response.data;
   },
-  createTicketOrder: async (eventId: string, amount: number) => {
-    const response = await api.post('/payments/ticket-order', { eventId, amount });
+  createTicketOrder: async (eventId: string, amount: number, selectedSeats?: string[], bookingType?: string) => {
+    const response = await api.post('/payments/ticket-order', { eventId, amount, selectedSeats, bookingType });
+    return response.data;
+  },
+  getPriceBreakdown: async (eventId: string, amount: number) => {
+    const response = await api.get(`/payments/price-breakdown?eventId=${eventId}&amount=${amount}`);
+    return response.data;
+  },
+  getMyBookings: async () => {
+    const response = await api.get('/payments/my-bookings');
     return response.data;
   },
 

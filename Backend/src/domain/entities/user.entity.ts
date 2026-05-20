@@ -18,5 +18,6 @@ export class User {
     public applyingupgrade: UpgradeStatus,
     public rejectedAt: Date | null,
     public reapplyAt: Date | null,
+    public activeSubscription?: string | any,
   ) {}
 }

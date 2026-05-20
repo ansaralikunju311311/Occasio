@@ -43,6 +43,22 @@ export class SubscriptionRepository
     );
   }
 
+  async findPlanById(id: string): Promise<Subscription | null> {
+    const plan = await this.model.findById(id);
+    if (!plan) return null;
+    return new Subscription(
+      plan._id as unknown as string,
+      plan.name,
+      plan.price,
+      plan.eventLimit,
+      plan.commissionPercentage,
+      plan.features as [],
+      plan.isActive,
+      plan.createdAt,
+      plan.updatedAt
+    );
+  }
+
   async update(id: string, data: Partial<Subscription>): Promise<Subscription | null> {
     const updatedPlan = await this.model.findByIdAndUpdate(id, data, { new: true });
     if (!updatedPlan) return null;

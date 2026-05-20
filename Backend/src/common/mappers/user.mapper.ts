@@ -14,7 +14,7 @@ export class UserMapper extends BaseMapper<User, UserResponseDto> {
       applyingupgrade: entity.applyingupgrade,
       rejectedAt: entity.rejectedAt,
       reapplyAt: entity.reapplyAt,
-     
+      activeSubscription: entity.activeSubscription,
     };
   }
 

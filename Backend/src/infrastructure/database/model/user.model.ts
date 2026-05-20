@@ -20,6 +20,7 @@ export interface IUserDocument extends Document {
   applyingupgrade: UpgradeStatus;
   rejectedAt: Date | null;
   reapplyAt: Date | null;
+  activeSubscription?: mongoose.Types.ObjectId;
 }
 
 const userSchema = new Schema<IUserDocument>(
@@ -77,6 +78,11 @@ const userSchema = new Schema<IUserDocument>(
     },
     reapplyAt: {
       type: Date,
+      default: null,
+    },
+    activeSubscription: {
+      type: Schema.Types.ObjectId,
+      ref: 'Subscription',
       default: null,
     },
   },

@@ -12,6 +12,7 @@ export interface UserResponseDto {
   applyingupgrade: UpgradeStatus;
   rejectedAt: Date | null;
   reapplyAt: Date | null;
+  activeSubscription?: any;
   createdAt?: Date;
   updatedAt?: Date;
 }
