@@ -1,10 +1,7 @@
 import mongoose, { Document, Schema } from 'mongoose';
 import { UserRole } from '../../../common/enums/userrole-enum';
 import { UserStatus } from '../../../common/enums/userstatus-enum';
-// import { UserOtp } from "../../../../common/enums/user-otp.enum";
 import { UpgradeStatus } from '../../../common/enums/upgrade-enums';
-// import { devNull } from "node:os";
-
 export interface IUserDocument extends Document {
   name: string;
   email: string;
@@ -12,11 +9,6 @@ export interface IUserDocument extends Document {
   role: UserRole;
   status: UserStatus;
   isVerified: boolean;
-  // otp: string | null,
-  // otpExpires: Date | null,
-  // otpType: UserOtp | null,
-  // otpSendAt: Date | null,
-
   applyingupgrade: UpgradeStatus;
   rejectedAt: Date | null;
   reapplyAt: Date | null;

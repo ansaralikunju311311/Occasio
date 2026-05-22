@@ -83,34 +83,55 @@ const groupSeats = (existingSeats: Seat[], layoutBlocks: any[] = []): GroupedBlo
 interface SeatBtnProps {
   seat: Seat;
   isSelected: boolean;
-  onClick: (id: string, status: string) => void;
+  onClick: (seatNumber: string, status: string) => void;
 }
 
 const SeatBtn = ({ seat, isSelected, onClick }: SeatBtnProps) => {
   const col = String(seat.column).padStart(2, '0');
 
   let cls = '';
+  let content: React.ReactNode = col;
+
   if (seat.status === 'BOOKED') {
     cls = 'bg-gray-200 border-gray-200 text-gray-400 cursor-not-allowed';
+    content = (
+      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    );
   } else if (seat.status === 'HELD') {
     cls = 'bg-amber-50 border-amber-400 text-amber-600 cursor-not-allowed';
+    content = (
+      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+      </svg>
+    );
   } else if (isSelected) {
     cls = 'bg-green-500 border-green-500 text-white shadow-md scale-105';
+    content = (
+      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+      </svg>
+    );
   } else {
     cls =
       'bg-white border-gray-300 text-gray-600 hover:border-green-400 hover:bg-green-50 hover:text-green-700 cursor-pointer';
   }
 
+  const titleText = `${seat.block}-${seat.row}-${seat.column} ${
+    seat.status !== 'AVAILABLE' ? `(${seat.status})` : isSelected ? '(Selected)' : ''
+  }`.trim();
+
   return (
     <button
       id={`seat-${seat.id}`}
       aria-label={`Seat ${seat.block}-${seat.row}-${seat.column} ${seat.status}`}
-      title={`${seat.block}-${seat.row}-${seat.column}`}
+      title={titleText}
       disabled={seat.status !== 'AVAILABLE'}
-      onClick={() => onClick(seat.id, seat.status)}
+      onClick={() => onClick(seat.seatNumber!, seat.status)}
       className={`w-8 h-8 rounded border text-[10px] font-bold transition-all duration-150 select-none flex items-center justify-center ${cls}`}
     >
-      {col}
+      {content}
     </button>
   );
 };
@@ -119,7 +140,7 @@ const SeatBtn = ({ seat, isSelected, onClick }: SeatBtnProps) => {
 interface BlockSectionProps {
   block: GroupedBlock;
   selectedSeats: string[];
-  onSeatClick: (id: string, status: string) => void;
+  onSeatClick: (seatNumber: string, status: string) => void;
 }
 
 const BlockSection = ({ block, selectedSeats, onSeatClick }: BlockSectionProps) => {
@@ -154,7 +175,7 @@ const BlockSection = ({ block, selectedSeats, onSeatClick }: BlockSectionProps) 
                   <SeatBtn
                     key={seat.id}
                     seat={seat}
-                    isSelected={selectedSeats.includes(seat.id)}
+                    isSelected={selectedSeats.includes(seat.seatNumber!)}
                     onClick={onSeatClick}
                   />
                 ))}
@@ -167,7 +188,7 @@ const BlockSection = ({ block, selectedSeats, onSeatClick }: BlockSectionProps) 
                   <SeatBtn
                     key={seat.id}
                     seat={seat}
-                    isSelected={selectedSeats.includes(seat.id)}
+                    isSelected={selectedSeats.includes(seat.seatNumber!)}
                     onClick={onSeatClick}
                   />
                 ))}
@@ -182,21 +203,51 @@ const BlockSection = ({ block, selectedSeats, onSeatClick }: BlockSectionProps) 
 
 // ─── Legend ───────────────────────────────────────────────────────────────────
 
-const Legend = () => (
-  <div className="flex flex-wrap items-center justify-center gap-6 pt-6 mt-4 border-t border-gray-100">
-    {[
-      { label: 'Available', cls: 'border-gray-300 bg-white' },
-      { label: 'Selected', cls: 'border-green-500 bg-green-500' },
-      { label: 'Held', cls: 'border-amber-400 bg-amber-50' },
-      { label: 'Sold', cls: 'border-gray-200 bg-gray-200' },
-    ].map((item) => (
-      <div key={item.label} className="flex items-center gap-1.5">
-        <div className={`w-5 h-5 rounded border-2 ${item.cls}`} />
-        <span className="text-[11px] text-gray-500 font-medium">{item.label}</span>
-      </div>
-    ))}
-  </div>
-);
+const Legend = () => {
+  const legendItems = [
+    { label: 'Available', cls: 'border-gray-300 bg-white text-gray-600', icon: null },
+    {
+      label: 'Selected',
+      cls: 'border-green-500 bg-green-500 text-white',
+      icon: (
+        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+        </svg>
+      ),
+    },
+    {
+      label: 'Held',
+      cls: 'border-amber-400 bg-amber-50 text-amber-600',
+      icon: (
+        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+        </svg>
+      ),
+    },
+    {
+      label: 'Sold',
+      cls: 'border-gray-200 bg-gray-200 text-gray-400',
+      icon: (
+        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      ),
+    },
+  ];
+
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-6 pt-6 mt-4 border-t border-gray-100">
+      {legendItems.map((item) => (
+        <div key={item.label} className="flex items-center gap-1.5">
+          <div className={`w-5 h-5 flex items-center justify-center rounded border-2 ${item.cls}`}>
+            {item.icon}
+          </div>
+          <span className="text-[11px] text-gray-500 font-medium">{item.label}</span>
+        </div>
+      ))}
+    </div>
+  );
+};
 
 
 const Stage = () => (
@@ -263,16 +314,16 @@ const SeatSelection = () => {
     return groupSeats(seats, layoutBlocks);
   }, [event]);
 
-  const handleSeatClick = (seatId: string, status: string) => {
+  const handleSeatClick = (seatNumber: string, status: string) => {
     if (status !== 'AVAILABLE') return;
     setSelectedSeats((prev) =>
-      prev.includes(seatId) ? prev.filter((s) => s !== seatId) : [...prev, seatId]
+      prev.includes(seatNumber) ? prev.filter((s) => s !== seatNumber) : [...prev, seatNumber]
     );
   };
 
   const selectedSeatDetails = useMemo(() => {
     const all = groupedBlocks.flatMap((b) => b.rows.flatMap((r) => r.seats));
-    return selectedSeats.map((sid) => all.find((s) => s.id === sid)).filter(Boolean) as Seat[];
+    return selectedSeats.map((sNum) => all.find((s) => s.seatNumber === sNum)).filter(Boolean) as Seat[];
   }, [selectedSeats, groupedBlocks]);
 
   const isOnlineMode = event?.eventType === 'ONLINE' || bookingType === 'online';
@@ -431,7 +482,7 @@ const SeatSelection = () => {
                             </span>
                           )}
                           <button
-                            onClick={() => handleSeatClick(seat.id, 'AVAILABLE')}
+                            onClick={() => handleSeatClick(seat.seatNumber!, 'AVAILABLE')}
                             className="text-gray-300 hover:text-red-400 transition-colors"
                             title="Remove"
                           >
