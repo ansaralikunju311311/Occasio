@@ -252,7 +252,7 @@ const Legend = () => {
 
 const Stage = () => (
   <div className="flex flex-col items-center mt-10 mb-2">
-    <div className="w-[60%] h-10 rounded-b-[50%] bg-gradient-to-b from-gray-200 to-gray-100 border border-gray-200 flex items-center justify-center">
+    <div className="w-[60%] h-10 rounded-b-[50%] bg-linear-to-b from-gray-200 to-gray-100 border border-gray-200 flex items-center justify-center">
       <span className="text-[10px] font-bold text-gray-400 tracking-[0.3em] uppercase">Stage</span>
     </div>
   </div>
