@@ -6,8 +6,11 @@ import { EventDetailsUseCase } from '../application/usecases/events/eventdetails
 import { MyEventsUseCase } from '../application/usecases/events/myevents/myevents.usecase';
 import { UpdateEventUseCase } from '../application/usecases/events/updatevent/updateevent.usecase';
 import { DeleteEventUseCase } from '../application/usecases/events/deleteevent/deleteevent.usecase';
+import { BookingRepository } from '../infrastructure/repositories/booking/booking.repository';
+
 export const MakeEventController = () => {
   const eventRepository = new EventRepository();
+  const bookingRepository = new BookingRepository();
 
 
 
@@ -21,7 +24,7 @@ export const MakeEventController = () => {
   const myEventsUseCase = new MyEventsUseCase(eventRepository);
   
 
-  const eventDetailsUseCase = new EventDetailsUseCase(eventRepository);
+  const eventDetailsUseCase = new EventDetailsUseCase(eventRepository, bookingRepository);
   const updateEventsUseCase = new UpdateEventUseCase(eventRepository);
   const deleteEventUseCase = new DeleteEventUseCase(eventRepository);
 

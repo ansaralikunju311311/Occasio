@@ -2,8 +2,10 @@ import mongoose, { Document, Schema } from 'mongoose';
 
 export enum BookingStatus {
   PENDING = 'PENDING',
-  SUCCESS = 'SUCCESS',
+  CONFIRMED = 'CONFIRMED',
   FAILED = 'FAILED',
+  CANCELLED = 'CANCELLED',
+  EXPIRED = 'EXPIRED',
 }
 
 export interface IBookingDocument extends Document {
@@ -16,6 +18,7 @@ export interface IBookingDocument extends Document {
   organizerRevenue: number;
   status: BookingStatus;
   paymentId?: string;
+  qrCodeData?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -35,6 +38,7 @@ const BookingSchema = new Schema<IBookingDocument>(
       default: BookingStatus.PENDING,
     },
     paymentId: { type: String },
+    qrCodeData: { type: String },
   },
   { timestamps: true }
 );

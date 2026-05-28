@@ -47,7 +47,7 @@ export class VerifyPaymentUseCase implements IVerifyPaymentUseCase {
     if (booking) {
       // TICKET BOOKING FLOW
       // Update booking to SUCCESS
-      await this.bookingRepository.updateBookingStatus(booking.id!, BookingStatus.SUCCESS);
+      await this.bookingRepository.updateBookingStatus(booking.id!, BookingStatus.CONFIRMED);
 
       // If physical booking, update/insert seat statuses to BOOKED in DB
       if (booking.bookingType === 'physical' && booking.seats && booking.seats.length > 0) {

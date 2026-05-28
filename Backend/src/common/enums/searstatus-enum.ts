@@ -1,5 +1,5 @@
 export enum SeatStatus {
   AVAILABLE = 'AVAILABLE',
-  HELD = 'HELD',
+  LOCKED = 'LOCKED',
   BOOKED = 'BOOKED',
 }

@@ -12,6 +12,7 @@ import eventRoutes from '../src/presentation/routes/event.routes';
 import adminRoutes from '../src/presentation/routes/admin.routes';
 import planRoutes from "../src/presentation/routes/plans.routes"
 import paymentRoutes from './presentation/routes/payment.routes';
+import bookingRoutes from './presentation/routes/booking.routes';
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/events', eventRoutes); // Restore original
 app.use('/api/payments', paymentRoutes);
 app.use('/api/plans', planRoutes);
+app.use('/api/bookings', bookingRoutes);
 app.use((_req, res) => {
   res.status(404).json({ message: 'the page not found' });
 });

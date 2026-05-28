@@ -13,7 +13,9 @@ export interface ISeat extends Document {
   price: number;
 
   status: SeatStatus;
-  holdExpiresAt?: Date;
+  lockedBy?: Schema.Types.ObjectId;
+  lockedAt?: Date;
+  lockExpiresAt?: Date;
 }
 
 const SeatSchema = new Schema<ISeat>(
@@ -32,7 +34,9 @@ const SeatSchema = new Schema<ISeat>(
       enum: Object.values(SeatStatus),
       default: SeatStatus.AVAILABLE,
     },
-    holdExpiresAt: Date,
+    lockedBy: { type: Schema.Types.ObjectId, ref: 'User' },
+    lockedAt: Date,
+    lockExpiresAt: Date,
   },
   { timestamps: true },
 );

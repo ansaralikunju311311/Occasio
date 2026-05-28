@@ -23,6 +23,7 @@ export class EventMapper extends BaseMapper<Events, EventResponseDto> {
       status: entity.status,
       picture: entity.picture,
       creatorDetails: entity.creatorDetails ? userMapper.toResponse(entity.creatorDetails) : undefined,
+      bookedTickets: entity.bookedTickets,
       seatLayoutId: entity.seatLayoutId,
       SeatLayout: entity.SeatLayout ? this.mapSeatLayout(entity.SeatLayout) : undefined,
       seats: entity.seats ? entity.seats.map(s => this.mapSeat(s)) : undefined,

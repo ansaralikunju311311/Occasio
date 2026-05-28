@@ -10,6 +10,7 @@ export class Booking {
     public organizerRevenue: number,
     public status: string,
     public paymentId?: string,
+    public qrCodeData?: string,
     public createdAt?: Date,
     public updatedAt?: Date
   ) {}

@@ -108,8 +108,17 @@ export class BookingRepository implements IBookingRepository {
       doc.organizerRevenue,
       doc.status,
       doc.paymentId,
+      doc.qrCodeData,
       doc.createdAt,
       doc.updatedAt
     );
+  }
+
+  async getOnlineBookedCount(eventId: string): Promise<number> {
+    return await BookingModel.countDocuments({
+      eventId,
+      bookingType: 'online',
+      status: 'CONFIRMED',
+    });
   }
 }

@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import HomeButton from '../../components/common/HomeButton';
 import { useEventDetails } from '../../hooks/useEvents';
 import { paymentService } from '../../services/payment.service';
+import { bookingService } from '../../services/booking.service';
 
 interface PriceBreakdown {
   commissionPercentage: number;
@@ -20,8 +21,9 @@ const Checkout = () => {
   const [isPaying, setIsPaying] = useState(false);
   const [breakdown, setBreakdown] = useState<PriceBreakdown | null>(null);
   const [loadingBreakdown, setLoadingBreakdown] = useState(true);
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
 
-  const { selectedSeats = [], bookingType = 'physical' } = location.state || {};
+  const { selectedSeats = [], bookingType = 'physical', lockExpiresAt } = location.state || {};
   const { data: event, isLoading: loading, isError } = useEventDetails(id);
 
   const isOnline = event?.eventType === 'ONLINE' || bookingType === 'online';
@@ -63,6 +65,39 @@ const Checkout = () => {
     }
   }, [id, total]);
 
+  useEffect(() => {
+    if (!lockExpiresAt || isOnline) return;
+
+    const interval = setInterval(() => {
+      const now = new Date().getTime();
+      const distance = lockExpiresAt - now;
+
+      if (distance <= 0) {
+        clearInterval(interval);
+        setTimeLeft(0);
+        toast.error('Session expired. Seats have been released.');
+        bookingService.failBooking(selectedSeats).finally(() => {
+          navigate(-1);
+        });
+      } else {
+        setTimeLeft(distance);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [lockExpiresAt, isOnline, navigate, selectedSeats]);
+
+  const handleCancel = async () => {
+    if (!isOnline && selectedSeats.length > 0) {
+      try {
+        await bookingService.failBooking(selectedSeats);
+      } catch (err) {
+        console.error('Failed to release seats', err);
+      }
+    }
+    navigate(-1);
+  };
+
   if (loading || (total > 0 && loadingBreakdown)) return <LoadingSpinner />;
   if (!event) return null;
 
@@ -78,7 +113,7 @@ const Checkout = () => {
         return;
       }
 
-      // Pass eventId, amount, selectedSeats, bookingType to create ticket order
+      // 1. Create Ticket Order (Backend handles Pending Booking + Razorpay Order)
       const orderResponse = await paymentService.createTicketOrder(
         id,
         amountToPay,
@@ -86,16 +121,16 @@ const Checkout = () => {
         bookingType
       );
 
+      // 2. Open Razorpay Checkout
       paymentService.openRazorpayCheckout(
         orderResponse.order,
         id,
         () => {
           toast.success('Payment successful! Your tickets are booked.');
-          // Redirect to user's personal bookings page
           navigate('/eventmanager/user-bookings');
         },
         (err: any) => {
-          toast.error(err.message || 'Payment failed');
+          toast.error(err.message || 'Payment failed or verification error');
           setIsPaying(false);
         }
       );
@@ -233,6 +268,20 @@ const Checkout = () => {
                 </span>
               </div>
 
+              {!isOnline && timeLeft !== null && timeLeft > 0 && (
+                <div className="mb-6 p-4 rounded-xl border border-red-500/30 bg-red-500/10 text-center">
+                  <p className="text-xs text-red-400 font-bold uppercase tracking-wider mb-1">
+                    Seats Reserved For
+                  </p>
+                  <p className="text-2xl font-black text-red-500 font-mono">
+                    {Math.floor(timeLeft / 1000 / 60)}:
+                    {Math.floor((timeLeft / 1000) % 60)
+                      .toString()
+                      .padStart(2, '0')}
+                  </p>
+                </div>
+              )}
+
               <button
                 onClick={handlePayment}
                 disabled={isPaying}
@@ -247,7 +296,7 @@ const Checkout = () => {
               </p>
 
               <button
-                onClick={() => navigate(-1)}
+                onClick={handleCancel}
                 className="w-full mt-4 py-3 bg-slate-800 text-slate-400 rounded-xl font-bold text-sm hover:bg-slate-700 hover:text-white transition-all"
               >
                 Cancel & Back

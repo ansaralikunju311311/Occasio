@@ -37,6 +37,7 @@ export class UpgradeUseCase implements IUpgradeUseCase {
 
     await this.managerRepository.createManager(request);
 
+    user.applyingupgrade = UpgradeStatus.PENDING;
     const updatedUser = await this.userRepository.updateUser(user);
     return updatedUser ? userMapper.toResponse(updatedUser) : null;
   }

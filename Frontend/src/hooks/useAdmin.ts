@@ -65,7 +65,7 @@ export const useAdminManagerDetails = (id: string, email?: string) => {
 export const useBlockUser = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, status }: { id: string; status: string }) => adminService.blockUnblockUser(id, status === 'ACTIVE'),
+    mutationFn: ({ id, status }: { id: string; status: string }) => adminService.blockUnblockUser(id, status),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['adminUsers'] });
       queryClient.invalidateQueries({ queryKey: ['adminManagers'] });

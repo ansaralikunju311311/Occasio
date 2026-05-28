@@ -22,6 +22,7 @@ export interface EventResponseDto {
   status: EventStatus;
   picture: string;
   creatorDetails?: UserResponseDto;
+  bookedTickets?: number;
   seatLayoutId?: string;
   SeatLayout?: SeatLayoutResponseDto;
   seats?: SeatResponseDto[];

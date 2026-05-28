@@ -3,12 +3,23 @@ import { eventMapper } from '../../../../common/mappers/event.mapper';
 import { EventResponseDto } from '../../../../application/dtos/responses/event-response.dto';
 import { IEventDetailsUseCase } from './eventdetails.usecase.interface';
 
+import { IBookingRepository } from '../../../../domain/repositories/booking/booking.repository.interface';
+
 export class EventDetailsUseCase implements IEventDetailsUseCase {
-  constructor(private eventRepository: IEventRepository) {}
+  constructor(
+    private eventRepository: IEventRepository,
+    private bookingRepository: IBookingRepository
+  ) {}
 
   async execute(id: string): Promise<EventResponseDto | null> {
     const events = await this.eventRepository.findByIdEvents(id);
-    console.log('events in execute:', events);
-    return events ? eventMapper.toResponse(events) : null;
+    if (!events) return null;
+
+    if (events.eventType === 'ONLINE' || events.eventType === 'HYBRID') {
+      const count = await this.bookingRepository.getOnlineBookedCount(id);
+      events.bookedTickets = count;
+    }
+
+    return eventMapper.toResponse(events);
   }
 }

@@ -32,6 +32,7 @@ export class Events {
     public isPublished?: boolean,
     public isDeleted?: boolean,
     public deletedAt?: Date,
+    public bookedTickets?: number,
   ) {
     this.validate();
   }

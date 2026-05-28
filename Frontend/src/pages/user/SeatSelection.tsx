@@ -3,8 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { toast } from 'sonner';
 import { useEventSeats } from '../../hooks/useEvents';
-
-
+import { bookingService } from '../../services/booking.service';
 
 interface Seat {
   id: string;
@@ -259,33 +258,47 @@ const Stage = () => (
 );
 
 
-const OnlinePassCard = ({ price }: { price: number }) => (
-  <div className="flex flex-col items-center justify-center py-20 px-8 bg-white rounded-2xl border border-gray-100 shadow-sm text-center">
-    <div className="w-20 h-20 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center mb-6">
-      <svg
-        className="w-10 h-10 text-indigo-500"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={1.5}
-          d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
-        />
-      </svg>
+const OnlinePassCard = ({ price, maxSlots, bookedSlots }: { price: number; maxSlots?: number; bookedSlots?: number }) => {
+  const max = maxSlots || 0;
+  const booked = bookedSlots || 0;
+  const remaining = Math.max(0, max - booked);
+  const isFull = max > 0 && remaining === 0;
+
+  return (
+    <div className="flex flex-col items-center justify-center py-20 px-8 bg-white rounded-2xl border border-gray-100 shadow-sm text-center">
+      <div className="w-20 h-20 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center mb-6">
+        <svg
+          className="w-10 h-10 text-indigo-500"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={1.5}
+            d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+          />
+        </svg>
+      </div>
+      <h3 className="text-2xl font-bold text-gray-800 mb-2">Virtual Experience Pass</h3>
+      <p className="text-gray-400 max-w-xs mb-4 text-sm leading-relaxed">
+        Watch live from anywhere. Full HD streaming with multi-device access.
+      </p>
+
+      {max > 0 && (
+        <div className={`px-4 py-2 mb-6 rounded-lg font-bold text-sm ${isFull ? 'bg-red-50 text-red-500' : 'bg-emerald-50 text-emerald-600'}`}>
+          {isFull ? 'Sold Out' : `${remaining} Slots Remaining`}
+        </div>
+      )}
+
+      <div className="px-8 py-4 bg-indigo-50 rounded-xl border border-indigo-100">
+        <p className="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-1">Price</p>
+        <p className="text-3xl font-black text-indigo-600">₹{price}</p>
+      </div>
     </div>
-    <h3 className="text-2xl font-bold text-gray-800 mb-2">Virtual Experience Pass</h3>
-    <p className="text-gray-400 max-w-xs mb-8 text-sm leading-relaxed">
-      Watch live from anywhere. Full HD streaming with multi-device access.
-    </p>
-    <div className="px-8 py-4 bg-indigo-50 rounded-xl border border-indigo-100">
-      <p className="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-1">Price</p>
-      <p className="text-3xl font-black text-indigo-600">₹{price}</p>
-    </div>
-  </div>
-);
+  );
+};
 
 
 const SeatSelection = () => {
@@ -293,6 +306,7 @@ const SeatSelection = () => {
   const navigate = useNavigate();
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
   const [bookingType, setBookingType] = useState<'physical' | 'online'>('physical');
+  const [isLocking, setIsLocking] = useState(false);
 
   const { data: event, isLoading: loading, isError } = useEventSeats(id || '');
 
@@ -327,7 +341,11 @@ const SeatSelection = () => {
   }, [selectedSeats, groupedBlocks]);
 
   const isOnlineMode = event?.eventType === 'ONLINE' || bookingType === 'online';
-  const canCheckout = isOnlineMode || selectedSeats.length > 0;
+  const maxOnlineSlots = event?.maxOnlineUsers || 0;
+  const bookedOnlineSlots = event?.bookedTickets || event?.bookedCount || event?.soldTickets || 0;
+  const isOnlineFull = maxOnlineSlots > 0 && Math.max(0, maxOnlineSlots - bookedOnlineSlots) === 0;
+
+  const canCheckout = isOnlineMode ? !isOnlineFull : selectedSeats.length > 0;
 
   const totalPrice = useMemo(() => {
     if (isOnlineMode) return event?.price ?? 0;
@@ -336,6 +354,32 @@ const SeatSelection = () => {
       return sum + (block?.categoryPrice ?? 0);
     }, 0);
   }, [isOnlineMode, selectedSeatDetails, groupedBlocks, event]);
+
+  const handleCheckout = async () => {
+    if (!event || !canCheckout) return;
+
+    if (isOnlineMode) {
+      navigate(`/checkout/${event.id}`, {
+        state: { selectedSeats: [], bookingType: 'online', totalPrice },
+      });
+      return;
+    }
+
+    setIsLocking(true);
+    try {
+      // Pass the seatNumbers to the backend to lock them
+      await bookingService.lockSeats(event.id, selectedSeats);
+      const lockExpiresAt = new Date().getTime() + 5 * 60 * 1000;
+      
+      navigate(`/checkout/${event.id}`, {
+        state: { selectedSeats, bookingType: 'physical', totalPrice, lockExpiresAt },
+      });
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to lock seats. Some seats may have been taken.');
+    } finally {
+      setIsLocking(false);
+    }
+  };
 
   if (loading) return <LoadingSpinner />;
   if (!event) return null;
@@ -425,7 +469,7 @@ const SeatSelection = () => {
                 <Legend />
               </div>
             ) : (
-              <OnlinePassCard price={event.price ?? 0} />
+              <OnlinePassCard price={event.price ?? 0} maxSlots={maxOnlineSlots} bookedSlots={bookedOnlineSlots} />
             )}
           </div>
 
@@ -541,28 +585,26 @@ const SeatSelection = () => {
               {/* CTA */}
               <button
                 id="checkout-btn"
-                disabled={!canCheckout}
-                onClick={() =>
-                  navigate(`/checkout/${event.id}`, {
-                    state: { selectedSeats, bookingType, totalPrice },
-                  })
-                }
+                disabled={!canCheckout || isLocking}
+                onClick={handleCheckout}
                 className={`w-full py-3.5 rounded-xl font-bold text-sm transition-all duration-200 ${
-                  canCheckout
+                  canCheckout && !isLocking
                     ? 'bg-indigo-600 text-white hover:bg-indigo-700 active:scale-95 shadow-md hover:shadow-lg'
                     : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                 }`}
               >
                 <span className="flex items-center justify-center gap-2">
-                  Proceed to Checkout
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13 7l5 5m0 0l-5 5m5-5H6"
-                    />
-                  </svg>
+                  {isLocking ? 'Locking Seats...' : 'Proceed to Checkout'}
+                  {!isLocking && (
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13 7l5 5m0 0l-5 5m5-5H6"
+                      />
+                    </svg>
+                  )}
                 </span>
               </button>
 
