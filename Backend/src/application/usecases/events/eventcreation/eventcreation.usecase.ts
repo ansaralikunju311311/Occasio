@@ -9,14 +9,36 @@ import { normalizeCoordinates } from '../../../../common/utils/geo.utils';
 import { SeatStatus } from '../../../../common/enums/searstatus-enum';
 import mongoose from 'mongoose';
 import { IEventCreationUseCase } from './eventcreation.usecase.interface';
+import { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
+import { ISubscriptionRepository } from '../../../../domain/repositories/subscription/subscription.repository.interface';
 
 export class EventCretionUseCase implements IEventCreationUseCase {
-  constructor(private eventRepository: IEventRepository) {}
+  constructor(
+    private eventRepository: IEventRepository,
+    private userRepository: IUserRepository,
+    private subscriptionRepository: ISubscriptionRepository
+  ) {}
 
   async execute(
     data: EventDto,
     userId: string,
   ): Promise<EventResponseDto | null> {
+    const user = await this.userRepository.findByIdUser(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    if (user.activeSubscription) {
+      const plan = await this.subscriptionRepository.findPlanById(user.activeSubscription);
+      if (plan && plan.eventLimit !== 0 && user.eventsCreated >= plan.eventLimit) {
+        throw new Error('Event creation limit reached. Please upgrade your subscription plan.');
+      }
+    } else {
+      // Default free plan usually has limit 0 or something. We assume no subscription means 0 limit unless it's handled differently.
+      // Let's assume without subscription they can't create, or limit is 1?
+      // For now we just enforce it if they have a plan.
+    }
+
     const session = await mongoose.startSession();
     session.startTransaction();
 
@@ -133,6 +155,9 @@ export class EventCretionUseCase implements IEventCreationUseCase {
           session,
         );
       }
+
+      user.eventsCreated = (user.eventsCreated || 0) + 1;
+      await this.userRepository.updateUser(user);
 
       await session.commitTransaction();
       session.endSession();

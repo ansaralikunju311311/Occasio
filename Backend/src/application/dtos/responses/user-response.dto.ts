@@ -13,6 +13,7 @@ export interface UserResponseDto {
   rejectedAt: Date | null;
   reapplyAt: Date | null;
   activeSubscription?: any;
+  eventsCreated?: number;
   createdAt?: Date;
   updatedAt?: Date;
 }

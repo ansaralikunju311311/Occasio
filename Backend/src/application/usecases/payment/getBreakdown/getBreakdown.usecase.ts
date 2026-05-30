@@ -37,8 +37,8 @@ export class GetBreakdownUseCase implements IGetBreakdownUseCase {
     }
 
     const commissionAmount = parseFloat((amount * (commissionPercentage / 100)).toFixed(2));
-    const totalAmount = parseFloat((amount + commissionAmount).toFixed(2));
-    const organizerRevenue = amount;
+    const totalAmount = amount;
+    const organizerRevenue = parseFloat((amount - commissionAmount).toFixed(2));
 
     return {
       eventId,

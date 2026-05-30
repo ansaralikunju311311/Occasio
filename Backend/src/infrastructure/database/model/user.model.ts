@@ -13,6 +13,7 @@ export interface IUserDocument extends Document {
   rejectedAt: Date | null;
   reapplyAt: Date | null;
   activeSubscription?: mongoose.Types.ObjectId;
+  eventsCreated: number;
 }
 
 const userSchema = new Schema<IUserDocument>(
@@ -76,6 +77,10 @@ const userSchema = new Schema<IUserDocument>(
       type: Schema.Types.ObjectId,
       ref: 'Subscription',
       default: null,
+    },
+    eventsCreated: {
+      type: Number,
+      default: 0,
     },
   },
   { timestamps: true },

@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAppDispatch } from '../../redux/hook';
+import { useAppDispatch, useAppSelector } from '../../redux/hook';
 import { logout } from '../../redux/slices/authSlice';
 import { api } from '../../services/api';
 import { toast } from 'sonner';
@@ -10,6 +10,7 @@ const EventManagerSidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useAppDispatch();
+  const { user } = useAppSelector((state) => state.auth);
 
   // const handlelogout = async ()=>{
   //    console.log("happen this c all")
@@ -265,6 +266,7 @@ const EventManagerSidebar = () => {
         </div>
 
         {/* Management Section */}
+        {user?.role === 'EVENT_MANAGER' && (
         <div className="space-y-2">
           <h3 className="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-4">
             Event Management
@@ -294,6 +296,7 @@ const EventManagerSidebar = () => {
             );
           })}
         </div>
+        )}
       </nav>
 
       {/* Account / Logout */}

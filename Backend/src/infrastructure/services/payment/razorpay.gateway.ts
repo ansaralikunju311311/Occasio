@@ -4,14 +4,14 @@ import crypto from 'crypto';
 
 export class RazorpayGateway implements IPaymentGateway {
  
-  async createOrder(eventId: string, amount: number) {
+  async createOrder(eventId: string, amount: number, notesType: string = 'scheduling_fee') {
     const options = {
       amount: amount * 100, 
       currency: 'INR',
       receipt: `receipt_event_${eventId}`,
       notes: {
-        eventId: eventId,
-        type: 'scheduling_fee',
+        referenceId: eventId,
+        type: notesType,
       },
     };
 

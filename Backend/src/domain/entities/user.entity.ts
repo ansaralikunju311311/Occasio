@@ -19,5 +19,6 @@ export class User {
     public rejectedAt: Date | null,
     public reapplyAt: Date | null,
     public activeSubscription?: string | any,
+    public eventsCreated: number = 0,
   ) {}
 }

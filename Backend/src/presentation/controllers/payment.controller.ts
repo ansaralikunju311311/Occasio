@@ -4,13 +4,54 @@ import { IVerifyPaymentUseCase } from '../../application/usecases/payment/verify
 import { IGetBreakdownUseCase } from '../../application/usecases/payment/getBreakdown/getBreakdown.usecase';
 import { IBookingRepository } from '../../domain/repositories/booking/booking.repository.interface';
 
+import { ICreateSubscriptionOrderUseCase } from '../../application/usecases/payment/createSubscriptionOrder/createSubscriptionOrder.usecase.interface';
+import { IVerifySubscriptionPaymentUseCase } from '../../application/usecases/payment/verifySubscriptionPayment/verifySubscriptionPayment.usecase.interface';
+
 export class PaymentController {
   constructor(
     private createOrderUseCase: ICreateOrderUseCase,
     private verifyPaymentUseCase: IVerifyPaymentUseCase,
     private getBreakdownUseCase: IGetBreakdownUseCase,
-    private bookingRepository: IBookingRepository
+    private bookingRepository: IBookingRepository,
+    private createSubscriptionOrderUseCase: ICreateSubscriptionOrderUseCase,
+    private verifySubscriptionPaymentUseCase: IVerifySubscriptionPaymentUseCase
   ) {}
+
+  createSubscriptionOrder = async (req: Request, res: Response) => {
+    try {
+      const { planId } = req.body;
+      const userId = (req as any).user?.id || (req as any).authUser?.userId;
+
+      if (!userId) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+
+      const order = await this.createSubscriptionOrderUseCase.execute(userId, planId);
+
+      return res.status(200).json({
+        success: true,
+        order,
+      });
+    } catch (error: any) {
+      return res.status(400).json({ success: false, message: error.message });
+    }
+  };
+
+  verifySubscriptionPayment = async (req: Request, res: Response) => {
+    try {
+      const userId = (req as any).user?.id || (req as any).authUser?.userId;
+
+      if (!userId) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+
+      const result = await this.verifySubscriptionPaymentUseCase.execute(req.body, userId);
+
+      return res.status(200).json(result);
+    } catch (error: any) {
+      return res.status(400).json({ success: false, message: error.message });
+    }
+  };
 
   createOrder = async (req: Request, res: Response) => {
     try {

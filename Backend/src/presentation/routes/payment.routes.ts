@@ -11,4 +11,7 @@ router.post('/verify', verifyAccessToken, controller.verifyPayment);
 router.get('/price-breakdown', verifyAccessToken, controller.getPriceBreakdown);
 router.get('/my-bookings', verifyAccessToken, controller.getMyBookings);
 
+router.post('/subscription-order', verifyAccessToken, controller.createSubscriptionOrder);
+router.post('/verify-subscription', verifyAccessToken, controller.verifySubscriptionPayment);
+
 export default router;

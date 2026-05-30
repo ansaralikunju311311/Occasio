@@ -30,6 +30,9 @@ export class EventController {
 
   allEvents = catchAsync(async (req: Request, res: Response) => {
     const user = req.authUser;
+
+
+    console.log("for the user id ",user)
     const eventType = req.query.eventType as string;
     const search = req.query.search as string;
     const page = parseInt(req.query.page as string) || 1;

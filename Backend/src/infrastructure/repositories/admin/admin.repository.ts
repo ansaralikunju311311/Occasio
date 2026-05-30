@@ -110,12 +110,12 @@ export class AdminRepository implements IAdminRepository {
     return new EventManager(
       manager._id.toString(),
       manager.userId.toString(),
-      manager.aboutEvents,
-      manager.experienceLevel,
       manager.fullName,
       manager.organizationName,
+      manager.aboutEvents,
       manager.certificate,
       manager.documentReference,
+      manager.experienceLevel,
       manager.socialLinks,
       manager.organizationType,
     );

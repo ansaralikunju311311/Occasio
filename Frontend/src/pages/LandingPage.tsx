@@ -113,7 +113,7 @@ const LandingPage = () => {
 
         <div className="relative z-10 max-w-4xl mx-auto">
           <span className="inline-block py-1 px-3 rounded-full bg-indigo-500/10 text-indigo-400 text-sm font-semibold mb-6 shadow-sm border border-indigo-500/20">
-            {user ? `Welcome Back to Occasio - ${user.email}` : 'The New Standard for Events'}
+            {user ? `Welcome Back to Occasio - ${user.email}   ${user.id}` : 'The New Standard for Events'}
           </span>
 
           <h1 className="text-5xl md:text-7xl font-extrabold leading-tight tracking-tight mb-8 text-white">

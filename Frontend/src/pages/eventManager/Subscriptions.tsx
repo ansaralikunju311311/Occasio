@@ -1,27 +1,91 @@
+import { useState } from 'react';
 import { usePlans } from '../../hooks/useAdmin';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
+import { useAppSelector, useAppDispatch } from '../../redux/hook';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import { api } from '../../services/api';
+import { setAuth } from '../../redux/slices/authSlice';
+import { paymentService } from '../../services/payment.service';
 
 const Subscriptions = () => {
   const { data: plansData, isLoading, error } = usePlans();
+  const { user } = useAppSelector((state) => state.auth);
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   if (isLoading) return <LoadingSpinner />;
   if (error) return <div className="text-white text-center py-20">Error loading plans</div>;
 
   const apiPlans = plansData?.plans || [];
 
-  const plans = apiPlans.map((plan: any) => ({
-    name: plan.name,
-    price: `₹${plan.price}`,
-    period: '/per month',
-    commission: `${plan.commissionPercentage}%`,
-    limit: plan.eventLimit === 0 ? 'Unlimited events' : `Up to ${plan.eventLimit} events/month`,
-    description: `Get ${plan.eventLimit === 0 ? 'unlimited' : plan.eventLimit} events per month with a low ${plan.commissionPercentage}% commission rate.`,
-    features: plan.features,
-    color: plan.name === 'PRO' ? 'teal' : plan.name === 'ELITE' ? 'indigo' : 'slate',
-    buttonText: plan.name === 'FREE' ? 'Current Plan' : `Upgrade to ${plan.name}`,
-    isCurrent: plan.name === 'FREE', // Logic for current plan can be improved later
-    popular: plan.name === 'PRO',
-  }));
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const handleSubscribe = async (planId: string, price: string) => {
+    if (user?.role === 'USER') {
+      toast.error('You must be an Event Manager to subscribe to plans.');
+      navigate('/applyasmanager');
+      return;
+    }
+    
+    setIsProcessing(true);
+    try {
+      // Check if price is Free or 0
+      const numericPrice = parseFloat(price.replace('₹', ''));
+      
+      if (numericPrice === 0) {
+        const res = await api.post('/user/subscribe', { planId });
+        if (res.data.success) {
+          toast.success('Successfully subscribed to plan!');
+          dispatch(setAuth({ user: res.data.user }));
+        }
+      } else {
+        // Paid plan flow
+        const orderResponse = await paymentService.createSubscriptionOrder(planId);
+        
+        paymentService.openRazorpaySubscriptionCheckout(
+          orderResponse.order,
+          planId,
+          async () => {
+            toast.success('Payment successful! Your subscription is upgraded.');
+            // Refetch user data
+            const res = await api.get('/auth/me');
+            if (res.data) {
+              dispatch(setAuth({ user: res.data.user }));
+            }
+          },
+          (err: any) => {
+            toast.error(err.message || 'Payment failed or verification error');
+          }
+        );
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to subscribe to plan');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const plans = apiPlans.map((plan: any) => {
+    // Basic logic to determine if current plan
+    const planId = plan.id || plan._id;
+    const isCurrent = user?.activeSubscription === planId || (!user?.activeSubscription && plan.name === 'FREE');
+
+    return {
+      id: planId,
+      name: plan.name,
+      price: `₹${plan.price}`,
+      period: '/per month',
+      commission: `${plan.commissionPercentage}%`,
+      limit: plan.eventLimit === 0 ? 'Unlimited events' : `Up to ${plan.eventLimit} events/month`,
+      description: `Get ${plan.eventLimit === 0 ? 'unlimited' : plan.eventLimit} events per month with a low ${plan.commissionPercentage}% commission rate.`,
+      features: plan.features,
+      color: plan.name === 'PRO' ? 'teal' : plan.name === 'ELITE' ? 'indigo' : 'slate',
+      buttonText: user?.role === 'USER' ? 'Upgrade to Event Manager' : isCurrent ? 'Current Plan' : `Upgrade to ${plan.name}`,
+      isCurrent: user?.role === 'USER' ? false : isCurrent,
+      popular: plan.name === 'PRO',
+    };
+  });
 
   return (
     <div className="relative min-h-full pb-20">
@@ -104,7 +168,8 @@ const Subscriptions = () => {
             </div>
 
             <button
-              disabled={plan.isCurrent}
+              onClick={() => handleSubscribe(plan.id, plan.price)}
+              disabled={plan.isCurrent || isProcessing}
               className={`w-full py-4 rounded-2xl text-sm font-bold transition-all duration-300 active:scale-95
                 ${plan.isCurrent
                   ? 'bg-slate-800/50 text-slate-500 border border-slate-700 cursor-default'
@@ -114,7 +179,7 @@ const Subscriptions = () => {
                 }
               `}
             >
-              {plan.buttonText}
+              {isProcessing ? 'Processing...' : plan.buttonText}
             </button>
           </div>
         ))}

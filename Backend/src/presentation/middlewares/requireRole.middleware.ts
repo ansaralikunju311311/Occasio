@@ -1,10 +1,10 @@
 import { NextFunction, Response, Request } from 'express';
 import { HttpStatus } from '../../common/constants/http-status';
+import { UserModel } from '../../infrastructure/database/model/user.model';
+
 export const requireRole = (roles: string[]) => {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
     const user = req.authUser;
-    console.log('for', user);
-    console.log(roles);
 
     if (!user) {
       return res
@@ -12,13 +12,25 @@ export const requireRole = (roles: string[]) => {
         .json({ message: 'Unauthorized' });
     }
 
-    console.log('usr', user.role);
-    console.log(roles, user.role);
-    if (!roles.includes(user.role)) {
-      console.log('evide vannoooooo');
-      return res.status(HttpStatus.FORBIDDEN).json({ message: 'Forbidden' });
-    }
+    try {
+      const dbUser = await UserModel.findById(user.userId);
+      if (!dbUser) {
+        return res
+          .status(HttpStatus.UNAUTHORIZED)
+          .json({ message: 'User not found' });
+      }
 
-    next();
+      if (!roles.includes(dbUser.role)) {
+        return res.status(HttpStatus.FORBIDDEN).json({ message: 'Forbidden' });
+      }
+
+      if (req.authUser) {
+        req.authUser.role = dbUser.role as any;
+      }
+      next();
+    } catch (error) {
+      console.error('requireRole error:', error);
+      return res.status(500).json({ message: 'Internal Server Error' });
+    }
   };
 };

@@ -59,6 +59,8 @@ export class UserRepository
         role: user.role,
         rejectedAt: user.rejectedAt,
         reapplyAt: user.reapplyAt,
+        eventsCreated: user.eventsCreated,
+        activeSubscription: user.activeSubscription,
       },
     );
 
@@ -66,16 +68,6 @@ export class UserRepository
 
     return this.toEntity(doc);
   }
-  // async otpStore(otp: OTP): Promise<void> {
-  //     const doc = await super.findOne(otp.email)
-  //     if(doc){
-  //       const otp = await super.create({
-  //         email:doc.email,
-  //         otp:doc.otp,
-
-  //       })
-  //     }
-  // }
 
   private toEntity(doc: any): User {
     return new User(
@@ -86,14 +78,11 @@ export class UserRepository
       doc.role,
       doc.status,
       doc.isVerified,
-      //   doc.otp,
-      //   doc.otpExpires,
-      //   doc.otpType,
-      //   doc.otpSendAt,
       doc.applyingupgrade,
       doc.rejectedAt,
       doc.reapplyAt,
-      doc.activeSubscription ? (doc.activeSubscription._id?.toString() || doc.activeSubscription.toString()) : undefined,
+      doc.activeSubscription ? (doc._id ? doc.activeSubscription._id?.toString() || doc.activeSubscription.toString() : doc.activeSubscription) : undefined,
+      doc.eventsCreated || 0,
     );
   }
 }

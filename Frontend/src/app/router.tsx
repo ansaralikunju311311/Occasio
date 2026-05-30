@@ -206,11 +206,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'subscriptions',
-        element: (
-          <ManagerGuard>
-            <Subscriptions />
-          </ManagerGuard>
-        ),
+        element: <Subscriptions />,
       },
     ],
   },

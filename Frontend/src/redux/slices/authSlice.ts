@@ -10,6 +10,8 @@ interface User {
   applyingupgrade: UpgradeStatus;
   rejectedAt?: string | null;
   reapplyAt?: string | null;
+  activeSubscription?: string;
+  eventsCreated?: number;
 }
 
 interface AuthState {

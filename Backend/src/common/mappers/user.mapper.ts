@@ -15,6 +15,7 @@ export class UserMapper extends BaseMapper<User, UserResponseDto> {
       rejectedAt: entity.rejectedAt,
       reapplyAt: entity.reapplyAt,
       activeSubscription: entity.activeSubscription,
+      eventsCreated: entity.eventsCreated,
     };
   }
 

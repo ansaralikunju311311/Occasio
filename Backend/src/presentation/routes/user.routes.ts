@@ -26,4 +26,10 @@ router.patch(
   requireRole([UserRole.USER, UserRole.EVENT_MANAGER]),
   controller.editProfile.bind(controller),
 );
+router.post(
+  '/subscribe',
+  verifyAccessToken,
+  requireRole([UserRole.EVENT_MANAGER]),
+  controller.subscribe.bind(controller),
+);
 export default router;

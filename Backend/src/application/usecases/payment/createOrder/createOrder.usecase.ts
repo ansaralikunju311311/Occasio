@@ -68,8 +68,8 @@ export class CreateOrderUseCase implements ICreateOrderUseCase {
     }
 
     const commissionAmount = parseFloat((amount * (commissionPercentage / 100)).toFixed(2));
-    const totalAmount = parseFloat((amount + commissionAmount).toFixed(2));
-    const organizerRevenue = amount;
+    const totalAmount = amount;
+    const organizerRevenue = parseFloat((amount - commissionAmount).toFixed(2));
 
     // 3. Create Razorpay order
     const order = await this.paymentGateway.createOrder(eventId, totalAmount);
