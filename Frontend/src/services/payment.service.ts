@@ -1,4 +1,5 @@
 import { api } from './api';
+import { API_ENDPOINTS } from '../constants';
 
 declare global {
   interface Window {
@@ -8,19 +9,19 @@ declare global {
 
 export const paymentService = {
   createOrder: async (eventId: string) => {
-    const response = await api.post('/payments/order', { eventId });
+    const response = await api.post(API_ENDPOINTS.PAYMENTS_ORDER, { eventId });
     return response.data;
   },
   createTicketOrder: async (eventId: string, amount: number, selectedSeats?: string[], bookingType?: string) => {
-    const response = await api.post('/payments/ticket-order', { eventId, amount, selectedSeats, bookingType });
+    const response = await api.post(API_ENDPOINTS.PAYMENTS_TICKET_ORDER, { eventId, amount, selectedSeats, bookingType });
     return response.data;
   },
   getPriceBreakdown: async (eventId: string, amount: number) => {
-    const response = await api.get(`/payments/price-breakdown?eventId=${eventId}&amount=${amount}`);
+    const response = await api.get(`${API_ENDPOINTS.PAYMENTS_PRICE_BREAKDOWN}?eventId=${eventId}&amount=${amount}`);
     return response.data;
   },
   getMyBookings: async () => {
-    const response = await api.get('/payments/my-bookings');
+    const response = await api.get(API_ENDPOINTS.PAYMENTS_MY_BOOKINGS);
     return response.data;
   },
 
@@ -30,12 +31,12 @@ export const paymentService = {
     razorpay_signature: string;
     eventId: string;
   }) => {
-    const response = await api.post('/payments/verify', paymentData);
+    const response = await api.post(API_ENDPOINTS.PAYMENTS_VERIFY, paymentData);
     return response.data;
   },
 
   createSubscriptionOrder: async (planId: string) => {
-    const response = await api.post('/payments/subscription-order', { planId });
+    const response = await api.post(API_ENDPOINTS.PAYMENTS_SUBSCRIPTION_ORDER, { planId });
     return response.data;
   },
 
@@ -45,7 +46,7 @@ export const paymentService = {
     razorpay_signature: string;
     planId: string;
   }) => {
-    const response = await api.post('/payments/verify-subscription', paymentData);
+    const response = await api.post(API_ENDPOINTS.PAYMENTS_VERIFY_SUBSCRIPTION, paymentData);
     return response.data;
   },
 
@@ -71,7 +72,7 @@ export const paymentService = {
         }
       },
       prefill: {
-        name: 'User Name', // Can be dynamic
+        name: 'User Name',
         email: 'user@example.com',
       },
       theme: {
@@ -133,4 +134,3 @@ export const paymentService = {
     rzp.open();
   },
 };
-

@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import HomeButton from '../../components/common/HomeButton';
 import { paymentService } from '../../services/payment.service';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { toast } from 'sonner';
+import { APP_MESSAGES } from '../../constants';
 
 interface Booking {
   id: string;
@@ -27,6 +29,7 @@ interface Booking {
 const UserBookings = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -38,7 +41,7 @@ const UserBookings = () => {
         }
       } catch (err: any) {
         console.error('Failed to fetch bookings:', err);
-        toast.error('Could not load your bookings');
+        toast.error(APP_MESSAGES.LOAD_BOOKINGS_FAILED);
       } finally {
         setLoading(false);
       }
@@ -85,8 +88,8 @@ const UserBookings = () => {
             You haven't booked any events yet. Explore upcoming events to get started.
           </p>
           <button
-            onClick={() => (window.location.href = '/')}
-            className="mt-8 px-6 py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-purple-600/20"
+            onClick={() => navigate('/events')}
+            className="mt-8 px-6 py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-purple-600/20 cursor-pointer"
           >
             Browse Events
           </button>
@@ -123,22 +126,37 @@ const UserBookings = () => {
                   </div>
                 </div>
 
-                <div className="space-y-2 py-4 border-t border-b border-slate-800/50">
-                  {booking.bookingType === 'physical' && booking.seats.length > 0 && (
-                    <div className="flex justify-between items-center text-xs">
-                      <span className="text-slate-400 font-semibold uppercase tracking-wider">Seats</span>
-                      <span className="text-white font-bold">{booking.seats.join(', ')}</span>
+                <div className="space-y-2 py-4 border-t border-b border-slate-800/50 flex justify-between items-center">
+                  <div className="space-y-2 flex-grow">
+                    {booking.bookingType === 'physical' && booking.seats.length > 0 && (
+                      <div className="flex justify-between items-center text-xs pr-4">
+                        <span className="text-slate-400 font-semibold uppercase tracking-wider">Seats</span>
+                        <span className="text-white font-bold">{booking.seats.join(', ')}</span>
+                      </div>
+                    )}
+                    {booking.eventId.location?.address && (
+                      <div className="flex justify-between items-start text-xs pr-4 gap-4">
+                        <span className="text-slate-400 font-semibold uppercase tracking-wider whitespace-nowrap">Venue</span>
+                        <span className="text-slate-300 font-medium text-right line-clamp-1">{booking.eventId.location.address}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between items-center text-xs pr-4">
+                      <span className="text-slate-400 font-semibold uppercase tracking-wider">Amount Paid</span>
+                      <span className="text-teal-400 font-bold text-sm">₹{booking.totalAmount}</span>
                     </div>
-                  )}
-                  {booking.eventId.location?.address && (
-                    <div className="flex justify-between items-start text-xs gap-4">
-                      <span className="text-slate-400 font-semibold uppercase tracking-wider whitespace-nowrap">Venue</span>
-                      <span className="text-slate-300 font-medium text-right line-clamp-1">{booking.eventId.location.address}</span>
-                    </div>
-                  )}
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="text-slate-400 font-semibold uppercase tracking-wider">Amount Paid</span>
-                    <span className="text-teal-400 font-bold text-sm">₹{booking.totalAmount}</span>
+                  </div>
+
+                  {/* QR Code thumbnail preview */}
+                  <div
+                    onClick={() => navigate(`/booking/${booking.id}`)}
+                    className="w-14 h-14 bg-white p-1 rounded-xl flex items-center justify-center cursor-pointer border border-slate-700/50 shadow-inner shrink-0 group/qr"
+                    title="Click to view ticket QR Code"
+                  >
+                    <img
+                      src={`https://api.qrserver.com/v1/create-qr-code/?size=60x60&data=${booking.id}`}
+                      alt="QR"
+                      className="w-full h-full object-contain group-hover/qr:scale-105 transition-transform"
+                    />
                   </div>
                 </div>
               </div>
@@ -147,17 +165,27 @@ const UserBookings = () => {
                 <span className="text-[10px] text-slate-500">
                   Booked on {new Date(booking.createdAt).toLocaleDateString()}
                 </span>
-                <span
-                  className={`px-3 py-1 rounded-full text-[10px] font-black tracking-wider uppercase border ${
-                    booking.status === 'SUCCESS'
-                      ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.05)]'
-                      : booking.status === 'PENDING'
-                      ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
-                      : 'bg-red-500/10 text-red-400 border-red-500/20'
-                  }`}
-                >
-                  {booking.status}
-                </span>
+                
+                <div className="flex items-center gap-3">
+                  <span
+                    className={`px-3 py-1 rounded-full text-[10px] font-black tracking-wider uppercase border ${
+                      booking.status === 'SUCCESS'
+                        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                        : booking.status === 'PENDING'
+                        ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                        : 'bg-red-500/10 text-red-400 border-red-500/20'
+                    }`}
+                  >
+                    {booking.status}
+                  </span>
+
+                  <button
+                    onClick={() => navigate(`/booking/${booking.id}`)}
+                    className="px-4 py-1.5 bg-indigo-600/20 hover:bg-indigo-600 text-indigo-400 hover:text-white text-xs font-bold rounded-lg border border-indigo-500/20 transition-all cursor-pointer"
+                  >
+                    View Ticket
+                  </button>
+                </div>
               </div>
             </div>
           ))}

@@ -39,6 +39,12 @@ const Navbar = () => {
           >
             Home
           </Link>
+          <Link
+            to="/events"
+            className="text-sm font-medium text-slate-300 hover:text-white transition-colors"
+          >
+            Events
+          </Link>
 
           {isAuthenticated && user ? (
             <>

@@ -1,11 +1,12 @@
 import { api } from './api';
+import { API_ENDPOINTS } from '../constants';
 
 export const eventService = {
-  getEvents: (params?: any) => api.get('/events/events', { params }),
-  getEventDetails: (id: string) => api.get(`/events/eventDetails/${id}`),
-  createEvent: (payload: any) => api.post('/events/creation', payload),
-  getAllEvents: (params?: any) => api.get(`/events/allevents/${id}`, { params }),
-  getMyEvents: (params?: any) => api.get('/events/myevents', { params }),
-  updateEvent: (id: string, payload: any) => api.put(`/events/update/${id}`, payload),
-  deleteEvent: (id: string) => api.delete(`/events/${id}`),
+  getEvents: (params?: any) => api.get(API_ENDPOINTS.EVENTS, { params }),
+  getEventDetails: (id: string) => api.get(API_ENDPOINTS.EVENT_DETAILS(id)),
+  createEvent: (payload: any) => api.post(API_ENDPOINTS.EVENT_CREATION, payload),
+  getAllEvents: (params?: any) => api.get(API_ENDPOINTS.EVENTS_ALL, { params }),
+  getMyEvents: (params?: any) => api.get(API_ENDPOINTS.EVENTS_MY, { params }),
+  updateEvent: (id: string, payload: any) => api.put(API_ENDPOINTS.EVENT_UPDATE(id), payload),
+  deleteEvent: (id: string) => api.delete(API_ENDPOINTS.EVENT_DELETE(id)),
 };

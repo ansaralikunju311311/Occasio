@@ -7,6 +7,9 @@ import LoadingSpinner from '../components/common/LoadingSpinner';
 import MainLayout from '../layouts/MainLayout';
 
 const LandingPage = lazy(() => import('../pages/LandingPage'));
+const EventsPage = lazy(() => import('../pages/EventsPage.tsx'));
+const EventDetailsPage = lazy(() => import('../pages/EventDetailsPage.tsx'));
+const BookingDetailsPage = lazy(() => import('../pages/BookingDetailsPage.tsx'));
 
 const LoginPage = lazy(() => import('../pages/user/LoginPage.tsx'));
 const SignPage = lazy(() => import('../pages/user/SignupPage.tsx'));
@@ -61,6 +64,10 @@ export const router = createBrowserRouter([
     ),
     children: [
       { index: true, element: <LandingPage /> },
+      { path: '/events', element: <EventsPage /> },
+      { path: '/event/:id', element: <EventDetailsPage /> },
+      { path: '/bookings', element: <ProtectedRoute><UserBookings /></ProtectedRoute> },
+      { path: '/booking/:id', element: <ProtectedRoute><BookingDetailsPage /></ProtectedRoute> },
       { path: '/seat-selection/:id', element: <SeatSelection /> },
       { path: '/checkout/:id', element: <Checkout /> },
     ],

@@ -2,8 +2,9 @@ import { IUserRepository } from '../../../../domain/repositories/user.repository
 import { ISubscriptionRepository } from '../../../../domain/repositories/subscription/subscription.repository.interface';
 import { UserResponseDto } from '../../../dtos/responses/user-response.dto';
 import { userMapper } from '../../../../common/mappers/user.mapper';
+import { ISubscribeUseCase } from './subscribe.usecase.interface';
 
-export class SubscribeUseCase {
+export class SubscribeUseCase implements ISubscribeUseCase {
   constructor(
     private userRepository: IUserRepository,
     private subscriptionRepository: ISubscriptionRepository

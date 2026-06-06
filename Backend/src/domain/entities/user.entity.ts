@@ -11,10 +11,7 @@ export class User {
     public role: UserRole,
     public status: UserStatus,
     public isVerified: boolean,
-    // public otp: string | null,
-    // public otpExpires: Date | null,
-    // public otpType: UserOtp | null,
-    // public otpSendAt: Date | null,
+   
     public applyingupgrade: UpgradeStatus,
     public rejectedAt: Date | null,
     public reapplyAt: Date | null,

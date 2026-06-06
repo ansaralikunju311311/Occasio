@@ -1,22 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../redux/hook';
-import { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
-import { createPortal } from 'react-dom';
-import EventMap from '../components/eventManager/EventMap';
 import CurrentLocation from '../components/user/CurrentLocation';
-import { EventType } from './eventManager/CreateEvent';
-
-import { Pagination } from '../components/common/Pagination';
 import { useEvents } from '../hooks/useEvents';
-import { api } from '../services/api';
 
 const LandingPage = () => {
-  const [selectedEvent, setSelectedEvent] = useState<any>(null);
-  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
-  const [eventFilter, setEventFilter] = useState('ALL');
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
   const navigate = useNavigate();
   const user = useAppSelector((state) => state.auth.user);
 
@@ -25,51 +12,12 @@ const LandingPage = () => {
     isLoading: loading,
     error,
   } = useEvents({
-    eventType: eventFilter && eventFilter.toUpperCase() !== 'ALL' ? eventFilter : undefined,
-    page: currentPage,
-    limit: itemsPerPage,
+    page: 1,
+    limit: 3,
   });
 
   const events = responseData?.events || [];
-  const metadata = responseData?.metadata;
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    // Smooth scroll to top of events section, or just top of page
-    const eventsSection = document.getElementById('events-section');
-    if (eventsSection) {
-      eventsSection.scrollIntoView({ behavior: 'smooth' });
-    } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  };
-
-  const fetchEvents = (eventType: string = 'ALL') => {
-    setEventFilter(eventType);
-    setCurrentPage(1);
-  };
-
-  const detailMutation = useMutation({
-    mutationFn: (id: string) => api.get(`/events/eventDetails/${id}`),
-    onSuccess: (response: any) => {
-      const eventData = response.data.events || response.data.data?.events || response.data;
-      setSelectedEvent(eventData);
-      setIsDetailsModalOpen(true);
-    },
-    onError: (err: any) => {
-      console.error('Failed to fetch event details:', err);
-    },
-  });
-
-
-  const viewEventDetails = (id: string) => {
-    detailMutation.mutate(id);
-  };
-
-  const closeDetailsModal = () => {
-    setIsDetailsModalOpen(false);
-    setSelectedEvent(null);
-  };
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       weekday: 'short',
@@ -95,11 +43,6 @@ const LandingPage = () => {
       })
       .filter((p: number) => !isNaN(p) && p > 0);
     return prices.length > 0 ? Math.min(...prices) : null;
-  };
-
-  const openInMaps = (lat: number, lng: number) => {
-    const url = `https://www.google.com/maps?q=${lat},${lng}`;
-    window.open(url, '_blank');
   };
   return (
     <div className="min-h-screen bg-slate-950 pt-16">
@@ -296,33 +239,13 @@ const LandingPage = () => {
               Discover local and international events across online, offline, and hybrid formats.
             </p>
           </div>
-          <div className="flex flex-col sm:flex-row items-center gap-4">
-            <div className="flex items-center gap-2">
-              <button
-                className="px-4 py-2 rounded-xl bg-slate-900/50 text-slate-300 text-sm font-medium border border-slate-800 hover:border-slate-500 hover:bg-slate-800 hover:text-white transition-all duration-300"
-                onClick={() => fetchEvents('All')}
-              >
-                All
-              </button>
-              <button
-                className="px-4 py-2 rounded-xl bg-slate-900/50 text-slate-300 text-sm font-medium border border-slate-800 hover:border-slate-500 hover:bg-slate-800 hover:text-white transition-all duration-300"
-                onClick={() => fetchEvents(EventType.ONLINE)}
-              >
-                Online
-              </button>
-              <button
-                className="px-4 py-2 rounded-xl bg-slate-900/50 text-slate-300 text-sm font-medium border border-slate-800 hover:border-slate-500 hover:bg-slate-800 hover:text-white transition-all duration-300"
-                onClick={() => fetchEvents(EventType.OFFLINE)}
-              >
-                Offline
-              </button>
-              <button
-                className="px-4 py-2 rounded-xl bg-slate-900/50 text-slate-300 text-sm font-medium border border-slate-800 hover:border-slate-500 hover:bg-slate-800 hover:text-white transition-all duration-300"
-                onClick={() => fetchEvents(EventType.HYBRID)}
-              >
-                Hybrid
-              </button>
-            </div>
+          <div>
+            <button
+              onClick={() => navigate('/events')}
+              className="px-6 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold transition-all duration-300 border border-indigo-500 shadow-lg shadow-indigo-500/25 cursor-pointer"
+            >
+              Explore All Events
+            </button>
           </div>
         </div>
         {error && (
@@ -351,7 +274,8 @@ const LandingPage = () => {
             {events.map((event: any) => (
               <div
                 key={event.id}
-                className="group relative bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-[2rem] overflow-hidden hover:border-indigo-500/40 hover:shadow-[0_20px_50px_-12px_rgba(99,102,241,0.2)] transition-all duration-500 flex flex-col h-full"
+                onClick={() => navigate(`/event/${event.id}`)}
+                className="group relative bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-[2rem] overflow-hidden hover:border-indigo-500/40 hover:shadow-[0_20px_50px_-12px_rgba(99,102,241,0.2)] transition-all duration-500 flex flex-col h-full cursor-pointer"
               >
                 <div className="aspect-video w-full overflow-hidden relative">
                   <img
@@ -481,7 +405,10 @@ const LandingPage = () => {
                       })()}
                     </div>
                     <button
-                      onClick={() => viewEventDetails(event.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/event/${event.id}`);
+                      }}
                       className="text-indigo-400 hover:text-white text-sm font-semibold flex items-center transition-colors group/btn"
                     >
                       View Details
@@ -503,21 +430,17 @@ const LandingPage = () => {
                 </div>
               </div>
             ))}
-          </div>
-
-          {/* Pagination Section */}
-          {metadata && metadata.total > 0 && (
-            <div className="mt-12 flex justify-center">
-              <Pagination
-                currentPage={currentPage}
-                totalPages={metadata.totalPages}
-                totalItems={metadata.total}
-                itemsPerPage={itemsPerPage}
-                onPageChange={handlePageChange}
-              />
             </div>
-          )}
-        </>
+
+            <div className="mt-16 flex justify-center">
+              <button
+                onClick={() => navigate('/events')}
+                className="px-8 py-4 rounded-xl bg-slate-900/50 text-white font-semibold text-lg border border-slate-800 hover:border-slate-600 hover:bg-slate-900 hover:-translate-y-0.5 transition-all duration-300 cursor-pointer shadow-md"
+              >
+                View More Events
+              </button>
+            </div>
+          </>
         ) : (
           <div className="text-center py-24 bg-slate-900/20 backdrop-blur-sm border border-slate-800/40 rounded-[3rem]">
             <div className="w-20 h-20 bg-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-8 border border-slate-700 shadow-inner">
@@ -544,270 +467,6 @@ const LandingPage = () => {
           </div>
         )}
       </section>
-      {/* CTA SECTION */}
-      {!user && (
-        <section className="py-32 px-6">
-          <div className="max-w-5xl mx-auto bg-slate-900/60 backdrop-blur-lg border border-slate-800 rounded-[3rem] p-12 md:p-20 text-center relative overflow-hidden shadow-[0_0_50px_-15px_rgb(99,102,241,0.3)]">
-            <div className="absolute inset-0 bg-linear-to-br from-indigo-500/10 via-transparent to-purple-500/10 opacity-100"></div>
-            <div className="relative z-10">
-              <h2 className="text-4xl md:text-5xl font-bold mb-8 text-white tracking-tight">
-                Ready to step into the future of events?
-              </h2>
-              <button
-                onClick={() => navigate('/signup')}
-                className="bg-white text-slate-900 px-10 py-4 rounded-xl font-bold text-lg hover:bg-gray-200 hover:scale-105 transition-all duration-300 shadow-[0_0_20px_rgb(255,255,255,0.2)]"
-              >
-                Join Occasio Today
-              </button>
-            </div>
-          </div>
-        </section>
-      )}
-      {/* EVENT DETAILS MODAL */}
-      {isDetailsModalOpen &&
-        selectedEvent &&
-        typeof document !== 'undefined' &&
-        createPortal(
-          <div
-            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md transition-all duration-300 animate-in fade-in"
-            onClick={closeDetailsModal}
-          >
-            <div
-              className="bg-slate-900 border border-slate-800 w-full max-w-4xl max-h-[90vh] rounded-[2.5rem] overflow-hidden shadow-[0_0_100px_-20px_rgba(99,102,241,0.3)] transform transition-all animate-in zoom-in-95 duration-300 flex flex-col md:flex-row relative"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Close Button */}
-              <button
-                onClick={closeDetailsModal}
-                className="absolute top-6 right-6 z-50 p-2.5 bg-slate-950/50 backdrop-blur-md text-white/70 hover:text-white hover:bg-slate-800 rounded-full transition-all border border-white/10"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2.5"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-
-              {/* ncncn */}
-              {/* Image Section */}
-              <div className="md:w-1/2 h-64 md:h-auto overflow-hidden relative group">
-                <img
-                  src={
-                    selectedEvent.picture ||
-                    'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2070&auto=format&fit=crop'
-                  }
-                  alt={selectedEvent.title}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-linear-to-t from-slate-900 via-transparent to-transparent"></div>
-                <div className="absolute bottom-8 left-8">
-                  <span className="px-4 py-1.5 rounded-full bg-indigo-500/20 backdrop-blur-md text-xs font-bold text-indigo-400 border border-indigo-500/30 uppercase tracking-[0.2em]">
-                    {selectedEvent.eventType}
-                  </span>
-                </div>
-              </div>
-              {/* Content Section */}
-              <div className="md:w-1/2 p-8 md:p-12 overflow-y-auto flex flex-col bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.05),transparent)]">
-                <div className="mb-8">
-                  <div className="flex items-center gap-2 text-indigo-400 text-xs font-bold mb-4 uppercase tracking-[0.3em]">
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2.5}
-                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                      />
-                    </svg>
-                    {formatDate(selectedEvent.startTime)}
-                  </div>
-                  <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-6 leading-tight tracking-tight">
-                    {selectedEvent.title}
-                  </h2>
-                  <p className="text-slate-400 text-lg font-light leading-relaxed mb-8">
-                    {selectedEvent.description}
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-8 mb-10">
-                  <div className="space-y-2">
-                    <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">
-                      Pricing
-                    </p>
-                    <div className="text-2xl font-bold text-white">
-                      {(() => {
-                        const type = selectedEvent.eventType?.toUpperCase();
-                        const minSeatPrice = getMinSeatPrice(selectedEvent);
-                        const onlinePrice = Number(selectedEvent.price) || 0;
-
-                        if (type === 'ONLINE') {
-                          return onlinePrice > 0 ? (
-                            <span>₹{onlinePrice}</span>
-                          ) : (
-                            <span className="text-emerald-400 font-extrabold">FREE</span>
-                          );
-                        }
-
-                        if (type === 'OFFLINE') {
-                          if (minSeatPrice !== null && minSeatPrice > 0) {
-                            return <span>₹{minSeatPrice}</span>;
-                          }
-                          return onlinePrice > 0 ? (
-                            <span>₹{onlinePrice}</span>
-                          ) : (
-                            <span className="text-emerald-400 font-extrabold">FREE</span>
-                          );
-                        }
-
-                        if (type === 'HYBRID') {
-                          return (
-                            <div className="flex flex-col gap-1 text-base">
-                              {minSeatPrice !== null && minSeatPrice > 0 && (
-                                <span className="text-slate-300">
-                                  Venue:{' '}
-                                  <span className="text-white font-bold text-xl">
-                                    ₹{minSeatPrice}
-                                  </span>
-                                </span>
-                              )}
-                              {onlinePrice > 0 && (
-                                <span className="text-slate-300">
-                                  Online:{' '}
-                                  <span className="text-indigo-400 font-bold text-xl">
-                                    ₹{onlinePrice}
-                                  </span>
-                                </span>
-                              )}
-                              {!(minSeatPrice && minSeatPrice > 0) && !onlinePrice && (
-                                <span className="text-emerald-400 font-extrabold text-2xl">
-                                  FREE
-                                </span>
-                              )}
-                            </div>
-                          );
-                        }
-
-                        // Fallback
-                        return onlinePrice > 0 ? (
-                          <span>₹{onlinePrice}</span>
-                        ) : (
-                          <span className="text-emerald-400 font-extrabold">FREE</span>
-                        );
-                      })()}
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">
-                      Attendance
-                    </p>
-                    <p className="text-lg font-medium text-slate-200">
-                      {(() => {
-                        if (selectedEvent.eventType === 'ONLINE')
-                          return `${selectedEvent.maxOnlineUsers} Slots`;
-                        if (selectedEvent.eventType === 'HYBRID') return 'Online & In-Person';
-                        return 'In-Person';
-                      })()}
-                    </p>
-                  </div>
-                  {selectedEvent.location && (
-                    <div className="col-span-2 space-y-2">
-                      <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">
-                        Location
-                      </p>
-                      <div className="flex items-start gap-3">
-                        <div className="mt-1 p-1.5 rounded-lg bg-indigo-500/10 text-indigo-400">
-                          <svg
-                            className="w-4 h-4"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                            />
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                            />
-                          </svg>
-                        </div>
-                        <p className="text-sm font-medium text-slate-300 leading-relaxed">
-                          {selectedEvent.location.address}
-                        </p>
-                      </div>
-
-                      {/* Map Integration */}
-                      {(() => {
-                        const lng = selectedEvent.location.coordinates[0];
-                        const lat = selectedEvent.location.coordinates[1];
-
-                        // Debug log to verify coordinates
-                        console.log('Rendering Map with Coordinates:', { lat, lng });
-
-                        return (
-                          <>
-                            <div className="mt-4 rounded-2xl overflow-hidden border border-slate-700/50 shadow-inner group/map h-[200px] relative">
-                              <EventMap
-                                lat={lat}
-                                lng={lng}
-                                locationName={selectedEvent.location.address}
-                              />
-                            </div>
-
-                            <button
-                              onClick={() => openInMaps(lat, lng)}
-                              className="mt-4 w-full py-2 bg-slate-800/50 hover:bg-slate-700/50 text-indigo-400 text-xs font-bold rounded-xl border border-slate-700/50 transition-all flex items-center justify-center gap-2 group/mapbtn"
-                            >
-                              <svg
-                                className="w-4 h-4 group-hover/mapbtn:scale-110 transition-transform"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                                />
-                              </svg>
-                              Open in Google Maps
-                            </button>
-                          </>
-                        );
-                      })()}
-                    </div>
-                  )}
-                </div>
-
-                <div className="mt-auto flex gap-4">
-                  <button
-                    onClick={() => {
-                      navigate(`/seat-selection/${selectedEvent.id}`);
-                    }}
-                    className="flex-1 py-4 bg-linear-to-r from-indigo-500 to-purple-600 text-white font-bold rounded-2xl shadow-[0_20px_40px_-10px_rgba(99,102,241,0.4)] hover:shadow-[0_25px_50px_-12px_rgba(99,102,241,0.5)] hover:-translate-y-1 transition-all duration-300 active:scale-95"
-                  >
-                    Book This Experience
-                  </button>
-                  <button
-                    onClick={closeDetailsModal}
-                    className="px-8 py-4 bg-slate-800/50 text-white font-bold rounded-2xl border border-slate-700 hover:bg-slate-800 transition-all active:scale-95"
-                  >
-                    Close
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>,
-          document.body
-        )}
     </div>
   );
 };
