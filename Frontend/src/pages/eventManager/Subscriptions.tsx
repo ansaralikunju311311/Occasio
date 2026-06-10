@@ -13,13 +13,12 @@ const Subscriptions = () => {
   const { user } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const [isProcessing, setIsProcessing] = useState(false);
 
   if (isLoading) return <LoadingSpinner />;
   if (error) return <div className="text-white text-center py-20">Error loading plans</div>;
 
   const apiPlans = plansData?.plans || [];
-
-  const [isProcessing, setIsProcessing] = useState(false);
 
   const handleSubscribe = async (planId: string, price: string) => {
     if (user?.role === 'USER') {

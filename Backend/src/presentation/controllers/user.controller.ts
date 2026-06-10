@@ -53,6 +53,7 @@ export class UserController {
         res.status(401).json({ success: false, message: 'Unauthorized' });
         return;
       }
+      
       const userId = req.authUser.userId;
       const { planId } = req.body;
       if (!planId) {
@@ -67,6 +68,10 @@ export class UserController {
       }
 
       const updatedUser = await subscribeUseCase.execute(userId, planId);
+
+
+
+      console.log("the code is active")
       res.status(200).json({ success: true, message: 'Subscribed successfully', user: updatedUser });
     } catch (error: any) {
       res.status(400).json({ success: false, message: error.message });

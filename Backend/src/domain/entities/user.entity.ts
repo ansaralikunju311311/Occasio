@@ -11,7 +11,6 @@ export class User {
     public role: UserRole,
     public status: UserStatus,
     public isVerified: boolean,
-   
     public applyingupgrade: UpgradeStatus,
     public rejectedAt: Date | null,
     public reapplyAt: Date | null,

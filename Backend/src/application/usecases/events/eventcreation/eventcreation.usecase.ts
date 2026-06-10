@@ -24,12 +24,15 @@ export class EventCretionUseCase implements IEventCreationUseCase {
     userId: string,
   ): Promise<EventResponseDto | null> {
     const user = await this.userRepository.findByIdUser(userId);
+    console.log("user details i am showing the time of creation",user)
     if (!user) {
       throw new Error('User not found');
     }
 
     if (user.activeSubscription) {
       const plan = await this.subscriptionRepository.findPlanById(user.activeSubscription);
+
+      console.log("the event creator have plan", plan)
       if (plan && plan.eventLimit !== 0 && user.eventsCreated >= plan.eventLimit) {
         throw new Error('Event creation limit reached. Please upgrade your subscription plan.');
       }
