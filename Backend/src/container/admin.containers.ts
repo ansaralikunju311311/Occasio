@@ -12,7 +12,9 @@ import { ManagerRejectionUseCase } from '../application/usecases/admin/managerRe
 import { EmailSerive } from '../common/services/email.service';
 import { ManagerRepository } from '../infrastructure/repositories/user/manager.repository';
 import { ManagerDetailsUseCase } from '../application/usecases/admin/managerDetails/managerdetails.usecase';
+import { ManagerSubscriptionRepository } from '../infrastructure/repositories/manager-subscription/manager-subscription.repository';
 import { PaymentRepository } from '../infrastructure/repositories/payment/payment.repository';
+import { SubscriptionRepository } from '../infrastructure/repositories/subscription/subscription.repository';
 import { GetAllPaymentsUseCase } from '../application/usecases/payment/getAllPayments/getAllPayments.usecase';
 
 export const makeAdminController = () => {
@@ -21,6 +23,8 @@ export const makeAdminController = () => {
   const emailService = new EmailSerive();
   const managerRepository = new ManagerRepository();
   const paymentRepository = new PaymentRepository();
+  const managerSubscriptionRepository = new ManagerSubscriptionRepository();
+  const subscriptionRepository = new SubscriptionRepository();
   // const managerRespository = new ManagerRepository
 
   const findAllUseCase = new FindAllUseCase(adminRepository);
@@ -32,6 +36,8 @@ export const makeAdminController = () => {
   const managerApprovalUseCase = new ManagerApprovalUseCase(
     userRepository,
     emailService,
+    managerSubscriptionRepository,
+    subscriptionRepository,
   );
   const managerRejectionUseCase = new ManagerRejectionUseCase(
     userRepository,

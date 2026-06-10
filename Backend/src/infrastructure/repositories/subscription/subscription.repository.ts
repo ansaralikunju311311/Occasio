@@ -43,6 +43,22 @@ export class SubscriptionRepository
     );
   }
 
+  async findPlanByName(name: string): Promise<Subscription | null> {
+    const plan = await this.model.findOne({ name });
+    if (!plan) return null;
+    return new Subscription(
+      plan._id as unknown as string,
+      plan.name,
+      plan.price,
+      plan.eventLimit,
+      plan.commissionPercentage,
+      plan.features as [],
+      plan.isActive,
+      plan.createdAt,
+      plan.updatedAt
+    );
+  }
+
   async findPlanById(id: string): Promise<Subscription | null> {
     const plan = await this.model.findById(id);
     if (!plan) return null;

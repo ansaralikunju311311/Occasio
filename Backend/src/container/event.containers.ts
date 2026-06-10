@@ -9,17 +9,20 @@ import { DeleteEventUseCase } from '../application/usecases/events/deleteevent/d
 import { BookingRepository } from '../infrastructure/repositories/booking/booking.repository';
 import { UserRepository } from '../infrastructure/repositories/user/user.repository';
 import { SubscriptionRepository } from '../infrastructure/repositories/subscription/subscription.repository';
+import { ManagerSubscriptionRepository } from '../infrastructure/repositories/manager-subscription/manager-subscription.repository';
 
 export const MakeEventController = () => {
   const eventRepository = new EventRepository();
   const bookingRepository = new BookingRepository();
   const userRepository = new UserRepository();
   const subscriptionRepository = new SubscriptionRepository();
+  const managerSubscriptionRepository = new ManagerSubscriptionRepository();
 
   const eventCretionUseCase = new EventCretionUseCase(
     eventRepository,
     userRepository,
-    subscriptionRepository
+    subscriptionRepository,
+    managerSubscriptionRepository
   );
   const getEventsUseCase = new GetEventsUseCase(eventRepository);
   const myEventsUseCase = new MyEventsUseCase(eventRepository);

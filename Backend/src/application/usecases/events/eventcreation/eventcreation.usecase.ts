@@ -11,12 +11,14 @@ import mongoose from 'mongoose';
 import { IEventCreationUseCase } from './eventcreation.usecase.interface';
 import { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
 import { ISubscriptionRepository } from '../../../../domain/repositories/subscription/subscription.repository.interface';
+import { IManagerSubscriptionRepository } from '../../../../domain/repositories/imanager-subscription.repository';
 
 export class EventCretionUseCase implements IEventCreationUseCase {
   constructor(
     private eventRepository: IEventRepository,
     private userRepository: IUserRepository,
-    private subscriptionRepository: ISubscriptionRepository
+    private subscriptionRepository: ISubscriptionRepository,
+    private managerSubscriptionRepository: IManagerSubscriptionRepository
   ) {}
 
   async execute(
@@ -29,17 +31,22 @@ export class EventCretionUseCase implements IEventCreationUseCase {
       throw new Error('User not found');
     }
 
+    let activeSub = null;
     if (user.activeSubscription) {
-      const plan = await this.subscriptionRepository.findPlanById(user.activeSubscription);
+      activeSub = await this.managerSubscriptionRepository.findById(user.activeSubscription);
 
-      console.log("the event creator have plan", plan)
-      if (plan && plan.eventLimit !== 0 && user.eventsCreated >= plan.eventLimit) {
-        throw new Error('Event creation limit reached. Please upgrade your subscription plan.');
+      console.log("the event creator has manager subscription", activeSub);
+      if (activeSub) {
+        if (activeSub.eventLimit !== 0 && activeSub.eventsUsed >= activeSub.eventLimit) {
+          throw new Error('Event creation limit reached. Please upgrade your subscription plan.');
+        }
+
+        if (activeSub.endDate && new Date() > new Date(activeSub.endDate)) {
+          throw new Error('Your subscription plan has expired. Please renew or upgrade.');
+        }
       }
     } else {
-      // Default free plan usually has limit 0 or something. We assume no subscription means 0 limit unless it's handled differently.
-      // Let's assume without subscription they can't create, or limit is 1?
-      // For now we just enforce it if they have a plan.
+      // Logic for users without an active subscription
     }
 
     const session = await mongoose.startSession();
@@ -160,7 +167,12 @@ export class EventCretionUseCase implements IEventCreationUseCase {
       }
 
       user.eventsCreated = (user.eventsCreated || 0) + 1;
-      await this.userRepository.updateUser(user);
+      await this.userRepository.updateUser(user, session);
+
+      if (activeSub && activeSub.id) {
+        activeSub.eventsUsed = (activeSub.eventsUsed || 0) + 1;
+        await this.managerSubscriptionRepository.update(activeSub.id, { eventsUsed: activeSub.eventsUsed }, session);
+      }
 
       await session.commitTransaction();
       session.endSession();

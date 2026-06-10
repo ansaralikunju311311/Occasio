@@ -11,15 +11,17 @@ export abstract class BaseRepository<T> {
     return this.model.findById(id).exec();
   }
 
-  async create(data: Partial<T>): Promise<HydratedDocument<T>> {
-    return this.model.create(data);
+  async create(data: Partial<T>, options?: any): Promise<HydratedDocument<T>> {
+    const createdDocs = await this.model.create([data], options);
+    return createdDocs[0];
   }
 
   async updateById(
     id: string,
     data: UpdateQuery<T>,
+    options?: any
   ): Promise<HydratedDocument<T> | null> {
-    return this.model.findByIdAndUpdate(id, data, { new: true }).exec();
+    return this.model.findByIdAndUpdate(id, data, { new: true, ...options }).exec();
   }
 
   async findAll(filter: FilterQuery<T> = {}): Promise<HydratedDocument<T>[]> {
@@ -43,7 +45,8 @@ export abstract class BaseRepository<T> {
   async updateOne(
     filter: FilterQuery<T>,
     data: UpdateQuery<T>,
+    options?: any
   ): Promise<HydratedDocument<T> | null> {
-    return this.model.findOneAndUpdate(filter, data, { new: true }).exec();
+    return this.model.findOneAndUpdate(filter, data, { new: true, ...options }).exec();
   }
 }

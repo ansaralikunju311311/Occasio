@@ -42,19 +42,14 @@ export class UserRepository
     return this.toEntity(doc);
   }
 
-  async updateUser(user: User): Promise<User> {
+  async updateUser(user: User, session?: any): Promise<User> {
     const doc = await super.updateOne(
       { email: user.email },
       {
-        // email:user.email,
         status: user.status,
         name: user.name,
         password: user.password,
         isVerified: user.isVerified,
-        // otp: user.otp,
-        // otpExpires: user.otpExpires,
-        // otpType: user.otpType,
-        // otpSendAt: user.otpSendAt,
         applyingupgrade: user.applyingupgrade,
         role: user.role,
         rejectedAt: user.rejectedAt,
@@ -62,6 +57,7 @@ export class UserRepository
         eventsCreated: user.eventsCreated,
         activeSubscription: user.activeSubscription,
       },
+      { session }
     );
 
     if (!doc) throw new Error('User not found');

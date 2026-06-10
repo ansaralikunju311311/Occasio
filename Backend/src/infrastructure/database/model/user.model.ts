@@ -75,7 +75,7 @@ const userSchema = new Schema<IUserDocument>(
     },
     activeSubscription: {
       type: Schema.Types.ObjectId,
-      ref: 'Subscription',
+      ref: 'ManagerSubscription',
       default: null,
     },
     eventsCreated: {
