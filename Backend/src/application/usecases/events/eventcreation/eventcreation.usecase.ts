@@ -12,6 +12,7 @@ import { IEventCreationUseCase } from './eventcreation.usecase.interface';
 import { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
 import { ISubscriptionRepository } from '../../../../domain/repositories/subscription/subscription.repository.interface';
 import { IManagerSubscriptionRepository } from '../../../../domain/repositories/imanager-subscription.repository';
+import { ManagerPlan } from '../../../../common/enums/manager-plan.enum';
 
 export class EventCretionUseCase implements IEventCreationUseCase {
   constructor(
@@ -85,7 +86,10 @@ export class EventCretionUseCase implements IEventCreationUseCase {
 
       console.log('thehhehe location', data.location);
 
-      const status = EventStatus.DRAFT;
+      let status = EventStatus.DRAFT;
+      if (activeSub && activeSub.plan !== ManagerPlan.FREE) {
+        status = EventStatus.LIVE;
+      }
 
       console.log('sample', status);
 

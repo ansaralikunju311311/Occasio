@@ -10,6 +10,7 @@ export const API_ENDPOINTS = {
   AUTH_VERIFY_OTP: '/auth/verify-otp',
   AUTH_ME: '/auth/me',
   AUTH_UPDATE_PASSWORD: '/auth/updatepassword',
+  AUTH_REFRESH: '/auth/refresh',
 
   // Events
   EVENTS: '/events/events',
@@ -25,6 +26,7 @@ export const API_ENDPOINTS = {
   PAYMENTS_TICKET_ORDER: '/payments/ticket-order',
   PAYMENTS_PRICE_BREAKDOWN: '/payments/price-breakdown',
   PAYMENTS_MY_BOOKINGS: '/payments/my-bookings',
+  PAYMENTS_MANAGER_BOOKINGS: '/payments/manager-bookings',
   PAYMENTS_VERIFY: '/payments/verify',
   PAYMENTS_SUBSCRIPTION_ORDER: '/payments/subscription-order',
   PAYMENTS_VERIFY_SUBSCRIPTION: '/payments/verify-subscription',

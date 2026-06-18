@@ -24,6 +24,10 @@ export const paymentService = {
     const response = await api.get(API_ENDPOINTS.PAYMENTS_MY_BOOKINGS);
     return response.data;
   },
+  getManagerBookings: async (page: number = 1, limit: number = 10) => {
+    const response = await api.get(`${API_ENDPOINTS.PAYMENTS_MANAGER_BOOKINGS}?page=${page}&limit=${limit}`);
+    return response.data;
+  },
 
   verifyPayment: async (paymentData: {
     razorpay_order_id: string;

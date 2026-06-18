@@ -3,6 +3,8 @@ import { IPaymentGateway } from '../../../../domain/services/payment-gateway.int
 import { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
 import { IPaymentRepository } from '../../../../domain/repositories/payment/payment.repository.interface';
 import { ISubscriptionRepository } from '../../../../domain/repositories/subscription/subscription.repository.interface';
+import { IManagerSubscriptionRepository } from '../../../../domain/repositories/imanager-subscription.repository';
+import { ManagerPlan } from '../../../../common/enums/manager-plan.enum';
 import { Payment } from '../../../../domain/entities/payment.entity';
 import { PaymentPurpose } from '../../../../common/enums/payment-purpose.enum';
 import { PaymentStatus } from '../../../../common/enums/payment-status.enum';
@@ -13,7 +15,8 @@ export class VerifySubscriptionPaymentUseCase implements IVerifySubscriptionPaym
     private paymentGateway: IPaymentGateway,
     private userRepository: IUserRepository,
     private paymentRepository: IPaymentRepository,
-    private subscriptionRepository: ISubscriptionRepository
+    private subscriptionRepository: ISubscriptionRepository,
+    private managerSubscriptionRepository: IManagerSubscriptionRepository
   ) {}
 
   async execute(
@@ -43,18 +46,38 @@ export class VerifySubscriptionPaymentUseCase implements IVerifySubscriptionPaym
     const targetPlan = await this.subscriptionRepository.findPlanById(planId);
     if (!targetPlan) throw new Error('Target plan not found');
 
-    // Prevent downgrade again just in case (someone bypasses the order creation)
+    // Prevent downgrade
     if (user.activeSubscription) {
-      const currentPlan = await this.subscriptionRepository.findPlanById(user.activeSubscription);
-      if (currentPlan) {
-        if (targetPlan.price < currentPlan.price) {
+      const managerSub = await this.managerSubscriptionRepository.findById(user.activeSubscription);
+      if (managerSub) {
+        const currentPlanDef = await this.subscriptionRepository.findPlanByName(managerSub.plan);
+        if (currentPlanDef && targetPlan.price < currentPlanDef.price) {
           throw new Error('You cannot downgrade to a lower tier plan.');
         }
+
+        // 1. Assign new subscription details and reset eventsUsed
+        managerSub.plan = targetPlan.name as ManagerPlan;
+        managerSub.eventLimit = targetPlan.eventLimit;
+        managerSub.eventsUsed = 0;
+        managerSub.startDate = new Date();
+        const endDate = new Date(managerSub.startDate);
+        endDate.setMonth(endDate.getMonth() + 1);
+        managerSub.endDate = endDate;
+
+        await this.managerSubscriptionRepository.update(managerSub.id as string, {
+          plan: managerSub.plan,
+          eventLimit: managerSub.eventLimit,
+          eventsUsed: managerSub.eventsUsed,
+          startDate: managerSub.startDate,
+          endDate: managerSub.endDate
+        });
+      } else {
+        throw new Error('Manager Subscription not found.');
       }
+    } else {
+      throw new Error('No active subscription found to upgrade.');
     }
 
-    // 1. Assign new subscription and reset eventsCreated
-    user.activeSubscription = planId;
     user.eventsCreated = 0;
     await this.userRepository.updateUser(user);
 

@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { store } from '../redux/store';
 import { logout } from '../redux/slices/authSlice';
+import { API_ENDPOINTS } from '../constants';
 
 export const api = axios.create({
   baseURL: 'http://localhost:5000/api',
@@ -37,15 +38,15 @@ api.interceptors.response.use(
     const originalRequest = error.config;
 
     const authEndpoints = [
-      '/auth/login',
-      '/auth/verify-otp',
-      '/auth/signup',
-      '/auth/resend-otp',
-      '/auth/forgot-password',
-      '/auth/reset-password',
-      '/auth/admin/login',
-      '/auth/refresh',
-      '/auth/logout',
+      API_ENDPOINTS.AUTH_LOGIN,
+      API_ENDPOINTS.AUTH_VERIFY_OTP,
+      API_ENDPOINTS.AUTH_SIGNUP,
+      API_ENDPOINTS.AUTH_RESEND_OTP,
+      API_ENDPOINTS.AUTH_FORGOT_PASSWORD,
+      API_ENDPOINTS.AUTH_RESET_PASSWORD,
+      API_ENDPOINTS.AUTH_ADMIN_LOGIN,
+      API_ENDPOINTS.AUTH_REFRESH,
+      API_ENDPOINTS.AUTH_LOGOUT,
     ];
 
     const isAuthRequest = authEndpoints.some((endpoint) => originalRequest.url?.includes(endpoint));
@@ -69,7 +70,7 @@ api.interceptors.response.use(
 
       try {
         console.log('Access token expired → trying refresh');
-        const res = await api.post('/auth/refresh');
+        const res = await api.post(API_ENDPOINTS.AUTH_REFRESH);
         const newAccessToken = res.data.accessToken;
 
         localStorage.setItem('accessToken', newAccessToken);

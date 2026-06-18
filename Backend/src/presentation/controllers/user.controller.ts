@@ -7,6 +7,7 @@ import { IEditProfileUseCase } from '../../application/usecases/user/editProfile
 import { catchAsync } from '../../common/utils/catchAsync';
 
 import { SubscribeUseCase } from '../../application/usecases/user/subscribe/subscribe.usecase';
+import { GetMySubscriptionUseCase } from '../../application/usecases/user/getMySubscription/get-my-subscription.usecase';
 
 export class UserController {
   constructor(
@@ -14,6 +15,7 @@ export class UserController {
     private ReapplyUseCase: IReapplyUseCase,
     private EditProfileUseCase: IEditProfileUseCase,
     private SubscribeUseCase: SubscribeUseCase,
+    private GetMySubscriptionUseCase: GetMySubscriptionUseCase
   ) {}
 
   upgraderole = catchAsync(async (req: Request, res: Response) => {
@@ -50,20 +52,20 @@ export class UserController {
   subscribe = async (req: Request, res: Response): Promise<void> => {
     try {
       if (!req.authUser || !req.authUser.userId) {
-        res.status(401).json({ success: false, message: 'Unauthorized' });
+        res.status(HttpStatus.UNAUTHORIZED).json({ success: false, message: 'Unauthorized' });
         return;
       }
       
       const userId = req.authUser.userId;
       const { planId } = req.body;
       if (!planId) {
-        res.status(400).json({ success: false, message: 'Plan ID is required' });
+        res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: 'Plan ID is required' });
         return;
       }
 
       const subscribeUseCase = (this as any).SubscribeUseCase;
       if (!subscribeUseCase) {
-        res.status(500).json({ success: false, message: 'SubscribeUseCase not injected' });
+        res.status(INTERNAL_SERVER_ERROR).json({ success: false, message: 'SubscribeUseCase not injected' });
         return;
       }
 
@@ -72,9 +74,9 @@ export class UserController {
 
 
       console.log("the code is active")
-      res.status(200).json({ success: true, message: 'Subscribed successfully', user: updatedUser });
+      res.status(HttpStatus.OK).json({ success: true, message: 'Subscribed successfully', user: updatedUser });
     } catch (error: any) {
-      res.status(400).json({ success: false, message: error.message });
+      res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: error.message });
     }
   };
 
@@ -96,6 +98,23 @@ export class UserController {
 
     res.status(HttpStatus.OK).json({
       profile,
+    });
+  });
+
+  getMySubscription = catchAsync(async (req: Request, res: Response) => {
+    const userId = req.authUser!.userId;
+    const getMySubscriptionUseCase = (this as any).GetMySubscriptionUseCase;
+    
+    if (!getMySubscriptionUseCase) {
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'GetMySubscriptionUseCase not injected' });
+      return;
+    }
+
+    const subscription = await getMySubscriptionUseCase.execute(userId);
+
+    res.status(HttpStatus.OK).json({
+      success: true,
+      subscription,
     });
   });
 }

@@ -6,6 +6,7 @@ import { IBookingRepository } from '../../domain/repositories/booking/booking.re
 
 import { ICreateSubscriptionOrderUseCase } from '../../application/usecases/payment/createSubscriptionOrder/createSubscriptionOrder.usecase.interface';
 import { IVerifySubscriptionPaymentUseCase } from '../../application/usecases/payment/verifySubscriptionPayment/verifySubscriptionPayment.usecase.interface';
+import { HttpStatus } from '../../common/constants/http-status';
 
 export class PaymentController {
   constructor(
@@ -23,17 +24,17 @@ export class PaymentController {
       const userId = (req as any).user?.id || (req as any).authUser?.userId;
 
       if (!userId) {
-        return res.status(401).json({ message: 'Unauthorized' });
+        return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Unauthorized' });
       }
 
       const order = await this.createSubscriptionOrderUseCase.execute(userId, planId);
 
-      return res.status(200).json({
+      return res.status(HttpStatus.OK).json({
         success: true,
         order,
       });
     } catch (error: any) {
-      return res.status(400).json({ success: false, message: error.message });
+      return res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: error.message });
     }
   };
 
@@ -42,14 +43,14 @@ export class PaymentController {
       const userId = (req as any).user?.id || (req as any).authUser?.userId;
 
       if (!userId) {
-        return res.status(401).json({ message: 'Unauthorized' });
+        return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Unauthorized' });
       }
 
       const result = await this.verifySubscriptionPaymentUseCase.execute(req.body, userId);
 
-      return res.status(200).json(result);
+      return res.status(HttpStatus.OK).json(result);
     } catch (error: any) {
-      return res.status(400).json({ success: false, message: error.message });
+      return res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: error.message });
     }
   };
 
@@ -59,17 +60,17 @@ export class PaymentController {
       const userId = (req as any).user?.id || (req as any).authUser?.userId;
 
       if (!userId) {
-        return res.status(401).json({ message: 'Unauthorized' });
+        return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Unauthorized' });
       }
 
       const order = await this.createOrderUseCase.execute(eventId, userId);
 
-      return res.status(200).json({
+      return res.status(HttpStatus.OK).json({
         success: true,
         order,
       });
     } catch (error: any) {
-      return res.status(400).json({ success: false, message: error.message });
+      return res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: error.message });
     }
   };
 
@@ -79,7 +80,7 @@ export class PaymentController {
       const userId = (req as any).user?.id || (req as any).authUser?.userId;
 
       if (!userId) {
-        return res.status(401).json({ message: 'Unauthorized' });
+        return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Unauthorized' });
       }
 
       const order = await this.createOrderUseCase.execute(
@@ -90,12 +91,12 @@ export class PaymentController {
         selectedSeats
       );
 
-      return res.status(200).json({
+      return res.status(HttpStatus.OK).json({
         success: true,
         order,
       });
     } catch (error: any) {
-      return res.status(400).json({ success: false, message: error.message });
+      return res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: error.message });
     }
   };
 
@@ -105,13 +106,13 @@ export class PaymentController {
       const amount = parseFloat(req.query.amount as string);
 
       if (!eventId || isNaN(amount)) {
-        return res.status(400).json({ message: 'Invalid query parameters' });
+        return res.status(HttpStatus.BAD_REQUEST).json({ message: 'Invalid query parameters' });
       }
 
       const breakdown = await this.getBreakdownUseCase.execute(eventId, amount);
-      return res.status(200).json({ success: true, breakdown });
+      return res.status(HttpStatus.OK).json({ success: true, breakdown });
     } catch (error: any) {
-      return res.status(400).json({ success: false, message: error.message });
+      return res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: error.message });
     }
   };
 
@@ -119,16 +120,33 @@ export class PaymentController {
     try {
       const userId = (req as any).user?.id || (req as any).authUser?.userId;
       if (!userId) {
-        return res.status(401).json({ message: 'Unauthorized' });
+        return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Unauthorized' });
       }
 
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
 
       const result = await this.bookingRepository.getBookingsByUser(userId, { page, limit });
-      return res.status(200).json({ success: true, ...result });
+      return res.status(HttpStatus.OK).json({ success: true, ...result });
     } catch (error: any) {
-      return res.status(400).json({ success: false, message: error.message });
+      return res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: error.message });
+    }
+  };
+
+  getManagerBookings = async (req: Request, res: Response) => {
+    try {
+      const managerId = (req as any).user?.id || (req as any).authUser?.userId;
+      if (!managerId) {
+        return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Unauthorized' });
+      }
+
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+
+      const result = await this.bookingRepository.getManagerBookings(managerId, { page, limit });
+      return res.status(HttpStatus.OK).json({ success: true, ...result });
+    } catch (error: any) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: error.message });
     }
   };
 
@@ -137,14 +155,14 @@ export class PaymentController {
       const userId = (req as any).user?.id || (req as any).authUser?.userId;
 
       if (!userId) {
-        return res.status(401).json({ message: 'Unauthorized' });
+        return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Unauthorized' });
       }
 
       const result = await this.verifyPaymentUseCase.execute(req.body, userId);
 
-      return res.status(200).json(result);
+      return res.status(HttpStatus.OK).json(result);
     } catch (error: any) {
-      return res.status(400).json({ success: false, message: error.message });
+      return res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: error.message });
     }
   };
 }

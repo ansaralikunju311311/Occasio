@@ -6,8 +6,10 @@ import { Pagination } from '../components/common/Pagination';
 import { SearchBar } from '../components/common/SearchBar';
 import { toast } from 'sonner';
 import { APP_MESSAGES } from '../constants';
+import { useAppSelector } from '../redux/hook';
 
 const EventsPage = () => {
+  const user = useAppSelector((state) => state.auth.user);
   const [searchValue, setSearchValue] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [eventFilter, setEventFilter] = useState('ALL');
@@ -149,6 +151,9 @@ const EventsPage = () => {
 
   // Filter based on "Nearby Only"
   const filteredEvents = processedEvents.filter((event: any) => {
+    // Hide own events
+    if (user && event.createdBy === user.id) return false;
+
     if (nearbyOnly && userCoords) {
       if (event.eventType?.toUpperCase() === 'ONLINE') return false; // Online has no physical proximity
       if (event.distance === null) return false;

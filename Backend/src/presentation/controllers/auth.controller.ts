@@ -55,7 +55,7 @@ export class AuthController {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge:process.env.MAX_AGE,
     });
 
     res.status(HttpStatus.OK).json({
@@ -135,7 +135,7 @@ export class AuthController {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge:process.env.MAX_AGE,
     });
 
     res.status(HttpStatus.OK).json({
@@ -210,7 +210,7 @@ export class AuthController {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge:process.env.MAX_AGE,
     });
 
     res.status(HttpStatus.OK).json({

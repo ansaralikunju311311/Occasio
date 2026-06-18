@@ -113,7 +113,7 @@ const UserBookings = () => {
                       {booking.eventId.title}
                     </h3>
                     <p className="text-slate-400 text-xs mt-1">
-                      {new Date(booking.eventId.startTime).toLocaleString()}
+                      {booking.eventId?.startTime ? new Date(booking.eventId.startTime).toLocaleString() : 'N/A'}
                     </p>
                     <div className="flex gap-2 mt-2">
                       <span className="px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-[9px] font-bold uppercase tracking-wider">
@@ -163,7 +163,7 @@ const UserBookings = () => {
 
               <div className="mt-4 flex items-center justify-between">
                 <span className="text-[10px] text-slate-500">
-                  Booked on {new Date(booking.createdAt).toLocaleDateString()}
+                  Booked on {booking.createdAt ? new Date(booking.createdAt).toLocaleDateString() : 'N/A'}
                 </span>
                 
                 <div className="flex items-center gap-3">

@@ -96,11 +96,46 @@ export class BookingRepository implements IBookingRepository {
     };
   }
 
+  async getManagerBookings(managerId: string, params: PaginationParams): Promise<PaginatedResponse<Booking>> {
+    const { page = 1, limit = 10 } = params;
+    const skip = (page - 1) * limit;
+
+    // Find all events created by this manager
+    const EventModel = require('../../database/model/events/event.model').EventModel;
+    const managerEvents = await EventModel.find({ createdBy: managerId }).select('_id');
+    const eventIds = managerEvents.map((e: any) => e._id);
+
+    const query = { eventId: { $in: eventIds } };
+
+    const [bookings, total] = await Promise.all([
+      BookingModel.find(query)
+        .populate('eventId')
+        .populate('userId', 'name email')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .exec(),
+      BookingModel.countDocuments(query).exec(),
+    ]);
+
+    const data = bookings.map((b) => this.toEntity(b));
+
+    return {
+      data,
+      metadata: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
   private toEntity(doc: any): Booking {
     return new Booking(
       doc._id?.toString() || null,
-      doc.userId._id?.toString() || doc.userId.toString(),
-      doc.eventId._id?.toString() || doc.eventId.toString(),
+      doc.userId,
+      doc.eventId,
       doc.seats,
       doc.bookingType,
       doc.totalAmount,

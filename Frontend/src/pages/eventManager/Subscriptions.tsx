@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { usePlans } from '../../hooks/useAdmin';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { useAppSelector, useAppDispatch } from '../../redux/hook';
@@ -14,6 +14,23 @@ const Subscriptions = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [mySubscription, setMySubscription] = useState<any>(null);
+  const [isLoadingSubscription, setIsLoadingSubscription] = useState(false);
+
+  useEffect(() => {
+    if (user?.role === 'EVENT_MANAGER') {
+      setIsLoadingSubscription(true);
+      api.get('/user/my-subscription')
+        .then(res => {
+          if (res.data.success) {
+            // It might be null if they don't have one yet
+            setMySubscription(res.data.subscription);
+          }
+        })
+        .catch(err => console.error("Error fetching subscription details", err))
+        .finally(() => setIsLoadingSubscription(false));
+    }
+  }, [user]);
 
   if (isLoading) return <LoadingSpinner />;
   if (error) return <div className="text-white text-center py-20">Error loading plans</div>;
@@ -68,7 +85,7 @@ const Subscriptions = () => {
   const plans = apiPlans.map((plan: any) => {
     // Basic logic to determine if current plan
     const planId = plan.id || plan._id;
-    const isCurrent = user?.activeSubscription === planId || (!user?.activeSubscription && plan.name === 'FREE');
+    const isCurrent = (mySubscription && mySubscription.plan === plan.name) || (!user?.activeSubscription && plan.name === 'FREE');
 
     return {
       id: planId,
@@ -98,6 +115,61 @@ const Subscriptions = () => {
         </p>
       </div>
 
+      {/* Current Subscription Status */}
+      {user?.role === 'EVENT_MANAGER' && (
+        <div className="max-w-4xl mx-auto mb-16">
+          {isLoadingSubscription ? (
+            <div className="p-8 bg-slate-900 border border-slate-700 rounded-3xl shadow-xl flex justify-center items-center">
+              <span className="text-slate-400">Loading subscription details...</span>
+            </div>
+          ) : mySubscription ? (
+            <div className="p-8 bg-slate-900 border border-slate-700 rounded-3xl shadow-xl animation-slide-up text-white">
+              <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div>
+                  <h3 className="text-2xl font-bold uppercase tracking-widest text-teal-400 mb-2">
+                    {mySubscription.plan} Plan
+                  </h3>
+                  <span className={`px-3 py-1 text-xs font-bold uppercase rounded-full ${
+                    mySubscription.status === 'ACTIVE' ? 'bg-teal-500/20 text-teal-400' : 'bg-red-500/20 text-red-400'
+                  }`}>
+                    {mySubscription.status}
+                  </span>
+                </div>
+                
+                <div className="flex-1 w-full md:px-8">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm text-slate-400 font-bold uppercase tracking-wider">Events Used</span>
+                    <span className="text-sm font-bold">
+                      {mySubscription.eventsUsed} / {mySubscription.eventLimit === 0 ? 'Unlimited' : mySubscription.eventLimit}
+                    </span>
+                  </div>
+                  <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-teal-500 rounded-full"
+                      style={{ width: mySubscription.eventLimit === 0 ? '10%' : `${Math.min((mySubscription.eventsUsed / mySubscription.eventLimit) * 100, 100)}%` }}
+                    ></div>
+                  </div>
+                </div>
+
+                <div className="text-right">
+                  <p className="text-xs text-slate-400 uppercase tracking-wider font-bold mb-1">Expiry Date</p>
+                  <p className="font-bold">
+                    {mySubscription.endDate ? new Date(mySubscription.endDate).toLocaleDateString() : 'Lifetime (No Expiry)'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="p-8 bg-slate-900 border border-slate-800 rounded-3xl shadow-xl text-center">
+              <h3 className="text-xl font-bold uppercase tracking-widest text-slate-400 mb-2">
+                No Active Subscription
+              </h3>
+              <p className="text-slate-500 font-light">You currently do not have an active manager subscription. Please select a plan below to get started.</p>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Plans grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto px-4">
         {plans.map((plan: any, index: number) => (
@@ -108,9 +180,15 @@ const Subscriptions = () => {
               ${index === 0 ? 'animation-slide-up' : index === 1 ? 'animation-slide-up-delay' : 'stagger-animation'}
             `}
           >
-            {plan.popular && (
+            {plan.popular && !plan.isCurrent && (
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-teal-500 text-[#070b14] text-[10px] font-bold uppercase tracking-widest rounded-full shadow-lg">
                 Most Popular
+              </div>
+            )}
+            
+            {plan.isCurrent && (
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-slate-800 text-teal-400 border border-teal-500/30 text-[10px] font-bold uppercase tracking-widest rounded-full shadow-[0_0_15px_rgba(20,184,166,0.3)]">
+                Active Plan
               </div>
             )}
 

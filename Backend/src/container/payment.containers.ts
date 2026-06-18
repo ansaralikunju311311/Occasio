@@ -10,6 +10,7 @@ import { BookingRepository } from '../infrastructure/repositories/booking/bookin
 import { GetBreakdownUseCase } from '../application/usecases/payment/getBreakdown/getBreakdown.usecase';
 import { CreateSubscriptionOrderUseCase } from '../application/usecases/payment/createSubscriptionOrder/createSubscriptionOrder.usecase';
 import { VerifySubscriptionPaymentUseCase } from '../application/usecases/payment/verifySubscriptionPayment/verifySubscriptionPayment.usecase';
+import { ManagerSubscriptionRepository } from '../infrastructure/repositories/manager-subscription/manager-subscription.repository';
 
 export const MakePaymentController = () => {
   const paymentGateway = new RazorpayGateway();
@@ -18,6 +19,7 @@ export const MakePaymentController = () => {
   const userRepository = new UserRepository();
   const subscriptionRepository = new SubscriptionRepository();
   const bookingRepository = new BookingRepository();
+  const managerSubscriptionRepository = new ManagerSubscriptionRepository();
 
   const getBreakdownUseCase = new GetBreakdownUseCase(
     eventRepository,
@@ -43,14 +45,16 @@ export const MakePaymentController = () => {
   const createSubscriptionOrderUseCase = new CreateSubscriptionOrderUseCase(
     paymentGateway,
     userRepository,
-    subscriptionRepository
+    subscriptionRepository,
+    managerSubscriptionRepository
   );
 
   const verifySubscriptionPaymentUseCase = new VerifySubscriptionPaymentUseCase(
     paymentGateway,
     userRepository,
     paymentRepository,
-    subscriptionRepository
+    subscriptionRepository,
+    managerSubscriptionRepository
   );
 
   return new PaymentController(

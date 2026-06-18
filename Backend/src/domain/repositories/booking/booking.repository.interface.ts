@@ -8,5 +8,6 @@ export interface IBookingRepository {
   updateBookingStatus(id: string, status: string): Promise<Booking | null>;
   getBookingsByUser(userId: string, params: PaginationParams): Promise<PaginatedResponse<Booking>>;
   getBookingsByEvent(eventId: string, params: PaginationParams): Promise<PaginatedResponse<Booking>>;
+  getManagerBookings(managerId: string, params: PaginationParams): Promise<PaginatedResponse<Booking>>;
   getOnlineBookedCount(eventId: string): Promise<number>;
 }

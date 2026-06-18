@@ -32,4 +32,10 @@ router.post(
   requireRole([UserRole.EVENT_MANAGER]),
   controller.subscribe.bind(controller),
 );
+router.get(
+  '/my-subscription',
+  verifyAccessToken,
+  requireRole([UserRole.EVENT_MANAGER]),
+  controller.getMySubscription.bind(controller),
+);
 export default router;

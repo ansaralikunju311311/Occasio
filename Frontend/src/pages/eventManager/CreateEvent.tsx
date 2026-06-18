@@ -73,9 +73,15 @@ const CreateEvent = () => {
   const eventMutation = useMutation({
     mutationFn: (payload: any) => api.post('/events/creation', payload),
     onSuccess: (response: any) => {
-      toast.success('Event draft created successfully!');
-      setCreatedEventId(response.data.creation.id);
-      setShowSuccessModal(true);
+      const createdEvent = response.data.creation;
+      if (createdEvent.status === 'LIVE' || createdEvent.status === 'ACTIVE') {
+        toast.success('Event published directly successfully (Pro/Elite plan)!');
+        navigate('/eventmanager/my-events');
+      } else {
+        toast.success('Event draft created successfully!');
+        setCreatedEventId(createdEvent.id);
+        setShowSuccessModal(true);
+      }
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || 'Failed to create event.');

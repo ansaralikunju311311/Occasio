@@ -36,6 +36,7 @@ const EventManagerPlaceholder = lazy(
   () => import('../pages/eventManager/EventManagerPlaceholder.tsx')
 );
 const EventManagerMyEvents = lazy(() => import('../pages/eventManager/EventManagerMyEvents.tsx'));
+const EventManagerBookings = lazy(() => import('../pages/eventManager/EventManagerBookings.tsx'));
 const CreateEvent = lazy(() => import('../pages/eventManager/CreateEvent.tsx'));
 const EditEvent = lazy(() => import('../pages/eventManager/EditEvent.tsx'));
 const Subscriptions = lazy(() => import('../pages/eventManager/Subscriptions.tsx'));
@@ -199,7 +200,7 @@ export const router = createBrowserRouter([
         path: 'bookings',
         element: (
           <ManagerGuard>
-            <EventManagerPlaceholder />
+            <EventManagerBookings />
           </ManagerGuard>
         ),
       },
