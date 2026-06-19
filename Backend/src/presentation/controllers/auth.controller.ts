@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Request, response, Response } from 'express';
 import { HttpStatus } from '../../common/constants/http-status';
 import { SuccessMessage, ErrorMessage } from '../../common/enums/message-enum';
 import { logger } from '../../common/logger/logger';
@@ -12,7 +12,7 @@ import { ILoginUsecase } from '../../application/usecases/auth/login/login.useca
 import { IUpdateUseCase } from '../../application/usecases/auth/updatepassword/update.usecase.interface';
 import { IResetPasswordUseCase } from '../../application/usecases/auth/resetPassword/reset.usecase.interface';
 import { catchAsync } from '../../common/utils/catchAsync';
-
+import { ISessionService } from '../../common/interfaces/session.interface';
 export class AuthController {
   constructor(
     private SignupUsecase: ISignupUseCase,
@@ -25,6 +25,7 @@ export class AuthController {
     private ResetPasswordUseCase: IResetPasswordUseCase,
     private UpdatePasswordUseCase: IUpdateUseCase,
     private AdminLoginUseCase: ILoginUsecase,
+    private SessionService:ISessionService
   ) {}
 
   signup = catchAsync(async (req: Request, res: Response) => {
@@ -51,12 +52,15 @@ export class AuthController {
 
     const { user, accessToken, refreshToken } = await this.VerifyUseCase.execute({ email, otp });
 
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge:process.env.MAX_AGE,
-    });
+    // res.cookie('refreshToken', refreshToken, {
+    //   httpOnly: true,
+    //   secure: process.env.NODE_ENV === 'production',
+    //   sameSite: 'lax',
+    //   maxAge:process.env.MAX_AGE,
+    // });
+
+
+    this.SessionService.setRefreshToken(res,refreshToken)
 
     res.status(HttpStatus.OK).json({
       message: SuccessMessage.OTP_VERIFIED,
@@ -95,11 +99,13 @@ export class AuthController {
   });
 
   logout = (req: Request, res: Response) => {
-    res.clearCookie('refreshToken', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-    });
+    // res.clearCookie('refreshToken', {
+    //   httpOnly: true,
+    //   secure: process.env.NODE_ENV === 'production',
+    //   sameSite: 'lax',
+    // });
+
+    this.SessionService.clerRefreshToken(res)
 
     return res.status(HttpStatus.OK).json({
       success: true,
@@ -131,13 +137,14 @@ export class AuthController {
     const { email, password } = req.body;
     const { user, accessToken, refreshToken } = await this.LoginUseCase.execute({ email, password });
 
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge:process.env.MAX_AGE,
-    });
+    // res.cookie('refreshToken', refreshToken, {
+    //   httpOnly: true,
+    //   secure: process.env.NODE_ENV === 'production',
+    //   sameSite: 'lax',
+    //   maxAge:process.env.MAX_AGE,
+    // });
 
+    this.SessionService.setRefreshToken(res,refreshToken)
     res.status(HttpStatus.OK).json({
       message: SuccessMessage.LOGIN_SUCCESS,
       user,
@@ -193,11 +200,13 @@ export class AuthController {
       role: user.role,
     });
 
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-    });
+    // res.cookie('refreshToken', refreshToken, {
+    //   httpOnly: true,
+    //   secure: process.env.NODE_ENV === 'production',
+    //   sameSite: 'lax',
+    // });
+
+    this.SessionService.setRefreshToken(res,refreshToken)
 
     res.redirect(`http://localhost:5173/oauth-success?token=${accessToken}`);
   };
@@ -206,12 +215,14 @@ export class AuthController {
     const { email, password } = req.body;
     const { user, accessToken, refreshToken } = await this.AdminLoginUseCase.execute({ email, password });
 
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge:process.env.MAX_AGE,
-    });
+    // res.cookie('refreshToken', refreshToken, {
+    //   httpOnly: true,
+    //   secure: process.env.NODE_ENV === 'production',
+    //   sameSite: 'lax',
+    //   maxAge:process.env.MAX_AGE,
+    // });
+        this.SessionService.setRefreshToken(res,refreshToken)
+
 
     res.status(HttpStatus.OK).json({
       message: SuccessMessage.LOGIN_SUCCESS,

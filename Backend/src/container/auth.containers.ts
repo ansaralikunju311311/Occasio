@@ -14,6 +14,7 @@ import { LoginUseCase } from '../application/usecases/auth/login/login.usecase';
 import { UpdatePasswordUseCase } from '../application/usecases/auth/updatepassword/updatepassword.usecase';
 import { ResetPasswordUseCase } from '../application/usecases/auth/resetPassword/reset.usecase';
 import { AdminLoginUseCase } from '../application/usecases/auth/adminLogin/adminLogin.usecase';
+import { SessionService } from '../common/services/session.service';
 export const MakeAdminController = () => {
   const userRepository = new UserRepository();
   const hashService = new BcryptHashService();
@@ -21,6 +22,8 @@ export const MakeAdminController = () => {
   const otpRespository = new OtpRepository();
   const tokenService = new CreateToken();
   const comapreService = new BcryptHashService();
+  const sessionservice = new SessionService();
+
 
   const signupUsecase = new SignupUsecase(
     userRepository,
@@ -77,6 +80,7 @@ export const MakeAdminController = () => {
     resetPasswordUseCase,
     updatePasswordUseCase,
     adminLoginUseCase,
+    sessionservice
   );
 };
 
