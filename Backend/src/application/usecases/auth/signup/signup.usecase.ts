@@ -18,15 +18,15 @@ import { UserOtp } from '../../../../common/enums/userotp-enum';
 import { IOtpRepository } from '../../../../domain/repositories/otp.repository.interface';
 export class SignupUsecase implements ISignupUseCase {
   constructor(
-    private userRepository: IUserRepository,
-    private hashService: IHashServive,
-    private emailService: EmailSerive,
-    private otpRespository: IOtpRepository,
+    private _userRepository: IUserRepository,
+    private _hashService: IHashServive,
+    private _emailService: EmailSerive,
+    private _otpRespository: IOtpRepository,
   ) {}
 
   async execute(data: signupDTO): Promise<OtpResponseDto | null> {
     console.log('Incoming signup data:', data);
-    const existingUser = await this.userRepository.findByEmail(data.email);
+    const existingUser = await this._userRepository.findByEmail(data.email);
     if (existingUser) {
       if (existingUser.isVerified) {
         throw new AppError(
@@ -43,7 +43,7 @@ export class SignupUsecase implements ISignupUseCase {
       );
     }
 
-    const hashpassword = await this.hashService.hash(data.password);
+    const hashpassword = await this._hashService.hash(data.password);
     const role: UserRole = UserRole.USER;
     const applyingupgrade = UpgradeStatus.NONE;
     // const isEventManger = false;
@@ -57,7 +57,7 @@ export class SignupUsecase implements ISignupUseCase {
     const otpExpires = new Date(Date.now() + 5 * 60 * 1000);
 
     const isUsed = false;
-    const checkig = await this.emailService.sendOtpEmail(data.email, otp);
+    const checkig = await this._emailService.sendOtpEmail(data.email, otp);
 
     //   email:string,
     //    otp:string,
@@ -96,12 +96,12 @@ export class SignupUsecase implements ISignupUseCase {
 
     let newUsers;
     if (existingUser && !existingUser.isVerified) {
-      newUsers = await this.userRepository.updateUser(newUser);
+      newUsers = await this._userRepository.updateUser(newUser);
     } else {
-      newUsers = await this.userRepository.createUser(newUser);
+      newUsers = await this._userRepository.createUser(newUser);
     }
 
-    const otpDetails = await this.otpRespository.otpStore(Otp);
+    const otpDetails = await this._otpRespository.otpStore(Otp);
 
     return otpDetails ? otpMapper.toResponse(otpDetails) : null;
   }

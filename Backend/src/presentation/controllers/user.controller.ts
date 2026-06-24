@@ -11,11 +11,11 @@ import { ISubscribeUseCase } from '../../application/usecases/user/subscribe/sub
 
 export class UserController {
   constructor(
-    private UpgradeUseCase: IUpgradeUseCase,
-    private ReapplyUseCase: IReapplyUseCase,
-    private EditProfileUseCase: IEditProfileUseCase,
-    private SubscribeUseCase: ISubscribeUseCase,
-    private GetMySubscriptionUseCase: IGetMySubscriptionUseCase
+    private _upgradeUseCase: IUpgradeUseCase,
+    private _reapplyUseCase: IReapplyUseCase,
+    private _editProfileUseCase: IEditProfileUseCase,
+    private _subscribeUseCase: ISubscribeUseCase,
+    private _getMySubscriptionUseCase: IGetMySubscriptionUseCase
   ) {}
 
   upgraderole = catchAsync(async (req: Request, res: Response) => {
@@ -31,7 +31,7 @@ export class UserController {
       organizationType,
     } = req.body;
 
-    const users = await this.UpgradeUseCase.execute({
+    const users = await this._upgradeUseCase.execute({
       email,
       fullName,
       organizationName,
@@ -63,13 +63,7 @@ export class UserController {
         return;
       }
 
-      // const subscribeUseCase = (this as any).SubscribeUseCase;
-      const updatedUser = await this.SubscribeUseCase.execute(userId, planId);
-      
-
-      
-
-
+      const updatedUser = await this._subscribeUseCase.execute(userId, planId);
 
       res.status(HttpStatus.OK).json({ success: true, message: 'Subscribed successfully', user: updatedUser });
     } catch (error: any) {
@@ -80,7 +74,7 @@ export class UserController {
   reapply = catchAsync(async (req: Request, res: Response) => {
     const userId = req.authUser!.userId;
 
-    const users = await this.ReapplyUseCase.execute(userId);
+    const users = await this._reapplyUseCase.execute(userId);
     res.status(HttpStatus.OK).json({
       message: SuccessMessage.REAPPLY_REQUEST_SENT,
       users,
@@ -91,7 +85,7 @@ export class UserController {
     const userId = req.authUser!.userId;
     const { name } = req.body;
 
-    const profile = await this.EditProfileUseCase.execute({ userId, name });
+    const profile = await this._editProfileUseCase.execute({ userId, name });
 
     res.status(HttpStatus.OK).json({
       profile,
@@ -100,11 +94,7 @@ export class UserController {
 
   getMySubscription = catchAsync(async (req: Request, res: Response) => {
     const userId = req.authUser!.userId;
-    // const getMySubscriptionUseCase = (this as any).GetMySubscriptionUseCase;
-           const subscription = await this.GetMySubscriptionUseCase.execute(userId);
-
-   
-
+    const subscription = await this._getMySubscriptionUseCase.execute(userId);
 
     res.status(HttpStatus.OK).json({
       success: true,

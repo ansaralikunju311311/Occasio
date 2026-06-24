@@ -8,17 +8,15 @@ import { IBookingRepository } from '../../../../domain/repositories/booking/book
 import { ISeatRepository } from '../../../../domain/repositories/seats/seat.repository.interface';
 import { IQrCodeService } from '../../../../common/interfaces/qr.interface';
 import { ITransactionManager } from '../../../../domain/services/transaction-manager.interface';
+
 export class ConfirmBookingUseCase implements IConfirmBookingUseCase{
-
   constructor(
-    private bookingRepository:IBookingRepository,
-    private seatRepository:ISeatRepository,
-    private  qrCode :IQrCodeService,
-      private transactionManager: ITransactionManager
+    private _bookingRepository: IBookingRepository,
+    private _seatRepository: ISeatRepository,
+    private _qrCode: IQrCodeService,
+    private _transactionManager: ITransactionManager
+  ) {}
 
-  ){
-
-  }
   async execute(
     userId: string,
     eventId: string,
@@ -27,13 +25,10 @@ export class ConfirmBookingUseCase implements IConfirmBookingUseCase{
     totalAmount: number,
     bookingType: 'physical' | 'online'
   ) {
-    // const session = await mongoose.startSession();
-    // session.startTransaction();
-    const session = await this.transactionManager.start();
+    const session = await this._transactionManager.start();
 
     try {
-      // const seats = await SeatModel.find({ seatNumber: { $in: seatIds }, eventId }).session(session);
-      const seats = await this.seatRepository.findSeats(seatIds,eventId,session)
+      const seats = await this._seatRepository.findSeats(seatIds,eventId,session)
       for (const seat of seats) {
         if (seat.status !== SeatStatus.LOCKED) {
           throw new Error(`Seat ${seat.seatNumber} is no longer locked.`);
@@ -42,16 +37,8 @@ export class ConfirmBookingUseCase implements IConfirmBookingUseCase{
           throw new Error(`Seat ${seat.seatNumber} is not locked by you.`);
         }
       }
-      // await SeatModel.updateMany(
-      //   { seatNumber: { $in: seatIds }, eventId },
-      //   { 
-      //     $set: { status: SeatStatus.BOOKED },
-      //     $unset: { lockExpiresAt: 1 } 
-      //   },
-      //   { session }
-      // );
 
-      await this.seatRepository.markBooked(eventId,
+      await this._seatRepository.markBooked(eventId,
         seatIds,
         session)
       const bookingReference = `BKG-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
@@ -61,11 +48,10 @@ export class ConfirmBookingUseCase implements IConfirmBookingUseCase{
         eventId,
         seats: seats.map(s => s.seatNumber)
       });
-      // const qrCodeData = await QRCode.toDataURL(qrDataString);
-      const qrCodeData = await this.qrCode.execute(qrDataString)
+      const qrCodeData = await this._qrCode.execute(qrDataString)
       const commissionAmount = totalAmount * 0.10;
       const organizerRevenue = totalAmount - commissionAmount;
-      const newBooking = await this.bookingRepository.saveBooking(new Booking(
+      const newBooking = await this._bookingRepository.saveBooking(new Booking(
         null,
         userId,
         eventId,
@@ -79,7 +65,7 @@ export class ConfirmBookingUseCase implements IConfirmBookingUseCase{
         qrCodeData
       ));
 
-     await this.transactionManager.commit(session);
+     await this._transactionManager.commit(session);
 
       return {
         message: 'Booking confirmed successfully',
@@ -87,7 +73,7 @@ export class ConfirmBookingUseCase implements IConfirmBookingUseCase{
         bookingReference
       };
     } catch (error) {
-      await this.transactionManager.rollback(session);
+      await this._transactionManager.rollback(session);
       throw error;
     }
   }

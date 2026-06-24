@@ -8,16 +8,16 @@ import { ISubscribeUseCase } from './subscribe.usecase.interface';
 
 export class SubscribeUseCase implements ISubscribeUseCase {
   constructor(
-    private userRepository: IUserRepository,
-    private subscriptionRepository: ISubscriptionRepository,
-    private managerSubscriptionRepository: IManagerSubscriptionRepository
+    private _userRepository: IUserRepository,
+    private _subscriptionRepository: ISubscriptionRepository,
+    private _managerSubscriptionRepository: IManagerSubscriptionRepository
   ) {}
 
   async execute(userId: string, planId: string): Promise<UserResponseDto> {
-    const user = await this.userRepository.findByIdUser(userId);
+    const user = await this._userRepository.findByIdUser(userId);
     if (!user) throw new Error('User not found');
 
-    const plan = await this.subscriptionRepository.findPlanById(planId);
+    const plan = await this._subscriptionRepository.findPlanById(planId);
     if (!plan) throw new Error('Plan not found');
 
     if (plan.price > 0) {
@@ -25,11 +25,11 @@ export class SubscribeUseCase implements ISubscribeUseCase {
     }
 
     if (user.activeSubscription) {
-      const managerSub = await this.managerSubscriptionRepository.findById(user.activeSubscription);
+      const managerSub = await this._managerSubscriptionRepository.findById(user.activeSubscription);
       
       if (managerSub) {
         // Prevent downgrade by checking prices if necessary. Wait, we need the price of the current plan.
-        const currentPlanDef = await this.subscriptionRepository.findPlanByName(managerSub.plan);
+        const currentPlanDef = await this._subscriptionRepository.findPlanByName(managerSub.plan);
         if (currentPlanDef && plan.price < currentPlanDef.price) {
           throw new Error('You cannot downgrade to a lower tier plan.');
         }
@@ -42,7 +42,7 @@ export class SubscribeUseCase implements ISubscribeUseCase {
         endDate.setMonth(endDate.getMonth() + 1);
         managerSub.endDate = endDate;
 
-        await this.managerSubscriptionRepository.update(managerSub.id as string, {
+        await this._managerSubscriptionRepository.update(managerSub.id as string, {
           plan: managerSub.plan,
           eventLimit: managerSub.eventLimit,
           eventsUsed: managerSub.eventsUsed,
@@ -58,7 +58,7 @@ export class SubscribeUseCase implements ISubscribeUseCase {
 
     user.eventsCreated = 0; // Reset quota on new subscription
 
-    const updatedUser = await this.userRepository.updateUser(user);
+    const updatedUser = await this._userRepository.updateUser(user);
     return userMapper.toResponse(updatedUser);
   }
 }

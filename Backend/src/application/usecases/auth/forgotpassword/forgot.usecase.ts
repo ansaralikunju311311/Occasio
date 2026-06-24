@@ -14,12 +14,12 @@ import { OtpResponseDto } from '../../../../application/dtos/responses/otp-respo
 import { IForgotpasswordUsecase } from './forgot.usecase.interface';
 export class ForgotpasswordUsecase implements IForgotpasswordUsecase {
   constructor(
-    private userRepository: IUserRepository,
-    private emailService: EmailSerive,
-    private otpRepository: IOtpRepository,
+    private _userRepository: IUserRepository,
+    private _emailService: EmailSerive,
+    private _otpRepository: IOtpRepository,
   ) {}
   async execute(email: string): Promise<OtpResponseDto | null> {
-    const data = await this.userRepository.findByEmail(email);
+    const data = await this._userRepository.findByEmail(email);
 
     if (!data) {
       throw new AppError(ErrorMessage.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
@@ -38,7 +38,7 @@ export class ForgotpasswordUsecase implements IForgotpasswordUsecase {
     const otp = generateOTP();
 
     const otpExpires = new Date(Date.now() + 5 * 60 * 1000);
-    await this.emailService.sendOtpEmail(data.email, otp);
+    await this._emailService.sendOtpEmail(data.email, otp);
     const otpSendAt = new Date();
     const isUsed = false;
     const otpType = UserOtp.FORGOT_PASSWORD;
@@ -73,7 +73,7 @@ export class ForgotpasswordUsecase implements IForgotpasswordUsecase {
       otpSendAt,
     );
 
-    const storedOtp = await this.otpRepository.otpStore(newUser);
+    const storedOtp = await this._otpRepository.otpStore(newUser);
     return storedOtp ? otpMapper.toResponse(storedOtp) : null;
   }
 }

@@ -5,51 +5,46 @@ import { IConfirmBookingUseCase } from '../../application/usecases/booking/confi
 import { IFailBookingUseCase } from '../../application/usecases/booking/bookingfailed/fail-booking.usecase.interface';
 import { catchAsync } from '../../common/utils/catchAsync';
 import { HttpStatus } from '../../common/constants/http-status';
+
 export class BookingController {
-  constructor(  private lockSeatsUseCase: ILockSeatsUseCase,
-  private mockPaymentUseCase: IMockPaymentUseCase,
-  private confirmBookingUseCase: IConfirmBookingUseCase,
-  private failBookingUseCase: IFailBookingUseCase) {}
+  constructor(
+    private _lockSeatsUseCase: ILockSeatsUseCase,
+    private _mockPaymentUseCase: IMockPaymentUseCase,
+    private _confirmBookingUseCase: IConfirmBookingUseCase,
+    private _failBookingUseCase: IFailBookingUseCase
+  ) {}
 
   lockSeats = catchAsync(async (req: Request, res: Response): Promise<void> => {
+    const { eventId, seatIds } = req.body;
+    const userId = (req as any).authUser?.userId;
     
-      const { eventId, seatIds } = req.body;
-      const userId = (req as any).authUser?.userId;
-      
-      const result = await this.lockSeatsUseCase.execute(userId, eventId, seatIds);
-      res.status(HttpStatus.OK).json(result);
-   
+    const result = await this._lockSeatsUseCase.execute(userId, eventId, seatIds);
+    res.status(HttpStatus.OK).json(result);
   });
 
   createPaymentIntent = catchAsync(async (req: Request, res: Response): Promise<void> => {
-   
-      const { eventId, amount } = req.body;
-      const userId = (req as any).authUser?.userId;
-      
-      const result = await this.mockPaymentUseCase.createPaymentIntent(userId, eventId, amount);
-      res.status(HttpStatus.OK).json(result);
+    const { eventId, amount } = req.body;
+    const userId = (req as any).authUser?.userId;
     
+    const result = await this._mockPaymentUseCase.createPaymentIntent(userId, eventId, amount);
+    res.status(HttpStatus.OK).json(result);
   });
 
   confirmBooking = catchAsync(async (req: Request, res: Response): Promise<void> => {
-   
-      const { eventId, seatIds, paymentId, totalAmount, bookingType } = req.body;
-      const userId = (req as any).authUser?.userId;
+    const { eventId, seatIds, paymentId, totalAmount, bookingType } = req.body;
+    const userId = (req as any).authUser?.userId;
 
-      const result = await this.confirmBookingUseCase.execute(
-        userId, eventId, seatIds, paymentId, totalAmount, bookingType
-      );
-      res.status(HttpStatus.OK).json(result);
-    
+    const result = await this._confirmBookingUseCase.execute(
+      userId, eventId, seatIds, paymentId, totalAmount, bookingType
+    );
+    res.status(HttpStatus.OK).json(result);
   });
 
   failBooking = catchAsync(async (req: Request, res: Response): Promise<void> => {
-    
-      const { seatIds } = req.body;
-      const userId = (req as any).authUser?.userId;
+    const { seatIds } = req.body;
+    const userId = (req as any).authUser?.userId;
 
-      const result = await this.failBookingUseCase.execute(userId, seatIds);
-      res.status(HttpStatus.OK).json(result);
-   
+    const result = await this._failBookingUseCase.execute(userId, seatIds);
+    res.status(HttpStatus.OK).json(result);
   });
 }

@@ -5,11 +5,11 @@ import { userMapper } from '../../../../common/mappers/user.mapper';
 import { UserResponseDto } from '../../../../application/dtos/responses/user-response.dto';
 import { IApprovalUseCase } from '../../admin/manageApproval/managerapproval.usecase.interface';
 export class GetmeUseCase implements IApprovalUseCase {
-  constructor(private userRepository: IUserRepository) {}
+  constructor(private _userRepository: IUserRepository) {}
 
   async execute(id: string): Promise<UserResponseDto | null> {
     console.log('evidunn as chyne', id);
-    const user = await this.userRepository.findByIdUser(id);
+    const user = await this._userRepository.findByIdUser(id);
     console.log('get the correct user', user);
 
     if (!user) {

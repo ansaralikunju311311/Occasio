@@ -5,12 +5,12 @@ import { ILockSeatsUseCase } from "./lock-seats.usecase.interface";
 
 export class LockSeatsUseCase implements ILockSeatsUseCase {
   constructor(
-    private eventRepository: IEventRepository,
-    private seatRepository: ISeatRepository
+    private _eventRepository: IEventRepository,
+    private _seatRepository: ISeatRepository
   ) {}
 
   async execute(userId: string, eventId: string, seatIds: string[]) {
-    const event = await this.eventRepository.findByIdEvents(eventId);
+    const event = await this._eventRepository.findByIdEvents(eventId);
 
     if (!event) throw new Error("Event not found");
 
@@ -33,7 +33,7 @@ export class LockSeatsUseCase implements ILockSeatsUseCase {
 
     try {
       for (const seatNumber of seatIds) {
-        const updatedSeat = await this.seatRepository.lockSeats(
+        const updatedSeat = await this._seatRepository.lockSeats(
           userId,
           eventId,
           seatNumber,
@@ -50,7 +50,7 @@ export class LockSeatsUseCase implements ILockSeatsUseCase {
         lockedSeats.push(updatedSeat);
       }
     } catch (error) {
-      await this.seatRepository.releaseSeats(
+      await this._seatRepository.releaseSeats(
         lockedSeats.map((seat) => seat._id)
       );
       throw error;

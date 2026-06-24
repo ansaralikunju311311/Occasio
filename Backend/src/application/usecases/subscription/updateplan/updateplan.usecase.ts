@@ -4,10 +4,10 @@ import { ResponsePlanDto } from "../../../dtos/responses/responseplan.dto";
 import { ISubscriptionRepository } from "../../../../domain/repositories/subscription/subscription.repository.interface";
 
 export class UpdatePlanUseCase implements IUpdatePlanUseCase {
-  constructor(private subscriptionRepository: ISubscriptionRepository) {}
+  constructor(private _subscriptionRepository: ISubscriptionRepository) {}
 
   async execute(id: string, data: Partial<CreatePlanDto>): Promise<ResponsePlanDto | null> {
-    const updatedPlan = await this.subscriptionRepository.update(id, data);
+    const updatedPlan = await this._subscriptionRepository.update(id, data);
     if (!updatedPlan) return null;
     return {
       id: updatedPlan.id!,

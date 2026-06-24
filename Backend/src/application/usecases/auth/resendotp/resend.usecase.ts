@@ -14,20 +14,20 @@ import { IResendUseCase } from './resend.usecase.interface';
 
 export class ResendotpUseCase implements IResendUseCase {
   constructor(
-    private userRepository: IUserRepository,
-    private emailService: EmailSerive,
-    private otpRepository: IOtpRepository,
+    private _userRepository: IUserRepository,
+    private _emailService: EmailSerive,
+    private _otpRepository: IOtpRepository,
   ) {}
 
   async execute(email: string): Promise<OtpResponseDto | null> {
-    const user = await this.userRepository.findByEmail(email);
+    const user = await this._userRepository.findByEmail(email);
 
     console.log('user', user);
     if (!user) {
       throw new AppError(ErrorMessage.USER_NOT_FOUND, HttpStatus.UNAUTHORIZED);
     }
 
-    let otpUser = await this.otpRepository.ResendOtp({ email: email });
+    let otpUser = await this._otpRepository.ResendOtp({ email: email });
 
     const now = new Date();
     console.log('the time now ', now);
@@ -78,9 +78,9 @@ export class ResendotpUseCase implements IResendUseCase {
       otpUser.otpSendAt = now;
     }
 
-    await this.emailService.sendOtpEmail(user.email, newOtp);
+    await this._emailService.sendOtpEmail(user.email, newOtp);
 
-    const storedOtp = await this.otpRepository.otpStore(otpUser);
+    const storedOtp = await this._otpRepository.otpStore(otpUser);
     return storedOtp ? otpMapper.toResponse(storedOtp) : null;
   }
 }

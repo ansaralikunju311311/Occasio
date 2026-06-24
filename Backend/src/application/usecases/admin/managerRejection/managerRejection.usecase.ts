@@ -6,21 +6,21 @@ import { UpgradeStatus } from '../../../../common/enums/upgrade-enums';
 import { IManagerRejectionUseCase } from './managerRejection.usecase.interface';
 export class ManagerRejectionUseCase implements IManagerRejectionUseCase{
   constructor(
-    private userRepository: IUserRepository,
-    private emailService: EmailSerive,
+    private _userRepository: IUserRepository,
+    private _emailService: EmailSerive,
   ) {}
   async execute(id: string, reason?: string): Promise<UserResponseDto | null> {
-    const user = await this.userRepository.findByIdUser(id);
+    const user = await this._userRepository.findByIdUser(id);
     console.log('user', user);
     if (!user) return null;
 
     user.rejectedAt = new Date();
     user.reapplyAt = new Date(Date.now() + 60 * 1000); // 1 minute cooldown
     user.applyingupgrade = UpgradeStatus.REJECTED;
-    const updatedUser = await this.userRepository.updateUser(user);
+    const updatedUser = await this._userRepository.updateUser(user);
 
     if (updatedUser) {
-      await this.emailService.sendRejectionEmail(
+      await this._emailService.sendRejectionEmail(
         updatedUser.email,
         updatedUser.name,
         reason,

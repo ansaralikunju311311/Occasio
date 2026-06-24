@@ -9,15 +9,16 @@ import { IVerifySubscriptionPaymentUseCase } from '../../application/usecases/pa
 import { HttpStatus } from '../../common/constants/http-status';
 import { IGetMyBookingUseCase } from '../../application/usecases/booking/getMybookings/getmybooking.usecase.interface';
 import { IGetManagerBookingUseCase } from '../../application/usecases/booking/getManagerbookings/getmanagerbooking.usecase.interface';
+
 export class PaymentController {
   constructor(
-    private createOrderUseCase: ICreateOrderUseCase,
-    private verifyPaymentUseCase: IVerifyPaymentUseCase,
-    private getBreakdownUseCase: IGetBreakdownUseCase,
-    private createSubscriptionOrderUseCase: ICreateSubscriptionOrderUseCase,
-    private verifySubscriptionPaymentUseCase: IVerifySubscriptionPaymentUseCase,
-    private getMybookingUseCase:IGetMyBookingUseCase,
-    private getManagerBookingUseCase:IGetManagerBookingUseCase
+    private _createOrderUseCase: ICreateOrderUseCase,
+    private _verifyPaymentUseCase: IVerifyPaymentUseCase,
+    private _getBreakdownUseCase: IGetBreakdownUseCase,
+    private _createSubscriptionOrderUseCase: ICreateSubscriptionOrderUseCase,
+    private _verifySubscriptionPaymentUseCase: IVerifySubscriptionPaymentUseCase,
+    private _getMybookingUseCase: IGetMyBookingUseCase,
+    private _getManagerBookingUseCase: IGetManagerBookingUseCase
   ) {}
 
   createSubscriptionOrder = async (req: Request, res: Response) => {
@@ -29,7 +30,7 @@ export class PaymentController {
         return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Unauthorized' });
       }
 
-      const order = await this.createSubscriptionOrderUseCase.execute(userId, planId);
+      const order = await this._createSubscriptionOrderUseCase.execute(userId, planId);
 
       return res.status(HttpStatus.OK).json({
         success: true,
@@ -48,7 +49,7 @@ export class PaymentController {
         return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Unauthorized' });
       }
 
-      const result = await this.verifySubscriptionPaymentUseCase.execute(req.body, userId);
+      const result = await this._verifySubscriptionPaymentUseCase.execute(req.body, userId);
 
       return res.status(HttpStatus.OK).json(result);
     } catch (error: any) {
@@ -65,7 +66,7 @@ export class PaymentController {
         return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Unauthorized' });
       }
 
-      const order = await this.createOrderUseCase.execute(eventId, userId);
+      const order = await this._createOrderUseCase.execute(eventId, userId);
 
       return res.status(HttpStatus.OK).json({
         success: true,
@@ -85,7 +86,7 @@ export class PaymentController {
         return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Unauthorized' });
       }
 
-      const order = await this.createOrderUseCase.execute(
+      const order = await this._createOrderUseCase.execute(
         eventId,
         userId,
         amount,
@@ -111,7 +112,7 @@ export class PaymentController {
         return res.status(HttpStatus.BAD_REQUEST).json({ message: 'Invalid query parameters' });
       }
 
-      const breakdown = await this.getBreakdownUseCase.execute(eventId, amount);
+      const breakdown = await this._getBreakdownUseCase.execute(eventId, amount);
       return res.status(HttpStatus.OK).json({ success: true, breakdown });
     } catch (error: any) {
       return res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: error.message });
@@ -128,9 +129,7 @@ export class PaymentController {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
 
-      // const result = await this.bookingRepository.getBookingsByUser(userId, { page, limit });
-
-      const result = await this.getMybookingUseCase.execute(userId,page,limit)
+      const result = await this._getMybookingUseCase.execute(userId,page,limit)
       return res.status(HttpStatus.OK).json({ success: true, ...result });
     } catch (error: any) {
       return res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: error.message });
@@ -148,7 +147,7 @@ export class PaymentController {
       const limit = parseInt(req.query.limit as string) || 10;
 
 
-      const result = await this.getManagerBookingUseCase.execute(managerId,page,limit)
+      const result = await this._getManagerBookingUseCase.execute(managerId,page,limit)
       return res.status(HttpStatus.OK).json({ success: true, ...result });
     } catch (error: any) {
       return res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: error.message });
@@ -163,7 +162,7 @@ export class PaymentController {
         return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Unauthorized' });
       }
 
-      const result = await this.verifyPaymentUseCase.execute(req.body, userId);
+      const result = await this._verifyPaymentUseCase.execute(req.body, userId);
 
       return res.status(HttpStatus.OK).json(result);
     } catch (error: any) {

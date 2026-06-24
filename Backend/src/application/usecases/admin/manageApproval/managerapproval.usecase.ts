@@ -14,13 +14,13 @@ import { ISubscriptionRepository } from '../../../../domain/repositories/subscri
 import { PlanType } from '../../../../common/enums/plan-enum';
 export class ManagerApprovalUseCase implements IApprovalUseCase {
   constructor(
-    private userRepository: IUserRepository,
-    private emailService: EmailSerive,
-    private managerSubscriptionRepository: IManagerSubscriptionRepository,
-    private subscriptionRepository: ISubscriptionRepository
+    private _userRepository: IUserRepository,
+    private _emailService: EmailSerive,
+    private _managerSubscriptionRepository: IManagerSubscriptionRepository,
+    private _subscriptionRepository: ISubscriptionRepository
   ) {}
   async execute(id: string): Promise<UserResponseDto | null> {
-    const user = await this.userRepository.findByIdUser(id);
+    const user = await this._userRepository.findByIdUser(id);
     console.log(user);
 
     if (!user) return null;
@@ -29,7 +29,7 @@ export class ManagerApprovalUseCase implements IApprovalUseCase {
     session.startTransaction();
 
     try {
-      const freePlan = await this.subscriptionRepository.findPlanByName(PlanType.FREE);
+      const freePlan = await this._subscriptionRepository.findPlanByName(PlanType.FREE);
       const eventLimit = freePlan ? freePlan.eventLimit : 2;
 
       const startDate = new Date();
@@ -44,19 +44,19 @@ export class ManagerApprovalUseCase implements IApprovalUseCase {
         startDate
       );
 
-      const createdSubscription = await this.managerSubscriptionRepository.create(newSubscription, session);
+      const createdSubscription = await this._managerSubscriptionRepository.create(newSubscription, session);
 
       user.role = UserRole.EVENT_MANAGER;
       user.rejectedAt = null;
       user.applyingupgrade = UpgradeStatus.APPROVED;
       user.activeSubscription = createdSubscription.id;
       
-      const updatedUser = await this.userRepository.updateUser(user, session);
+      const updatedUser = await this._userRepository.updateUser(user, session);
 
       await session.commitTransaction();
 
       if (updatedUser) {
-        await this.emailService.sendApprovalEmail(
+        await this._emailService.sendApprovalEmail(
           updatedUser.email,
           updatedUser.name,
         );

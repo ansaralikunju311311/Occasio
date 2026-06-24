@@ -4,13 +4,13 @@ import { IGoogleLoginUseCase } from "./googleLogin.usecase.interface";
 export class GoogleLogin implements IGoogleLoginUseCase
 {
     constructor(
-     private tokenService : ITokenService
+     private _tokenService : ITokenService
     ){}
 
 
     async execute(userId: string, role: string): Promise<{ accessToken: string; refreshToken: string; }> {
        
-          const accessToken =  this.tokenService.generateAccessToken({
+          const accessToken =  this._tokenService.generateAccessToken({
             userId,
             role
 
@@ -18,7 +18,7 @@ export class GoogleLogin implements IGoogleLoginUseCase
 
 
 
-          const refreshToken =  this.tokenService.generateRefreshToken({
+          const refreshToken =  this._tokenService.generateRefreshToken({
             userId,role
           })
 

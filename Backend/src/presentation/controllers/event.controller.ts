@@ -11,17 +11,17 @@ import { IUpdateEventUseCase } from '../../application/usecases/events/updateven
 
 export class EventController {
   constructor(
-    private eventCreationUseCase: IEventCreationUseCase,
-    private getEventsUseCase: IGetEventsUseCase,
-    private eventDetailsUseCase: IEventDetailsUseCase,
-    private myEventsUseCase: IMyEventsUseCase,
-    private updateEventsUseCase: IUpdateEventUseCase,
-    private deleteEventUseCase: IDeleteEventUseCase,
+    private _eventCreationUseCase: IEventCreationUseCase,
+    private _getEventsUseCase: IGetEventsUseCase,
+    private _eventDetailsUseCase: IEventDetailsUseCase,
+    private _myEventsUseCase: IMyEventsUseCase,
+    private _updateEventsUseCase: IUpdateEventUseCase,
+    private _deleteEventUseCase: IDeleteEventUseCase,
   ) {}
 
   eventCreation = catchAsync(async (req: Request, res: Response) => {
     const userId = req.authUser!.userId;
-    const creation = await this.eventCreationUseCase.execute(req.body, userId);
+    const creation = await this._eventCreationUseCase.execute(req.body, userId);
 
     res.status(HttpStatus.OK).json({
       creation,
@@ -39,7 +39,7 @@ export class EventController {
     const limit = parseInt(req.query.limit as string) || 10;
 
     const isAdmin = user && user.role === UserRole.ADMIN;
-    const result = await this.getEventsUseCase.execute({
+    const result = await this._getEventsUseCase.execute({
       eventType,
       search,
       page,
@@ -61,7 +61,7 @@ export class EventController {
 
   eventDetails = catchAsync(async (req: Request, res: Response) => {
     const id = req.params.id as string;
-    const events = await this.eventDetailsUseCase.execute(id);
+    const events = await this._eventDetailsUseCase.execute(id);
     res.status(HttpStatus.OK).json({
       events,
     });
@@ -73,7 +73,7 @@ export class EventController {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
 
-    const result = await this.myEventsUseCase.execute(userId, { search, page, limit });
+    const result = await this._myEventsUseCase.execute(userId, { search, page, limit });
     res.status(HttpStatus.OK).json({
       events: result?.data || [],
       metadata: result?.metadata,
@@ -88,7 +88,7 @@ export class EventController {
 
     console.log("the req.body",req.body)
 
-    const result = await this.updateEventsUseCase.execute(id, managerId, req.body);
+    const result = await this._updateEventsUseCase.execute(id, managerId, req.body);
     res.status(HttpStatus.OK).json({
       data: result,
     });
@@ -96,7 +96,7 @@ export class EventController {
 
   deleteEvent = catchAsync(async (req: Request, res: Response) => {
     const id = req.params.id as string;
-    const result = await this.deleteEventUseCase.execute(id);
+    const result = await this._deleteEventUseCase.execute(id);
     res.status(HttpStatus.OK).json({
       success: result,
     });

@@ -4,10 +4,10 @@ import { UserResponseDto } from '../../../../application/dtos/responses/user-res
 import { IUserdetailsUseCase } from './userdetails.usecase.interface';
 
 export class UserDetailsUseCase implements IUserdetailsUseCase {
-  constructor(private userRepository: IUserRepository) {}
+  constructor(private _userRepository: IUserRepository) {}
 
   async execute(userId: string): Promise<UserResponseDto | null> {
-    const user = await this.userRepository.findByIdUser(userId);
+    const user = await this._userRepository.findByIdUser(userId);
     if (!user) return null;
 
     return userMapper.toResponse(user);

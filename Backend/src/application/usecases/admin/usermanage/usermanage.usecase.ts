@@ -5,15 +5,15 @@ import { IUserRepository } from '../../../../domain/repositories/user.repository
 import { UserStatus } from '../../../../common/enums/userstatus-enum';
 import { IUserManageUseCase } from './usermanage.usecase.interface';
 export class UserManageUseCase implements IUserManageUseCase {
-  constructor(private userRepository: IUserRepository) {}
+  constructor(private _userRepository: IUserRepository) {}
 
   async execute(data: ManageDto): Promise<UserResponseDto | null> {
-    const user = await this.userRepository.findByIdUser(data.userId);
+    const user = await this._userRepository.findByIdUser(data.userId);
 
     if (!user) return null;
 
     user.status = data.status as UserStatus;
-    const updatedUser = await this.userRepository.updateUser(user);
+    const updatedUser = await this._userRepository.updateUser(user);
     return updatedUser ? userMapper.toResponse(updatedUser) : null;
   }
 }

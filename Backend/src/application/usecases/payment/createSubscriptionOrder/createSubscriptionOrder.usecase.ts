@@ -6,24 +6,24 @@ import { IManagerSubscriptionRepository } from '../../../../domain/repositories/
 
 export class CreateSubscriptionOrderUseCase implements ICreateSubscriptionOrderUseCase {
   constructor(
-    private paymentGateway: IPaymentGateway,
-    private userRepository: IUserRepository,
-    private subscriptionRepository: ISubscriptionRepository,
-    private managerSubscriptionRepository: IManagerSubscriptionRepository
+    private _paymentGateway: IPaymentGateway,
+    private _userRepository: IUserRepository,
+    private _subscriptionRepository: ISubscriptionRepository,
+    private _managerSubscriptionRepository: IManagerSubscriptionRepository
   ) {}
 
   async execute(userId: string, planId: string): Promise<any> {
-    const user = await this.userRepository.findByIdUser(userId);
+    const user = await this._userRepository.findByIdUser(userId);
     if (!user) throw new Error('User not found');
 
-    const targetPlan = await this.subscriptionRepository.findPlanById(planId);
+    const targetPlan = await this._subscriptionRepository.findPlanById(planId);
     if (!targetPlan) throw new Error('Target plan not found');
 
     // Downgrade Prevention Logic
     if (user.activeSubscription) {
-      const managerSub = await this.managerSubscriptionRepository.findById(user.activeSubscription);
+      const managerSub = await this._managerSubscriptionRepository.findById(user.activeSubscription);
       if (managerSub) {
-        const currentPlanDef = await this.subscriptionRepository.findPlanByName(managerSub.plan);
+        const currentPlanDef = await this._subscriptionRepository.findPlanByName(managerSub.plan);
         if (currentPlanDef && targetPlan.price < currentPlanDef.price) {
           throw new Error('You cannot downgrade to a lower tier plan.');
         }
@@ -36,7 +36,7 @@ export class CreateSubscriptionOrderUseCase implements ICreateSubscriptionOrderU
 
     // Generate Razorpay Order
     try {
-      const order = await this.paymentGateway.createOrder(targetPlan.id?.toString() || planId, targetPlan.price, 'subscription');
+      const order = await this._paymentGateway.createOrder(targetPlan.id?.toString() || planId, targetPlan.price, 'subscription');
       return order;
     } catch (error: any) {
       console.error("Razorpay order creation failed:", error);

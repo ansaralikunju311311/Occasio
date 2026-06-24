@@ -10,7 +10,7 @@ import { getLocationName } from '../../../../common/services/location.service';
 import { normalizeCoordinates } from '../../../../common/utils/geo.utils';
 
 export class UpdateEventUseCase implements IUpdateEventUseCase {
-  constructor(private eventRepository: IEventRepository) {}
+  constructor(private _eventRepository: IEventRepository) {}
 
   async execute(
     eventId: string,
@@ -21,7 +21,7 @@ export class UpdateEventUseCase implements IUpdateEventUseCase {
     session.startTransaction();
 
     try {
-      const event = await this.eventRepository.findByIdEvents(eventId);
+      const event = await this._eventRepository.findByIdEvents(eventId);
 
       if (!event) {
         await session.abortTransaction();
@@ -71,13 +71,13 @@ export class UpdateEventUseCase implements IUpdateEventUseCase {
         }
       }
 
-      await this.eventRepository.updateEvent(eventId, data, session, unsetData);
+      await this._eventRepository.updateEvent(eventId, data, session, unsetData);
 
       if (currentEventType === EventType.ONLINE) {
-        await this.eventRepository.deleteSeatsByEventId(eventId, session);
-        await this.eventRepository.deleteLayoutByEventId(eventId, session);
+        await this._eventRepository.deleteSeatsByEventId(eventId, session);
+        await this._eventRepository.deleteLayoutByEventId(eventId, session);
 
-        await this.eventRepository.updateEventLayout(eventId, null, session);
+        await this._eventRepository.updateEventLayout(eventId, null, session);
       }
 
       if (
@@ -85,10 +85,10 @@ export class UpdateEventUseCase implements IUpdateEventUseCase {
         currentEventType === EventType.HYBRID
       ) {
         if (data.layout) {
-          await this.eventRepository.deleteSeatsByEventId(eventId, session);
-          await this.eventRepository.deleteLayoutByEventId(eventId, session);
+          await this._eventRepository.deleteSeatsByEventId(eventId, session);
+          await this._eventRepository.deleteLayoutByEventId(eventId, session);
 
-          const layout = await this.eventRepository.createSeatLayout(
+          const layout = await this._eventRepository.createSeatLayout(
             {
               eventId: eventId,
               blocks: data.layout.blocks,
@@ -97,7 +97,7 @@ export class UpdateEventUseCase implements IUpdateEventUseCase {
           );
 
           
-          await this.eventRepository.updateEventLayout(
+          await this._eventRepository.updateEventLayout(
             eventId,
             layout._id,
             session,
@@ -108,7 +108,7 @@ export class UpdateEventUseCase implements IUpdateEventUseCase {
       await session.commitTransaction();
       session.endSession();
 
-      const updatedEvent = await this.eventRepository.findByIdEvents(eventId);
+      const updatedEvent = await this._eventRepository.findByIdEvents(eventId);
       return updatedEvent ? eventMapper.toResponse(updatedEvent) : null;
 
     } catch (error) {

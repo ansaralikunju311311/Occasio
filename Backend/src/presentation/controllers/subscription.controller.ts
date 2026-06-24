@@ -7,21 +7,21 @@ import { IUpdatePlanUseCase } from '../../application/usecases/subscription/upda
 
 export class PlanController {
   constructor(
-    private createPlansUseCase: ICreatePlanUseCase,
-    private getPlansUseCase: IGetPlansUseCase,
-    private updatePlanUseCase: IUpdatePlanUseCase
+    private _createPlansUseCase: ICreatePlanUseCase,
+    private _getPlansUseCase: IGetPlansUseCase,
+    private _updatePlanUseCase: IUpdatePlanUseCase
   ) {}
 
   createPlans = catchAsync(async (req: Request, res: Response) => {
     console.log("data", req.body);
-    const plans = await this.createPlansUseCase.execute(req.body);
+    const plans = await this._createPlansUseCase.execute(req.body);
     res.status(HttpStatus.OK).json({
       plans,
     });
   });
 
   getPlans = catchAsync(async (req: Request, res: Response) => {
-    const plans = await this.getPlansUseCase.execute();
+    const plans = await this._getPlansUseCase.execute();
     res.status(HttpStatus.OK).json({
       plans,
     });
@@ -29,7 +29,7 @@ export class PlanController {
 
   updatePlan = catchAsync(async (req: Request, res: Response) => {
     const id = req.params.id as string;
-    const plan = await this.updatePlanUseCase.execute(id, req.body);
+    const plan = await this._updatePlanUseCase.execute(id, req.body);
     res.status(HttpStatus.OK).json({
       plan,
     });

@@ -6,11 +6,11 @@ export class CreatePlanUseCase implements ICreatePlanUseCase{
 
 
     constructor(
-        private subscriptionRepository :ISubscriptionRepository
+        private _subscriptionRepository :ISubscriptionRepository
     ){}
     async execute(data: CreatePlanDto): Promise<ResponsePlanDto | null> {
         
-       const plan = await this.subscriptionRepository.createPlan(data as any);
+       const plan = await this._subscriptionRepository.createPlan(data as any);
 
        return {
          id: plan.id!,

@@ -3,9 +3,9 @@ import { IPaymentRepository } from '../../../../domain/repositories/payment/paym
 import { PaginatedResponse, PaginationParams } from '../../../../common/interfaces/pagination.interface';
 
 export class GetAllPaymentsUseCase implements IGetAllPaymentsUseCase {
-  constructor(private paymentRepository: IPaymentRepository) {}
+  constructor(private _paymentRepository: IPaymentRepository) {}
 
   async execute(params: PaginationParams): Promise<PaginatedResponse<any>> {
-    return await this.paymentRepository.getAllPayments(params);
+    return await this._paymentRepository.getAllPayments(params);
   }
 }

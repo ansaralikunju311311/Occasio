@@ -3,10 +3,10 @@ import { ManagerResponseDto } from '../../../../application/dtos/responses/manag
 import { IEventManagerRepository } from '../../../../domain/repositories/manger.repository.interface';
 import { IManagerDetailsUseCase } from './managerdetails.usecase.interface';
 export class ManagerDetailsUseCase implements IManagerDetailsUseCase {
-  constructor(private managerRepository: IEventManagerRepository) {}
+  constructor(private _managerRepository: IEventManagerRepository) {}
 
   async execute(id: string): Promise<ManagerResponseDto | null> {
-    const manager = await this.managerRepository.findByIdManager(id);
+    const manager = await this._managerRepository.findByIdManager(id);
     if (!manager) return null;
     return managerMapper.toResponse(manager);
   }

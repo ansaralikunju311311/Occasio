@@ -17,17 +17,17 @@ import { ManagerSubscription } from '../../../../domain/entities/manager-subscri
 
 export class EventCretionUseCase implements IEventCreationUseCase {
   constructor(
-    private eventRepository: IEventRepository,
-    private userRepository: IUserRepository,
-    private subscriptionRepository: ISubscriptionRepository,
-    private managerSubscriptionRepository: IManagerSubscriptionRepository
+    private _eventRepository: IEventRepository,
+    private _userRepository: IUserRepository,
+    private _subscriptionRepository: ISubscriptionRepository,
+    private _managerSubscriptionRepository: IManagerSubscriptionRepository
   ) {}
 
   async execute(
     data: EventDto,
     userId: string,
   ): Promise<EventResponseDto | null> {
-    const user = await this.userRepository.findByIdUser(userId);
+    const user = await this._userRepository.findByIdUser(userId);
     console.log("user details i am showing the time of creation",user)
     if (!user) {
       throw new Error('User not found');
@@ -35,7 +35,7 @@ export class EventCretionUseCase implements IEventCreationUseCase {
 
     let activeSub: ManagerSubscription | null = null;
     if (user.activeSubscription) {
-      activeSub = await this.managerSubscriptionRepository.findById(user.activeSubscription);
+      activeSub = await this._managerSubscriptionRepository.findById(user.activeSubscription);
 
       console.log("the event creator has manager subscription", activeSub);
       if (activeSub) {
@@ -103,7 +103,7 @@ export class EventCretionUseCase implements IEventCreationUseCase {
           location?.coordinates?.[1] ?? 0,
         );
 
-        const conflict = await this.eventRepository.findExactConflict(
+        const conflict = await this._eventRepository.findExactConflict(
           longitude,
           latitude,
           new Date(startTime),
@@ -140,7 +140,7 @@ export class EventCretionUseCase implements IEventCreationUseCase {
         undefined, // seats
       );
 
-      const event = await this.eventRepository.createEvent(
+      const event = await this._eventRepository.createEvent(
         eventEntity,
         session,
       );
@@ -150,7 +150,7 @@ export class EventCretionUseCase implements IEventCreationUseCase {
           throw new Error('Seat layout blocks are required');
         }
 
-        const layout = await this.eventRepository.createSeatLayout(
+        const layout = await this._eventRepository.createSeatLayout(
           {
             eventId: event.id,
             blocks: data.layout.blocks,
@@ -164,7 +164,7 @@ export class EventCretionUseCase implements IEventCreationUseCase {
           throw new Error('Event ID not generated');
         }
 
-        await this.eventRepository.updateEventLayout(
+        await this._eventRepository.updateEventLayout(
           event.id,
           layout._id,
           session,
@@ -172,11 +172,11 @@ export class EventCretionUseCase implements IEventCreationUseCase {
       }
 
       user.eventsCreated = (user.eventsCreated || 0) + 1;
-      await this.userRepository.updateUser(user, session);
+      await this._userRepository.updateUser(user, session);
 
       if (activeSub && activeSub.id) {
         activeSub.eventsUsed = (activeSub.eventsUsed || 0) + 1;
-        await this.managerSubscriptionRepository.update(activeSub.id, { eventsUsed: activeSub.eventsUsed }, session);
+        await this._managerSubscriptionRepository.update(activeSub.id, { eventsUsed: activeSub.eventsUsed }, session);
       }
 
       await session.commitTransaction();

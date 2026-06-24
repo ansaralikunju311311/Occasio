@@ -9,12 +9,12 @@ import { IUpgradeUseCase } from './upgaradeRole.usecase.interface';
 
 export class UpgradeUseCase implements IUpgradeUseCase {
   constructor(
-    private userRepository: IUserRepository,
-    private managerRepository: IEventManagerRepository,
+    private _userRepository: IUserRepository,
+    private _managerRepository: IEventManagerRepository,
   ) {}
 
   async execute(data: UpgraderoleDto): Promise<UserResponseDto | null> {
-    const user = await this.userRepository.findByEmail(data.email);
+    const user = await this._userRepository.findByEmail(data.email);
 
     if (!user || !user.id) return null;
 
@@ -35,10 +35,10 @@ export class UpgradeUseCase implements IUpgradeUseCase {
 
     console.log('cheking for tthe request');
 
-    await this.managerRepository.createManager(request);
+    await this._managerRepository.createManager(request);
 
     user.applyingupgrade = UpgradeStatus.PENDING;
-    const updatedUser = await this.userRepository.updateUser(user);
+    const updatedUser = await this._userRepository.updateUser(user);
     return updatedUser ? userMapper.toResponse(updatedUser) : null;
   }
 }

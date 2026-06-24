@@ -16,17 +16,17 @@ export class ManagerSubscriptionRepository implements IManagerSubscriptionReposi
       endDate: subscription.endDate,
     }], { session });
 
-    return this.toEntity(createdDocs[0]);
+    return this._toEntity(createdDocs[0]);
   }
 
   async findById(id: string): Promise<ManagerSubscription | null> {
     const doc = await ManagerSubscriptionModel.findById(id).exec();
-    return doc ? this.toEntity(doc) : null;
+    return doc ? this._toEntity(doc) : null;
   }
 
   async findByUserId(userId: string): Promise<ManagerSubscription[]> {
     const docs = await ManagerSubscriptionModel.find({ userId }).exec();
-    return docs.map(doc => this.toEntity(doc));
+    return docs.map(doc => this._toEntity(doc));
   }
 
   async update(id: string, updateData: Partial<ManagerSubscription>, session?: any): Promise<ManagerSubscription | null> {
@@ -35,10 +35,10 @@ export class ManagerSubscriptionRepository implements IManagerSubscriptionReposi
       mappedUpdateData.plan = updateData.plan as unknown as PlanType;
     }
     const doc = await ManagerSubscriptionModel.findByIdAndUpdate(id, mappedUpdateData, { new: true, session }).exec();
-    return doc ? this.toEntity(doc) : null;
+    return doc ? this._toEntity(doc) : null;
   }
 
-  private toEntity(doc: any): ManagerSubscription {
+  private _toEntity(doc: any): ManagerSubscription {
     return new ManagerSubscription(
       doc._id.toString(),
       doc.userId.toString(),

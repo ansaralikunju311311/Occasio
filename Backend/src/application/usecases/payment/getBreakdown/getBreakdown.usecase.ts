@@ -8,19 +8,19 @@ export interface IGetBreakdownUseCase {
 
 export class GetBreakdownUseCase implements IGetBreakdownUseCase {
   constructor(
-    private eventRepository: IEventRepository,
-    private userRepository: IUserRepository,
-    private subscriptionRepository: ISubscriptionRepository
+    private _eventRepository: IEventRepository,
+    private _userRepository: IUserRepository,
+    private _subscriptionRepository: ISubscriptionRepository
   ) {}
 
   async execute(eventId: string, amount: number): Promise<any> {
-    const event = await this.eventRepository.findByIdEvents(eventId);
+    const event = await this._eventRepository.findByIdEvents(eventId);
     if (!event) {
       throw new Error('Event not found');
     }
 
     const creatorId = event.createdBy;
-    const creator = await this.userRepository.findByIdUser(creatorId);
+    const creator = await this._userRepository.findByIdUser(creatorId);
     if (!creator) {
       throw new Error('Event creator not found');
     }
@@ -29,7 +29,7 @@ export class GetBreakdownUseCase implements IGetBreakdownUseCase {
     let planName = 'No Subscription';
 
     if (creator.activeSubscription) {
-      const plan = await this.subscriptionRepository.findPlanById(creator.activeSubscription);
+      const plan = await this._subscriptionRepository.findPlanById(creator.activeSubscription);
       if (plan) {
         commissionPercentage = plan.commissionPercentage;
         planName = plan.name;

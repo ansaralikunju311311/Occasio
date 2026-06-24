@@ -6,10 +6,10 @@ import { UserResponseDto } from '../../../../application/dtos/responses/user-res
 import { userMapper } from '../../../../common/mappers/user.mapper';
 
 export class EditProfileUseCase implements IEditProfileUseCase {
-  constructor(private userRepository: IUserRepository) {}
+  constructor(private _userRepository: IUserRepository) {}
 
   async execute(datas: EditProfileDto): Promise<UserResponseDto | null> {
-    const data = await this.userRepository.findByIdUser(datas.userId);
+    const data = await this._userRepository.findByIdUser(datas.userId);
 
     if (!data) return null;
 
@@ -25,7 +25,7 @@ export class EditProfileUseCase implements IEditProfileUseCase {
       data.rejectedAt,
       data.reapplyAt,
     );
-    const updatedUser = await this.userRepository.updateUser(newUser);
+    const updatedUser = await this._userRepository.updateUser(newUser);
     return userMapper.toResponse(updatedUser);
   }
 }

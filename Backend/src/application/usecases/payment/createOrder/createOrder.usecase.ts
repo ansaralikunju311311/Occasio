@@ -11,11 +11,11 @@ import { SeatStatus } from '../../../../common/enums/searstatus-enum';
 
 export class CreateOrderUseCase implements ICreateOrderUseCase {
   constructor(
-    private paymentGateway: IPaymentGateway,
-    private eventRepository: IEventRepository,
-    private userRepository: IUserRepository,
-    private subscriptionRepository: ISubscriptionRepository,
-    private bookingRepository: IBookingRepository
+    private _paymentGateway: IPaymentGateway,
+    private _eventRepository: IEventRepository,
+    private _userRepository: IUserRepository,
+    private _subscriptionRepository: ISubscriptionRepository,
+    private _bookingRepository: IBookingRepository
   ) {}
 
   async execute(
@@ -27,13 +27,13 @@ export class CreateOrderUseCase implements ICreateOrderUseCase {
   ): Promise<any> {
     if (!amount) {
       // Event publishing fee flow (fixed amount 99)
-      await this.eventRepository.validateOwnershipAndDraft(eventId, userId);
-      return await this.paymentGateway.createOrder(eventId, 99);
+      await this._eventRepository.validateOwnershipAndDraft(eventId, userId);
+      return await this._paymentGateway.createOrder(eventId, 99);
     }
 
     // Ticket booking flow
     // 1. Fetch event to validate existence and ownership
-    const event = await this.eventRepository.findByIdEvents(eventId);
+    const event = await this._eventRepository.findByIdEvents(eventId);
     if (!event) {
       throw new Error('Event not found');
     }
@@ -57,11 +57,11 @@ export class CreateOrderUseCase implements ICreateOrderUseCase {
       }
     }
 
-    const creator = await this.userRepository.findByIdUser(event.createdBy);
+    const creator = await this._userRepository.findByIdUser(event.createdBy);
     let commissionPercentage = 10; // Default 10% if no active subscription
 
     if (creator && creator.activeSubscription) {
-      const plan = await this.subscriptionRepository.findPlanById(creator.activeSubscription);
+      const plan = await this._subscriptionRepository.findPlanById(creator.activeSubscription);
       if (plan) {
         commissionPercentage = plan.commissionPercentage;
       }
@@ -72,7 +72,7 @@ export class CreateOrderUseCase implements ICreateOrderUseCase {
     const organizerRevenue = parseFloat((amount - commissionAmount).toFixed(2));
 
     // 3. Create Razorpay order
-    const order = await this.paymentGateway.createOrder(eventId, totalAmount);
+    const order = await this._paymentGateway.createOrder(eventId, totalAmount);
 
     // 4. Create pending booking record in the database
     const booking = new Booking(
@@ -88,7 +88,7 @@ export class CreateOrderUseCase implements ICreateOrderUseCase {
       order.id // Razorpay Order ID
     );
 
-    await this.bookingRepository.saveBooking(booking);
+    await this._bookingRepository.saveBooking(booking);
 
     return order;
   }

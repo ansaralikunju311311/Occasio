@@ -3,10 +3,10 @@ import { IBookingRepository } from "../../../../domain/repositories/booking/book
 
 export class GetMyBookingUseCase implements IGetMyBookingUseCase{
     constructor(
-            private bookingRepository:IBookingRepository
+            private _bookingRepository:IBookingRepository
         ){}
    async execute(userId: string, page: number, limit: number){
         
-    return this.bookingRepository.getBookingsByUser(userId,{page,limit})
+    return this._bookingRepository.getBookingsByUser(userId,{page,limit})
     }
 }

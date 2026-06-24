@@ -8,11 +8,11 @@ import { eventMapper } from '../../../../common/mappers/event.mapper';
 import { EventResponseDto } from '../../../../application/dtos/responses/event-response.dto';
 
 export class GetEventsUseCase implements IGetEventsUseCase {
-  constructor(private eventRepository: IEventRepository) {}
+  constructor(private _eventRepository: IEventRepository) {}
   async execute(
     params: PaginationParams,
   ): Promise<PaginatedResponse<EventResponseDto> | null> {
-    const result = await this.eventRepository.findAllEvents(params);
+    const result = await this._eventRepository.findAllEvents(params);
 
     if (result && result.data) {
       return {

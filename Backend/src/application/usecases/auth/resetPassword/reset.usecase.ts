@@ -12,17 +12,17 @@ import { IResetPasswordUseCase } from './reset.usecase.interface';
 
 export class ResetPasswordUseCase implements IResetPasswordUseCase {
   constructor(
-    private userRespository: IUserRepository,
-    private hashService: IHashServive,
-    private otpRepository: IOtpRepository,
+    private _userRespository: IUserRepository,
+    private _hashService: IHashServive,
+    private _otpRepository: IOtpRepository,
   ) {}
 
   async execute(data: ResetPasswordDTO): Promise<UserResponseDto> {
-    const user = await this.userRespository.findByEmail(data.email);
+    const user = await this._userRespository.findByEmail(data.email);
     if (!user)
       throw new AppError(ErrorMessage.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
 
-    const otpUser = await this.otpRepository.MatchOTP({
+    const otpUser = await this._otpRepository.MatchOTP({
       email: data.email,
       otp: data.otp,
     });
@@ -55,15 +55,15 @@ export class ResetPasswordUseCase implements IResetPasswordUseCase {
       );
     }
     console.log('the password', data.password);
-    const hashedpassword = await this.hashService.hash(data.password);
+    const hashedpassword = await this._hashService.hash(data.password);
 
     user.password = hashedpassword;
     console.log('user pass', user.password);
 
     otpUser.isUsed = true;
-    await this.otpRepository.otpStore(otpUser);
+    await this._otpRepository.otpStore(otpUser);
 
-    const updatedUser = await this.userRespository.updateUser(user);
+    const updatedUser = await this._userRespository.updateUser(user);
     return userMapper.toResponse(updatedUser);
   }
 }

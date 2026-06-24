@@ -13,10 +13,10 @@ import { SeatStatus } from '../../../../common/enums/searstatus-enum';
 
 export class VerifyPaymentUseCase implements IVerifyPaymentUseCase {
   constructor(
-    private paymentGateway: IPaymentGateway,
-    private eventRepository: IEventRepository,
-    private paymentRepository: IPaymentRepository,
-    private bookingRepository: IBookingRepository
+    private _paymentGateway: IPaymentGateway,
+    private _eventRepository: IEventRepository,
+    private _paymentRepository: IPaymentRepository,
+    private _bookingRepository: IBookingRepository
   ) {}
 
   async execute(
@@ -31,7 +31,7 @@ export class VerifyPaymentUseCase implements IVerifyPaymentUseCase {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature, eventId } = data;
 
     // 1. Verify Razorpay Signature
-    const isValid = this.paymentGateway.verifySignature(
+    const isValid = this._paymentGateway.verifySignature(
       razorpay_order_id,
       razorpay_payment_id,
       razorpay_signature
@@ -42,16 +42,16 @@ export class VerifyPaymentUseCase implements IVerifyPaymentUseCase {
     }
 
     // 2. Check if a pending booking exists for this order
-    const booking = await this.bookingRepository.findBookingByPaymentId(razorpay_order_id);
+    const booking = await this._bookingRepository.findBookingByPaymentId(razorpay_order_id);
 
     if (booking) {
       // TICKET BOOKING FLOW
       // Update booking to SUCCESS
-      await this.bookingRepository.updateBookingStatus(booking.id!, BookingStatus.CONFIRMED);
+      await this._bookingRepository.updateBookingStatus(booking.id!, BookingStatus.CONFIRMED);
 
       // If physical booking, update/insert seat statuses to BOOKED in DB
       if (booking.bookingType === 'physical' && booking.seats && booking.seats.length > 0) {
-        const event = await this.eventRepository.findByIdEvents(booking.eventId);
+        const event = await this._eventRepository.findByIdEvents(booking.eventId);
         const layoutId = event?.seatLayoutId;
         const layout = event?.SeatLayout;
 
@@ -110,7 +110,7 @@ export class VerifyPaymentUseCase implements IVerifyPaymentUseCase {
         undefined
       );
 
-      await this.paymentRepository.savePayment(payment);
+      await this._paymentRepository.savePayment(payment);
 
       return {
         success: true,
@@ -120,7 +120,7 @@ export class VerifyPaymentUseCase implements IVerifyPaymentUseCase {
     } else {
       // EVENT PUBLISHING FLOW
       // Update event to LIVE
-      await this.eventRepository.publishEvent(eventId);
+      await this._eventRepository.publishEvent(eventId);
 
       // Save payment details
       const payment = new Payment(
@@ -139,7 +139,7 @@ export class VerifyPaymentUseCase implements IVerifyPaymentUseCase {
         undefined
       );
 
-      await this.paymentRepository.savePayment(payment);
+      await this._paymentRepository.savePayment(payment);
 
       return {
         success: true,

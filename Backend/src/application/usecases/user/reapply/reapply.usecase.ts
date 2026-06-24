@@ -8,12 +8,12 @@ import { UpgradeStatus } from '../../../../common/enums/upgrade-enums';
 import { UserResponseDto } from '../../../../application/dtos/responses/user-response.dto';
 import { IReapplyUseCase } from './reapply.usecase.interface';
 export class ReapplyUseCase implements IReapplyUseCase {
-  constructor(private userRepository: IUserRepository) {}
+  constructor(private _userRepository: IUserRepository) {}
 
   async execute(userId: string): Promise<UserResponseDto | null> {
     console.log(userId);
 
-    const user = await this.userRepository.findByIdUser(userId);
+    const user = await this._userRepository.findByIdUser(userId);
     console.log(user);
 
     if (!user) {
@@ -30,7 +30,7 @@ export class ReapplyUseCase implements IReapplyUseCase {
     user.applyingupgrade = UpgradeStatus.NONE;
     user.rejectedAt = null;
     user.reapplyAt = null;
-    const updated = await this.userRepository.updateUser(user);
+    const updated = await this._userRepository.updateUser(user);
     return updated ? userMapper.toResponse(updated) : null;
   }
 }

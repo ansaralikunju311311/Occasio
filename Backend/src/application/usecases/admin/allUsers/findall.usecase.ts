@@ -8,11 +8,11 @@ import {
 } from '../../../../common/interfaces/pagination.interface';
 
 export class FindAllUseCase implements IFindallUseCase {
-  constructor(private adminRepository: IAdminRepository) {}
+  constructor(private _adminRepository: IAdminRepository) {}
   async execute(
     params: PaginationParams,
   ): Promise<PaginatedResponse<UserResponseDto> | null> {
-    const result = await this.adminRepository.findAllUser(params);
+    const result = await this._adminRepository.findAllUser(params);
 
     if (result && result.data) {
       return {

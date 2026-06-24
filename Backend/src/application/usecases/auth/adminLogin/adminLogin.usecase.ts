@@ -14,14 +14,14 @@ import { ErrorMessage } from '../../../../common/enums/message-enum';
 import { ILoginUsecase } from '../login/login.usecase.interface';
 export class AdminLoginUseCase implements ILoginUsecase {
   constructor(
-    private userRepository: IUserRepository,
-    private compareService: IHashServive,
-    private tokenService: ITokenService,
+    private _userRepository: IUserRepository,
+    private _compareService: IHashServive,
+    private _tokenService: ITokenService,
   ) {}
 
   async execute(data: LoginDto): Promise<LoginResponseDto> {
     //    console.log(data.role)
-    const user = await this.userRepository.findByEmail(data.email);
+    const user = await this._userRepository.findByEmail(data.email);
 
     //    console.log(value)
     console.log('user', user);
@@ -36,7 +36,7 @@ export class AdminLoginUseCase implements ILoginUsecase {
         HttpStatus.UNAUTHORIZED,
       );
     }
-    const isMatch = await this.compareService.comapre(
+    const isMatch = await this._compareService.comapre(
       data.password,
       user.password,
     );
@@ -59,12 +59,12 @@ export class AdminLoginUseCase implements ILoginUsecase {
       throw new AppError(ErrorMessage.ACCOUNT_BLOCKED, HttpStatus.UNAUTHORIZED);
     }
 
-    const accessToken = this.tokenService.generateAccessToken({
+    const accessToken = this._tokenService.generateAccessToken({
       userId: user.id,
       role: user.role,
     });
 
-    const refreshToken = this.tokenService.generateRefreshToken({
+    const refreshToken = this._tokenService.generateRefreshToken({
       userId: user.id,
       role: user.role,
     });

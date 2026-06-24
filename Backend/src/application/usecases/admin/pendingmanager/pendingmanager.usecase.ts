@@ -4,10 +4,10 @@ import { managerMapper } from '../../../../common/mappers/manager.mapper';
 import { IManagerDetailsUseCase } from '../managerDetails/managerdetails.usecase.interface';
 
 export class PendingmanagerDetailsUseCase implements IManagerDetailsUseCase {
-  constructor(private adminRepository: IAdminRepository) {}
+  constructor(private _adminRepository: IAdminRepository) {}
 
   async execute(userId: string, search?: string): Promise<ManagerResponseDto | null> {
-    const user = await this.adminRepository.findByuserId(userId, search);
+    const user = await this._adminRepository.findByuserId(userId, search);
 
     console.log(user);
     return user ? managerMapper.toResponse(user) : null;

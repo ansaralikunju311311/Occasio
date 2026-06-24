@@ -12,11 +12,11 @@ import { PaymentMethod } from '../../../../common/enums/payment-method.enum';
 
 export class VerifySubscriptionPaymentUseCase implements IVerifySubscriptionPaymentUseCase {
   constructor(
-    private paymentGateway: IPaymentGateway,
-    private userRepository: IUserRepository,
-    private paymentRepository: IPaymentRepository,
-    private subscriptionRepository: ISubscriptionRepository,
-    private managerSubscriptionRepository: IManagerSubscriptionRepository
+    private _paymentGateway: IPaymentGateway,
+    private _userRepository: IUserRepository,
+    private _paymentRepository: IPaymentRepository,
+    private _subscriptionRepository: ISubscriptionRepository,
+    private _managerSubscriptionRepository: IManagerSubscriptionRepository
   ) {}
 
   async execute(
@@ -30,7 +30,7 @@ export class VerifySubscriptionPaymentUseCase implements IVerifySubscriptionPaym
   ): Promise<any> {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature, planId } = data;
 
-    const isValid = this.paymentGateway.verifySignature(
+    const isValid = this._paymentGateway.verifySignature(
       razorpay_order_id,
       razorpay_payment_id,
       razorpay_signature
@@ -40,17 +40,17 @@ export class VerifySubscriptionPaymentUseCase implements IVerifySubscriptionPaym
       throw new Error('Invalid payment signature');
     }
 
-    const user = await this.userRepository.findByIdUser(userId);
+    const user = await this._userRepository.findByIdUser(userId);
     if (!user) throw new Error('User not found');
 
-    const targetPlan = await this.subscriptionRepository.findPlanById(planId);
+    const targetPlan = await this._subscriptionRepository.findPlanById(planId);
     if (!targetPlan) throw new Error('Target plan not found');
 
     // Prevent downgrade
     if (user.activeSubscription) {
-      const managerSub = await this.managerSubscriptionRepository.findById(user.activeSubscription);
+      const managerSub = await this._managerSubscriptionRepository.findById(user.activeSubscription);
       if (managerSub) {
-        const currentPlanDef = await this.subscriptionRepository.findPlanByName(managerSub.plan);
+        const currentPlanDef = await this._subscriptionRepository.findPlanByName(managerSub.plan);
         if (currentPlanDef && targetPlan.price < currentPlanDef.price) {
           throw new Error('You cannot downgrade to a lower tier plan.');
         }
@@ -64,7 +64,7 @@ export class VerifySubscriptionPaymentUseCase implements IVerifySubscriptionPaym
         endDate.setMonth(endDate.getMonth() + 1);
         managerSub.endDate = endDate;
 
-        await this.managerSubscriptionRepository.update(managerSub.id as string, {
+        await this._managerSubscriptionRepository.update(managerSub.id as string, {
           plan: managerSub.plan,
           eventLimit: managerSub.eventLimit,
           eventsUsed: managerSub.eventsUsed,
@@ -79,7 +79,7 @@ export class VerifySubscriptionPaymentUseCase implements IVerifySubscriptionPaym
     }
 
     user.eventsCreated = 0;
-    await this.userRepository.updateUser(user);
+    await this._userRepository.updateUser(user);
 
     // 3. Create a payment record
     const payment = new Payment(
@@ -96,7 +96,7 @@ export class VerifySubscriptionPaymentUseCase implements IVerifySubscriptionPaym
       new Date()
     );
 
-    await this.paymentRepository.savePayment(payment);
+    await this._paymentRepository.savePayment(payment);
 
     return {
       success: true,

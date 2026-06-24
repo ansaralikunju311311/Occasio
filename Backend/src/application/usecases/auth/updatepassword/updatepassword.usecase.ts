@@ -11,18 +11,18 @@ import { UserResponseDto } from '../../../../application/dtos/responses/user-res
 import { IUpdateUseCase } from './update.usecase.interface';
 export class UpdatePasswordUseCase implements IUpdateUseCase {
   constructor(
-    private userRepository: IUserRepository,
-    private compareService: IHashServive,
-    private hashService: IHashServive,
+    private _userRepository: IUserRepository,
+    private _compareService: IHashServive,
+    private _hashService: IHashServive,
   ) {}
 
   async execute(data: UpdatePasswordDto): Promise<UserResponseDto> {
-    const user = await this.userRepository.findByEmail(data.email);
+    const user = await this._userRepository.findByEmail(data.email);
     if (!user) {
       throw new AppError(ErrorMessage.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
-    const isMatch = await this.compareService.comapre(
+    const isMatch = await this._compareService.comapre(
       data.currentPassword,
       user.password,
     );
@@ -37,7 +37,7 @@ export class UpdatePasswordUseCase implements IUpdateUseCase {
     if (user.status === UserStatus.BLOCK) {
       throw new AppError(ErrorMessage.ACCOUNT_BLOCKED, HttpStatus.UNAUTHORIZED);
     }
-    const hashpassword = await this.hashService.hash(data.newPassword);
+    const hashpassword = await this._hashService.hash(data.newPassword);
 
     const newUser = new User(
       user.id,
@@ -53,7 +53,7 @@ export class UpdatePasswordUseCase implements IUpdateUseCase {
       user.reapplyAt,
     );
 
-    const updatedUser = await this.userRepository.updateUser(newUser);
+    const updatedUser = await this._userRepository.updateUser(newUser);
     return userMapper.toResponse(updatedUser);
   }
 }

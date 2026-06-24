@@ -12,20 +12,20 @@ import { IVerifyOtpUseCase } from './verifyotp.usecase.interface';
 import { ErrorMessage } from '../../../../common/enums/message-enum';
 export class VerifyUseCase implements IVerifyOtpUseCase {
   constructor(
-    private userRepository: IUserRepository,
-    private otpRepository: IOtpRepository,
-    private tokenService: ITokenService,
+    private _userRepository: IUserRepository,
+    private _otpRepository: IOtpRepository,
+    private _tokenService: ITokenService,
   ) {}
 
   async execute(data: VerfiyOtpDto): Promise<LoginResponseDto> {
     console.log('body daata for the otp verifction', data);
 
-    const user = await this.userRepository.findByEmail(data.email);
+    const user = await this._userRepository.findByEmail(data.email);
     if (!user) {
       throw new AppError(ErrorMessage.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
-    const otp = await this.otpRepository.MatchOTP(data);
+    const otp = await this._otpRepository.MatchOTP(data);
 
     if (!otp) {
       throw new Error('no user and otp');
@@ -39,7 +39,7 @@ export class VerifyUseCase implements IVerifyOtpUseCase {
       throw new AppError(ErrorMessage.INCORRECT_OTP, HttpStatus.UNAUTHORIZED);
     }
     if (otp.otpExpires < new Date()) {
-      //    await this.userRepository.updateUser(user)
+      //    await this._userRepository.updateUser(user)
       throw new AppError(ErrorMessage.OTP_EXPIRED, HttpStatus.GONE);
     }
 
@@ -54,13 +54,13 @@ export class VerifyUseCase implements IVerifyOtpUseCase {
     console.log(user.isVerified);
 
     3;
-    const updateUser = await this.userRepository.updateUser(user);
+    const updateUser = await this._userRepository.updateUser(user);
 
-    const accessToken = this.tokenService.generateAccessToken({
+    const accessToken = this._tokenService.generateAccessToken({
       userId: updateUser.id,
       role: updateUser.role,
     });
-    const refreshToken = this.tokenService.generateRefreshToken({
+    const refreshToken = this._tokenService.generateRefreshToken({
       userId: updateUser.id,
       role: updateUser.role,
     });

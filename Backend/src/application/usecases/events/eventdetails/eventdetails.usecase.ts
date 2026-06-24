@@ -7,16 +7,16 @@ import { IBookingRepository } from '../../../../domain/repositories/booking/book
 
 export class EventDetailsUseCase implements IEventDetailsUseCase {
   constructor(
-    private eventRepository: IEventRepository,
-    private bookingRepository: IBookingRepository
+    private _eventRepository: IEventRepository,
+    private _bookingRepository: IBookingRepository
   ) {}
 
   async execute(id: string): Promise<EventResponseDto | null> {
-    const events = await this.eventRepository.findByIdEvents(id);
+    const events = await this._eventRepository.findByIdEvents(id);
     if (!events) return null;
 
     if (events.eventType === 'ONLINE' || events.eventType === 'HYBRID') {
-      const count = await this.bookingRepository.getOnlineBookedCount(id);
+      const count = await this._bookingRepository.getOnlineBookedCount(id);
       events.bookedTickets = count;
     }
 
