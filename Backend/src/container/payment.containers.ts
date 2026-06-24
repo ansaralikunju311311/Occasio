@@ -7,6 +7,7 @@ import { PaymentRepository } from '../infrastructure/repositories/payment/paymen
 import { UserRepository } from '../infrastructure/repositories/user/user.repository';
 import { SubscriptionRepository } from '../infrastructure/repositories/subscription/subscription.repository';
 import { BookingRepository } from '../infrastructure/repositories/booking/booking.repository';
+import { SeatRepository } from '../infrastructure/repositories/seatrepo/seat.repository';
 import { GetBreakdownUseCase } from '../application/usecases/payment/getBreakdown/getBreakdown.usecase';
 import { CreateSubscriptionOrderUseCase } from '../application/usecases/payment/createSubscriptionOrder/createSubscriptionOrder.usecase';
 import { VerifySubscriptionPaymentUseCase } from '../application/usecases/payment/verifySubscriptionPayment/verifySubscriptionPayment.usecase';
@@ -21,6 +22,7 @@ export const MakePaymentController = () => {
   const userRepository = new UserRepository();
   const subscriptionRepository = new SubscriptionRepository();
   const bookingRepository = new BookingRepository();
+  const seatRepository = new SeatRepository();
   const managerSubscriptionRepository = new ManagerSubscriptionRepository();
 
   const getBreakdownUseCase = new GetBreakdownUseCase(
@@ -42,6 +44,7 @@ export const MakePaymentController = () => {
     eventRepository,
     paymentRepository,
     bookingRepository,
+    seatRepository,
   );
 
   const createSubscriptionOrderUseCase = new CreateSubscriptionOrderUseCase(

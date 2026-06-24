@@ -2,28 +2,49 @@ import { Router } from 'express';
 
 import { verifyAccessToken } from '../middlewares/verifyAccessToken.middleware';
 import { MakePaymentController } from '../../container/payment.containers';
+import { ApiEndpoints } from '../../common/constants/api-endpoints';
 
 const router = Router();
 const controller = MakePaymentController();
 
-router.post('/order', verifyAccessToken, controller.createOrder);
-router.post('/ticket-order', verifyAccessToken, controller.createTicketOrder);
-router.post('/verify', verifyAccessToken, controller.verifyPayment);
-router.get('/price-breakdown', verifyAccessToken, controller.getPriceBreakdown);
-router.get('/my-bookings', verifyAccessToken, controller.getMyBookings);
+router.post(
+  ApiEndpoints.Payments.Order,
+  verifyAccessToken,
+  controller.createOrder,
+);
+router.post(
+  ApiEndpoints.Payments.TicketOrder,
+  verifyAccessToken,
+  controller.createTicketOrder,
+);
+router.post(
+  ApiEndpoints.Payments.Verify,
+  verifyAccessToken,
+  controller.verifyPayment,
+);
 router.get(
-  '/manager-bookings',
+  ApiEndpoints.Payments.PriceBreakdown,
+  verifyAccessToken,
+  controller.getPriceBreakdown,
+);
+router.get(
+  ApiEndpoints.Payments.MyBookings,
+  verifyAccessToken,
+  controller.getMyBookings,
+);
+router.get(
+  ApiEndpoints.Payments.ManagerBookings,
   verifyAccessToken,
   controller.getManagerBookings,
 );
 
 router.post(
-  '/subscription-order',
+  ApiEndpoints.Payments.SubscriptionOrder,
   verifyAccessToken,
   controller.createSubscriptionOrder,
 );
 router.post(
-  '/verify-subscription',
+  ApiEndpoints.Payments.VerifySubscription,
   verifyAccessToken,
   controller.verifySubscriptionPayment,
 );

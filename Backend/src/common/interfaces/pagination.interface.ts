@@ -1,9 +1,11 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 export interface PaginationParams {
   page?: number;
   limit?: number;
   search?: string;
-  [key: string]: any;
+  role?: string;
+  applyingupgrade?: string;
+  eventType?: string;
+  upcoming?: boolean;
 }
 
 export interface PaginatedResponse<T> {

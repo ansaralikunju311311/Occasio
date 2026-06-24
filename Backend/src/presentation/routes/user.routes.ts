@@ -5,36 +5,38 @@ import { makeUserController } from '../../container/user.containers';
 import { requireRole } from '../../presentation/middlewares/requireRole.middleware';
 import { UserRole } from '../../common/enums/userrole-enum';
 import { requireAuth } from '../middlewares/requireauth.middleware';
+import { ApiEndpoints } from '../../common/constants/api-endpoints';
+
 const router = Router();
 const controller = makeUserController();
 
 router.post(
-  '/upgraderole',
+  ApiEndpoints.User.UpgradeRole,
   verifyAccessToken,
   requireRole([UserRole.USER]),
   controller.upgraderole.bind(controller),
 );
 router.patch(
-  '/reapply',
+  ApiEndpoints.User.Reapply,
   verifyAccessToken,
   requireAuth,
   requireRole([UserRole.USER]),
   controller.reapply.bind(controller),
 );
 router.patch(
-  '/profile',
+  ApiEndpoints.User.Profile,
   verifyAccessToken,
   requireRole([UserRole.USER, UserRole.EVENT_MANAGER]),
   controller.editProfile.bind(controller),
 );
 router.post(
-  '/subscribe',
+  ApiEndpoints.User.Subscribe,
   verifyAccessToken,
   requireRole([UserRole.EVENT_MANAGER]),
   controller.subscribe.bind(controller),
 );
 router.get(
-  '/my-subscription',
+  ApiEndpoints.User.MySubscription,
   verifyAccessToken,
   requireRole([UserRole.EVENT_MANAGER]),
   controller.getMySubscription.bind(controller),

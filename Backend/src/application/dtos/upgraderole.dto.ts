@@ -1,3 +1,6 @@
+import type { ExperienceLevel } from '../../common/enums/experience-level.enum';
+import type { OrganizationType } from '../../common/enums/organization-type.enum';
+
 export interface UpgraderoleDto {
   email: string;
   fullName: string;
@@ -5,7 +8,7 @@ export interface UpgraderoleDto {
   aboutEvents: string;
   certificate: string;
   documentReference: string;
-  experienceLevel: string;
+  experienceLevel: ExperienceLevel;
   socialLinks: string;
-  organizationType: string;
+  organizationType: OrganizationType;
 }

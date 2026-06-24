@@ -163,7 +163,7 @@ const AdminPayments = () => {
                   {payment.purpose?.replace('_', ' ')}
                 </span>
                 {payment.eventId && (
-                  <div className="text-xs text-gray-500 mt-1 truncate max-w-[150px]">
+                  <div className="text-xs text-gray-500 mt-1 truncate max-w-37.5">
                     Event: {payment.eventId.title}
                   </div>
                 )}

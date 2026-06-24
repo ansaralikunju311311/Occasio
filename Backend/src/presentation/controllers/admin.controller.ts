@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 
 import { HttpStatus } from '../../common/constants/http-status';
+import type { UserStatus } from '../../common/enums/userstatus-enum';
 import type { IFindallUseCase } from '../../application/usecases/admin/allUsers/findall.usecase.interface';
 import type { IUserManageUseCase } from '../../application/usecases/admin/usermanage/usermanage.usecase.interface';
 import type { IManagerDetailsUseCase } from '../../application/usecases/admin/managerDetails/managerdetails.usecase.interface';
@@ -48,7 +49,7 @@ export class AdminController {
 
     const user = await this._userManageUseCase.execute({
       userId: userId as string,
-      status,
+      status: status as UserStatus,
     });
     res.status(HttpStatus.OK).json({
       user,

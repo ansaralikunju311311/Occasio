@@ -4,7 +4,7 @@ import type { IUserRepository } from '../../../../domain/repositories/user.repos
 import type { ISubscriptionRepository } from '../../../../domain/repositories/subscription/subscription.repository.interface';
 import type { IBookingRepository } from '../../../../domain/repositories/booking/booking.repository.interface';
 import { Booking } from '../../../../domain/entities/booking.entity';
-import { BookingStatus } from '../../../../infrastructure/database/model/booking.model';
+import { BookingStatus } from '../../../../common/enums/booking-status.enum';
 import { SeatModel } from '../../../../infrastructure/database/model/events/seat.model';
 import { SeatStatus } from '../../../../common/enums/searstatus-enum';
 

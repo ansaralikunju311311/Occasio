@@ -1,6 +1,11 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import type { ISeatRepository } from '../../../domain/repositories/seats/seat.repository.interface';
+import type { ClientSession } from 'mongoose';
+
+import type {
+  ISeatRepository,
+  ISeatData,
+} from '../../../domain/repositories/seats/seat.repository.interface';
 import { SeatModel } from '../../database/model/events/seat.model';
+import type { ISeat } from '../../database/model/events/seat.model';
 import { SeatStatus } from '../../../common/enums/searstatus-enum';
 
 export class SeatRepository implements ISeatRepository {
@@ -10,8 +15,8 @@ export class SeatRepository implements ISeatRepository {
     seatNumber: string,
     now: Date,
     lockExpiresAt: Date,
-  ): Promise<any> {
-    return await SeatModel.findOneAndUpdate(
+  ): Promise<{ _id: string } | null> {
+    const result = await SeatModel.findOneAndUpdate(
       {
         seatNumber,
         eventId,
@@ -38,6 +43,10 @@ export class SeatRepository implements ISeatRepository {
       },
       { new: true, upsert: true },
     );
+    if (!result) {
+      return null;
+    }
+    return { _id: result._id.toString() };
   }
 
   async releaseSeats(seatIds: string[]): Promise<number> {
@@ -60,18 +69,34 @@ export class SeatRepository implements ISeatRepository {
   async findSeats(
     seatIds: string[],
     eventId: string,
-    session?: any,
-  ): Promise<any[]> {
-    return await SeatModel.find({
+    session?: ClientSession,
+  ): Promise<ISeatData[]> {
+    const seats = (await SeatModel.find({
       seatNumber: { $in: seatIds },
       eventId,
-    }).session(session);
+    }).session(session ?? null)) as unknown as ISeat[];
+
+    return seats.map((s: ISeat) => ({
+      _id: s._id.toString(),
+      eventId: s.eventId?.toString() ?? '',
+      layoutId: s.layoutId?.toString(),
+      block: s.block ?? '',
+      row: s.row ?? 0,
+      column: s.column ?? 0,
+      seatNumber: s.seatNumber,
+      categoryName: s.categoryName ?? '',
+      price: s.price ?? 0,
+      status: s.status,
+      lockedBy: s.lockedBy?.toString(),
+      lockedAt: s.lockedAt,
+      lockExpiresAt: s.lockExpiresAt,
+    }));
   }
 
   async markBooked(
     eventId: string,
     seatIds: string[],
-    session?: any,
+    session?: ClientSession,
   ): Promise<void> {
     await SeatModel.updateMany(
       { seatNumber: { $in: seatIds }, eventId },
@@ -80,6 +105,34 @@ export class SeatRepository implements ISeatRepository {
         $unset: { lockExpiresAt: 1 },
       },
       { session },
+    );
+  }
+
+  async upsertSeat(seatData: {
+    eventId: string;
+    layoutId?: string;
+    block: string;
+    row: number;
+    column: number;
+    seatNumber: string;
+    price: number;
+    categoryName: string;
+    status: SeatStatus;
+  }): Promise<void> {
+    await SeatModel.findOneAndUpdate(
+      { eventId: seatData.eventId, seatNumber: seatData.seatNumber },
+      {
+        eventId: seatData.eventId,
+        layoutId: seatData.layoutId,
+        block: seatData.block,
+        row: seatData.row,
+        column: seatData.column,
+        seatNumber: seatData.seatNumber,
+        price: seatData.price,
+        categoryName: seatData.categoryName,
+        status: seatData.status,
+      },
+      { upsert: true, new: true },
     );
   }
 }

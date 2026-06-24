@@ -31,8 +31,7 @@ export class LockSeatsUseCase implements ILockSeatsUseCase {
     const now = new Date();
     const lockExpiresAt = new Date(now.getTime() + 5 * 60 * 1000);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const lockedSeats: any[] = [];
+    const lockedSeats: { _id: string }[] = [];
 
     try {
       for (const seatNumber of seatIds) {

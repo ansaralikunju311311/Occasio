@@ -1,68 +1,65 @@
 import { Router } from 'express';
 
 import { verifyAccessToken } from '../middlewares/verifyAccessToken.middleware';
-// import { makeAuthController } from "../../../container/auth.container";
 import { requireRole } from '../middlewares/requireRole.middleware';
 import { makeAdminController } from '../../container/admin.containers';
 import { UserRole } from '../../common/enums/userrole-enum';
+import { ApiEndpoints } from '../../common/constants/api-endpoints';
 
 const router = Router();
 const controller = makeAdminController();
 
 router.get(
-  '/users',
+  ApiEndpoints.Admin.Users,
   verifyAccessToken,
   requireRole([UserRole.ADMIN]),
   controller.getUsers.bind(controller),
 );
 
 router.patch(
-  '/blockorunblock/:userId',
+  ApiEndpoints.Admin.BlockOrUnblock,
   verifyAccessToken,
   requireRole([UserRole.ADMIN]),
   controller.userManage.bind(controller),
 );
+
 router.get(
-  '/userDetails/:userId',
+  ApiEndpoints.Admin.UserDetails,
   verifyAccessToken,
   requireRole([UserRole.ADMIN]),
   controller.userDetails.bind(controller),
 );
 
 router.get(
-  '/pendingmanagers/:userId',
+  ApiEndpoints.Admin.PendingManagers,
   verifyAccessToken,
   requireRole([UserRole.ADMIN]),
   controller.pendingmanagerDetails.bind(controller),
 );
 
 router.patch(
-  '/approval/:id',
+  ApiEndpoints.Admin.Approval,
   verifyAccessToken,
   requireRole([UserRole.ADMIN]),
   controller.managerApproval.bind(controller),
 );
+
 router.patch(
-  '/rejection/:id',
+  ApiEndpoints.Admin.Rejection,
   verifyAccessToken,
   requireRole([UserRole.ADMIN]),
   controller.managerRejection.bind(controller),
 );
 
 router.get(
-  '/managerDetails/:id',
+  ApiEndpoints.Admin.ManagerDetails,
   verifyAccessToken,
   requireRole([UserRole.ADMIN]),
   controller.managerDetails.bind(controller),
 );
 
-// router.post('/createplans',
-//   verifyAccessToken,
-//   requireRole([UserRole.ADMIN]),
-//   controller.createPlans.bind(controller))
-
 router.get(
-  '/payments',
+  ApiEndpoints.Admin.Payments,
   verifyAccessToken,
   requireRole([UserRole.ADMIN]),
   controller.getAllPayments.bind(controller),

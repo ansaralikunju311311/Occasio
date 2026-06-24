@@ -6,6 +6,8 @@ import type { IVerifyPaymentUseCase } from '../../application/usecases/payment/v
 import type { IGetBreakdownUseCase } from '../../application/usecases/payment/getBreakdown/getBreakdown.usecase';
 import type { ICreateSubscriptionOrderUseCase } from '../../application/usecases/payment/createSubscriptionOrder/createSubscriptionOrder.usecase.interface';
 import type { IVerifySubscriptionPaymentUseCase } from '../../application/usecases/payment/verifySubscriptionPayment/verifySubscriptionPayment.usecase.interface';
+import type { VerifyPaymentDto } from '../../application/dtos/verify-payment.dto';
+import type { VerifySubscriptionPaymentDto } from '../../application/dtos/verify-subscription-payment.dto';
 import { HttpStatus } from '../../common/constants/http-status';
 import type { IGetMyBookingUseCase } from '../../application/usecases/booking/getMybookings/getmybooking.usecase.interface';
 import type { IGetManagerBookingUseCase } from '../../application/usecases/booking/getManagerbookings/getmanagerbooking.usecase.interface';
@@ -50,7 +52,7 @@ export class PaymentController {
 
   verifySubscriptionPayment = async (req: Request, res: Response) => {
     try {
-      const userId = (req as any).user?.id || (req as any).authUser?.userId;
+      const userId = (req as any).authUser?.userId;
 
       if (!userId) {
         return res
@@ -58,8 +60,32 @@ export class PaymentController {
           .json({ message: 'Unauthorized' });
       }
 
+      const {
+        razorpay_order_id,
+        razorpay_payment_id,
+        razorpay_signature,
+        planId,
+      } = req.body;
+      if (
+        !razorpay_order_id ||
+        !razorpay_payment_id ||
+        !razorpay_signature ||
+        !planId
+      ) {
+        return res
+          .status(HttpStatus.BAD_REQUEST)
+          .json({ message: 'Missing required payment fields' });
+      }
+
+      const dto: VerifySubscriptionPaymentDto = {
+        razorpay_order_id: razorpay_order_id as string,
+        razorpay_payment_id: razorpay_payment_id as string,
+        razorpay_signature: razorpay_signature as string,
+        planId: planId as string,
+      };
+
       const result = await this._verifySubscriptionPaymentUseCase.execute(
-        req.body,
+        dto,
         userId,
       );
 
@@ -165,7 +191,11 @@ export class PaymentController {
         page,
         limit,
       );
-      return res.status(HttpStatus.OK).json({ success: true, ...result });
+      return res.status(HttpStatus.OK).json({
+        success: true,
+        data: result.data,
+        metadata: result.metadata,
+      });
     } catch (error: any) {
       return res
         .status(HttpStatus.BAD_REQUEST)
@@ -190,7 +220,11 @@ export class PaymentController {
         page,
         limit,
       );
-      return res.status(HttpStatus.OK).json({ success: true, ...result });
+      return res.status(HttpStatus.OK).json({
+        success: true,
+        data: result.data,
+        metadata: result.metadata,
+      });
     } catch (error: any) {
       return res
         .status(HttpStatus.BAD_REQUEST)
@@ -200,7 +234,7 @@ export class PaymentController {
 
   verifyPayment = async (req: Request, res: Response) => {
     try {
-      const userId = (req as any).user?.id || (req as any).authUser?.userId;
+      const userId = (req as any).authUser?.userId;
 
       if (!userId) {
         return res
@@ -208,7 +242,31 @@ export class PaymentController {
           .json({ message: 'Unauthorized' });
       }
 
-      const result = await this._verifyPaymentUseCase.execute(req.body, userId);
+      const {
+        razorpay_order_id,
+        razorpay_payment_id,
+        razorpay_signature,
+        eventId,
+      } = req.body;
+      if (
+        !razorpay_order_id ||
+        !razorpay_payment_id ||
+        !razorpay_signature ||
+        !eventId
+      ) {
+        return res
+          .status(HttpStatus.BAD_REQUEST)
+          .json({ message: 'Missing required payment fields' });
+      }
+
+      const dto: VerifyPaymentDto = {
+        razorpay_order_id: razorpay_order_id as string,
+        razorpay_payment_id: razorpay_payment_id as string,
+        razorpay_signature: razorpay_signature as string,
+        eventId: eventId as string,
+      };
+
+      const result = await this._verifyPaymentUseCase.execute(dto, userId);
 
       return res.status(HttpStatus.OK).json(result);
     } catch (error: any) {

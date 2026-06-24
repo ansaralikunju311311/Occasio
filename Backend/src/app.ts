@@ -12,6 +12,7 @@ import planRoutes from '../src/presentation/routes/plans.routes';
 import bookingRoutes from './presentation/routes/booking.routes';
 import paymentRoutes from './presentation/routes/payment.routes';
 import userRoutes from './presentation/routes/user.routes';
+import { ApiEndpoints } from './common/constants/api-endpoints';
 import './shared/config/passport/google.strategy';
 
 const app = express();
@@ -26,13 +27,13 @@ app.use(
   }),
 );
 app.use(express.json());
-app.use('/api/auth', authRoutes);
-app.use('/api/user', userRoutes);
-app.use('/api/admin', adminRoutes);
-app.use('/api/events', eventRoutes); // Restore original
-app.use('/api/payments', paymentRoutes);
-app.use('/api/plans', planRoutes);
-app.use('/api/bookings', bookingRoutes);
+app.use(ApiEndpoints.Auth.Base, authRoutes);
+app.use(ApiEndpoints.User.Base, userRoutes);
+app.use(ApiEndpoints.Admin.Base, adminRoutes);
+app.use(ApiEndpoints.Events.Base, eventRoutes); // Restore original
+app.use(ApiEndpoints.Payments.Base, paymentRoutes);
+app.use(ApiEndpoints.Plans.Base, planRoutes);
+app.use(ApiEndpoints.Bookings.Base, bookingRoutes);
 app.use((_req, res) => {
   res.status(404).json({ message: 'the page not found' });
 });

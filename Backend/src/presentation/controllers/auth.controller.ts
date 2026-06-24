@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { Request, Response } from 'express';
 
 import { HttpStatus } from '../../common/constants/http-status';
@@ -42,7 +41,7 @@ export class AuthController {
       email,
       password,
       confirmpassword,
-      isVerified,
+      isVerified: Boolean(isVerified),
     });
 
     res.status(HttpStatus.CREATED).json({
@@ -173,9 +172,9 @@ export class AuthController {
   });
 
   googleLogin = catchAsync(async (req: Request, res: Response) => {
-    const user = req.user as any;
+    const oauthUser = req.user as { id: string; role: string } | undefined;
 
-    if (!user || !user.id) {
+    if (!oauthUser || !oauthUser.id) {
       return res.status(HttpStatus.UNAUTHORIZED).json({
         message: ErrorMessage.USER_NOT_FOUND,
       });
@@ -191,7 +190,7 @@ export class AuthController {
     // });
 
     const { accessToken, refreshToken } =
-      await this._googleLoginUseCase.execute(user.id, user.role);
+      await this._googleLoginUseCase.execute(oauthUser.id, oauthUser.role);
     if (refreshToken) {
       this._sessionService.setRefreshToken(res, refreshToken);
     }

@@ -7,8 +7,8 @@ export interface EventDto {
   picture: string;
   eventType: EventType;
 
-  startTime: string | Date;
-  endTime: string | Date;
+  startTime: Date;
+  endTime: Date;
 
   status?: EventStatus;
   price: number;

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { Request, Response } from 'express';
 
 import type { ILockSeatsUseCase } from '../../application/usecases/booking/lockseats/lock-seats.usecase.interface';
@@ -17,8 +16,12 @@ export class BookingController {
   ) {}
 
   lockSeats = catchAsync(async (req: Request, res: Response): Promise<void> => {
+    const userId = req.authUser?.userId;
+    if (!userId) {
+      res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Unauthorized' });
+      return;
+    }
     const { eventId, seatIds } = req.body;
-    const userId = (req as any).authUser?.userId;
 
     const result = await this._lockSeatsUseCase.execute(
       userId,
@@ -30,8 +33,12 @@ export class BookingController {
 
   createPaymentIntent = catchAsync(
     async (req: Request, res: Response): Promise<void> => {
+      const userId = req.authUser?.userId;
+      if (!userId) {
+        res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Unauthorized' });
+        return;
+      }
       const { eventId, amount } = req.body;
-      const userId = (req as any).authUser?.userId;
 
       const result = await this._mockPaymentUseCase.createPaymentIntent(
         userId,
@@ -44,9 +51,13 @@ export class BookingController {
 
   confirmBooking = catchAsync(
     async (req: Request, res: Response): Promise<void> => {
+      const userId = req.authUser?.userId;
+      if (!userId) {
+        res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Unauthorized' });
+        return;
+      }
       const { eventId, seatIds, paymentId, totalAmount, bookingType } =
         req.body;
-      const userId = (req as any).authUser?.userId;
 
       const result = await this._confirmBookingUseCase.execute(
         userId,
@@ -62,8 +73,12 @@ export class BookingController {
 
   failBooking = catchAsync(
     async (req: Request, res: Response): Promise<void> => {
+      const userId = req.authUser?.userId;
+      if (!userId) {
+        res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Unauthorized' });
+        return;
+      }
       const { seatIds } = req.body;
-      const userId = (req as any).authUser?.userId;
 
       const result = await this._failBookingUseCase.execute(userId, seatIds);
       res.status(HttpStatus.OK).json(result);

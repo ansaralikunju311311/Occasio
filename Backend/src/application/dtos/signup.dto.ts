@@ -3,5 +3,5 @@ export interface signupDTO {
   email: string;
   password: string;
   confirmpassword: string;
-  isVerified: string;
+  isVerified: boolean;
 }

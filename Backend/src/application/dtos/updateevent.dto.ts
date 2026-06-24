@@ -49,7 +49,7 @@ export interface UpdateEventDTO {
       };
 
       rows: {
-        rowNumber: string;
+        rowNumber: number;
         columns: number;
       }[];
     }[];

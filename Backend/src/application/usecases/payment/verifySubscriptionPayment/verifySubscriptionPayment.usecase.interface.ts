@@ -1,11 +1,8 @@
+import type { VerifySubscriptionPaymentDto } from '../../../../application/dtos/verify-subscription-payment.dto';
+
 export interface IVerifySubscriptionPaymentUseCase {
   execute(
-    data: {
-      razorpay_order_id: string;
-      razorpay_payment_id: string;
-      razorpay_signature: string;
-      planId: string;
-    },
+    data: VerifySubscriptionPaymentDto,
     userId: string,
   ): Promise<Record<string, unknown>>;
 }

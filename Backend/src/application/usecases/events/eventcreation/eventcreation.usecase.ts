@@ -89,7 +89,6 @@ export class EventCretionUseCase implements IEventCreationUseCase {
         status = EventStatus.LIVE;
       }
 
-      const { startTime, endTime } = data;
       let location = data.location;
 
       if (data.eventType !== 'ONLINE') {
@@ -101,8 +100,8 @@ export class EventCretionUseCase implements IEventCreationUseCase {
         const conflict = await this._eventRepository.findExactConflict(
           longitude,
           latitude,
-          new Date(startTime),
-          new Date(endTime),
+          data.startTime,
+          data.endTime,
         );
 
         if (conflict) {
@@ -121,8 +120,8 @@ export class EventCretionUseCase implements IEventCreationUseCase {
         data.title,
         data.description,
         data.eventType,
-        new Date(data.startTime),
-        new Date(data.endTime),
+        data.startTime,
+        data.endTime,
         data.location || undefined,
         data.maxOnlineUsers,
         data.price,

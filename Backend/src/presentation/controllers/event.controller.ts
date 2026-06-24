@@ -2,6 +2,9 @@ import type { Request, Response } from 'express-serve-static-core';
 
 import { HttpStatus } from '../../common/constants/http-status';
 import { UserRole } from '../../common/enums/userrole-enum';
+import type { EventType } from '../../common/enums/event-type';
+import type { EventDto } from '../../application/dtos/event.dto';
+import type { UpdateEventDTO } from '../../application/dtos/updateevent.dto';
 import type { IEventCreationUseCase } from '../../application/usecases/events/eventcreation/eventcreation.usecase.interface';
 import type { IGetEventsUseCase } from '../../application/usecases/events/getEvents/getEvents.usecase.interface';
 import type { IEventDetailsUseCase } from '../../application/usecases/events/eventdetails/eventdetails.usecase.interface';
@@ -27,9 +30,28 @@ export class EventController {
         .status(HttpStatus.UNAUTHORIZED)
         .json({ message: 'Unauthorized' });
     }
-    const creation = await this._eventCreationUseCase.execute(req.body, userId);
 
-    res.status(HttpStatus.OK).json({
+    const dto: EventDto = {
+      title: req.body.title as string,
+      description: req.body.description as string,
+      picture: req.body.picture as string,
+      eventType: req.body.eventType as EventType,
+      startTime: new Date(req.body.startTime as string),
+      endTime: new Date(req.body.endTime as string),
+      price: Number(req.body.price),
+      isSeatLayoutEnabled: Boolean(req.body.isSeatLayoutEnabled),
+      maxOnlineUsers:
+        req.body.maxOnlineUsers !== undefined &&
+        req.body.maxOnlineUsers !== null
+          ? Number(req.body.maxOnlineUsers)
+          : undefined,
+      address: req.body.address as string | undefined,
+      layout: req.body.layout,
+    };
+
+    const creation = await this._eventCreationUseCase.execute(dto, userId);
+
+    res.status(HttpStatus.CREATED).json({
       creation,
     });
   });
@@ -103,11 +125,39 @@ export class EventController {
         .json({ message: 'Unauthorized' });
     }
 
-    const result = await this._updateEventsUseCase.execute(
-      id,
-      managerId,
-      req.body,
-    );
+    const dto: UpdateEventDTO = {};
+    if (req.body.title !== undefined) {
+      dto.title = req.body.title as string;
+    }
+    if (req.body.description !== undefined) {
+      dto.description = req.body.description as string;
+    }
+    if (req.body.picture !== undefined) {
+      dto.picture = req.body.picture as string;
+    }
+    if (req.body.eventType !== undefined) {
+      dto.eventType = req.body.eventType as EventType;
+    }
+    if (req.body.startTime !== undefined) {
+      dto.startTime = new Date(req.body.startTime as string);
+    }
+    if (req.body.endTime !== undefined) {
+      dto.endTime = new Date(req.body.endTime as string);
+    }
+    if (req.body.price !== undefined) {
+      dto.price = Number(req.body.price);
+    }
+    if (req.body.maxOnlineUsers !== undefined) {
+      dto.maxOnlineUsers = Number(req.body.maxOnlineUsers);
+    }
+    if (req.body.location !== undefined) {
+      dto.location = req.body.location;
+    }
+    if (req.body.layout !== undefined) {
+      dto.layout = req.body.layout;
+    }
+
+    const result = await this._updateEventsUseCase.execute(id, managerId, dto);
     res.status(HttpStatus.OK).json({
       data: result,
     });

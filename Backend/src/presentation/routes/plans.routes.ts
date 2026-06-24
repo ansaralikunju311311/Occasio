@@ -1,31 +1,30 @@
 import { Router } from 'express';
 
 import { verifyAccessToken } from '../middlewares/verifyAccessToken.middleware';
-// import { makeAuthController } from "../../../container/auth.container";
 import { requireRole } from '../middlewares/requireRole.middleware';
-// import { makeAdminController } from '../../container/admin.containers';
 import { UserRole } from '../../common/enums/userrole-enum';
 import { makePlanController } from '../../container/subscription.containers';
+import { ApiEndpoints } from '../../common/constants/api-endpoints';
 
 const router = Router();
 const controller = makePlanController();
 
 router.post(
-  '/createplans',
+  ApiEndpoints.Plans.CreatePlans,
   verifyAccessToken,
   requireRole([UserRole.ADMIN]),
   controller.createPlans.bind(controller),
 );
 
 router.get(
-  '/getplans',
+  ApiEndpoints.Plans.GetPlans,
   verifyAccessToken,
   requireRole([UserRole.ADMIN, UserRole.EVENT_MANAGER, UserRole.USER]),
   controller.getPlans.bind(controller),
 );
 
 router.patch(
-  '/updateplan/:id',
+  ApiEndpoints.Plans.UpdatePlan,
   verifyAccessToken,
   requireRole([UserRole.ADMIN]),
   controller.updatePlan.bind(controller),

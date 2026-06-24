@@ -2,6 +2,8 @@ import type { Request, Response } from 'express';
 
 import { HttpStatus } from '../../common/constants/http-status';
 import { catchAsync } from '../../common/utils/catchAsync';
+import type { PlanType } from '../../common/enums/plan-enum';
+import type { CreatePlanDto } from '../../application/dtos/createplan.dto';
 import type { ICreatePlanUseCase } from '../../application/usecases/subscription/createPlan/createplan.usecase.interface';
 import type { IGetPlansUseCase } from '../../application/usecases/subscription/getPlan/getplan.usecase.interface';
 import type { IUpdatePlanUseCase } from '../../application/usecases/subscription/updateplan/updateplan.usecase.interface';
@@ -14,7 +16,16 @@ export class PlanController {
   ) {}
 
   createPlans = catchAsync(async (req: Request, res: Response) => {
-    const plans = await this._createPlansUseCase.execute(req.body);
+    const dto: CreatePlanDto = {
+      name: req.body.name as PlanType,
+      price: Number(req.body.price),
+      eventLimit: Number(req.body.eventLimit),
+      commissionPercentage: Number(req.body.commissionPercentage),
+      features: Array.isArray(req.body.features)
+        ? (req.body.features as string[])
+        : [],
+    };
+    const plans = await this._createPlansUseCase.execute(dto);
     res.status(HttpStatus.OK).json({
       plans,
     });
@@ -29,7 +40,23 @@ export class PlanController {
 
   updatePlan = catchAsync(async (req: Request, res: Response) => {
     const id = req.params.id as string;
-    const plan = await this._updatePlanUseCase.execute(id, req.body);
+    const dto: Partial<CreatePlanDto> = {};
+    if (req.body.name !== undefined) {
+      dto.name = req.body.name as PlanType;
+    }
+    if (req.body.price !== undefined) {
+      dto.price = Number(req.body.price);
+    }
+    if (req.body.eventLimit !== undefined) {
+      dto.eventLimit = Number(req.body.eventLimit);
+    }
+    if (req.body.commissionPercentage !== undefined) {
+      dto.commissionPercentage = Number(req.body.commissionPercentage);
+    }
+    if (Array.isArray(req.body.features)) {
+      dto.features = req.body.features as string[];
+    }
+    const plan = await this._updatePlanUseCase.execute(id, dto);
     res.status(HttpStatus.OK).json({
       plan,
     });

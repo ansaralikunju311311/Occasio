@@ -1,8 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { Request, Response } from 'express';
 
 import { HttpStatus } from '../../common/constants/http-status';
 import { SuccessMessage } from '../../common/enums/message-enum';
+import type { ExperienceLevel } from '../../common/enums/experience-level.enum';
+import type { OrganizationType } from '../../common/enums/organization-type.enum';
 import type { IUpgradeUseCase } from '../../application/usecases/user/upgraderole/upgaradeRole.usecase.interface';
 import type { IReapplyUseCase } from '../../application/usecases/user/reapply/reapply.usecase.interface';
 import type { IEditProfileUseCase } from '../../application/usecases/user/editProfile/editprofile.usecase.interface';
@@ -39,9 +40,9 @@ export class UserController {
       aboutEvents,
       certificate,
       documentReference,
-      experienceLevel,
+      experienceLevel: experienceLevel as ExperienceLevel,
       socialLinks,
-      organizationType,
+      organizationType: organizationType as OrganizationType,
     });
 
     res.status(HttpStatus.OK).json({
@@ -51,35 +52,29 @@ export class UserController {
   });
 
   subscribe = catchAsync(async (req: Request, res: Response): Promise<void> => {
-    try {
-      if (!req.authUser || !req.authUser.userId) {
-        res
-          .status(HttpStatus.UNAUTHORIZED)
-          .json({ success: false, message: 'Unauthorized' });
-        return;
-      }
+    if (!req.authUser || !req.authUser.userId) {
+      res
+        .status(HttpStatus.UNAUTHORIZED)
+        .json({ success: false, message: 'Unauthorized' });
+      return;
+    }
 
-      const userId = req.authUser.userId;
-      const { planId } = req.body;
-      if (!planId) {
-        res
-          .status(HttpStatus.BAD_REQUEST)
-          .json({ success: false, message: 'Plan ID is required' });
-        return;
-      }
-
-      const updatedUser = await this._subscribeUseCase.execute(userId, planId);
-
-      res.status(HttpStatus.OK).json({
-        success: true,
-        message: 'Subscribed successfully',
-        user: updatedUser,
-      });
-    } catch (error: any) {
+    const userId = req.authUser.userId;
+    const { planId } = req.body;
+    if (!planId) {
       res
         .status(HttpStatus.BAD_REQUEST)
-        .json({ success: false, message: error.message });
+        .json({ success: false, message: 'Plan ID is required' });
+      return;
     }
+
+    const updatedUser = await this._subscribeUseCase.execute(userId, planId);
+
+    res.status(HttpStatus.OK).json({
+      success: true,
+      message: 'Subscribed successfully',
+      user: updatedUser,
+    });
   });
 
   reapply = catchAsync(async (req: Request, res: Response) => {

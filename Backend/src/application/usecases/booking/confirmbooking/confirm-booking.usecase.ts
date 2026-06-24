@@ -1,4 +1,4 @@
-import { BookingStatus } from '../../../../infrastructure/database/model/booking.model';
+import { BookingStatus } from '../../../../common/enums/booking-status.enum';
 import { Booking } from '../../../../domain/entities/booking.entity';
 import { SeatStatus } from '../../../../common/enums/searstatus-enum';
 import type { IBookingRepository } from '../../../../domain/repositories/booking/booking.repository.interface';

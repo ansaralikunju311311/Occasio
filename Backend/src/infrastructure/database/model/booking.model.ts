@@ -1,13 +1,10 @@
 import type { Document } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
 
-export enum BookingStatus {
-  PENDING = 'PENDING',
-  CONFIRMED = 'CONFIRMED',
-  FAILED = 'FAILED',
-  CANCELLED = 'CANCELLED',
-  EXPIRED = 'EXPIRED',
-}
+import { BookingStatus } from '../../../common/enums/booking-status.enum';
+
+// Re-export for infrastructure compatibility
+export { BookingStatus } from '../../../common/enums/booking-status.enum';
 
 export interface IBookingDocument extends Document {
   userId: mongoose.Types.ObjectId;

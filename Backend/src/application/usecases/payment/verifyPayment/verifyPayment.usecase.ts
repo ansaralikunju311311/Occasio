@@ -2,13 +2,14 @@ import type { IPaymentGateway } from '../../../../domain/services/payment-gatewa
 import type { IEventRepository } from '../../../../domain/repositories/event/event.repository.interface';
 import type { IPaymentRepository } from '../../../../domain/repositories/payment/payment.repository.interface';
 import type { IBookingRepository } from '../../../../domain/repositories/booking/booking.repository.interface';
+import type { ISeatRepository } from '../../../../domain/repositories/seats/seat.repository.interface';
 import { Payment } from '../../../../domain/entities/payment.entity';
 import { PaymentPurpose } from '../../../../common/enums/payment-purpose.enum';
 import { PaymentStatus } from '../../../../common/enums/payment-status.enum';
 import { PaymentMethod } from '../../../../common/enums/payment-method.enum';
-import { BookingStatus } from '../../../../infrastructure/database/model/booking.model';
-import { SeatModel } from '../../../../infrastructure/database/model/events/seat.model';
+import { BookingStatus } from '../../../../common/enums/booking-status.enum';
 import { SeatStatus } from '../../../../common/enums/searstatus-enum';
+import type { VerifyPaymentDto } from '../../../../application/dtos/verify-payment.dto';
 
 import type { IVerifyPaymentUseCase } from './verifyPayment.usecase.interface';
 
@@ -18,15 +19,11 @@ export class VerifyPaymentUseCase implements IVerifyPaymentUseCase {
     private _eventRepository: IEventRepository,
     private _paymentRepository: IPaymentRepository,
     private _bookingRepository: IBookingRepository,
+    private _seatRepository: ISeatRepository,
   ) {}
 
   async execute(
-    data: {
-      razorpay_order_id: string;
-      razorpay_payment_id: string;
-      razorpay_signature: string;
-      eventId: string;
-    },
+    data: VerifyPaymentDto,
     userId: string,
   ): Promise<Record<string, unknown>> {
     const {
@@ -94,22 +91,18 @@ export class VerifyPaymentUseCase implements IVerifyPaymentUseCase {
             }
           }
 
-          // Upsert Seat document as BOOKED
-          await SeatModel.findOneAndUpdate(
-            { eventId: booking.eventId, seatNumber: seatStr },
-            {
-              eventId: booking.eventId,
-              layoutId: layoutId,
-              block,
-              row,
-              column,
-              seatNumber: seatStr,
-              price,
-              categoryName,
-              status: SeatStatus.BOOKED,
-            },
-            { upsert: true, new: true },
-          );
+          // Upsert Seat document as BOOKED using repository
+          await this._seatRepository.upsertSeat({
+            eventId: booking.eventId,
+            layoutId: layoutId,
+            block,
+            row,
+            column,
+            seatNumber: seatStr,
+            price,
+            categoryName,
+            status: SeatStatus.BOOKED,
+          });
         }
       }
 
