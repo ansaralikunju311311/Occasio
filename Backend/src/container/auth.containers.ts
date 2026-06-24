@@ -15,6 +15,8 @@ import { UpdatePasswordUseCase } from '../application/usecases/auth/updatepasswo
 import { ResetPasswordUseCase } from '../application/usecases/auth/resetPassword/reset.usecase';
 import { AdminLoginUseCase } from '../application/usecases/auth/adminLogin/adminLogin.usecase';
 import { SessionService } from '../common/services/session.service';
+import { GoogleLogin } from '../application/usecases/auth/googleLogin/googleLogin.usecase';
+import { RefreshTokenUseCase } from '../common/services/refreshtoken.service';
 export const MakeAdminController = () => {
   const userRepository = new UserRepository();
   const hashService = new BcryptHashService();
@@ -23,7 +25,8 @@ export const MakeAdminController = () => {
   const tokenService = new CreateToken();
   const comapreService = new BcryptHashService();
   const sessionservice = new SessionService();
-
+const googleLoginUseCase = new GoogleLogin(tokenService);
+const refreshToken =  new RefreshTokenUseCase(tokenService)
 
   const signupUsecase = new SignupUsecase(
     userRepository,
@@ -47,7 +50,6 @@ export const MakeAdminController = () => {
     emailService,
     otpRespository,
   );
-  const createtoken = new CreateToken();
   const loginUseCase = new LoginUseCase(
     userRepository,
     comapreService,
@@ -69,19 +71,26 @@ export const MakeAdminController = () => {
     tokenService,
   );
 
+
+
+
+
+
   return new AuthController(
-    signupUsecase,
-    verifyUseCase,
-    resendotpUseCase,
-    getmeUseCase,
-    forgotpasswordUsecase,
-    createtoken,
-    loginUseCase,
-    resetPasswordUseCase,
-    updatePasswordUseCase,
-    adminLoginUseCase,
-    sessionservice
-  );
+  signupUsecase,
+  verifyUseCase,
+  resendotpUseCase,
+  getmeUseCase,
+  forgotpasswordUsecase,
+  
+  loginUseCase,
+  resetPasswordUseCase,
+  updatePasswordUseCase,
+  adminLoginUseCase,
+  sessionservice,
+  refreshToken,
+  googleLoginUseCase,
+);
 };
 
 //   private userRepository:IUserRepository,

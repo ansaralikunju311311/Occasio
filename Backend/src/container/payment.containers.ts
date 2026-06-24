@@ -11,6 +11,8 @@ import { GetBreakdownUseCase } from '../application/usecases/payment/getBreakdow
 import { CreateSubscriptionOrderUseCase } from '../application/usecases/payment/createSubscriptionOrder/createSubscriptionOrder.usecase';
 import { VerifySubscriptionPaymentUseCase } from '../application/usecases/payment/verifySubscriptionPayment/verifySubscriptionPayment.usecase';
 import { ManagerSubscriptionRepository } from '../infrastructure/repositories/manager-subscription/manager-subscription.repository';
+import { GetMyBookingUseCase } from '../application/usecases/booking/getMybookings/gertmybooking.usecase';
+import { GetManagerBookingUseCase } from '../application/usecases/booking/getManagerbookings/getmanagerbooking.usecase';
 
 export const MakePaymentController = () => {
   const paymentGateway = new RazorpayGateway();
@@ -56,14 +58,22 @@ export const MakePaymentController = () => {
     subscriptionRepository,
     managerSubscriptionRepository
   );
+  const getMybookingUseCase = new GetMyBookingUseCase(
+     bookingRepository
+  )
+  const getManagerBookingUseCase = new GetManagerBookingUseCase(
+    bookingRepository
+  )
 
   return new PaymentController(
+    
     createOrderUseCase,
     verifyPaymentUseCase,
     getBreakdownUseCase,
-    bookingRepository,
     createSubscriptionOrderUseCase,
-    verifySubscriptionPaymentUseCase
+    verifySubscriptionPaymentUseCase,
+    getMybookingUseCase,
+    getManagerBookingUseCase
   );
 };
 

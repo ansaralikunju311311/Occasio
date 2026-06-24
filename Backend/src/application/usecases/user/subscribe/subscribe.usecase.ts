@@ -34,7 +34,7 @@ export class SubscribeUseCase implements ISubscribeUseCase {
           throw new Error('You cannot downgrade to a lower tier plan.');
         }
 
-        managerSub.plan = plan.name as ManagerPlan;
+        managerSub.plan = plan.name as unknown as ManagerPlan;
         managerSub.eventLimit = plan.eventLimit;
         managerSub.eventsUsed = 0;
         managerSub.startDate = new Date();

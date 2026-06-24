@@ -21,7 +21,7 @@ export abstract class BaseRepository<T> {
     data: UpdateQuery<T>,
     options?: any
   ): Promise<HydratedDocument<T> | null> {
-    return this.model.findByIdAndUpdate(id, data, { new: true, ...options }).exec();
+    return this.model.findByIdAndUpdate(id, data, { new: true, ...options }).exec() as any;
   }
 
   async findAll(filter: FilterQuery<T> = {}): Promise<HydratedDocument<T>[]> {
@@ -47,6 +47,6 @@ export abstract class BaseRepository<T> {
     data: UpdateQuery<T>,
     options?: any
   ): Promise<HydratedDocument<T> | null> {
-    return this.model.findOneAndUpdate(filter, data, { new: true, ...options }).exec();
+    return this.model.findOneAndUpdate(filter, data, { new: true, ...options }).exec() as any;
   }
 }

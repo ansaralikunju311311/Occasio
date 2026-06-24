@@ -1,9 +1,9 @@
 import { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
 import { userMapper } from '../../../../common/mappers/user.mapper';
 import { UserResponseDto } from '../../../../application/dtos/responses/user-response.dto';
-import { IApprovalUseCase } from '../manageApproval/managerapproval.usecase.interface';
+import { IUserdetailsUseCase } from './userdetails.usecase.interface';
 
-export class UserDetailsUseCase implements IApprovalUseCase {
+export class UserDetailsUseCase implements IUserdetailsUseCase {
   constructor(private userRepository: IUserRepository) {}
 
   async execute(userId: string): Promise<UserResponseDto | null> {

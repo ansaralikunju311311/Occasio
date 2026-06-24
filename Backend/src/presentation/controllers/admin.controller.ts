@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { HttpStatus } from '../../common/constants/http-status';
-import { UserDetailsUseCase } from '../../application/usecases/admin/userDetails/userdetails.usecase';
 import { IFindallUseCase } from '../../application/usecases/admin/allUsers/findall.usecase.interface';
 import { IUserManageUseCase } from '../../application/usecases/admin/usermanage/usermanage.usecase.interface';
 import { IManagerDetailsUseCase } from '../../application/usecases/admin/managerDetails/managerdetails.usecase.interface';
@@ -8,12 +7,13 @@ import { IApprovalUseCase } from '../../application/usecases/admin/manageApprova
 import { IManagerRejectionUseCase } from '../../application/usecases/admin/managerRejection/managerRejection.usecase.interface';
 import { IGetAllPaymentsUseCase } from '../../application/usecases/payment/getAllPayments/getAllPayments.usecase.interface';
 import { catchAsync } from '../../common/utils/catchAsync';
-
+// import { IRefreshTokenUseCase } from '../../common/interfaces/refresh.interface';
+import { IUserdetailsUseCase } from '../../application/usecases/admin/userDetails/userdetails.usecase.interface';
 export class AdminController {
   constructor(
     private findallUsecase: IFindallUseCase,
     private userManageUseCase: IUserManageUseCase,
-    private userDetailsUseCase: UserDetailsUseCase,
+    private userDetailsUseCase: IUserdetailsUseCase,
     private pendingmanagerDetailsUseCase: IManagerDetailsUseCase,
     private managerApprovalUseCase: IApprovalUseCase,
     private managerRejectionUseCase: IManagerRejectionUseCase,

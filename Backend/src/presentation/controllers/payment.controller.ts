@@ -7,15 +7,17 @@ import { IBookingRepository } from '../../domain/repositories/booking/booking.re
 import { ICreateSubscriptionOrderUseCase } from '../../application/usecases/payment/createSubscriptionOrder/createSubscriptionOrder.usecase.interface';
 import { IVerifySubscriptionPaymentUseCase } from '../../application/usecases/payment/verifySubscriptionPayment/verifySubscriptionPayment.usecase.interface';
 import { HttpStatus } from '../../common/constants/http-status';
-
+import { IGetMyBookingUseCase } from '../../application/usecases/booking/getMybookings/getmybooking.usecase.interface';
+import { IGetManagerBookingUseCase } from '../../application/usecases/booking/getManagerbookings/getmanagerbooking.usecase.interface';
 export class PaymentController {
   constructor(
     private createOrderUseCase: ICreateOrderUseCase,
     private verifyPaymentUseCase: IVerifyPaymentUseCase,
     private getBreakdownUseCase: IGetBreakdownUseCase,
-    private bookingRepository: IBookingRepository,
     private createSubscriptionOrderUseCase: ICreateSubscriptionOrderUseCase,
-    private verifySubscriptionPaymentUseCase: IVerifySubscriptionPaymentUseCase
+    private verifySubscriptionPaymentUseCase: IVerifySubscriptionPaymentUseCase,
+    private getMybookingUseCase:IGetMyBookingUseCase,
+    private getManagerBookingUseCase:IGetManagerBookingUseCase
   ) {}
 
   createSubscriptionOrder = async (req: Request, res: Response) => {
@@ -126,7 +128,9 @@ export class PaymentController {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
 
-      const result = await this.bookingRepository.getBookingsByUser(userId, { page, limit });
+      // const result = await this.bookingRepository.getBookingsByUser(userId, { page, limit });
+
+      const result = await this.getMybookingUseCase.execute(userId,page,limit)
       return res.status(HttpStatus.OK).json({ success: true, ...result });
     } catch (error: any) {
       return res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: error.message });
@@ -143,7 +147,8 @@ export class PaymentController {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
 
-      const result = await this.bookingRepository.getManagerBookings(managerId, { page, limit });
+
+      const result = await this.getManagerBookingUseCase.execute(managerId,page,limit)
       return res.status(HttpStatus.OK).json({ success: true, ...result });
     } catch (error: any) {
       return res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: error.message });

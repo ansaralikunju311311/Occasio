@@ -6,16 +6,16 @@ import { IReapplyUseCase } from '../../application/usecases/user/reapply/reapply
 import { IEditProfileUseCase } from '../../application/usecases/user/editProfile/editprofile.usecase.interface';
 import { catchAsync } from '../../common/utils/catchAsync';
 
-import { SubscribeUseCase } from '../../application/usecases/user/subscribe/subscribe.usecase';
-import { GetMySubscriptionUseCase } from '../../application/usecases/user/getMySubscription/get-my-subscription.usecase';
+import { IGetMySubscriptionUseCase } from '../../application/usecases/user/getMySubscription/get-mysub.usecase.interface';
+import { ISubscribeUseCase } from '../../application/usecases/user/subscribe/subscribe.usecase.interface';
 
 export class UserController {
   constructor(
     private UpgradeUseCase: IUpgradeUseCase,
     private ReapplyUseCase: IReapplyUseCase,
     private EditProfileUseCase: IEditProfileUseCase,
-    private SubscribeUseCase: SubscribeUseCase,
-    private GetMySubscriptionUseCase: GetMySubscriptionUseCase
+    private SubscribeUseCase: ISubscribeUseCase,
+    private GetMySubscriptionUseCase: IGetMySubscriptionUseCase
   ) {}
 
   upgraderole = catchAsync(async (req: Request, res: Response) => {
@@ -49,7 +49,7 @@ export class UserController {
     });
   });
 
-  subscribe = async (req: Request, res: Response): Promise<void> => {
+  subscribe = catchAsync(async (req: Request, res: Response): Promise<void> => {
     try {
       if (!req.authUser || !req.authUser.userId) {
         res.status(HttpStatus.UNAUTHORIZED).json({ success: false, message: 'Unauthorized' });
@@ -63,22 +63,19 @@ export class UserController {
         return;
       }
 
-      const subscribeUseCase = (this as any).SubscribeUseCase;
-      if (!subscribeUseCase) {
-        res.status(INTERNAL_SERVER_ERROR).json({ success: false, message: 'SubscribeUseCase not injected' });
-        return;
-      }
+      // const subscribeUseCase = (this as any).SubscribeUseCase;
+      const updatedUser = await this.SubscribeUseCase.execute(userId, planId);
+      
 
-      const updatedUser = await subscribeUseCase.execute(userId, planId);
+      
 
 
 
-      console.log("the code is active")
       res.status(HttpStatus.OK).json({ success: true, message: 'Subscribed successfully', user: updatedUser });
     } catch (error: any) {
       res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: error.message });
     }
-  };
+  });
 
   reapply = catchAsync(async (req: Request, res: Response) => {
     const userId = req.authUser!.userId;
@@ -103,14 +100,11 @@ export class UserController {
 
   getMySubscription = catchAsync(async (req: Request, res: Response) => {
     const userId = req.authUser!.userId;
-    const getMySubscriptionUseCase = (this as any).GetMySubscriptionUseCase;
-    
-    if (!getMySubscriptionUseCase) {
-      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'GetMySubscriptionUseCase not injected' });
-      return;
-    }
+    // const getMySubscriptionUseCase = (this as any).GetMySubscriptionUseCase;
+           const subscription = await this.GetMySubscriptionUseCase.execute(userId);
 
-    const subscription = await getMySubscriptionUseCase.execute(userId);
+   
+
 
     res.status(HttpStatus.OK).json({
       success: true,

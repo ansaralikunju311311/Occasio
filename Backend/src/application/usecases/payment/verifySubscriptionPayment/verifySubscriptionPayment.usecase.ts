@@ -56,7 +56,7 @@ export class VerifySubscriptionPaymentUseCase implements IVerifySubscriptionPaym
         }
 
         // 1. Assign new subscription details and reset eventsUsed
-        managerSub.plan = targetPlan.name as ManagerPlan;
+        managerSub.plan = targetPlan.name as unknown as ManagerPlan;
         managerSub.eventLimit = targetPlan.eventLimit;
         managerSub.eventsUsed = 0;
         managerSub.startDate = new Date();

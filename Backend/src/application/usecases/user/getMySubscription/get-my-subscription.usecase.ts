@@ -1,8 +1,10 @@
-import { IUserRepository } from '../../../../../domain/repositories/user.repository.interface';
-import { IManagerSubscriptionRepository } from '../../../../../domain/repositories/imanager-subscription.repository';
-import { ManagerSubscription } from '../../../../../domain/entities/manager-subscription.entity';
+import { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
+// import { IManagerSubscriptionRepository } from '../../../../domain/repositories/event/event.repository.interface';
+import { IManagerSubscriptionRepository } from '../../../../domain/repositories/imanager-subscription.repository';
+import { ManagerSubscription } from '../../../../domain/entities/manager-subscription.entity';
+import { IGetMySubscriptionUseCase } from './get-mysub.usecase.interface';
 
-export class GetMySubscriptionUseCase {
+export class GetMySubscriptionUseCase implements IGetMySubscriptionUseCase{
   constructor(
     private readonly userRepository: IUserRepository,
     private readonly managerSubscriptionRepository: IManagerSubscriptionRepository

@@ -1,4 +1,6 @@
+import { Response } from 'express';
+
 export interface ISessionService{
     setRefreshToken(res:Response,token:string):void,
-    clerRefreshToken(res:Response):void
+    clearRefreshToken(res:Response):void
 }

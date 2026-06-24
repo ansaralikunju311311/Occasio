@@ -7,11 +7,12 @@ import { IVerifyOtpUseCase } from '../../application/usecases/auth/otp/verifyotp
 import { IResendUseCase } from '../../application/usecases/auth/resendotp/resend.usecase.interface';
 import { IApprovalUseCase } from '../../application/usecases/admin/manageApproval/managerapproval.usecase.interface';
 import { IForgotpasswordUsecase } from '../../application/usecases/auth/forgotpassword/forgot.usecase.interface';
-import { ITokenService } from '../../domain/services/token.service.interface';
 import { ILoginUsecase } from '../../application/usecases/auth/login/login.usecase.interface';
 import { IUpdateUseCase } from '../../application/usecases/auth/updatepassword/update.usecase.interface';
 import { IResetPasswordUseCase } from '../../application/usecases/auth/resetPassword/reset.usecase.interface';
 import { catchAsync } from '../../common/utils/catchAsync';
+import { IRefreshTokenUseCase } from '../../common/interfaces/refresh.interface';
+import { IGoogleLoginUseCase } from '../../application/usecases/auth/googleLogin/googleLogin.usecase.interface';
 import { ISessionService } from '../../common/interfaces/session.interface';
 export class AuthController {
   constructor(
@@ -20,12 +21,13 @@ export class AuthController {
     private ResendotpUseCase: IResendUseCase,
     private GetmeUseCase: IApprovalUseCase,
     private ForgotpasswordUsecase: IForgotpasswordUsecase,
-    private tokenService: ITokenService,
     private LoginUseCase: ILoginUsecase,
     private ResetPasswordUseCase: IResetPasswordUseCase,
     private UpdatePasswordUseCase: IUpdateUseCase,
     private AdminLoginUseCase: ILoginUsecase,
-    private SessionService:ISessionService
+    private SessionService:ISessionService,
+    private RefreshTokenUseCase:IRefreshTokenUseCase,
+    private GoogleLoginUseCase:IGoogleLoginUseCase
   ) {}
 
   signup = catchAsync(async (req: Request, res: Response) => {
@@ -51,16 +53,9 @@ export class AuthController {
     logger.info(`Verifying OTP for email: ${email}`);
 
     const { user, accessToken, refreshToken } = await this.VerifyUseCase.execute({ email, otp });
-
-    // res.cookie('refreshToken', refreshToken, {
-    //   httpOnly: true,
-    //   secure: process.env.NODE_ENV === 'production',
-    //   sameSite: 'lax',
-    //   maxAge:process.env.MAX_AGE,
-    // });
-
-
-    this.SessionService.setRefreshToken(res,refreshToken)
+    if (refreshToken) {
+      this.SessionService.setRefreshToken(res, refreshToken);
+    }
 
     res.status(HttpStatus.OK).json({
       message: SuccessMessage.OTP_VERIFIED,
@@ -99,13 +94,9 @@ export class AuthController {
   });
 
   logout = (req: Request, res: Response) => {
-    // res.clearCookie('refreshToken', {
-    //   httpOnly: true,
-    //   secure: process.env.NODE_ENV === 'production',
-    //   sameSite: 'lax',
-    // });
+  
 
-    this.SessionService.clerRefreshToken(res)
+    this.SessionService.clearRefreshToken(res)
 
     return res.status(HttpStatus.OK).json({
       success: true,
@@ -122,11 +113,9 @@ export class AuthController {
       });
     }
 
-    const decode = this.tokenService.verifyRefreshToken(refreshToken) as any;
-    const newaccessToken = this.tokenService.generateAccessToken({
-      userId: decode.userId,
-      role: decode.role,
-    });
+   
+
+    const newaccessToken = await this.RefreshTokenUseCase.execute(refreshToken)
 
     return res.json({
       accessToken: newaccessToken,
@@ -136,15 +125,9 @@ export class AuthController {
   login = catchAsync(async (req: Request, res: Response) => {
     const { email, password } = req.body;
     const { user, accessToken, refreshToken } = await this.LoginUseCase.execute({ email, password });
-
-    // res.cookie('refreshToken', refreshToken, {
-    //   httpOnly: true,
-    //   secure: process.env.NODE_ENV === 'production',
-    //   sameSite: 'lax',
-    //   maxAge:process.env.MAX_AGE,
-    // });
-
-    this.SessionService.setRefreshToken(res,refreshToken)
+    if (refreshToken) {
+      this.SessionService.setRefreshToken(res, refreshToken);
+    }
     res.status(HttpStatus.OK).json({
       message: SuccessMessage.LOGIN_SUCCESS,
       user,
@@ -182,7 +165,7 @@ export class AuthController {
     });
   });
 
-  googleLogin = (req: Request, res: Response) => {
+  googleLogin =catchAsync(async (req: Request, res: Response) => {
     const user = req.user as any;
 
     if (!user || !user.id) {
@@ -190,38 +173,30 @@ export class AuthController {
         message: ErrorMessage.USER_NOT_FOUND,
       });
     }
-    const accessToken = this.tokenService.generateAccessToken({
-      userId: user.id,
-      role: user.role,
-    });
-
-    const refreshToken = this.tokenService.generateRefreshToken({
-      userId: user.id,
-      role: user.role,
-    });
-
-    // res.cookie('refreshToken', refreshToken, {
-    //   httpOnly: true,
-    //   secure: process.env.NODE_ENV === 'production',
-    //   sameSite: 'lax',
+    // const accessToken = this.tokenService.generateAccessToken({
+    //   userId: user.id,
+    //   role: user.role,
     // });
 
-    this.SessionService.setRefreshToken(res,refreshToken)
+    // const refreshToken = this.tokenService.generateRefreshToken({
+    //   userId: user.id,
+    //   role: user.role,
+    // });
+
+       const { accessToken, refreshToken } = await this.GoogleLoginUseCase.execute(user.id,user.role)
+    if (refreshToken) {
+      this.SessionService.setRefreshToken(res, refreshToken);
+    }
 
     res.redirect(`http://localhost:5173/oauth-success?token=${accessToken}`);
-  };
+  });
 
   adminlogin = catchAsync(async (req: Request, res: Response) => {
     const { email, password } = req.body;
     const { user, accessToken, refreshToken } = await this.AdminLoginUseCase.execute({ email, password });
-
-    // res.cookie('refreshToken', refreshToken, {
-    //   httpOnly: true,
-    //   secure: process.env.NODE_ENV === 'production',
-    //   sameSite: 'lax',
-    //   maxAge:process.env.MAX_AGE,
-    // });
-        this.SessionService.setRefreshToken(res,refreshToken)
+    if (refreshToken) {
+      this.SessionService.setRefreshToken(res, refreshToken);
+    }
 
 
     res.status(HttpStatus.OK).json({

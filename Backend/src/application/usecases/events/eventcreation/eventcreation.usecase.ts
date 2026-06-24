@@ -13,6 +13,7 @@ import { IUserRepository } from '../../../../domain/repositories/user.repository
 import { ISubscriptionRepository } from '../../../../domain/repositories/subscription/subscription.repository.interface';
 import { IManagerSubscriptionRepository } from '../../../../domain/repositories/imanager-subscription.repository';
 import { ManagerPlan } from '../../../../common/enums/manager-plan.enum';
+import { ManagerSubscription } from '../../../../domain/entities/manager-subscription.entity';
 
 export class EventCretionUseCase implements IEventCreationUseCase {
   constructor(
@@ -32,7 +33,7 @@ export class EventCretionUseCase implements IEventCreationUseCase {
       throw new Error('User not found');
     }
 
-    let activeSub = null;
+    let activeSub: ManagerSubscription | null = null;
     if (user.activeSubscription) {
       activeSub = await this.managerSubscriptionRepository.findById(user.activeSubscription);
 
