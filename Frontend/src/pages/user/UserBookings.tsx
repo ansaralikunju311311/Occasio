@@ -5,6 +5,7 @@ import { paymentService } from '../../services/payment.service';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { toast } from 'sonner';
 import { APP_MESSAGES } from '../../constants';
+import { Table } from '../../components/common/Table';
 
 interface Booking {
   id: string;
@@ -95,27 +96,55 @@ const UserBookings = () => {
           </button>
         </div>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2">
-          {bookings.map((booking) => (
-            <div
-              key={booking.id}
-              className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-3xl p-6 flex flex-col justify-between hover:border-slate-700/80 transition-all duration-300 shadow-xl"
-            >
-              <div>
-                <div className="flex gap-4 mb-4">
-                  <img
-                    src={booking.eventId.picture || 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30'}
-                    alt={booking.eventId.title}
-                    className="w-16 h-16 rounded-xl object-cover border border-white/10"
-                  />
-                  <div>
-                    <h3 className="font-bold text-white text-lg leading-snug line-clamp-1">
+        <div className="bg-[#0a0f16]/80 backdrop-blur-xl border border-slate-800/60 rounded-2xl overflow-hidden shadow-2xl">
+          <Table
+            tableClassName="w-full text-left border-collapse min-w-[900px]"
+            theadClassName=""
+            trHeadClassName="bg-slate-900/60 border-b border-slate-800 text-slate-400 text-xs uppercase tracking-wider font-semibold"
+            tbodyClassName="divide-y divide-slate-800/60"
+            columns={[
+              { header: 'Event', className: 'px-6 py-4' },
+              { header: 'Date & Time', className: 'px-6 py-4' },
+              { header: 'Type / Format', className: 'px-6 py-4' },
+              { header: 'Seats', className: 'px-6 py-4' },
+              { header: 'Amount Paid', className: 'px-6 py-4' },
+              { header: 'Status', className: 'px-6 py-4' },
+              { header: 'Actions', className: 'px-6 py-4 text-right' },
+            ]}
+            data={bookings}
+            emptyState={
+              <tr>
+                <td colSpan={7} className="px-6 py-12 text-center text-slate-500">
+                  No bookings found
+                </td>
+              </tr>
+            }
+            renderRow={(booking: Booking) => (
+              <tr key={booking.id} className="hover:bg-slate-800/20 transition-colors duration-150 text-slate-300 text-sm">
+                <td className="px-6 py-4">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={booking.eventId.picture || 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30'}
+                      alt={booking.eventId.title}
+                      className="w-12 h-12 rounded-lg object-cover border border-white/10 shrink-0"
+                    />
+                    <div className="font-bold text-white max-w-[200px] truncate" title={booking.eventId.title}>
                       {booking.eventId.title}
-                    </h3>
-                    <p className="text-slate-400 text-xs mt-1">
-                      {booking.eventId?.startTime ? new Date(booking.eventId.startTime).toLocaleString() : 'N/A'}
-                    </p>
-                    <div className="flex gap-2 mt-2">
+                    </div>
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {booking.eventId?.startTime ? new Date(booking.eventId.startTime).toLocaleString('en-IN', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  }) : 'N/A'}
+                </td>
+                <td className="px-6 py-4">
+                  <div className="flex flex-col gap-1">
+                    <div className="flex gap-1.5">
                       <span className="px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-[9px] font-bold uppercase tracking-wider">
                         {booking.eventId.eventType}
                       </span>
@@ -123,52 +152,26 @@ const UserBookings = () => {
                         {booking.bookingType}
                       </span>
                     </div>
-                  </div>
-                </div>
-
-                <div className="space-y-2 py-4 border-t border-b border-slate-800/50 flex justify-between items-center">
-                  <div className="space-y-2 flex-grow">
-                    {booking.bookingType === 'physical' && booking.seats.length > 0 && (
-                      <div className="flex justify-between items-center text-xs pr-4">
-                        <span className="text-slate-400 font-semibold uppercase tracking-wider">Seats</span>
-                        <span className="text-white font-bold">{booking.seats.join(', ')}</span>
-                      </div>
-                    )}
                     {booking.eventId.location?.address && (
-                      <div className="flex justify-between items-start text-xs pr-4 gap-4">
-                        <span className="text-slate-400 font-semibold uppercase tracking-wider whitespace-nowrap">Venue</span>
-                        <span className="text-slate-300 font-medium text-right line-clamp-1">{booking.eventId.location.address}</span>
-                      </div>
+                      <span className="text-slate-400 text-xs truncate max-w-[180px]" title={booking.eventId.location.address}>
+                        {booking.eventId.location.address}
+                      </span>
                     )}
-                    <div className="flex justify-between items-center text-xs pr-4">
-                      <span className="text-slate-400 font-semibold uppercase tracking-wider">Amount Paid</span>
-                      <span className="text-teal-400 font-bold text-sm">₹{booking.totalAmount}</span>
-                    </div>
                   </div>
-
-                  {/* QR Code thumbnail preview */}
-                  <div
-                    onClick={() => navigate(`/booking/${booking.id}`)}
-                    className="w-14 h-14 bg-white p-1 rounded-xl flex items-center justify-center cursor-pointer border border-slate-700/50 shadow-inner shrink-0 group/qr"
-                    title="Click to view ticket QR Code"
-                  >
-                    <img
-                      src={`https://api.qrserver.com/v1/create-qr-code/?size=60x60&data=${booking.id}`}
-                      alt="QR"
-                      className="w-full h-full object-contain group-hover/qr:scale-105 transition-transform"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-4 flex items-center justify-between">
-                <span className="text-[10px] text-slate-500">
-                  Booked on {booking.createdAt ? new Date(booking.createdAt).toLocaleDateString() : 'N/A'}
-                </span>
-                
-                <div className="flex items-center gap-3">
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap font-medium text-white">
+                  {booking.bookingType === 'physical' && booking.seats.length > 0 ? (
+                    booking.seats.join(', ')
+                  ) : (
+                    <span className="text-slate-500">-</span>
+                  )}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap font-bold text-teal-400">
+                  ₹{booking.totalAmount}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
                   <span
-                    className={`px-3 py-1 rounded-full text-[10px] font-black tracking-wider uppercase border ${
+                    className={`inline-flex px-3 py-1 rounded-full text-[10px] font-black tracking-wider uppercase border ${
                       booking.status === 'SUCCESS'
                         ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
                         : booking.status === 'PENDING'
@@ -178,17 +181,31 @@ const UserBookings = () => {
                   >
                     {booking.status}
                   </span>
-
-                  <button
-                    onClick={() => navigate(`/booking/${booking.id}`)}
-                    className="px-4 py-1.5 bg-indigo-600/20 hover:bg-indigo-600 text-indigo-400 hover:text-white text-xs font-bold rounded-lg border border-indigo-500/20 transition-all cursor-pointer"
-                  >
-                    View Ticket
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
+                </td>
+                <td className="px-6 py-4 text-right whitespace-nowrap">
+                  <div className="flex items-center justify-end gap-3">
+                    <div
+                      onClick={() => navigate(`/booking/${booking.id}`)}
+                      className="w-10 h-10 bg-white p-0.5 rounded-lg flex items-center justify-center cursor-pointer border border-slate-700/50 shadow-inner shrink-0 group/qr"
+                      title="Click to view ticket QR Code"
+                    >
+                      <img
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=40x40&data=${booking.id}`}
+                        alt="QR"
+                        className="w-full h-full object-contain group-hover/qr:scale-105 transition-transform"
+                      />
+                    </div>
+                    <button
+                      onClick={() => navigate(`/booking/${booking.id}`)}
+                      className="px-3 py-1.5 bg-indigo-600/20 hover:bg-indigo-600 text-indigo-400 hover:text-white text-xs font-bold rounded-lg border border-indigo-500/20 transition-all cursor-pointer"
+                    >
+                      View Ticket
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            )}
+          />
         </div>
       )}
     </div>
