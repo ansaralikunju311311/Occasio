@@ -15,6 +15,7 @@ import { catchAsync } from '../../common/utils/catchAsync';
 import type { IRefreshTokenUseCase } from '../../common/interfaces/refresh.interface';
 import type { IGoogleLoginUseCase } from '../../application/usecases/auth/googleLogin/googleLogin.usecase.interface';
 import type { ISessionService } from '../../common/interfaces/session.interface';
+import { sendSuccess } from '../../common/utils/response';
 
 export class AuthController {
   constructor(
@@ -44,10 +45,7 @@ export class AuthController {
       isVerified: Boolean(isVerified),
     });
 
-    res.status(HttpStatus.CREATED).json({
-      message: SuccessMessage.USER_CREATED,
-      data: user,
-    });
+    sendSuccess(res, user, SuccessMessage.USER_CREATED, HttpStatus.CREATED);
   });
 
   verify = catchAsync(async (req: Request, res: Response) => {
@@ -60,71 +58,71 @@ export class AuthController {
       this._sessionService.setRefreshToken(res, refreshToken);
     }
 
-    res.status(HttpStatus.OK).json({
-      message: SuccessMessage.OTP_VERIFIED,
-      user,
-      accessToken,
-    });
+    sendSuccess(
+      res,
+      { user, accessToken },
+      SuccessMessage.OTP_VERIFIED,
+      HttpStatus.OK,
+      {
+        user,
+        accessToken,
+      },
+    );
   });
 
   resnedVerify = catchAsync(async (req: Request, res: Response) => {
     const { email } = req.body;
     const verifyOtp = await this._resendotpUseCase.execute(email);
 
-    res.status(HttpStatus.OK).json({
-      message: SuccessMessage.OTP_RESENT,
-      data: verifyOtp,
-    });
+    sendSuccess(res, verifyOtp, SuccessMessage.OTP_RESENT);
   });
 
   getMe = catchAsync(async (req: Request, res: Response) => {
     const userId = req.authUser?.userId;
     if (!userId) {
-      return res
-        .status(HttpStatus.UNAUTHORIZED)
-        .json({ message: 'Unauthorized' });
+      res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Unauthorized' });
+      return;
     }
     const user = await this._getmeUseCase.execute(userId);
 
-    res.status(HttpStatus.OK).json({
-      user,
-    });
+    sendSuccess(res, user, undefined, HttpStatus.OK, { user });
   });
 
   forgotPassword = catchAsync(async (req: Request, res: Response) => {
     const { email } = req.body;
     const user = await this._forgotpasswordUsecase.execute(email);
 
-    res.status(HttpStatus.OK).json({
-      message: SuccessMessage.OTP_SENT,
-      data: user,
-    });
+    sendSuccess(res, user, SuccessMessage.OTP_SENT);
   });
 
   logout = (req: Request, res: Response) => {
     this._sessionService.clearRefreshToken(res);
 
-    return res.status(HttpStatus.OK).json({
-      success: true,
-      message: SuccessMessage.LOGOUT_SUCCESS,
-    });
+    sendSuccess(res, null, SuccessMessage.LOGOUT_SUCCESS);
   };
 
   refreshToken = catchAsync(async (req: Request, res: Response) => {
     const refreshToken = req.cookies.refreshToken;
 
     if (!refreshToken) {
-      return res.status(HttpStatus.UNAUTHORIZED).json({
+      res.status(HttpStatus.UNAUTHORIZED).json({
         message: ErrorMessage.REFRESH_TOKEN_MISSING,
       });
+      return;
     }
 
     const newaccessToken =
       await this._refreshTokenUseCase.execute(refreshToken);
 
-    return res.json({
-      accessToken: newaccessToken,
-    });
+    sendSuccess(
+      res,
+      { accessToken: newaccessToken },
+      undefined,
+      HttpStatus.OK,
+      {
+        accessToken: newaccessToken,
+      },
+    );
   });
 
   login = catchAsync(async (req: Request, res: Response) => {
@@ -134,11 +132,16 @@ export class AuthController {
     if (refreshToken) {
       this._sessionService.setRefreshToken(res, refreshToken);
     }
-    res.status(HttpStatus.OK).json({
-      message: SuccessMessage.LOGIN_SUCCESS,
-      user,
-      accessToken,
-    });
+    sendSuccess(
+      res,
+      { user, accessToken },
+      SuccessMessage.LOGIN_SUCCESS,
+      HttpStatus.OK,
+      {
+        user,
+        accessToken,
+      },
+    );
   });
 
   updatePassword = catchAsync(async (req: Request, res: Response) => {
@@ -150,10 +153,7 @@ export class AuthController {
       confirmPassword,
     });
 
-    res.status(HttpStatus.OK).json({
-      message: SuccessMessage.PASSWORD_UPDATED,
-      data: user,
-    });
+    sendSuccess(res, user, SuccessMessage.PASSWORD_UPDATED);
   });
 
   resetpassword = catchAsync(async (req: Request, res: Response) => {
@@ -165,29 +165,18 @@ export class AuthController {
       confirmpassword,
     });
 
-    res.status(HttpStatus.OK).json({
-      message: SuccessMessage.PASSWORD_RESET,
-      data: user,
-    });
+    sendSuccess(res, user, SuccessMessage.PASSWORD_RESET);
   });
 
   googleLogin = catchAsync(async (req: Request, res: Response) => {
     const oauthUser = req.user as { id: string; role: string } | undefined;
 
     if (!oauthUser || !oauthUser.id) {
-      return res.status(HttpStatus.UNAUTHORIZED).json({
+      res.status(HttpStatus.UNAUTHORIZED).json({
         message: ErrorMessage.USER_NOT_FOUND,
       });
+      return;
     }
-    // const accessToken = this.tokenService.generateAccessToken({
-    //   userId: user.id,
-    //   role: user.role,
-    // });
-
-    // const refreshToken = this.tokenService.generateRefreshToken({
-    //   userId: user.id,
-    //   role: user.role,
-    // });
 
     const { accessToken, refreshToken } =
       await this._googleLoginUseCase.execute(oauthUser.id, oauthUser.role);
@@ -208,10 +197,15 @@ export class AuthController {
       this._sessionService.setRefreshToken(res, refreshToken);
     }
 
-    res.status(HttpStatus.OK).json({
-      message: SuccessMessage.LOGIN_SUCCESS,
-      user,
-      accessToken,
-    });
+    sendSuccess(
+      res,
+      { user, accessToken },
+      SuccessMessage.LOGIN_SUCCESS,
+      HttpStatus.OK,
+      {
+        user,
+        accessToken,
+      },
+    );
   });
 }

@@ -12,6 +12,7 @@ import type { IMyEventsUseCase } from '../../application/usecases/events/myevent
 import { catchAsync } from '../../common/utils/catchAsync';
 import type { IDeleteEventUseCase } from '../../application/usecases/events/deleteevent/deleteevent.usecase.interface';
 import type { IUpdateEventUseCase } from '../../application/usecases/events/updatevent/updatevent.usecase.interface';
+import { sendSuccess } from '../../common/utils/response';
 
 export class EventController {
   constructor(
@@ -26,9 +27,8 @@ export class EventController {
   eventCreation = catchAsync(async (req: Request, res: Response) => {
     const userId = req.authUser?.userId;
     if (!userId) {
-      return res
-        .status(HttpStatus.UNAUTHORIZED)
-        .json({ message: 'Unauthorized' });
+      res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Unauthorized' });
+      return;
     }
 
     const dto: EventDto = {
@@ -51,9 +51,7 @@ export class EventController {
 
     const creation = await this._eventCreationUseCase.execute(dto, userId);
 
-    res.status(HttpStatus.CREATED).json({
-      creation,
-    });
+    sendSuccess(res, creation, undefined, HttpStatus.CREATED, { creation });
   });
 
   allEvents = catchAsync(async (req: Request, res: Response) => {
@@ -74,13 +72,14 @@ export class EventController {
     });
 
     if (!result) {
-      return res.status(HttpStatus.OK).json({
+      sendSuccess(res, [], undefined, HttpStatus.OK, {
         events: [],
         metadata: { total: 0, page, limit, totalPages: 0 },
       });
+      return;
     }
 
-    res.status(HttpStatus.OK).json({
+    sendSuccess(res, result.data, undefined, HttpStatus.OK, {
       events: result.data,
       metadata: result.metadata,
     });
@@ -89,17 +88,14 @@ export class EventController {
   eventDetails = catchAsync(async (req: Request, res: Response) => {
     const id = req.params.id as string;
     const events = await this._eventDetailsUseCase.execute(id);
-    res.status(HttpStatus.OK).json({
-      events,
-    });
+    sendSuccess(res, events, undefined, HttpStatus.OK, { events });
   });
 
   myEvents = catchAsync(async (req: Request, res: Response) => {
     const userId = req.authUser?.userId;
     if (!userId) {
-      return res
-        .status(HttpStatus.UNAUTHORIZED)
-        .json({ message: 'Unauthorized' });
+      res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Unauthorized' });
+      return;
     }
     const search = req.query.search as string;
     const page = parseInt(req.query.page as string) || 1;
@@ -110,7 +106,7 @@ export class EventController {
       page,
       limit,
     });
-    res.status(HttpStatus.OK).json({
+    sendSuccess(res, result?.data || [], undefined, HttpStatus.OK, {
       events: result?.data || [],
       metadata: result?.metadata,
     });
@@ -120,9 +116,8 @@ export class EventController {
     const id = req.params.id as string;
     const managerId = req.authUser?.userId;
     if (!managerId) {
-      return res
-        .status(HttpStatus.UNAUTHORIZED)
-        .json({ message: 'Unauthorized' });
+      res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Unauthorized' });
+      return;
     }
 
     const dto: UpdateEventDTO = {};
@@ -158,16 +153,12 @@ export class EventController {
     }
 
     const result = await this._updateEventsUseCase.execute(id, managerId, dto);
-    res.status(HttpStatus.OK).json({
-      data: result,
-    });
+    sendSuccess(res, result, undefined, HttpStatus.OK, { data: result });
   });
 
   deleteEvent = catchAsync(async (req: Request, res: Response) => {
     const id = req.params.id as string;
     const result = await this._deleteEventUseCase.execute(id);
-    res.status(HttpStatus.OK).json({
-      success: result,
-    });
+    sendSuccess(res, result);
   });
 }

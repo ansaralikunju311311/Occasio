@@ -10,6 +10,7 @@ import type { IEditProfileUseCase } from '../../application/usecases/user/editPr
 import { catchAsync } from '../../common/utils/catchAsync';
 import type { IGetMySubscriptionUseCase } from '../../application/usecases/user/getMySubscription/get-mysub.usecase.interface';
 import type { ISubscribeUseCase } from '../../application/usecases/user/subscribe/subscribe.usecase.interface';
+import { sendSuccess } from '../../common/utils/response';
 
 export class UserController {
   constructor(
@@ -45,10 +46,15 @@ export class UserController {
       organizationType: organizationType as OrganizationType,
     });
 
-    res.status(HttpStatus.OK).json({
-      message: SuccessMessage.UPGRADE_REQUEST_SENT,
+    sendSuccess(
+      res,
       users,
-    });
+      SuccessMessage.UPGRADE_REQUEST_SENT,
+      HttpStatus.OK,
+      {
+        users,
+      },
+    );
   });
 
   subscribe = catchAsync(async (req: Request, res: Response): Promise<void> => {
@@ -70,9 +76,7 @@ export class UserController {
 
     const updatedUser = await this._subscribeUseCase.execute(userId, planId);
 
-    res.status(HttpStatus.OK).json({
-      success: true,
-      message: 'Subscribed successfully',
+    sendSuccess(res, updatedUser, 'Subscribed successfully', HttpStatus.OK, {
       user: updatedUser,
     });
   });
@@ -80,46 +84,43 @@ export class UserController {
   reapply = catchAsync(async (req: Request, res: Response) => {
     const userId = req.authUser?.userId;
     if (!userId) {
-      return res
-        .status(HttpStatus.UNAUTHORIZED)
-        .json({ message: 'Unauthorized' });
+      res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Unauthorized' });
+      return;
     }
 
     const users = await this._reapplyUseCase.execute(userId);
-    res.status(HttpStatus.OK).json({
-      message: SuccessMessage.REAPPLY_REQUEST_SENT,
+    sendSuccess(
+      res,
       users,
-    });
+      SuccessMessage.REAPPLY_REQUEST_SENT,
+      HttpStatus.OK,
+      {
+        users,
+      },
+    );
   });
 
   editProfile = catchAsync(async (req: Request, res: Response) => {
     const userId = req.authUser?.userId;
     if (!userId) {
-      return res
-        .status(HttpStatus.UNAUTHORIZED)
-        .json({ message: 'Unauthorized' });
+      res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Unauthorized' });
+      return;
     }
     const { name } = req.body;
 
     const profile = await this._editProfileUseCase.execute({ userId, name });
 
-    res.status(HttpStatus.OK).json({
-      profile,
-    });
+    sendSuccess(res, profile, undefined, HttpStatus.OK, { profile });
   });
 
   getMySubscription = catchAsync(async (req: Request, res: Response) => {
     const userId = req.authUser?.userId;
     if (!userId) {
-      return res
-        .status(HttpStatus.UNAUTHORIZED)
-        .json({ message: 'Unauthorized' });
+      res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Unauthorized' });
+      return;
     }
     const subscription = await this._getMySubscriptionUseCase.execute(userId);
 
-    res.status(HttpStatus.OK).json({
-      success: true,
-      subscription,
-    });
+    sendSuccess(res, subscription, undefined, HttpStatus.OK, { subscription });
   });
 }

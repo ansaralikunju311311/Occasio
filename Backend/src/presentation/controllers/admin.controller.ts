@@ -10,6 +10,7 @@ import type { IManagerRejectionUseCase } from '../../application/usecases/admin/
 import type { IGetAllPaymentsUseCase } from '../../application/usecases/payment/getAllPayments/getAllPayments.usecase.interface';
 import { catchAsync } from '../../common/utils/catchAsync';
 import type { IUserdetailsUseCase } from '../../application/usecases/admin/userDetails/userdetails.usecase.interface';
+import { sendSuccess } from '../../common/utils/response';
 
 export class AdminController {
   constructor(
@@ -37,7 +38,7 @@ export class AdminController {
       page,
       limit,
     });
-    res.status(HttpStatus.OK).json({
+    sendSuccess(res, result?.data || [], undefined, HttpStatus.OK, {
       users: result?.data || [],
       metadata: result?.metadata,
     });
@@ -51,25 +52,19 @@ export class AdminController {
       userId: userId as string,
       status: status as UserStatus,
     });
-    res.status(HttpStatus.OK).json({
-      user,
-    });
+    sendSuccess(res, user, undefined, HttpStatus.OK, { user });
   });
 
   userDetails = catchAsync(async (req: Request, res: Response) => {
     const { userId } = req.params;
     const user = await this._userDetailsUseCase.execute(userId as string);
-    res.status(HttpStatus.OK).json({
-      user,
-    });
+    sendSuccess(res, user, undefined, HttpStatus.OK, { user });
   });
 
   managerDetails = catchAsync(async (req: Request, res: Response) => {
     const { id } = req.params;
     const manager = await this._managerDetailsUseCase.execute(id as string);
-    res.status(HttpStatus.OK).json({
-      manager,
-    });
+    sendSuccess(res, manager, undefined, HttpStatus.OK, { manager });
   });
 
   pendingmanagerDetails = catchAsync(async (req: Request, res: Response) => {
@@ -80,17 +75,13 @@ export class AdminController {
       userId as string,
       search,
     );
-    res.status(HttpStatus.OK).json({
-      user,
-    });
+    sendSuccess(res, user, undefined, HttpStatus.OK, { user });
   });
 
   managerApproval = catchAsync(async (req: Request, res: Response) => {
     const { id } = req.params;
     const users = await this._managerApprovalUseCase.execute(id as string);
-    res.status(HttpStatus.OK).json({
-      users,
-    });
+    sendSuccess(res, users, undefined, HttpStatus.OK, { users });
   });
 
   managerRejection = catchAsync(async (req: Request, res: Response) => {
@@ -100,9 +91,7 @@ export class AdminController {
       id as string,
       reason,
     );
-    res.status(HttpStatus.OK).json({
-      users,
-    });
+    sendSuccess(res, users, undefined, HttpStatus.OK, { users });
   });
 
   getAllPayments = catchAsync(async (req: Request, res: Response) => {
@@ -110,7 +99,7 @@ export class AdminController {
     const limit = parseInt(req.query.limit as string) || 10;
 
     const result = await this._getAllPaymentsUseCase.execute({ page, limit });
-    res.status(HttpStatus.OK).json({
+    sendSuccess(res, result?.data || [], undefined, HttpStatus.OK, {
       payments: result?.data || [],
       metadata: result?.metadata,
     });

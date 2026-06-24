@@ -58,7 +58,9 @@ export class LockSeatsUseCase implements ILockSeatsUseCase {
 
     return {
       message: 'Seats locked successfully',
-      lockedSeats,
+      lockedSeats: lockedSeats.map((seat) => ({
+        id: seat._id,
+      })),
     };
   }
 }

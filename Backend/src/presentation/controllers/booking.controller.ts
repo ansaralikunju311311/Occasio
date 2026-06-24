@@ -6,6 +6,7 @@ import type { IConfirmBookingUseCase } from '../../application/usecases/booking/
 import type { IFailBookingUseCase } from '../../application/usecases/booking/bookingfailed/fail-booking.usecase.interface';
 import { catchAsync } from '../../common/utils/catchAsync';
 import { HttpStatus } from '../../common/constants/http-status';
+import { sendSuccess } from '../../common/utils/response';
 
 export class BookingController {
   constructor(
@@ -28,7 +29,13 @@ export class BookingController {
       eventId,
       seatIds,
     );
-    res.status(HttpStatus.OK).json(result);
+    sendSuccess(
+      res,
+      result,
+      result.message as string | undefined,
+      HttpStatus.OK,
+      result,
+    );
   });
 
   createPaymentIntent = catchAsync(
@@ -45,7 +52,7 @@ export class BookingController {
         eventId,
         amount,
       );
-      res.status(HttpStatus.OK).json(result);
+      sendSuccess(res, result);
     },
   );
 
@@ -67,7 +74,13 @@ export class BookingController {
         totalAmount,
         bookingType,
       );
-      res.status(HttpStatus.OK).json(result);
+      sendSuccess(
+        res,
+        result,
+        result.message as string | undefined,
+        HttpStatus.OK,
+        result,
+      );
     },
   );
 
@@ -81,7 +94,7 @@ export class BookingController {
       const { seatIds } = req.body;
 
       const result = await this._failBookingUseCase.execute(userId, seatIds);
-      res.status(HttpStatus.OK).json(result);
+      sendSuccess(res, result, 'Seats released successfully');
     },
   );
 }

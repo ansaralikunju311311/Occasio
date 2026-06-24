@@ -11,6 +11,9 @@ import type { VerifySubscriptionPaymentDto } from '../../application/dtos/verify
 import { HttpStatus } from '../../common/constants/http-status';
 import type { IGetMyBookingUseCase } from '../../application/usecases/booking/getMybookings/getmybooking.usecase.interface';
 import type { IGetManagerBookingUseCase } from '../../application/usecases/booking/getManagerbookings/getmanagerbooking.usecase.interface';
+import { catchAsync } from '../../common/utils/catchAsync';
+import { AppError } from '../../common/errors/apperror';
+import { sendSuccess } from '../../common/utils/response';
 
 export class PaymentController {
   constructor(
@@ -23,15 +26,13 @@ export class PaymentController {
     private _getManagerBookingUseCase: IGetManagerBookingUseCase,
   ) {}
 
-  createSubscriptionOrder = async (req: Request, res: Response) => {
-    try {
+  createSubscriptionOrder = catchAsync(
+    async (req: Request, res: Response): Promise<void> => {
       const { planId } = req.body;
       const userId = (req as any).user?.id || (req as any).authUser?.userId;
 
       if (!userId) {
-        return res
-          .status(HttpStatus.UNAUTHORIZED)
-          .json({ message: 'Unauthorized' });
+        throw new AppError('Unauthorized', HttpStatus.UNAUTHORIZED);
       }
 
       const order = await this._createSubscriptionOrderUseCase.execute(
@@ -39,25 +40,16 @@ export class PaymentController {
         planId,
       );
 
-      return res.status(HttpStatus.OK).json({
-        success: true,
-        order,
-      });
-    } catch (error: any) {
-      return res
-        .status(HttpStatus.BAD_REQUEST)
-        .json({ success: false, message: error.message });
-    }
-  };
+      sendSuccess(res, order, undefined, HttpStatus.OK, { order });
+    },
+  );
 
-  verifySubscriptionPayment = async (req: Request, res: Response) => {
-    try {
+  verifySubscriptionPayment = catchAsync(
+    async (req: Request, res: Response): Promise<void> => {
       const userId = (req as any).authUser?.userId;
 
       if (!userId) {
-        return res
-          .status(HttpStatus.UNAUTHORIZED)
-          .json({ message: 'Unauthorized' });
+        throw new AppError('Unauthorized', HttpStatus.UNAUTHORIZED);
       }
 
       const {
@@ -66,15 +58,17 @@ export class PaymentController {
         razorpay_signature,
         planId,
       } = req.body;
+
       if (
         !razorpay_order_id ||
         !razorpay_payment_id ||
         !razorpay_signature ||
         !planId
       ) {
-        return res
-          .status(HttpStatus.BAD_REQUEST)
-          .json({ message: 'Missing required payment fields' });
+        throw new AppError(
+          'Missing required payment fields',
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
       const dto: VerifySubscriptionPaymentDto = {
@@ -89,47 +83,32 @@ export class PaymentController {
         userId,
       );
 
-      return res.status(HttpStatus.OK).json(result);
-    } catch (error: any) {
-      return res
-        .status(HttpStatus.BAD_REQUEST)
-        .json({ success: false, message: error.message });
-    }
-  };
+      sendSuccess(res, result, result.message as string, HttpStatus.OK, result);
+    },
+  );
 
-  createOrder = async (req: Request, res: Response) => {
-    try {
+  createOrder = catchAsync(
+    async (req: Request, res: Response): Promise<void> => {
       const { eventId } = req.body;
       const userId = (req as any).user?.id || (req as any).authUser?.userId;
 
       if (!userId) {
-        return res
-          .status(HttpStatus.UNAUTHORIZED)
-          .json({ message: 'Unauthorized' });
+        throw new AppError('Unauthorized', HttpStatus.UNAUTHORIZED);
       }
 
       const order = await this._createOrderUseCase.execute(eventId, userId);
 
-      return res.status(HttpStatus.OK).json({
-        success: true,
-        order,
-      });
-    } catch (error: any) {
-      return res
-        .status(HttpStatus.BAD_REQUEST)
-        .json({ success: false, message: error.message });
-    }
-  };
+      sendSuccess(res, order, undefined, HttpStatus.OK, { order });
+    },
+  );
 
-  createTicketOrder = async (req: Request, res: Response) => {
-    try {
+  createTicketOrder = catchAsync(
+    async (req: Request, res: Response): Promise<void> => {
       const { eventId, amount, selectedSeats, bookingType } = req.body;
       const userId = (req as any).user?.id || (req as any).authUser?.userId;
 
       if (!userId) {
-        return res
-          .status(HttpStatus.UNAUTHORIZED)
-          .json({ message: 'Unauthorized' });
+        throw new AppError('Unauthorized', HttpStatus.UNAUTHORIZED);
       }
 
       const order = await this._createOrderUseCase.execute(
@@ -140,47 +119,32 @@ export class PaymentController {
         selectedSeats,
       );
 
-      return res.status(HttpStatus.OK).json({
-        success: true,
-        order,
-      });
-    } catch (error: any) {
-      return res
-        .status(HttpStatus.BAD_REQUEST)
-        .json({ success: false, message: error.message });
-    }
-  };
+      sendSuccess(res, order, undefined, HttpStatus.OK, { order });
+    },
+  );
 
-  getPriceBreakdown = async (req: Request, res: Response) => {
-    try {
+  getPriceBreakdown = catchAsync(
+    async (req: Request, res: Response): Promise<void> => {
       const eventId = req.query.eventId as string;
       const amount = parseFloat(req.query.amount as string);
 
       if (!eventId || isNaN(amount)) {
-        return res
-          .status(HttpStatus.BAD_REQUEST)
-          .json({ message: 'Invalid query parameters' });
+        throw new AppError('Invalid query parameters', HttpStatus.BAD_REQUEST);
       }
 
       const breakdown = await this._getBreakdownUseCase.execute(
         eventId,
         amount,
       );
-      return res.status(HttpStatus.OK).json({ success: true, breakdown });
-    } catch (error: any) {
-      return res
-        .status(HttpStatus.BAD_REQUEST)
-        .json({ success: false, message: error.message });
-    }
-  };
+      sendSuccess(res, breakdown, undefined, HttpStatus.OK, { breakdown });
+    },
+  );
 
-  getMyBookings = async (req: Request, res: Response) => {
-    try {
+  getMyBookings = catchAsync(
+    async (req: Request, res: Response): Promise<void> => {
       const userId = (req as any).user?.id || (req as any).authUser?.userId;
       if (!userId) {
-        return res
-          .status(HttpStatus.UNAUTHORIZED)
-          .json({ message: 'Unauthorized' });
+        throw new AppError('Unauthorized', HttpStatus.UNAUTHORIZED);
       }
 
       const page = parseInt(req.query.page as string) || 1;
@@ -191,25 +155,17 @@ export class PaymentController {
         page,
         limit,
       );
-      return res.status(HttpStatus.OK).json({
-        success: true,
-        data: result.data,
+      sendSuccess(res, result.data, undefined, HttpStatus.OK, {
         metadata: result.metadata,
       });
-    } catch (error: any) {
-      return res
-        .status(HttpStatus.BAD_REQUEST)
-        .json({ success: false, message: error.message });
-    }
-  };
+    },
+  );
 
-  getManagerBookings = async (req: Request, res: Response) => {
-    try {
+  getManagerBookings = catchAsync(
+    async (req: Request, res: Response): Promise<void> => {
       const managerId = (req as any).user?.id || (req as any).authUser?.userId;
       if (!managerId) {
-        return res
-          .status(HttpStatus.UNAUTHORIZED)
-          .json({ message: 'Unauthorized' });
+        throw new AppError('Unauthorized', HttpStatus.UNAUTHORIZED);
       }
 
       const page = parseInt(req.query.page as string) || 1;
@@ -220,26 +176,18 @@ export class PaymentController {
         page,
         limit,
       );
-      return res.status(HttpStatus.OK).json({
-        success: true,
-        data: result.data,
+      sendSuccess(res, result.data, undefined, HttpStatus.OK, {
         metadata: result.metadata,
       });
-    } catch (error: any) {
-      return res
-        .status(HttpStatus.BAD_REQUEST)
-        .json({ success: false, message: error.message });
-    }
-  };
+    },
+  );
 
-  verifyPayment = async (req: Request, res: Response) => {
-    try {
+  verifyPayment = catchAsync(
+    async (req: Request, res: Response): Promise<void> => {
       const userId = (req as any).authUser?.userId;
 
       if (!userId) {
-        return res
-          .status(HttpStatus.UNAUTHORIZED)
-          .json({ message: 'Unauthorized' });
+        throw new AppError('Unauthorized', HttpStatus.UNAUTHORIZED);
       }
 
       const {
@@ -254,9 +202,10 @@ export class PaymentController {
         !razorpay_signature ||
         !eventId
       ) {
-        return res
-          .status(HttpStatus.BAD_REQUEST)
-          .json({ message: 'Missing required payment fields' });
+        throw new AppError(
+          'Missing required payment fields',
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
       const dto: VerifyPaymentDto = {
@@ -268,11 +217,7 @@ export class PaymentController {
 
       const result = await this._verifyPaymentUseCase.execute(dto, userId);
 
-      return res.status(HttpStatus.OK).json(result);
-    } catch (error: any) {
-      return res
-        .status(HttpStatus.BAD_REQUEST)
-        .json({ success: false, message: error.message });
-    }
-  };
+      sendSuccess(res, result, result.message as string, HttpStatus.OK, result);
+    },
+  );
 }

@@ -7,6 +7,7 @@ import type { CreatePlanDto } from '../../application/dtos/createplan.dto';
 import type { ICreatePlanUseCase } from '../../application/usecases/subscription/createPlan/createplan.usecase.interface';
 import type { IGetPlansUseCase } from '../../application/usecases/subscription/getPlan/getplan.usecase.interface';
 import type { IUpdatePlanUseCase } from '../../application/usecases/subscription/updateplan/updateplan.usecase.interface';
+import { sendSuccess } from '../../common/utils/response';
 
 export class PlanController {
   constructor(
@@ -26,16 +27,12 @@ export class PlanController {
         : [],
     };
     const plans = await this._createPlansUseCase.execute(dto);
-    res.status(HttpStatus.OK).json({
-      plans,
-    });
+    sendSuccess(res, plans, undefined, HttpStatus.OK, { plans });
   });
 
   getPlans = catchAsync(async (req: Request, res: Response) => {
     const plans = await this._getPlansUseCase.execute();
-    res.status(HttpStatus.OK).json({
-      plans,
-    });
+    sendSuccess(res, plans, undefined, HttpStatus.OK, { plans });
   });
 
   updatePlan = catchAsync(async (req: Request, res: Response) => {
@@ -57,8 +54,6 @@ export class PlanController {
       dto.features = req.body.features as string[];
     }
     const plan = await this._updatePlanUseCase.execute(id, dto);
-    res.status(HttpStatus.OK).json({
-      plan,
-    });
+    sendSuccess(res, plan, undefined, HttpStatus.OK, { plan });
   });
 }

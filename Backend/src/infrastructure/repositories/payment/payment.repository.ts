@@ -1,12 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { IPaymentRepository } from '../../../domain/repositories/payment/payment.repository.interface';
-import { Payment } from '../../../domain/entities/payment.entity';
-import type { IPaymentDocument } from '../../database/model/payment/payment.model';
-import { PaymentModel } from '../../database/model/payment/payment.model';
+import type { PaymentResponseDto } from '../../../application/dtos/responses/payment-response.dto';
 import type {
   PaginationParams,
   PaginatedResponse,
 } from '../../../common/interfaces/pagination.interface';
+import type { IPaymentRepository } from '../../../domain/repositories/payment/payment.repository.interface';
+import type { IPaymentDocument } from '../../database/model/payment/payment.model';
+import { Payment } from '../../../domain/entities/payment.entity';
+import { PaymentModel } from '../../database/model/payment/payment.model';
+import { BookingModel } from '../../database/model/booking.model';
 
 export class PaymentRepository implements IPaymentRepository {
   async savePayment(payment: Payment): Promise<Payment> {
@@ -29,7 +31,7 @@ export class PaymentRepository implements IPaymentRepository {
 
   async getAllPayments(
     params: PaginationParams,
-  ): Promise<PaginatedResponse<any>> {
+  ): Promise<PaginatedResponse<PaymentResponseDto>> {
     const { page = 1, limit = 10 } = params;
     const query: any = {};
 
@@ -46,8 +48,33 @@ export class PaymentRepository implements IPaymentRepository {
       PaymentModel.countDocuments(query).exec(),
     ]);
 
+    const mappedData: PaymentResponseDto[] = payments.map((doc: any) => ({
+      id: doc._id.toString(),
+      userId: {
+        id: doc.userId?._id?.toString() ?? '',
+        name: doc.userId?.name ?? '',
+        email: doc.userId?.email ?? '',
+        picture: doc.userId?.picture,
+      },
+      purpose: doc.purpose,
+      amount: doc.amount,
+      currency: doc.currency,
+      paymentMethod: doc.paymentMethod,
+      paymentStatus: doc.paymentStatus,
+      transactionId: doc.transactionId,
+      eventId: doc.eventId
+        ? {
+            id: doc.eventId._id.toString(),
+            title: doc.eventId.title,
+          }
+        : undefined,
+      bookingId: doc.bookingId?.toString(),
+      paidAt: doc.paidAt,
+      createdAt: doc.createdAt,
+    }));
+
     return {
-      data: payments,
+      data: mappedData,
       metadata: {
         total,
         page,
@@ -73,5 +100,13 @@ export class PaymentRepository implements IPaymentRepository {
       doc.createdAt,
       doc.updatedAt,
     );
+  }
+
+  async getOnlineBookedCount(eventId: string): Promise<number> {
+    return await BookingModel.countDocuments({
+      eventId,
+      bookingType: 'online',
+      status: 'CONFIRMED',
+    });
   }
 }
