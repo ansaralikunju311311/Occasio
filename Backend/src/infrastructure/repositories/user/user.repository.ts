@@ -1,6 +1,8 @@
-import { IUserRepository } from '../../../domain/repositories/user.repository.interface';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import type { IUserRepository } from '../../../domain/repositories/user.repository.interface';
 import { User } from '../../../domain/entities/user.entity';
-import { UserModel, IUserDocument } from '../../database/model/user.model';
+import type { IUserDocument } from '../../database/model/user.model';
+import { UserModel } from '../../database/model/user.model';
 import { BaseRepository } from '../../../infrastructure/repositories/base.repository';
 // import { OTP } from "domain/entities/otp.entity";
 // import { IOtp } from "infrastructure/database/model/otp.model";
@@ -57,10 +59,12 @@ export class UserRepository
         eventsCreated: user.eventsCreated,
         activeSubscription: user.activeSubscription,
       },
-      { session }
+      { session },
     );
 
-    if (!doc) throw new Error('User not found');
+    if (!doc) {
+      throw new Error('User not found');
+    }
 
     return this.toEntity(doc);
   }
@@ -77,7 +81,12 @@ export class UserRepository
       doc.applyingupgrade,
       doc.rejectedAt,
       doc.reapplyAt,
-      doc.activeSubscription ? (doc._id ? doc.activeSubscription._id?.toString() || doc.activeSubscription.toString() : doc.activeSubscription) : undefined,
+      doc.activeSubscription
+        ? doc._id
+          ? doc.activeSubscription._id?.toString() ||
+            doc.activeSubscription.toString()
+          : doc.activeSubscription
+        : undefined,
       doc.eventsCreated || 0,
     );
   }

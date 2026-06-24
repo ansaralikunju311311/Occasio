@@ -1,11 +1,12 @@
 import { Router } from 'express';
+
 import { verifyAccessToken } from '../middlewares/verifyAccessToken.middleware';
 import { makebookingController } from '../../container/booking.containers';
 const router = Router();
-const bookingController =  makebookingController();
+const bookingController = makebookingController();
 
 // Apply auth middleware to all booking routes
-router.use(verifyAccessToken); 
+router.use(verifyAccessToken);
 
 router.post('/lock-seats', bookingController.lockSeats);
 router.post('/payment-intent', bookingController.createPaymentIntent);

@@ -2,7 +2,7 @@ export interface IMockPaymentUseCase {
   createPaymentIntent(
     userId: string,
     eventId: string,
-    amount: number
+    amount: number,
   ): Promise<PaymentIntentResponse>;
 }
 

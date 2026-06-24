@@ -1,5 +1,7 @@
 import nodemailer from 'nodemailer';
 
+import { logger } from '../logger/logger';
+
 export class EmailSerive {
   private transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -11,18 +13,18 @@ export class EmailSerive {
 
   constructor() {
     // Verify connection on startup
-    this.transporter.verify((error, success) => {
+    this.transporter.verify((error, _success) => {
       if (error) {
-        console.error('Email transporter verification failed:', error);
+        logger.error('Email transporter verification failed:', error);
       } else {
-        console.log('Email transporter is ready to send messages');
+        logger.info('Email transporter is ready to send messages');
       }
     });
   }
 
   async sendOtpEmail(to: string, otp: string): Promise<void> {
     try {
-      console.log(`Sending OTP to ${to}...`);
+      logger.info(`Sending OTP to ${to}...`);
       await this.transporter.sendMail({
         from: `"Occasio" <${process.env.MAIL_USER}>`,
         to,
@@ -34,15 +36,15 @@ export class EmailSerive {
                     <p>This OTP expires in 5 minutes.</p>
                 `,
       });
-      console.log(`OTP successfully sent to ${to}`);
+      logger.info(`OTP successfully sent to ${to}`);
     } catch (error: unknown) {
-      console.error(`Failed to send OTP to ${to}:`, error);
+      logger.error(`Failed to send OTP to ${to}:`, error as Error);
     }
   }
 
   async sendApprovalEmail(to: string, name: string): Promise<void> {
     try {
-      console.log(`Sending approval email to ${to}...`);
+      logger.info(`Sending approval email to ${to}...`);
       await this.transporter.sendMail({
         from: `"Occasio" <${process.env.MAIL_USER}>`,
         to,
@@ -54,9 +56,9 @@ export class EmailSerive {
                     <p>Best regards,<br/>The Occasio Team</p>
                 `,
       });
-      console.log(`Approval email successfully sent to ${to}`);
+      logger.info(`Approval email successfully sent to ${to}`);
     } catch (error: unknown) {
-      console.error(`Failed to send approval email to ${to}:`, error);
+      logger.error(`Failed to send approval email to ${to}:`, error as Error);
     }
   }
 
@@ -66,7 +68,7 @@ export class EmailSerive {
     reason?: string,
   ): Promise<void> {
     try {
-      console.log(`Sending rejection email to ${to}...`);
+      logger.info(`Sending rejection email to ${to}...`);
       await this.transporter.sendMail({
         from: `"Occasio" <${process.env.MAIL_USER}>`,
         to,
@@ -87,9 +89,9 @@ export class EmailSerive {
                     <p>Best regards,<br/>The Occasio Team</p>
                 `,
       });
-      console.log(`Rejection email successfully sent to ${to}`);
+      logger.info(`Rejection email successfully sent to ${to}`);
     } catch (error: unknown) {
-      console.error(`Failed to send rejection email to ${to}:`, error);
+      logger.error(`Failed to send rejection email to ${to}:`, error as Error);
     }
   }
 }

@@ -25,7 +25,6 @@ export const makeAdminController = () => {
   const paymentRepository = new PaymentRepository();
   const managerSubscriptionRepository = new ManagerSubscriptionRepository();
   const subscriptionRepository = new SubscriptionRepository();
-  
 
   const findAllUseCase = new FindAllUseCase(adminRepository);
   const userManageUseCase = new UserManageUseCase(userRepository);

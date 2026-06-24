@@ -1,12 +1,13 @@
-import { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
-import { IManagerSubscriptionRepository } from '../../../../domain/repositories/imanager-subscription.repository';
-import { ManagerSubscription } from '../../../../domain/entities/manager-subscription.entity';
-import { IGetMySubscriptionUseCase } from './get-mysub.usecase.interface';
+import type { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
+import type { IManagerSubscriptionRepository } from '../../../../domain/repositories/imanager-subscription.repository';
+import type { ManagerSubscription } from '../../../../domain/entities/manager-subscription.entity';
 
-export class GetMySubscriptionUseCase implements IGetMySubscriptionUseCase{
+import type { IGetMySubscriptionUseCase } from './get-mysub.usecase.interface';
+
+export class GetMySubscriptionUseCase implements IGetMySubscriptionUseCase {
   constructor(
     private readonly _userRepository: IUserRepository,
-    private readonly _managerSubscriptionRepository: IManagerSubscriptionRepository
+    private readonly _managerSubscriptionRepository: IManagerSubscriptionRepository,
   ) {}
 
   async execute(userId: string): Promise<ManagerSubscription | null> {
@@ -15,7 +16,9 @@ export class GetMySubscriptionUseCase implements IGetMySubscriptionUseCase{
       return null;
     }
 
-    const subscription = await this._managerSubscriptionRepository.findById(user.activeSubscription);
+    const subscription = await this._managerSubscriptionRepository.findById(
+      user.activeSubscription,
+    );
     return subscription;
   }
 }

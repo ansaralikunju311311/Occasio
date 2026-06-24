@@ -1,6 +1,7 @@
-import { ISeatRepository } from "../../../domain/repositories/seats/seat.repository.interface";
-import { SeatModel } from "../../database/model/events/seat.model";
-import { SeatStatus } from "../../../common/enums/searstatus-enum";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import type { ISeatRepository } from '../../../domain/repositories/seats/seat.repository.interface';
+import { SeatModel } from '../../database/model/events/seat.model';
+import { SeatStatus } from '../../../common/enums/searstatus-enum';
 
 export class SeatRepository implements ISeatRepository {
   async lockSeats(
@@ -8,7 +9,7 @@ export class SeatRepository implements ISeatRepository {
     eventId: string,
     seatNumber: string,
     now: Date,
-    lockExpiresAt: Date
+    lockExpiresAt: Date,
   ): Promise<any> {
     return await SeatModel.findOneAndUpdate(
       {
@@ -30,12 +31,12 @@ export class SeatRepository implements ISeatRepository {
           lockExpiresAt,
         },
         $setOnInsert: {
-          block: seatNumber.split("-")[0],
-          row: parseInt(seatNumber.split("-")[1] || "0"),
-          column: parseInt(seatNumber.split("-")[2] || "0"),
+          block: seatNumber.split('-')[0],
+          row: parseInt(seatNumber.split('-')[1] || '0'),
+          column: parseInt(seatNumber.split('-')[2] || '0'),
         },
       },
-      { new: true, upsert: true }
+      { new: true, upsert: true },
     );
   }
 
@@ -51,7 +52,7 @@ export class SeatRepository implements ISeatRepository {
           lockedAt: 1,
           lockExpiresAt: 1,
         },
-      }
+      },
     );
     return result.modifiedCount;
   }
@@ -59,23 +60,26 @@ export class SeatRepository implements ISeatRepository {
   async findSeats(
     seatIds: string[],
     eventId: string,
-    session?: any
+    session?: any,
   ): Promise<any[]> {
-    return await SeatModel.find({ seatNumber: { $in: seatIds }, eventId }).session(session);
+    return await SeatModel.find({
+      seatNumber: { $in: seatIds },
+      eventId,
+    }).session(session);
   }
 
   async markBooked(
     eventId: string,
     seatIds: string[],
-    session?: any
+    session?: any,
   ): Promise<void> {
     await SeatModel.updateMany(
       { seatNumber: { $in: seatIds }, eventId },
       {
         $set: { status: SeatStatus.BOOKED },
-        $unset: { lockExpiresAt: 1 }
+        $unset: { lockExpiresAt: 1 },
       },
-      { session }
+      { session },
     );
   }
 }

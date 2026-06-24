@@ -18,8 +18,21 @@ export const makeUserController = () => {
   const upgradeUseCase = new UpgradeUseCase(userRepository, managerRepository);
   const reapplyUseCase = new ReapplyUseCase(userRepository);
   const editProfileUseCase = new EditProfileUseCase(userRepository);
-  const subscribeUseCase = new SubscribeUseCase(userRepository, subscriptionRepository, managerSubscriptionRepository);
-  const getMySubscriptionUseCase = new GetMySubscriptionUseCase(userRepository, managerSubscriptionRepository);
+  const subscribeUseCase = new SubscribeUseCase(
+    userRepository,
+    subscriptionRepository,
+    managerSubscriptionRepository,
+  );
+  const getMySubscriptionUseCase = new GetMySubscriptionUseCase(
+    userRepository,
+    managerSubscriptionRepository,
+  );
 
-  return new UserController(upgradeUseCase, reapplyUseCase, editProfileUseCase, subscribeUseCase, getMySubscriptionUseCase);
+  return new UserController(
+    upgradeUseCase,
+    reapplyUseCase,
+    editProfileUseCase,
+    subscribeUseCase,
+    getMySubscriptionUseCase,
+  );
 };

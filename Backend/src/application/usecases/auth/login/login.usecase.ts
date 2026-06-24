@@ -1,14 +1,15 @@
-import { IHashServive } from '../../../../domain/services/hash.service.interface';
-import { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
+import type { IHashServive } from '../../../../domain/services/hash.service.interface';
+import type { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
 import { userMapper } from '../../../../common/mappers/user.mapper';
-import { LoginDto } from '../../../dtos/login.dto';
+import type { LoginDto } from '../../../dtos/login.dto';
 import { UserStatus } from '../../../../common/enums/userstatus-enum';
 import { AppError } from '../../../../common/errors/apperror';
 import { HttpStatus } from '../../../../common/constants/http-status';
-import { ITokenService } from '../../../../domain/services/token.service.interface';
-import { LoginResponseDto } from '../../../dtos/loginResponse.dto';
+import type { ITokenService } from '../../../../domain/services/token.service.interface';
+import type { LoginResponseDto } from '../../../dtos/loginResponse.dto';
 import { ErrorMessage } from '../../../../common/enums/message-enum';
-import { ILoginUsecase } from './login.usecase.interface';
+
+import type { ILoginUsecase } from './login.usecase.interface';
 export class LoginUseCase implements ILoginUsecase {
   constructor(
     private _userRepository: IUserRepository,

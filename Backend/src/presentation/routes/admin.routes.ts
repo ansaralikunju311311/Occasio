@@ -1,4 +1,5 @@
 import { Router } from 'express';
+
 import { verifyAccessToken } from '../middlewares/verifyAccessToken.middleware';
 // import { makeAuthController } from "../../../container/auth.container";
 import { requireRole } from '../middlewares/requireRole.middleware';
@@ -54,8 +55,6 @@ router.get(
   requireRole([UserRole.ADMIN]),
   controller.managerDetails.bind(controller),
 );
-
-
 
 // router.post('/createplans',
 //   verifyAccessToken,

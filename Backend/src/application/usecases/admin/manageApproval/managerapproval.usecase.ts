@@ -1,56 +1,66 @@
-import { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
-import { userMapper } from '../../../../common/mappers/user.mapper';
-import { UserResponseDto } from '../../../../application/dtos/responses/user-response.dto';
-import { UserRole } from '../../../../common/enums/userrole-enum';
-import { EmailSerive } from '../../../../common/services/email.service';
-import { UpgradeStatus } from '../../../../common/enums/upgrade-enums';
-import { IApprovalUseCase } from './managerapproval.usecase.interface';
 import mongoose from 'mongoose';
-import { IManagerSubscriptionRepository } from '../../../../domain/repositories/imanager-subscription.repository';
+
+import type { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
+import { userMapper } from '../../../../common/mappers/user.mapper';
+import type { UserResponseDto } from '../../../../application/dtos/responses/user-response.dto';
+import { UserRole } from '../../../../common/enums/userrole-enum';
+import type { EmailSerive } from '../../../../common/services/email.service';
+import { UpgradeStatus } from '../../../../common/enums/upgrade-enums';
+import type { IManagerSubscriptionRepository } from '../../../../domain/repositories/imanager-subscription.repository';
 import { ManagerSubscription } from '../../../../domain/entities/manager-subscription.entity';
 import { ManagerPlan } from '../../../../common/enums/manager-plan.enum';
 import { ManagerSubscriptionStatus } from '../../../../common/enums/manager-subscription-status.enum';
-import { ISubscriptionRepository } from '../../../../domain/repositories/subscription/subscription.repository.interface';
+import type { ISubscriptionRepository } from '../../../../domain/repositories/subscription/subscription.repository.interface';
 import { PlanType } from '../../../../common/enums/plan-enum';
+import { logger } from '../../../../common/logger/logger';
+
+import type { IApprovalUseCase } from './managerapproval.usecase.interface';
 export class ManagerApprovalUseCase implements IApprovalUseCase {
   constructor(
     private _userRepository: IUserRepository,
     private _emailService: EmailSerive,
     private _managerSubscriptionRepository: IManagerSubscriptionRepository,
-    private _subscriptionRepository: ISubscriptionRepository
+    private _subscriptionRepository: ISubscriptionRepository,
   ) {}
   async execute(id: string): Promise<UserResponseDto | null> {
     const user = await this._userRepository.findByIdUser(id);
-    console.log(user);
 
-    if (!user) return null;
+    if (!user) {
+      return null;
+    }
 
     const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
-      const freePlan = await this._subscriptionRepository.findPlanByName(PlanType.FREE);
+      const freePlan = await this._subscriptionRepository.findPlanByName(
+        PlanType.FREE,
+      );
       const eventLimit = freePlan ? freePlan.eventLimit : 2;
 
       const startDate = new Date();
-      
+
       const newSubscription = new ManagerSubscription(
         null,
         user.id as string,
         ManagerPlan.FREE,
         ManagerSubscriptionStatus.ACTIVE,
-        eventLimit, 
-        0, 
-        startDate
+        eventLimit,
+        0,
+        startDate,
       );
 
-      const createdSubscription = await this._managerSubscriptionRepository.create(newSubscription, session);
+      const createdSubscription =
+        await this._managerSubscriptionRepository.create(
+          newSubscription,
+          session,
+        );
 
       user.role = UserRole.EVENT_MANAGER;
       user.rejectedAt = null;
       user.applyingupgrade = UpgradeStatus.APPROVED;
       user.activeSubscription = createdSubscription.id;
-      
+
       const updatedUser = await this._userRepository.updateUser(user, session);
 
       await session.commitTransaction();
@@ -65,7 +75,7 @@ export class ManagerApprovalUseCase implements IApprovalUseCase {
       return updatedUser ? userMapper.toResponse(updatedUser) : null;
     } catch (error) {
       await session.abortTransaction();
-      console.error("Transaction aborted due to error:", error);
+      logger.error('Transaction aborted due to error:', error);
       throw error;
     } finally {
       session.endSession();

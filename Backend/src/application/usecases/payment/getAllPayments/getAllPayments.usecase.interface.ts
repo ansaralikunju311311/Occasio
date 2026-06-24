@@ -1,5 +1,8 @@
-import { PaginatedResponse, PaginationParams } from '../../../../common/interfaces/pagination.interface';
+import type {
+  PaginatedResponse,
+  PaginationParams,
+} from '../../../../common/interfaces/pagination.interface';
 
 export interface IGetAllPaymentsUseCase {
-  execute(params: PaginationParams): Promise<PaginatedResponse<any>>;
+  execute(params: PaginationParams): Promise<PaginatedResponse<unknown>>;
 }

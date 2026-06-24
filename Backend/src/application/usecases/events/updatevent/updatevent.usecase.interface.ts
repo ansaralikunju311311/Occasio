@@ -1,5 +1,5 @@
-import { UpdateEventDTO } from '../../../../application/dtos/updateevent.dto';
-import { EventResponseDto } from '../../../../application/dtos/responses/event-response.dto';
+import type { UpdateEventDTO } from '../../../../application/dtos/updateevent.dto';
+import type { EventResponseDto } from '../../../../application/dtos/responses/event-response.dto';
 
 export interface IUpdateEventUseCase {
   execute(

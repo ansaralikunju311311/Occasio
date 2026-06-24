@@ -1,4 +1,4 @@
-import { EventManager } from '../entities/manager.entity';
+import type { EventManager } from '../entities/manager.entity';
 
 export interface IEventManagerRepository {
   createManager(user: EventManager): Promise<EventManager>;

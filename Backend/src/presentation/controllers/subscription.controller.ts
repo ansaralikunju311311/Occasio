@@ -1,19 +1,19 @@
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
+
 import { HttpStatus } from '../../common/constants/http-status';
 import { catchAsync } from '../../common/utils/catchAsync';
-import { ICreatePlanUseCase } from '../../application/usecases/subscription/createPlan/createplan.usecase.interface';
-import { IGetPlansUseCase } from '../../application/usecases/subscription/getPlan/getplan.usecase.interface';
-import { IUpdatePlanUseCase } from '../../application/usecases/subscription/updateplan/updateplan.usecase.interface';
+import type { ICreatePlanUseCase } from '../../application/usecases/subscription/createPlan/createplan.usecase.interface';
+import type { IGetPlansUseCase } from '../../application/usecases/subscription/getPlan/getplan.usecase.interface';
+import type { IUpdatePlanUseCase } from '../../application/usecases/subscription/updateplan/updateplan.usecase.interface';
 
 export class PlanController {
   constructor(
     private _createPlansUseCase: ICreatePlanUseCase,
     private _getPlansUseCase: IGetPlansUseCase,
-    private _updatePlanUseCase: IUpdatePlanUseCase
+    private _updatePlanUseCase: IUpdatePlanUseCase,
   ) {}
 
   createPlans = catchAsync(async (req: Request, res: Response) => {
-    console.log("data", req.body);
     const plans = await this._createPlansUseCase.execute(req.body);
     res.status(HttpStatus.OK).json({
       plans,

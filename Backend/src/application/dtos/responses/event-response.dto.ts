@@ -1,8 +1,9 @@
-import { EventType } from '../../../common/enums/event-type';
-import { EventStatus } from '../../../common/enums/eventstatus-enum';
-import { UserResponseDto } from './user-response.dto';
-import { SeatResponseDto } from './seat-response.dto';
-import { SeatLayoutResponseDto } from './seat-layout-response.dto';
+import type { EventType } from '../../../common/enums/event-type';
+import type { EventStatus } from '../../../common/enums/eventstatus-enum';
+
+import type { UserResponseDto } from './user-response.dto';
+import type { SeatResponseDto } from './seat-response.dto';
+import type { SeatLayoutResponseDto } from './seat-layout-response.dto';
 
 export interface EventResponseDto {
   id: string;

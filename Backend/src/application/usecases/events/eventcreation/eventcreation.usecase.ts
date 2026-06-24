@@ -1,26 +1,27 @@
+import mongoose from 'mongoose';
+
 import { EventStatus } from '../../../../common/enums/eventstatus-enum';
 import { Events } from '../../../../domain/entities/event.entity';
-import { IEventRepository } from '../../../../domain/repositories/event/event.repository.interface';
+import type { IEventRepository } from '../../../../domain/repositories/event/event.repository.interface';
 import { eventMapper } from '../../../../common/mappers/event.mapper';
-import { EventDto } from '../../../dtos/event.dto';
-import { EventResponseDto } from '../../../../application/dtos/responses/event-response.dto';
+import type { EventDto } from '../../../dtos/event.dto';
+import type { EventResponseDto } from '../../../../application/dtos/responses/event-response.dto';
 import { getLocationName } from '../../../../common/services/location.service';
 import { normalizeCoordinates } from '../../../../common/utils/geo.utils';
-import { SeatStatus } from '../../../../common/enums/searstatus-enum';
-import mongoose from 'mongoose';
-import { IEventCreationUseCase } from './eventcreation.usecase.interface';
-import { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
-import { ISubscriptionRepository } from '../../../../domain/repositories/subscription/subscription.repository.interface';
-import { IManagerSubscriptionRepository } from '../../../../domain/repositories/imanager-subscription.repository';
+import type { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
+import type { ISubscriptionRepository } from '../../../../domain/repositories/subscription/subscription.repository.interface';
+import type { IManagerSubscriptionRepository } from '../../../../domain/repositories/imanager-subscription.repository';
 import { ManagerPlan } from '../../../../common/enums/manager-plan.enum';
-import { ManagerSubscription } from '../../../../domain/entities/manager-subscription.entity';
+import type { ManagerSubscription } from '../../../../domain/entities/manager-subscription.entity';
+
+import type { IEventCreationUseCase } from './eventcreation.usecase.interface';
 
 export class EventCretionUseCase implements IEventCreationUseCase {
   constructor(
     private _eventRepository: IEventRepository,
     private _userRepository: IUserRepository,
     private _subscriptionRepository: ISubscriptionRepository,
-    private _managerSubscriptionRepository: IManagerSubscriptionRepository
+    private _managerSubscriptionRepository: IManagerSubscriptionRepository,
   ) {}
 
   async execute(
@@ -28,23 +29,30 @@ export class EventCretionUseCase implements IEventCreationUseCase {
     userId: string,
   ): Promise<EventResponseDto | null> {
     const user = await this._userRepository.findByIdUser(userId);
-    console.log("user details i am showing the time of creation",user)
     if (!user) {
       throw new Error('User not found');
     }
 
     let activeSub: ManagerSubscription | null = null;
     if (user.activeSubscription) {
-      activeSub = await this._managerSubscriptionRepository.findById(user.activeSubscription);
+      activeSub = await this._managerSubscriptionRepository.findById(
+        user.activeSubscription,
+      );
 
-      console.log("the event creator has manager subscription", activeSub);
       if (activeSub) {
-        if (activeSub.eventLimit !== 0 && activeSub.eventsUsed >= activeSub.eventLimit) {
-          throw new Error('Event creation limit reached. Please upgrade your subscription plan.');
+        if (
+          activeSub.eventLimit !== 0 &&
+          activeSub.eventsUsed >= activeSub.eventLimit
+        ) {
+          throw new Error(
+            'Event creation limit reached. Please upgrade your subscription plan.',
+          );
         }
 
         if (activeSub.endDate && new Date() > new Date(activeSub.endDate)) {
-          throw new Error('Your subscription plan has expired. Please renew or upgrade.');
+          throw new Error(
+            'Your subscription plan has expired. Please renew or upgrade.',
+          );
         }
       }
     } else {
@@ -69,15 +77,6 @@ export class EventCretionUseCase implements IEventCreationUseCase {
         }
         const { longitude, latitude } = loc;
 
-        console.log(
-          'location',
-          data.location,
-          'longitude',
-          longitude,
-          'latitude',
-          latitude,
-        );
-
         data.location = {
           type: 'Point',
           coordinates: [longitude, latitude],
@@ -85,14 +84,10 @@ export class EventCretionUseCase implements IEventCreationUseCase {
         };
       }
 
-      console.log('thehhehe location', data.location);
-
       let status = EventStatus.DRAFT;
       if (activeSub && activeSub.plan !== ManagerPlan.FREE) {
         status = EventStatus.LIVE;
       }
-
-      console.log('sample', status);
 
       const { startTime, endTime } = data;
       let location = data.location;
@@ -158,8 +153,6 @@ export class EventCretionUseCase implements IEventCreationUseCase {
           session,
         );
 
-      
-        
         if (!event.id) {
           throw new Error('Event ID not generated');
         }
@@ -176,7 +169,11 @@ export class EventCretionUseCase implements IEventCreationUseCase {
 
       if (activeSub && activeSub.id) {
         activeSub.eventsUsed = (activeSub.eventsUsed || 0) + 1;
-        await this._managerSubscriptionRepository.update(activeSub.id, { eventsUsed: activeSub.eventsUsed }, session);
+        await this._managerSubscriptionRepository.update(
+          activeSub.id,
+          { eventsUsed: activeSub.eventsUsed },
+          session,
+        );
       }
 
       await session.commitTransaction();

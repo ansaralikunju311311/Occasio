@@ -9,73 +9,69 @@ import { toast } from 'sonner';
 import HomeButton from '../../components/common/HomeButton';
 import { useVerifyOtp, useResendOtp } from '../../hooks/useAuth';
 
-const OtpVerification = () => {
-  const [timeleft, setTimeLeft] = useState(60);
-  const [userData, setUserData] = useState(() => JSON.parse(localStorage.getItem('user') || '{}'));
+interface LocalStorageUser {
+  email?: string;
+  otpSendAt?: string;
+  role?: 'EVENT_MANAGER' | 'USER' | string;
+  [key: string]: any;
+}
+
+const OtpVerification: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
+  // Lazy state initialization to read from localStorage only once on mount
+  const [userData] = useState<LocalStorageUser>(() => {
+    try {
+      const data = JSON.parse(localStorage.getItem('user') || '{}');
+      // If the email is present but the otpSendAt timestamp is not, initialize it
+      if (data?.email && !data.otpSendAt) {
+        data.otpSendAt = new Date().toISOString();
+        localStorage.setItem('user', JSON.stringify(data));
+      }
+      return data;
+    } catch {
+      return {};
+    }
+  });
+
+  const [otpSendAt, setOtpSendAt] = useState<string | undefined>(userData.otpSendAt);
+  const [timeleft, setTimeLeft] = useState<number>(0);
+
   // Resend OTP Mutation
   const resendMutation = useResendOtp();
-
-  React.useEffect(() => {
-    if (resendMutation.isSuccess) {
-      toast.success('OTP resent successfully!');
-      const updatedUser = { ...userData, otpSendAt: new Date().toISOString() };
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-      setUserData(updatedUser);
-      setTimeLeft(60);
-    }
-    if (resendMutation.isError) {
-      const error = resendMutation.error as any;
-      toast.error(error.response?.data?.message || 'Something went wrong');
-    }
-  }, [resendMutation.isSuccess, resendMutation.isError, resendMutation.error, userData]);
-
   // Verify OTP Mutation
   const verifyMutation = useVerifyOtp();
 
-  React.useEffect(() => {
-    if (verifyMutation.isSuccess) {
-      const response = verifyMutation.data;
-      toast.success('OTP verified!');
-      localStorage.removeItem('user');
-      localStorage.setItem('accessToken', response.data.accessToken);
-
-      dispatch(setAuth({ user: response.data.user }));
-
-      if (response.data.user.role === 'EVENT_MANAGER') {
-        navigate('/eventmanager');
-      } else if (response.data.user.role === 'USER') {
-        navigate('/');
-      }
-    }
-    if (verifyMutation.isError) {
-      const error = verifyMutation.error as any;
-      toast.error(error.response?.data?.message || 'Something went wrong');
-    }
-  }, [verifyMutation.isSuccess, verifyMutation.isError, verifyMutation.data, verifyMutation.error, dispatch, navigate]);
-
+  // Countdown timer effect
   useEffect(() => {
-    if (!userData?.otpSendAt) return;
+    if (!otpSendAt) return;
 
-    const sentTime = new Date(userData.otpSendAt).getTime();
-    const resendTime = sentTime + 60 * 1000;
+    const calculateTimeLeft = (): number => {
+      const sentTime = new Date(otpSendAt).getTime();
+      const resendTime = sentTime + 60 * 1000;
+      const now = new Date().getTime();
+      const remaining = Math.ceil((resendTime - now) / 1000);
+      return remaining > 0 ? remaining : 0;
+    };
+
+    // Initialize timeLeft on mount or when otpSendAt changes
+    const initialRemaining = calculateTimeLeft();
+    setTimeLeft(initialRemaining);
+
+    if (initialRemaining <= 0) return;
 
     const timer = setInterval(() => {
-      const now = new Date().getTime();
-      const remaining = Math.floor((resendTime - now) / 1000);
+      const remaining = calculateTimeLeft();
+      setTimeLeft(remaining);
 
       if (remaining <= 0) {
-        setTimeLeft(0);
         clearInterval(timer);
-      } else {
-        setTimeLeft(remaining);
       }
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [userData.otpSendAt]);
+  }, [otpSendAt]);
 
   const {
     register,
@@ -87,7 +83,18 @@ const OtpVerification = () => {
 
   const resendOtp = () => {
     if (userData?.email) {
-      resendMutation.mutate(userData.email);
+      resendMutation.mutate(userData.email, {
+        onSuccess: () => {
+          toast.success('OTP resent successfully!');
+          const newSendTime = new Date().toISOString();
+          const updatedUser = { ...userData, otpSendAt: newSendTime };
+          localStorage.setItem('user', JSON.stringify(updatedUser));
+          setOtpSendAt(newSendTime);
+        },
+        onError: (error: any) => {
+          toast.error(error.response?.data?.message || 'Something went wrong');
+        },
+      });
     } else {
       toast.error('User email not found. Please try signing up again.');
     }
@@ -95,10 +102,30 @@ const OtpVerification = () => {
 
   const onSubmit = (data: OtpData) => {
     if (userData?.email) {
-      verifyMutation.mutate({
-        email: userData.email,
-        otp: data.otp,
-      });
+      verifyMutation.mutate(
+        {
+          email: userData.email,
+          otp: data.otp,
+        },
+        {
+          onSuccess: (response) => {
+            toast.success('OTP verified!');
+            localStorage.removeItem('user');
+            localStorage.setItem('accessToken', response.data.accessToken);
+
+            dispatch(setAuth({ user: response.data.user }));
+
+            if (response.data.user.role === 'EVENT_MANAGER') {
+              navigate('/eventmanager');
+            } else if (response.data.user.role === 'USER') {
+              navigate('/');
+            }
+          },
+          onError: (error: any) => {
+            toast.error(error.response?.data?.message || 'Something went wrong');
+          },
+        }
+      );
     } else {
       toast.error('User email not found. Please try signing up again.');
     }

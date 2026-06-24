@@ -6,6 +6,6 @@ export interface IVerifySubscriptionPaymentUseCase {
       razorpay_signature: string;
       planId: string;
     },
-    userId: string
-  ): Promise<any>;
+    userId: string,
+  ): Promise<Record<string, unknown>>;
 }

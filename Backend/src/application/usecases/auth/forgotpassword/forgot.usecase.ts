@@ -1,17 +1,17 @@
 import { AppError } from '../../../../common/errors/apperror';
 import { HttpStatus } from '../../../../common/constants/http-status';
 import { UserStatus } from '../../../../common/enums/userstatus-enum';
-import { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
+import type { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
 import { generateOTP } from '../../../../common/utils/generateotp';
-import { User } from '../../../../domain/entities/user.entity';
 import { UserOtp } from '../../../../common/enums/userotp-enum';
-import { EmailSerive } from '../../../../common/services/email.service';
+import type { EmailSerive } from '../../../../common/services/email.service';
 import { ErrorMessage } from '../../../../common/enums/message-enum';
 import { otpMapper } from '../../../../common/mappers/otp.mapper';
-import { IOtpRepository } from '../../../../domain/repositories/otp.repository.interface';
+import type { IOtpRepository } from '../../../../domain/repositories/otp.repository.interface';
 import { OTP } from '../../../../domain/entities/otp.entity';
-import { OtpResponseDto } from '../../../../application/dtos/responses/otp-response.dto';
-import { IForgotpasswordUsecase } from './forgot.usecase.interface';
+import type { OtpResponseDto } from '../../../../application/dtos/responses/otp-response.dto';
+
+import type { IForgotpasswordUsecase } from './forgot.usecase.interface';
 export class ForgotpasswordUsecase implements IForgotpasswordUsecase {
   constructor(
     private _userRepository: IUserRepository,
@@ -25,13 +25,13 @@ export class ForgotpasswordUsecase implements IForgotpasswordUsecase {
       throw new AppError(ErrorMessage.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
-    if (data.isVerified == false) {
+    if (data.isVerified === false) {
       throw new AppError(
         ErrorMessage.ACCOUNT_NOT_VERIFIED,
         HttpStatus.FORBIDDEN,
       );
     }
-    if (data.status == UserStatus.BLOCK) {
+    if (data.status === UserStatus.BLOCK) {
       throw new AppError(ErrorMessage.ACCOUNT_BLOCKED, HttpStatus.FORBIDDEN);
     }
 

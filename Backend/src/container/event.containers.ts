@@ -22,13 +22,15 @@ export const MakeEventController = () => {
     eventRepository,
     userRepository,
     subscriptionRepository,
-    managerSubscriptionRepository
+    managerSubscriptionRepository,
   );
   const getEventsUseCase = new GetEventsUseCase(eventRepository);
   const myEventsUseCase = new MyEventsUseCase(eventRepository);
-  
 
-  const eventDetailsUseCase = new EventDetailsUseCase(eventRepository, bookingRepository);
+  const eventDetailsUseCase = new EventDetailsUseCase(
+    eventRepository,
+    bookingRepository,
+  );
   const updateEventsUseCase = new UpdateEventUseCase(eventRepository);
   const deleteEventUseCase = new DeleteEventUseCase(eventRepository);
 

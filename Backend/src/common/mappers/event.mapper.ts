@@ -1,5 +1,7 @@
-import { Events } from '../../domain/entities/event.entity';
-import { EventResponseDto } from '../../application/dtos/responses/event-response.dto';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import type { Events } from '../../domain/entities/event.entity';
+import type { EventResponseDto } from '../../application/dtos/responses/event-response.dto';
+
 import { userMapper } from './user.mapper';
 import { BaseMapper } from './base.mapper';
 
@@ -12,21 +14,29 @@ export class EventMapper extends BaseMapper<Events, EventResponseDto> {
       eventType: entity.eventType,
       startTime: entity.startTime,
       endTime: entity.endTime,
-      location: entity.location ? {
-        type: entity.location.type,
-        coordinates: entity.location.coordinates,
-        address: entity.location.address,
-      } : undefined,
+      location: entity.location
+        ? {
+            type: entity.location.type,
+            coordinates: entity.location.coordinates,
+            address: entity.location.address,
+          }
+        : undefined,
       maxOnlineUsers: entity.maxOnlineUsers,
       price: entity.price,
       createdBy: entity.createdBy,
       status: entity.status,
       picture: entity.picture,
-      creatorDetails: entity.creatorDetails ? userMapper.toResponse(entity.creatorDetails) : undefined,
+      creatorDetails: entity.creatorDetails
+        ? userMapper.toResponse(entity.creatorDetails)
+        : undefined,
       bookedTickets: entity.bookedTickets,
       seatLayoutId: entity.seatLayoutId,
-      SeatLayout: entity.SeatLayout ? this.mapSeatLayout(entity.SeatLayout) : undefined,
-      seats: entity.seats ? entity.seats.map(s => this.mapSeat(s)) : undefined,
+      SeatLayout: entity.SeatLayout
+        ? this.mapSeatLayout(entity.SeatLayout)
+        : undefined,
+      seats: entity.seats
+        ? entity.seats.map((s) => this.mapSeat(s))
+        : undefined,
       isDeleted: entity.isDeleted,
       deletedAt: entity.deletedAt,
     };
@@ -63,7 +73,6 @@ export class EventMapper extends BaseMapper<Events, EventResponseDto> {
     };
   }
 
-  
   toSummary(entity: Events) {
     return {
       id: this.mapId(entity.id),

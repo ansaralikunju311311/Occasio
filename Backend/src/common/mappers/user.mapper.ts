@@ -1,5 +1,6 @@
-import { User } from '../../domain/entities/user.entity';
-import { UserResponseDto } from '../../application/dtos/responses/user-response.dto';
+import type { User } from '../../domain/entities/user.entity';
+import type { UserResponseDto } from '../../application/dtos/responses/user-response.dto';
+
 import { BaseMapper } from './base.mapper';
 
 export class UserMapper extends BaseMapper<User, UserResponseDto> {
@@ -19,7 +20,6 @@ export class UserMapper extends BaseMapper<User, UserResponseDto> {
     };
   }
 
-  
   toPreview(entity: User) {
     return {
       id: this.mapId(entity.id),

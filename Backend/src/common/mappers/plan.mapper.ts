@@ -1,4 +1,5 @@
-import { ResponsePlanDto } from "../../application/dtos/responses/responseplan.dto";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import type { ResponsePlanDto } from '../../application/dtos/responses/responseplan.dto';
 
 export const mapToResponsePlanDto = (plan: any): ResponsePlanDto => {
   return {

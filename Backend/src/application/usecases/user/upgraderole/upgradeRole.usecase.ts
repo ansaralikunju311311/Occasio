@@ -1,11 +1,12 @@
 import { userMapper } from '../../../../common/mappers/user.mapper';
-import { IEventManagerRepository } from '../../../../domain/repositories/manger.repository.interface';
-import { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
-import { UpgraderoleDto } from '../../../dtos/upgraderole.dto';
+import type { IEventManagerRepository } from '../../../../domain/repositories/manger.repository.interface';
+import type { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
+import type { UpgraderoleDto } from '../../../dtos/upgraderole.dto';
 import { EventManager } from '../../../../domain/entities/manager.entity';
 import { UpgradeStatus } from '../../../../common/enums/upgrade-enums';
-import { UserResponseDto } from '../../../../application/dtos/responses/user-response.dto';
-import { IUpgradeUseCase } from './upgaradeRole.usecase.interface';
+import type { UserResponseDto } from '../../../../application/dtos/responses/user-response.dto';
+
+import type { IUpgradeUseCase } from './upgaradeRole.usecase.interface';
 
 export class UpgradeUseCase implements IUpgradeUseCase {
   constructor(
@@ -16,9 +17,9 @@ export class UpgradeUseCase implements IUpgradeUseCase {
   async execute(data: UpgraderoleDto): Promise<UserResponseDto | null> {
     const user = await this._userRepository.findByEmail(data.email);
 
-    if (!user || !user.id) return null;
-
-    console.log('lvefjnjvjsfv');
+    if (!user || !user.id) {
+      return null;
+    }
 
     const request = new EventManager(
       null,
@@ -32,8 +33,6 @@ export class UpgradeUseCase implements IUpgradeUseCase {
       data.socialLinks,
       data.organizationType,
     );
-
-    console.log('cheking for tthe request');
 
     await this._managerRepository.createManager(request);
 

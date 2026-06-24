@@ -1,7 +1,12 @@
-import { IPaymentRepository } from '../../../domain/repositories/payment/payment.repository.interface';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import type { IPaymentRepository } from '../../../domain/repositories/payment/payment.repository.interface';
 import { Payment } from '../../../domain/entities/payment.entity';
-import { PaymentModel, IPaymentDocument } from '../../database/model/payment/payment.model';
-import { PaginationParams, PaginatedResponse } from '../../../common/interfaces/pagination.interface';
+import type { IPaymentDocument } from '../../database/model/payment/payment.model';
+import { PaymentModel } from '../../database/model/payment/payment.model';
+import type {
+  PaginationParams,
+  PaginatedResponse,
+} from '../../../common/interfaces/pagination.interface';
 
 export class PaymentRepository implements IPaymentRepository {
   async savePayment(payment: Payment): Promise<Payment> {
@@ -22,7 +27,9 @@ export class PaymentRepository implements IPaymentRepository {
     return this.toEntity(saved);
   }
 
-  async getAllPayments(params: PaginationParams): Promise<PaginatedResponse<any>> {
+  async getAllPayments(
+    params: PaginationParams,
+  ): Promise<PaginatedResponse<any>> {
     const { page = 1, limit = 10 } = params;
     const query: any = {};
 
@@ -64,7 +71,7 @@ export class PaymentRepository implements IPaymentRepository {
       doc.bookingId?.toString(),
       doc.paidAt,
       doc.createdAt,
-      doc.updatedAt
+      doc.updatedAt,
     );
   }
 }

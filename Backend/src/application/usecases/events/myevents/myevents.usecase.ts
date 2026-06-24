@@ -1,11 +1,12 @@
-import { IEventRepository } from '../../../../domain/repositories/event/event.repository.interface';
-import { IMyEventsUseCase } from './myevents.usecase.interface';
-import {
+import type { IEventRepository } from '../../../../domain/repositories/event/event.repository.interface';
+import type {
   PaginationParams,
   PaginatedResponse,
 } from '../../../../common/interfaces/pagination.interface';
 import { eventMapper } from '../../../../common/mappers/event.mapper';
-import { EventResponseDto } from '../../../../application/dtos/responses/event-response.dto';
+import type { EventResponseDto } from '../../../../application/dtos/responses/event-response.dto';
+
+import type { IMyEventsUseCase } from './myevents.usecase.interface';
 
 export class MyEventsUseCase implements IMyEventsUseCase {
   constructor(private _eventRepository: IEventRepository) {}

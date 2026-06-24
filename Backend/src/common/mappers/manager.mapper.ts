@@ -1,8 +1,12 @@
-import { EventManager } from '../../domain/entities/manager.entity';
-import { ManagerResponseDto } from '../../application/dtos/responses/manager-response.dto';
+import type { EventManager } from '../../domain/entities/manager.entity';
+import type { ManagerResponseDto } from '../../application/dtos/responses/manager-response.dto';
+
 import { BaseMapper } from './base.mapper';
 
-export class ManagerMapper extends BaseMapper<EventManager, ManagerResponseDto> {
+export class ManagerMapper extends BaseMapper<
+  EventManager,
+  ManagerResponseDto
+> {
   toResponse(entity: EventManager): ManagerResponseDto {
     return {
       id: this.mapId(entity.id),

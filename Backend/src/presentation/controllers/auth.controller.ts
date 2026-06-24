@@ -1,19 +1,21 @@
-import { Request, response, Response } from 'express';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import type { Request, Response } from 'express';
+
 import { HttpStatus } from '../../common/constants/http-status';
 import { SuccessMessage, ErrorMessage } from '../../common/enums/message-enum';
 import { logger } from '../../common/logger/logger';
-import { ISignupUseCase } from '../../application/usecases/auth/signup/signup.usecase.interface';
-import { IVerifyOtpUseCase } from '../../application/usecases/auth/otp/verifyotp.usecase.interface';
-import { IResendUseCase } from '../../application/usecases/auth/resendotp/resend.usecase.interface';
-import { IApprovalUseCase } from '../../application/usecases/admin/manageApproval/managerapproval.usecase.interface';
-import { IForgotpasswordUsecase } from '../../application/usecases/auth/forgotpassword/forgot.usecase.interface';
-import { ILoginUsecase } from '../../application/usecases/auth/login/login.usecase.interface';
-import { IUpdateUseCase } from '../../application/usecases/auth/updatepassword/update.usecase.interface';
-import { IResetPasswordUseCase } from '../../application/usecases/auth/resetPassword/reset.usecase.interface';
+import type { ISignupUseCase } from '../../application/usecases/auth/signup/signup.usecase.interface';
+import type { IVerifyOtpUseCase } from '../../application/usecases/auth/otp/verifyotp.usecase.interface';
+import type { IResendUseCase } from '../../application/usecases/auth/resendotp/resend.usecase.interface';
+import type { IApprovalUseCase } from '../../application/usecases/admin/manageApproval/managerapproval.usecase.interface';
+import type { IForgotpasswordUsecase } from '../../application/usecases/auth/forgotpassword/forgot.usecase.interface';
+import type { ILoginUsecase } from '../../application/usecases/auth/login/login.usecase.interface';
+import type { IUpdateUseCase } from '../../application/usecases/auth/updatepassword/update.usecase.interface';
+import type { IResetPasswordUseCase } from '../../application/usecases/auth/resetPassword/reset.usecase.interface';
 import { catchAsync } from '../../common/utils/catchAsync';
-import { IRefreshTokenUseCase } from '../../common/interfaces/refresh.interface';
-import { IGoogleLoginUseCase } from '../../application/usecases/auth/googleLogin/googleLogin.usecase.interface';
-import { ISessionService } from '../../common/interfaces/session.interface';
+import type { IRefreshTokenUseCase } from '../../common/interfaces/refresh.interface';
+import type { IGoogleLoginUseCase } from '../../application/usecases/auth/googleLogin/googleLogin.usecase.interface';
+import type { ISessionService } from '../../common/interfaces/session.interface';
 
 export class AuthController {
   constructor(
@@ -28,7 +30,7 @@ export class AuthController {
     private _adminLoginUseCase: ILoginUsecase,
     private _sessionService: ISessionService,
     private _refreshTokenUseCase: IRefreshTokenUseCase,
-    private _googleLoginUseCase: IGoogleLoginUseCase
+    private _googleLoginUseCase: IGoogleLoginUseCase,
   ) {}
 
   signup = catchAsync(async (req: Request, res: Response) => {
@@ -53,7 +55,8 @@ export class AuthController {
     const { email, otp } = req.body;
     logger.info(`Verifying OTP for email: ${email}`);
 
-    const { user, accessToken, refreshToken } = await this._verifyUseCase.execute({ email, otp });
+    const { user, accessToken, refreshToken } =
+      await this._verifyUseCase.execute({ email, otp });
     if (refreshToken) {
       this._sessionService.setRefreshToken(res, refreshToken);
     }
@@ -68,7 +71,7 @@ export class AuthController {
   resnedVerify = catchAsync(async (req: Request, res: Response) => {
     const { email } = req.body;
     const verifyOtp = await this._resendotpUseCase.execute(email);
-    
+
     res.status(HttpStatus.OK).json({
       message: SuccessMessage.OTP_RESENT,
       data: verifyOtp,
@@ -76,9 +79,14 @@ export class AuthController {
   });
 
   getMe = catchAsync(async (req: Request, res: Response) => {
-    const userId = req.authUser!.userId;
+    const userId = req.authUser?.userId;
+    if (!userId) {
+      return res
+        .status(HttpStatus.UNAUTHORIZED)
+        .json({ message: 'Unauthorized' });
+    }
     const user = await this._getmeUseCase.execute(userId);
-    
+
     res.status(HttpStatus.OK).json({
       user,
     });
@@ -95,9 +103,7 @@ export class AuthController {
   });
 
   logout = (req: Request, res: Response) => {
-  
-
-    this._sessionService.clearRefreshToken(res)
+    this._sessionService.clearRefreshToken(res);
 
     return res.status(HttpStatus.OK).json({
       success: true,
@@ -114,9 +120,8 @@ export class AuthController {
       });
     }
 
-   
-
-    const newaccessToken = await this._refreshTokenUseCase.execute(refreshToken)
+    const newaccessToken =
+      await this._refreshTokenUseCase.execute(refreshToken);
 
     return res.json({
       accessToken: newaccessToken,
@@ -125,7 +130,8 @@ export class AuthController {
 
   login = catchAsync(async (req: Request, res: Response) => {
     const { email, password } = req.body;
-    const { user, accessToken, refreshToken } = await this._loginUseCase.execute({ email, password });
+    const { user, accessToken, refreshToken } =
+      await this._loginUseCase.execute({ email, password });
     if (refreshToken) {
       this._sessionService.setRefreshToken(res, refreshToken);
     }
@@ -166,7 +172,7 @@ export class AuthController {
     });
   });
 
-  googleLogin =catchAsync(async (req: Request, res: Response) => {
+  googleLogin = catchAsync(async (req: Request, res: Response) => {
     const user = req.user as any;
 
     if (!user || !user.id) {
@@ -184,21 +190,24 @@ export class AuthController {
     //   role: user.role,
     // });
 
-       const { accessToken, refreshToken } = await this._googleLoginUseCase.execute(user.id,user.role)
+    const { accessToken, refreshToken } =
+      await this._googleLoginUseCase.execute(user.id, user.role);
     if (refreshToken) {
       this._sessionService.setRefreshToken(res, refreshToken);
     }
 
-    res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/oauth-success?token=${accessToken}`);
+    res.redirect(
+      `${process.env.CLIENT_URL || 'http://localhost:5173'}/oauth-success?token=${accessToken}`,
+    );
   });
 
   adminlogin = catchAsync(async (req: Request, res: Response) => {
     const { email, password } = req.body;
-    const { user, accessToken, refreshToken } = await this._adminLoginUseCase.execute({ email, password });
+    const { user, accessToken, refreshToken } =
+      await this._adminLoginUseCase.execute({ email, password });
     if (refreshToken) {
       this._sessionService.setRefreshToken(res, refreshToken);
     }
-
 
     res.status(HttpStatus.OK).json({
       message: SuccessMessage.LOGIN_SUCCESS,

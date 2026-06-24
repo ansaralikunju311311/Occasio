@@ -1,4 +1,5 @@
 import { Router } from 'express';
+
 import { verifyAccessToken } from '../../presentation/middlewares/verifyAccessToken.middleware';
 import { makeUserController } from '../../container/user.containers';
 import { requireRole } from '../../presentation/middlewares/requireRole.middleware';

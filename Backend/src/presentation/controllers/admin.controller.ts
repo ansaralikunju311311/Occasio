@@ -1,13 +1,14 @@
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
+
 import { HttpStatus } from '../../common/constants/http-status';
-import { IFindallUseCase } from '../../application/usecases/admin/allUsers/findall.usecase.interface';
-import { IUserManageUseCase } from '../../application/usecases/admin/usermanage/usermanage.usecase.interface';
-import { IManagerDetailsUseCase } from '../../application/usecases/admin/managerDetails/managerdetails.usecase.interface';
-import { IApprovalUseCase } from '../../application/usecases/admin/manageApproval/managerapproval.usecase.interface';
-import { IManagerRejectionUseCase } from '../../application/usecases/admin/managerRejection/managerRejection.usecase.interface';
-import { IGetAllPaymentsUseCase } from '../../application/usecases/payment/getAllPayments/getAllPayments.usecase.interface';
+import type { IFindallUseCase } from '../../application/usecases/admin/allUsers/findall.usecase.interface';
+import type { IUserManageUseCase } from '../../application/usecases/admin/usermanage/usermanage.usecase.interface';
+import type { IManagerDetailsUseCase } from '../../application/usecases/admin/managerDetails/managerdetails.usecase.interface';
+import type { IApprovalUseCase } from '../../application/usecases/admin/manageApproval/managerapproval.usecase.interface';
+import type { IManagerRejectionUseCase } from '../../application/usecases/admin/managerRejection/managerRejection.usecase.interface';
+import type { IGetAllPaymentsUseCase } from '../../application/usecases/payment/getAllPayments/getAllPayments.usecase.interface';
 import { catchAsync } from '../../common/utils/catchAsync';
-import { IUserdetailsUseCase } from '../../application/usecases/admin/userDetails/userdetails.usecase.interface';
+import type { IUserdetailsUseCase } from '../../application/usecases/admin/userDetails/userdetails.usecase.interface';
 
 export class AdminController {
   constructor(
@@ -94,12 +95,15 @@ export class AdminController {
   managerRejection = catchAsync(async (req: Request, res: Response) => {
     const { id } = req.params;
     const { reason } = req.body;
-    const users = await this._managerRejectionUseCase.execute(id as string, reason);
+    const users = await this._managerRejectionUseCase.execute(
+      id as string,
+      reason,
+    );
     res.status(HttpStatus.OK).json({
       users,
     });
   });
-  
+
   getAllPayments = catchAsync(async (req: Request, res: Response) => {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;

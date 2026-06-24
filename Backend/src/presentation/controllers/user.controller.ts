@@ -1,13 +1,14 @@
-import { Request, Response } from 'express';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import type { Request, Response } from 'express';
+
 import { HttpStatus } from '../../common/constants/http-status';
 import { SuccessMessage } from '../../common/enums/message-enum';
-import { IUpgradeUseCase } from '../../application/usecases/user/upgraderole/upgaradeRole.usecase.interface';
-import { IReapplyUseCase } from '../../application/usecases/user/reapply/reapply.usecase.interface';
-import { IEditProfileUseCase } from '../../application/usecases/user/editProfile/editprofile.usecase.interface';
+import type { IUpgradeUseCase } from '../../application/usecases/user/upgraderole/upgaradeRole.usecase.interface';
+import type { IReapplyUseCase } from '../../application/usecases/user/reapply/reapply.usecase.interface';
+import type { IEditProfileUseCase } from '../../application/usecases/user/editProfile/editprofile.usecase.interface';
 import { catchAsync } from '../../common/utils/catchAsync';
-
-import { IGetMySubscriptionUseCase } from '../../application/usecases/user/getMySubscription/get-mysub.usecase.interface';
-import { ISubscribeUseCase } from '../../application/usecases/user/subscribe/subscribe.usecase.interface';
+import type { IGetMySubscriptionUseCase } from '../../application/usecases/user/getMySubscription/get-mysub.usecase.interface';
+import type { ISubscribeUseCase } from '../../application/usecases/user/subscribe/subscribe.usecase.interface';
 
 export class UserController {
   constructor(
@@ -15,7 +16,7 @@ export class UserController {
     private _reapplyUseCase: IReapplyUseCase,
     private _editProfileUseCase: IEditProfileUseCase,
     private _subscribeUseCase: ISubscribeUseCase,
-    private _getMySubscriptionUseCase: IGetMySubscriptionUseCase
+    private _getMySubscriptionUseCase: IGetMySubscriptionUseCase,
   ) {}
 
   upgraderole = catchAsync(async (req: Request, res: Response) => {
@@ -52,27 +53,42 @@ export class UserController {
   subscribe = catchAsync(async (req: Request, res: Response): Promise<void> => {
     try {
       if (!req.authUser || !req.authUser.userId) {
-        res.status(HttpStatus.UNAUTHORIZED).json({ success: false, message: 'Unauthorized' });
+        res
+          .status(HttpStatus.UNAUTHORIZED)
+          .json({ success: false, message: 'Unauthorized' });
         return;
       }
-      
+
       const userId = req.authUser.userId;
       const { planId } = req.body;
       if (!planId) {
-        res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: 'Plan ID is required' });
+        res
+          .status(HttpStatus.BAD_REQUEST)
+          .json({ success: false, message: 'Plan ID is required' });
         return;
       }
 
       const updatedUser = await this._subscribeUseCase.execute(userId, planId);
 
-      res.status(HttpStatus.OK).json({ success: true, message: 'Subscribed successfully', user: updatedUser });
+      res.status(HttpStatus.OK).json({
+        success: true,
+        message: 'Subscribed successfully',
+        user: updatedUser,
+      });
     } catch (error: any) {
-      res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: error.message });
+      res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ success: false, message: error.message });
     }
   });
 
   reapply = catchAsync(async (req: Request, res: Response) => {
-    const userId = req.authUser!.userId;
+    const userId = req.authUser?.userId;
+    if (!userId) {
+      return res
+        .status(HttpStatus.UNAUTHORIZED)
+        .json({ message: 'Unauthorized' });
+    }
 
     const users = await this._reapplyUseCase.execute(userId);
     res.status(HttpStatus.OK).json({
@@ -82,7 +98,12 @@ export class UserController {
   });
 
   editProfile = catchAsync(async (req: Request, res: Response) => {
-    const userId = req.authUser!.userId;
+    const userId = req.authUser?.userId;
+    if (!userId) {
+      return res
+        .status(HttpStatus.UNAUTHORIZED)
+        .json({ message: 'Unauthorized' });
+    }
     const { name } = req.body;
 
     const profile = await this._editProfileUseCase.execute({ userId, name });
@@ -93,7 +114,12 @@ export class UserController {
   });
 
   getMySubscription = catchAsync(async (req: Request, res: Response) => {
-    const userId = req.authUser!.userId;
+    const userId = req.authUser?.userId;
+    if (!userId) {
+      return res
+        .status(HttpStatus.UNAUTHORIZED)
+        .json({ message: 'Unauthorized' });
+    }
     const subscription = await this._getMySubscriptionUseCase.execute(userId);
 
     res.status(HttpStatus.OK).json({

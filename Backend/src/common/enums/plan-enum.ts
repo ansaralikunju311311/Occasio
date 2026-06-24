@@ -1,5 +1,5 @@
-export enum PlanType{
-    FREE ='FREE',
-    PRO = 'PRO',
-    ELITE = 'ELITE'
+export enum PlanType {
+  FREE = 'FREE',
+  PRO = 'PRO',
+  ELITE = 'ELITE',
 }

@@ -1,12 +1,18 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { User } from '../../../domain/entities/user.entity';
-import { IAdminRepository } from '../../../domain/repositories/admin/admin.repository.interface';
+import type { IAdminRepository } from '../../../domain/repositories/admin/admin.repository.interface';
 import { UserModel } from '../../database/model/user.model';
-import { PaginationParams, PaginatedResponse } from '../../../common/interfaces/pagination.interface';
+import type {
+  PaginationParams,
+  PaginatedResponse,
+} from '../../../common/interfaces/pagination.interface';
 import { EventManager } from '../../../domain/entities/manager.entity';
 import { EventManagerModel } from '../../database/model/manager.model';
 
 export class AdminRepository implements IAdminRepository {
-  async findAllUser(params: PaginationParams): Promise<PaginatedResponse<User> | null> {
+  async findAllUser(
+    params: PaginationParams,
+  ): Promise<PaginatedResponse<User> | null> {
     const { page = 1, limit = 10, search, role, applyingupgrade } = params;
     const query: any = {
       role: { $ne: 'ADMIN' }, // always exclude admin
@@ -75,7 +81,9 @@ export class AdminRepository implements IAdminRepository {
 
   async findById(id: string): Promise<User | null> {
     const user = await UserModel.findById(id);
-    if (!user) return null;
+    if (!user) {
+      return null;
+    }
     return new User(
       user._id.toString(),
       user.name,
@@ -95,8 +103,6 @@ export class AdminRepository implements IAdminRepository {
     id: string,
     search?: string,
   ): Promise<EventManager | null> {
-    console.log('id evide vannooo just', id);
-
     const query: any = {
       userId: id, // always exclude admin
     };
@@ -105,7 +111,9 @@ export class AdminRepository implements IAdminRepository {
     }
     const manager = await EventManagerModel.findOne(query);
 
-    if (!manager) return null;
+    if (!manager) {
+      return null;
+    }
 
     return new EventManager(
       manager._id.toString(),

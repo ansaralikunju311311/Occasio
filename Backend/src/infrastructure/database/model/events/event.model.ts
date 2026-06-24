@@ -1,4 +1,6 @@
-import { Document, Schema, model } from 'mongoose';
+import type { Document } from 'mongoose';
+import { Schema, model } from 'mongoose';
+
 import { EventType } from '../../../../common/enums/event-type';
 import { EventStatus } from '../../../../common/enums/eventstatus-enum';
 

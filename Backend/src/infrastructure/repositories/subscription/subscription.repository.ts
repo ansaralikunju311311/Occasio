@@ -1,6 +1,7 @@
 import { BaseRepository } from '../base.repository';
-import { IPlanDocument, SubscriptionModel } from '../../database/model/subscription/plan.model';
-import { ISubscriptionRepository } from '../../../domain/repositories/subscription/subscription.repository.interface';
+import type { IPlanDocument } from '../../database/model/subscription/plan.model';
+import { SubscriptionModel } from '../../database/model/subscription/plan.model';
+import type { ISubscriptionRepository } from '../../../domain/repositories/subscription/subscription.repository.interface';
 import { Subscription } from '../../../domain/entities/subscription.entity';
 export class SubscriptionRepository
   extends BaseRepository<IPlanDocument>
@@ -21,7 +22,7 @@ export class SubscriptionRepository
       newPlan.features as [],
       newPlan.isActive,
       newPlan.createdAt,
-      newPlan.updatedAt
+      newPlan.updatedAt,
     );
   }
 
@@ -38,14 +39,16 @@ export class SubscriptionRepository
           plan.features as [],
           plan.isActive,
           plan.createdAt,
-          plan.updatedAt
-        )
+          plan.updatedAt,
+        ),
     );
   }
 
   async findPlanByName(name: string): Promise<Subscription | null> {
     const plan = await this.model.findOne({ name });
-    if (!plan) return null;
+    if (!plan) {
+      return null;
+    }
     return new Subscription(
       plan._id as unknown as string,
       plan.name,
@@ -55,13 +58,15 @@ export class SubscriptionRepository
       plan.features as [],
       plan.isActive,
       plan.createdAt,
-      plan.updatedAt
+      plan.updatedAt,
     );
   }
 
   async findPlanById(id: string): Promise<Subscription | null> {
     const plan = await this.model.findById(id);
-    if (!plan) return null;
+    if (!plan) {
+      return null;
+    }
     return new Subscription(
       plan._id as unknown as string,
       plan.name,
@@ -71,13 +76,20 @@ export class SubscriptionRepository
       plan.features as [],
       plan.isActive,
       plan.createdAt,
-      plan.updatedAt
+      plan.updatedAt,
     );
   }
 
-  async update(id: string, data: Partial<Subscription>): Promise<Subscription | null> {
-    const updatedPlan = await this.model.findByIdAndUpdate(id, data, { new: true });
-    if (!updatedPlan) return null;
+  async update(
+    id: string,
+    data: Partial<Subscription>,
+  ): Promise<Subscription | null> {
+    const updatedPlan = await this.model.findByIdAndUpdate(id, data, {
+      new: true,
+    });
+    if (!updatedPlan) {
+      return null;
+    }
     return new Subscription(
       updatedPlan._id as unknown as string,
       updatedPlan.name,
@@ -87,7 +99,7 @@ export class SubscriptionRepository
       updatedPlan.features as [],
       updatedPlan.isActive,
       updatedPlan.createdAt,
-      updatedPlan.updatedAt
+      updatedPlan.updatedAt,
     );
   }
 }

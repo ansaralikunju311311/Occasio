@@ -1,6 +1,7 @@
-import { UserOtp } from '../../../common/enums/userotp-enum';
+import type { Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 
-import mongoose, { Document, Schema } from 'mongoose';
+import { UserOtp } from '../../../common/enums/userotp-enum';
 
 export interface IOtp extends Document {
   email: string;

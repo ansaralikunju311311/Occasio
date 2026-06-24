@@ -1,8 +1,8 @@
-import {
+import type {
   PaginationParams,
   PaginatedResponse,
 } from '../../../../common/interfaces/pagination.interface';
-import { EventResponseDto } from '../../../../application/dtos/responses/event-response.dto';
+import type { EventResponseDto } from '../../../../application/dtos/responses/event-response.dto';
 
 export interface IGetEventsUseCase {
   execute(

@@ -1,15 +1,15 @@
-import { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
-import { IOtpRepository } from '../../../../domain/repositories/otp.repository.interface';
+import type { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
+import type { IOtpRepository } from '../../../../domain/repositories/otp.repository.interface';
 import { userMapper } from '../../../../common/mappers/user.mapper';
-import { VerfiyOtpDto } from '../../../dtos/verifyotp.dto';
-
+import type { VerfiyOtpDto } from '../../../dtos/verifyotp.dto';
 import { AppError } from '../../../../common/errors/apperror';
 import { HttpStatus } from '../../../../common/constants/http-status';
-import { ITokenService } from '../../../../domain/services/token.service.interface';
+import type { ITokenService } from '../../../../domain/services/token.service.interface';
 // import { CreateToken } from "common/services/token.service";
-import { LoginResponseDto } from '../../../dtos/loginResponse.dto';
-import { IVerifyOtpUseCase } from './verifyotp.usecase.interface';
+import type { LoginResponseDto } from '../../../dtos/loginResponse.dto';
 import { ErrorMessage } from '../../../../common/enums/message-enum';
+
+import type { IVerifyOtpUseCase } from './verifyotp.usecase.interface';
 export class VerifyUseCase implements IVerifyOtpUseCase {
   constructor(
     private _userRepository: IUserRepository,
@@ -18,8 +18,6 @@ export class VerifyUseCase implements IVerifyOtpUseCase {
   ) {}
 
   async execute(data: VerfiyOtpDto): Promise<LoginResponseDto> {
-    console.log('body daata for the otp verifction', data);
-
     const user = await this._userRepository.findByEmail(data.email);
     if (!user) {
       throw new AppError(ErrorMessage.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
@@ -30,12 +28,11 @@ export class VerifyUseCase implements IVerifyOtpUseCase {
     if (!otp) {
       throw new Error('no user and otp');
     }
-    console.log('fjnjfnvfj', user);
 
     if (!otp.otp || !otp.otpExpires) {
       throw new AppError(ErrorMessage.NO_OTP_FOUND, HttpStatus.BAD_REQUEST);
     }
-    if (otp.otp != data.otp) {
+    if (otp.otp !== data.otp) {
       throw new AppError(ErrorMessage.INCORRECT_OTP, HttpStatus.UNAUTHORIZED);
     }
     if (otp.otpExpires < new Date()) {
@@ -44,16 +41,8 @@ export class VerifyUseCase implements IVerifyOtpUseCase {
     }
 
     otp.isUsed = true;
-    ((user.isVerified = true),
-      // user.otp = null,
-      // user.otpExpires = null,
-      // user.otpType = null,
-      // user.otpSendAt = null
+    user.isVerified = true;
 
-      console.log('the passing value for the updation after the otp', user));
-    console.log(user.isVerified);
-
-    3;
     const updateUser = await this._userRepository.updateUser(user);
 
     const accessToken = this._tokenService.generateAccessToken({

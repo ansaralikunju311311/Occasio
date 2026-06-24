@@ -4,6 +4,6 @@ export interface ICreateOrderUseCase {
     userId: string,
     amount?: number,
     bookingType?: 'physical' | 'online',
-    seats?: string[]
-  ): Promise<any>;
+    seats?: string[],
+  ): Promise<unknown>;
 }

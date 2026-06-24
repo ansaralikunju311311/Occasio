@@ -1,7 +1,9 @@
-import { Document, Schema, model } from 'mongoose';
+import type { Document } from 'mongoose';
+import { Schema, model } from 'mongoose';
+
 import { PaymentPurpose } from '../../../../common/enums/payment-purpose.enum';
 import { PaymentStatus } from '../../../../common/enums/payment-status.enum';
-import { PaymentMethod } from '../../../../common/enums/payment-method.enum';
+import type { PaymentMethod } from '../../../../common/enums/payment-method.enum';
 
 export interface IPaymentDocument extends Document {
   userId: Schema.Types.ObjectId;
@@ -39,7 +41,7 @@ const paymentSchema = new Schema<IPaymentDocument>(
     transactionId: { type: String, required: true, unique: true },
     paidAt: { type: Date },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export const PaymentModel = model<IPaymentDocument>('Payment', paymentSchema);

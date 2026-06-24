@@ -1,3 +1,3 @@
-export interface IFailBookingUseCase{
-    execute(userId: string, seatIds: string[]):Promise<any>
+export interface IFailBookingUseCase {
+  execute(userId: string, seatIds: string[]): Promise<number>;
 }

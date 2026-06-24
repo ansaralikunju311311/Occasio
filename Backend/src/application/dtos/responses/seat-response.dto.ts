@@ -1,4 +1,4 @@
-import { SeatStatus } from '../../../common/enums/searstatus-enum';
+import type { SeatStatus } from '../../../common/enums/searstatus-enum';
 
 export interface SeatResponseDto {
   id: string;

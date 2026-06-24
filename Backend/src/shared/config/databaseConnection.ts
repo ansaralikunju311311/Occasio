@@ -4,9 +4,7 @@ export const connectDateBase = async (): Promise<void> => {
   try {
     const uri = process.env.Mongo_URI as string;
     await mongoose.connect(uri);
-    console.log(`the mongo db is connected`);
-  } catch (error: unknown) {
-    console.error(`MongoDB connection error:`, error);
+  } catch {
     process.exit(1);
   }
 };

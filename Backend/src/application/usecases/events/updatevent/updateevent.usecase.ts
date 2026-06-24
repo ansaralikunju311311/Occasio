@@ -1,13 +1,15 @@
-import { IEventRepository } from '../../../../domain/repositories/event/event.repository.interface';
-import { eventMapper } from '../../../../common/mappers/event.mapper';
-import { EventResponseDto } from '../../../../application/dtos/responses/event-response.dto';
-import { IUpdateEventUseCase } from './updatevent.usecase.interface';
-import { UpdateEventDTO } from '../../../../application/dtos/updateevent.dto';
 import mongoose from 'mongoose';
+
+import type { IEventRepository } from '../../../../domain/repositories/event/event.repository.interface';
+import { eventMapper } from '../../../../common/mappers/event.mapper';
+import type { EventResponseDto } from '../../../../application/dtos/responses/event-response.dto';
+import type { UpdateEventDTO } from '../../../../application/dtos/updateevent.dto';
 // import { SeatStatus } from '../../../../common/enums/searstatus-enum';
 import { EventType } from '../../../../common/enums/event-type';
 import { getLocationName } from '../../../../common/services/location.service';
 import { normalizeCoordinates } from '../../../../common/utils/geo.utils';
+
+import type { IUpdateEventUseCase } from './updatevent.usecase.interface';
 
 export class UpdateEventUseCase implements IUpdateEventUseCase {
   constructor(private _eventRepository: IEventRepository) {}
@@ -42,7 +44,7 @@ export class UpdateEventUseCase implements IUpdateEventUseCase {
       }
 
       const currentEventType = data.eventType || event.eventType;
-      const unsetData: any = {};
+      const unsetData: Record<string, unknown> = {};
 
       if (currentEventType === EventType.ONLINE) {
         unsetData.location = '';
@@ -71,7 +73,12 @@ export class UpdateEventUseCase implements IUpdateEventUseCase {
         }
       }
 
-      await this._eventRepository.updateEvent(eventId, data, session, unsetData);
+      await this._eventRepository.updateEvent(
+        eventId,
+        data,
+        session,
+        unsetData,
+      );
 
       if (currentEventType === EventType.ONLINE) {
         await this._eventRepository.deleteSeatsByEventId(eventId, session);
@@ -96,7 +103,6 @@ export class UpdateEventUseCase implements IUpdateEventUseCase {
             session,
           );
 
-          
           await this._eventRepository.updateEventLayout(
             eventId,
             layout._id,
@@ -110,7 +116,6 @@ export class UpdateEventUseCase implements IUpdateEventUseCase {
 
       const updatedEvent = await this._eventRepository.findByIdEvents(eventId);
       return updatedEvent ? eventMapper.toResponse(updatedEvent) : null;
-
     } catch (error) {
       await session.abortTransaction();
       session.endSession();

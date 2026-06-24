@@ -1,9 +1,9 @@
-import mongoose from "mongoose";
-import { ITransactionManager } from "../../domain/services/transaction-manager.interface";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import mongoose from 'mongoose';
 
-export class MongoTransactionManager
-  implements ITransactionManager
-{
+import type { ITransactionManager } from '../../domain/services/transaction-manager.interface';
+
+export class MongoTransactionManager implements ITransactionManager {
   async start() {
     const session = await mongoose.startSession();
     session.startTransaction();

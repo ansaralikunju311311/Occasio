@@ -1,8 +1,8 @@
 export class Booking {
   constructor(
     public readonly id: string | null,
-    public userId: any,
-    public eventId: any,
+    public userId: string,
+    public eventId: string,
     public seats: string[],
     public bookingType: 'physical' | 'online',
     public totalAmount: number,
@@ -12,6 +12,6 @@ export class Booking {
     public paymentId?: string,
     public qrCodeData?: string,
     public createdAt?: Date,
-    public updatedAt?: Date
+    public updatedAt?: Date,
   ) {}
 }

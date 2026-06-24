@@ -5,4 +5,3 @@ export enum EventStatus {
   DRAFT = 'DRAFT',
   LIVE = 'LIVE',
 }
-

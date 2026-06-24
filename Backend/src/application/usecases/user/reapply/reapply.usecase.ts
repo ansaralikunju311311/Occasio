@@ -1,26 +1,24 @@
-import { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
+import type { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
 import { AppError } from '../../../../common/errors/apperror';
 import { ErrorMessage } from '../../../../common/enums/message-enum';
 import { HttpStatus } from '../../../../common/constants/http-status';
 import { userMapper } from '../../../../common/mappers/user.mapper';
 import { UserStatus } from '../../../../common/enums/userstatus-enum';
 import { UpgradeStatus } from '../../../../common/enums/upgrade-enums';
-import { UserResponseDto } from '../../../../application/dtos/responses/user-response.dto';
-import { IReapplyUseCase } from './reapply.usecase.interface';
+import type { UserResponseDto } from '../../../../application/dtos/responses/user-response.dto';
+
+import type { IReapplyUseCase } from './reapply.usecase.interface';
 export class ReapplyUseCase implements IReapplyUseCase {
   constructor(private _userRepository: IUserRepository) {}
 
   async execute(userId: string): Promise<UserResponseDto | null> {
-    console.log(userId);
-
     const user = await this._userRepository.findByIdUser(userId);
-    console.log(user);
 
     if (!user) {
       throw new AppError(ErrorMessage.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
-    if (user.status == UserStatus.BLOCK) {
+    if (user.status === UserStatus.BLOCK) {
       throw new AppError(ErrorMessage.ACCOUNT_BLOCKED, HttpStatus.UNAUTHORIZED);
     }
     if (user.reapplyAt && new Date() < user.reapplyAt) {

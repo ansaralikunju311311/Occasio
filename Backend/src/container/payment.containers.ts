@@ -26,7 +26,7 @@ export const MakePaymentController = () => {
   const getBreakdownUseCase = new GetBreakdownUseCase(
     eventRepository,
     userRepository,
-    subscriptionRepository
+    subscriptionRepository,
   );
 
   const createOrderUseCase = new CreateOrderUseCase(
@@ -34,21 +34,21 @@ export const MakePaymentController = () => {
     eventRepository,
     userRepository,
     subscriptionRepository,
-    bookingRepository
+    bookingRepository,
   );
 
   const verifyPaymentUseCase = new VerifyPaymentUseCase(
     paymentGateway,
     eventRepository,
     paymentRepository,
-    bookingRepository
+    bookingRepository,
   );
 
   const createSubscriptionOrderUseCase = new CreateSubscriptionOrderUseCase(
     paymentGateway,
     userRepository,
     subscriptionRepository,
-    managerSubscriptionRepository
+    managerSubscriptionRepository,
   );
 
   const verifySubscriptionPaymentUseCase = new VerifySubscriptionPaymentUseCase(
@@ -56,24 +56,20 @@ export const MakePaymentController = () => {
     userRepository,
     paymentRepository,
     subscriptionRepository,
-    managerSubscriptionRepository
+    managerSubscriptionRepository,
   );
-  const getMybookingUseCase = new GetMyBookingUseCase(
-     bookingRepository
-  )
+  const getMybookingUseCase = new GetMyBookingUseCase(bookingRepository);
   const getManagerBookingUseCase = new GetManagerBookingUseCase(
-    bookingRepository
-  )
+    bookingRepository,
+  );
 
   return new PaymentController(
-    
     createOrderUseCase,
     verifyPaymentUseCase,
     getBreakdownUseCase,
     createSubscriptionOrderUseCase,
     verifySubscriptionPaymentUseCase,
     getMybookingUseCase,
-    getManagerBookingUseCase
+    getManagerBookingUseCase,
   );
 };
-

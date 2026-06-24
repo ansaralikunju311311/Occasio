@@ -1,7 +1,11 @@
-import { IBookingRepository } from '../../../domain/repositories/booking/booking.repository.interface';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import type { IBookingRepository } from '../../../domain/repositories/booking/booking.repository.interface';
 import { Booking } from '../../../domain/entities/booking.entity';
-import { BookingModel, IBookingDocument } from '../../database/model/booking.model';
-import { PaginationParams, PaginatedResponse } from '../../../common/interfaces/pagination.interface';
+import { BookingModel } from '../../database/model/booking.model';
+import type {
+  PaginationParams,
+  PaginatedResponse,
+} from '../../../common/interfaces/pagination.interface';
 
 export class BookingRepository implements IBookingRepository {
   async saveBooking(booking: Booking): Promise<Booking> {
@@ -31,16 +35,22 @@ export class BookingRepository implements IBookingRepository {
     return doc ? this.toEntity(doc) : null;
   }
 
-  async updateBookingStatus(id: string, status: string): Promise<Booking | null> {
+  async updateBookingStatus(
+    id: string,
+    status: string,
+  ): Promise<Booking | null> {
     const updated = await BookingModel.findByIdAndUpdate(
       id,
       { status },
-      { new: true }
+      { new: true },
     );
     return updated ? this.toEntity(updated) : null;
   }
 
-  async getBookingsByUser(userId: string, params: PaginationParams): Promise<PaginatedResponse<Booking>> {
+  async getBookingsByUser(
+    userId: string,
+    params: PaginationParams,
+  ): Promise<PaginatedResponse<Booking>> {
     const { page = 1, limit = 10 } = params;
     const query = { userId };
     const skip = (page - 1) * limit;
@@ -68,7 +78,10 @@ export class BookingRepository implements IBookingRepository {
     };
   }
 
-  async getBookingsByEvent(eventId: string, params: PaginationParams): Promise<PaginatedResponse<Booking>> {
+  async getBookingsByEvent(
+    eventId: string,
+    params: PaginationParams,
+  ): Promise<PaginatedResponse<Booking>> {
     const { page = 1, limit = 10 } = params;
     const query = { eventId };
     const skip = (page - 1) * limit;
@@ -96,13 +109,19 @@ export class BookingRepository implements IBookingRepository {
     };
   }
 
-  async getManagerBookings(managerId: string, params: PaginationParams): Promise<PaginatedResponse<Booking>> {
+  async getManagerBookings(
+    managerId: string,
+    params: PaginationParams,
+  ): Promise<PaginatedResponse<Booking>> {
     const { page = 1, limit = 10 } = params;
     const skip = (page - 1) * limit;
 
     // Find all events created by this manager
-    const EventModel = require('../../database/model/events/event.model').EventModel;
-    const managerEvents = await EventModel.find({ createdBy: managerId }).select('_id');
+    const EventModel =
+      require('../../database/model/events/event.model').EventModel;
+    const managerEvents = await EventModel.find({
+      createdBy: managerId,
+    }).select('_id');
     const eventIds = managerEvents.map((e: any) => e._id);
 
     const query = { eventId: { $in: eventIds } };
@@ -145,7 +164,7 @@ export class BookingRepository implements IBookingRepository {
       doc.paymentId,
       doc.qrCodeData,
       doc.createdAt,
-      doc.updatedAt
+      doc.updatedAt,
     );
   }
 

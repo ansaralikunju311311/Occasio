@@ -1,6 +1,6 @@
-import { Response } from 'express';
+import type { Response } from 'express';
 
-export interface ISessionService{
-    setRefreshToken(res:Response,token:string):void,
-    clearRefreshToken(res:Response):void
+export interface ISessionService {
+  setRefreshToken(res: Response, token: string): void;
+  clearRefreshToken(res: Response): void;
 }

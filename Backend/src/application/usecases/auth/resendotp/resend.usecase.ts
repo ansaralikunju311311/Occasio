@@ -1,16 +1,16 @@
 import { UserOtp } from '../../../../common/enums/userotp-enum';
 import { generateOTP } from '../../../../common/utils/generateotp';
-import { User } from '../../../../domain/entities/user.entity';
-import { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
+import type { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
 import { AppError } from '../../../../common/errors/apperror';
 import { HttpStatus } from '../../../../common/constants/http-status';
-import { EmailSerive } from '../../../../common/services/email.service';
+import type { EmailSerive } from '../../../../common/services/email.service';
 import { ErrorMessage } from '../../../../common/enums/message-enum';
 import { otpMapper } from '../../../../common/mappers/otp.mapper';
-import { IOtpRepository } from '../../../../domain/repositories/otp.repository.interface';
+import type { IOtpRepository } from '../../../../domain/repositories/otp.repository.interface';
 import { OTP } from '../../../../domain/entities/otp.entity';
-import { OtpResponseDto } from '../../../../application/dtos/responses/otp-response.dto';
-import { IResendUseCase } from './resend.usecase.interface';
+import type { OtpResponseDto } from '../../../../application/dtos/responses/otp-response.dto';
+
+import type { IResendUseCase } from './resend.usecase.interface';
 
 export class ResendotpUseCase implements IResendUseCase {
   constructor(
@@ -22,7 +22,6 @@ export class ResendotpUseCase implements IResendUseCase {
   async execute(email: string): Promise<OtpResponseDto | null> {
     const user = await this._userRepository.findByEmail(email);
 
-    console.log('user', user);
     if (!user) {
       throw new AppError(ErrorMessage.USER_NOT_FOUND, HttpStatus.UNAUTHORIZED);
     }
@@ -30,7 +29,6 @@ export class ResendotpUseCase implements IResendUseCase {
     let otpUser = await this._otpRepository.ResendOtp({ email: email });
 
     const now = new Date();
-    console.log('the time now ', now);
 
     if (otpUser) {
       if (otpUser.isUsed === true) {
@@ -39,7 +37,6 @@ export class ResendotpUseCase implements IResendUseCase {
 
       if (otpUser.otpSendAt) {
         const diff = (now.getTime() - otpUser.otpSendAt.getTime()) / 1000;
-        console.log('the diff', diff);
 
         if (diff < 60) {
           throw new AppError(
@@ -51,7 +48,6 @@ export class ResendotpUseCase implements IResendUseCase {
     }
 
     const newOtp = generateOTP();
-    console.log('generated', newOtp);
 
     let otpType = UserOtp.SIGNUP;
     if (user.isVerified === false) {

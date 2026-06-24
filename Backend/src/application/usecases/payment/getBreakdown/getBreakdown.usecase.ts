@@ -1,19 +1,22 @@
-import { IEventRepository } from '../../../../domain/repositories/event/event.repository.interface';
-import { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
-import { ISubscriptionRepository } from '../../../../domain/repositories/subscription/subscription.repository.interface';
+import type { IEventRepository } from '../../../../domain/repositories/event/event.repository.interface';
+import type { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
+import type { ISubscriptionRepository } from '../../../../domain/repositories/subscription/subscription.repository.interface';
 
 export interface IGetBreakdownUseCase {
-  execute(eventId: string, amount: number): Promise<any>;
+  execute(eventId: string, amount: number): Promise<Record<string, unknown>>;
 }
 
 export class GetBreakdownUseCase implements IGetBreakdownUseCase {
   constructor(
     private _eventRepository: IEventRepository,
     private _userRepository: IUserRepository,
-    private _subscriptionRepository: ISubscriptionRepository
+    private _subscriptionRepository: ISubscriptionRepository,
   ) {}
 
-  async execute(eventId: string, amount: number): Promise<any> {
+  async execute(
+    eventId: string,
+    amount: number,
+  ): Promise<Record<string, unknown>> {
     const event = await this._eventRepository.findByIdEvents(eventId);
     if (!event) {
       throw new Error('Event not found');
@@ -29,14 +32,18 @@ export class GetBreakdownUseCase implements IGetBreakdownUseCase {
     let planName = 'No Subscription';
 
     if (creator.activeSubscription) {
-      const plan = await this._subscriptionRepository.findPlanById(creator.activeSubscription);
+      const plan = await this._subscriptionRepository.findPlanById(
+        creator.activeSubscription,
+      );
       if (plan) {
         commissionPercentage = plan.commissionPercentage;
         planName = plan.name;
       }
     }
 
-    const commissionAmount = parseFloat((amount * (commissionPercentage / 100)).toFixed(2));
+    const commissionAmount = parseFloat(
+      (amount * (commissionPercentage / 100)).toFixed(2),
+    );
     const totalAmount = amount;
     const organizerRevenue = parseFloat((amount - commissionAmount).toFixed(2));
 

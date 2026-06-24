@@ -1,5 +1,4 @@
-
-import { Subscription } from "../../entities/subscription.entity";
+import type { Subscription } from '../../entities/subscription.entity';
 
 export interface ISubscriptionRepository {
   createPlan(data: Subscription): Promise<Subscription>;

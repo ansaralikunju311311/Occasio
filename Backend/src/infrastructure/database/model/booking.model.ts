@@ -1,4 +1,5 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import type { Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 
 export enum BookingStatus {
   PENDING = 'PENDING',
@@ -40,7 +41,10 @@ const BookingSchema = new Schema<IBookingDocument>(
     paymentId: { type: String },
     qrCodeData: { type: String },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-export const BookingModel = mongoose.model<IBookingDocument>('Booking', BookingSchema);
+export const BookingModel = mongoose.model<IBookingDocument>(
+  'Booking',
+  BookingSchema,
+);

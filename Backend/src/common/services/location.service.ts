@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from 'axios';
 export const getLocationName = async (address: string) => {
   try {
@@ -7,7 +8,9 @@ export const getLocationName = async (address: string) => {
 
     const results = res.data.results;
 
-    if (!results || results.length === 0) return null;
+    if (!results || results.length === 0) {
+      return null;
+    }
 
     //  Prefer high confidence result
     const bestResult =

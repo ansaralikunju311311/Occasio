@@ -1,6 +1,7 @@
-import { IGetPlansUseCase } from "./getplan.usecase.interface";
-import { ResponsePlanDto } from "../../../dtos/responses/responseplan.dto";
-import { ISubscriptionRepository } from "../../../../domain/repositories/subscription/subscription.repository.interface";
+import type { ResponsePlanDto } from '../../../dtos/responses/responseplan.dto';
+import type { ISubscriptionRepository } from '../../../../domain/repositories/subscription/subscription.repository.interface';
+
+import type { IGetPlansUseCase } from './getplan.usecase.interface';
 
 export class GetPlansUseCase implements IGetPlansUseCase {
   constructor(private _subscriptionRepository: ISubscriptionRepository) {}
@@ -8,7 +9,7 @@ export class GetPlansUseCase implements IGetPlansUseCase {
   async execute(): Promise<ResponsePlanDto[]> {
     const plans = await this._subscriptionRepository.findAllPlans();
     return plans.map((plan) => ({
-      id: plan.id!,
+      id: plan.id ?? '',
       name: plan.name,
       price: plan.price,
       eventLimit: plan.eventLimit,

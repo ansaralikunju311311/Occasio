@@ -1,4 +1,4 @@
-import { UserOtp } from '../../../common/enums/userotp-enum';
+import type { UserOtp } from '../../../common/enums/userotp-enum';
 
 export interface OtpResponseDto {
   email: string;

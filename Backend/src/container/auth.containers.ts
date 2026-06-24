@@ -25,8 +25,8 @@ export const MakeAdminController = () => {
   const tokenService = new CreateToken();
   const comapreService = new BcryptHashService();
   const sessionservice = new SessionService();
-const googleLoginUseCase = new GoogleLogin(tokenService);
-const refreshToken =  new RefreshTokenUseCase(tokenService)
+  const googleLoginUseCase = new GoogleLogin(tokenService);
+  const refreshToken = new RefreshTokenUseCase(tokenService);
 
   const signupUsecase = new SignupUsecase(
     userRepository,
@@ -71,26 +71,21 @@ const refreshToken =  new RefreshTokenUseCase(tokenService)
     tokenService,
   );
 
-
-
-
-
-
   return new AuthController(
-  signupUsecase,
-  verifyUseCase,
-  resendotpUseCase,
-  getmeUseCase,
-  forgotpasswordUsecase,
-  
-  loginUseCase,
-  resetPasswordUseCase,
-  updatePasswordUseCase,
-  adminLoginUseCase,
-  sessionservice,
-  refreshToken,
-  googleLoginUseCase,
-);
+    signupUsecase,
+    verifyUseCase,
+    resendotpUseCase,
+    getmeUseCase,
+    forgotpasswordUsecase,
+
+    loginUseCase,
+    resetPasswordUseCase,
+    updatePasswordUseCase,
+    adminLoginUseCase,
+    sessionservice,
+    refreshToken,
+    googleLoginUseCase,
+  );
 };
 
 //   private userRepository:IUserRepository,

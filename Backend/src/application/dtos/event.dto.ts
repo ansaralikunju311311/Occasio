@@ -1,5 +1,5 @@
-import { EventStatus } from '../../common/enums/eventstatus-enum';
-import { EventType } from '../../common/enums/event-type';
+import type { EventStatus } from '../../common/enums/eventstatus-enum';
+import type { EventType } from '../../common/enums/event-type';
 
 export interface EventDto {
   title: string;

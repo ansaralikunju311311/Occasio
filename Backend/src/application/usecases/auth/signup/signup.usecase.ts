@@ -1,21 +1,22 @@
-import { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
-import { IHashServive } from '../../../../domain/services/hash.service.interface';
-import { signupDTO } from '../../../dtos/signup.dto';
+import type { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
+import type { IHashServive } from '../../../../domain/services/hash.service.interface';
+import type { signupDTO } from '../../../dtos/signup.dto';
 import { User } from '../../../../domain/entities/user.entity';
 import { UserRole } from '../../../../common/enums/userrole-enum';
 import { UserStatus } from '../../../../common/enums/userstatus-enum';
 import { generateOTP } from '../../../../common/utils/generateotp';
 import { AppError } from '../../../../common/errors/apperror';
 import { HttpStatus } from '../../../../common/constants/http-status';
-import { EmailSerive } from '../../../../common/services/email.service';
+import type { EmailSerive } from '../../../../common/services/email.service';
 import { ErrorMessage } from '../../../../common/enums/message-enum';
 import { UpgradeStatus } from '../../../../common/enums/upgrade-enums';
 import { otpMapper } from '../../../../common/mappers/otp.mapper';
-import { ISignupUseCase } from './signup.usecase.interface';
 import { OTP } from '../../../../domain/entities/otp.entity';
-import { OtpResponseDto } from '../../../../application/dtos/responses/otp-response.dto';
+import type { OtpResponseDto } from '../../../../application/dtos/responses/otp-response.dto';
 import { UserOtp } from '../../../../common/enums/userotp-enum';
-import { IOtpRepository } from '../../../../domain/repositories/otp.repository.interface';
+import type { IOtpRepository } from '../../../../domain/repositories/otp.repository.interface';
+
+import type { ISignupUseCase } from './signup.usecase.interface';
 export class SignupUsecase implements ISignupUseCase {
   constructor(
     private _userRepository: IUserRepository,
@@ -25,7 +26,6 @@ export class SignupUsecase implements ISignupUseCase {
   ) {}
 
   async execute(data: signupDTO): Promise<OtpResponseDto | null> {
-    console.log('Incoming signup data:', data);
     const existingUser = await this._userRepository.findByEmail(data.email);
     if (existingUser) {
       if (existingUser.isVerified) {
@@ -35,8 +35,7 @@ export class SignupUsecase implements ISignupUseCase {
         );
       }
     }
-
-    if (data.confirmpassword != data.password) {
+    if (data.confirmpassword !== data.password) {
       throw new AppError(
         ErrorMessage.PASSWORD_MISMATCH,
         HttpStatus.BAD_REQUEST,
@@ -57,7 +56,7 @@ export class SignupUsecase implements ISignupUseCase {
     const otpExpires = new Date(Date.now() + 5 * 60 * 1000);
 
     const isUsed = false;
-    const checkig = await this._emailService.sendOtpEmail(data.email, otp);
+    await this._emailService.sendOtpEmail(data.email, otp);
 
     //   email:string,
     //    otp:string,
@@ -75,7 +74,6 @@ export class SignupUsecase implements ISignupUseCase {
       isUsed,
       otpSendAt,
     );
-    console.log('reched here', checkig);
 
     const newUser = new User(
       existingUser ? existingUser.id : null,
@@ -94,11 +92,10 @@ export class SignupUsecase implements ISignupUseCase {
       reapplyAt,
     );
 
-    let newUsers;
     if (existingUser && !existingUser.isVerified) {
-      newUsers = await this._userRepository.updateUser(newUser);
+      await this._userRepository.updateUser(newUser);
     } else {
-      newUsers = await this._userRepository.createUser(newUser);
+      await this._userRepository.createUser(newUser);
     }
 
     const otpDetails = await this._otpRespository.otpStore(Otp);

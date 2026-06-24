@@ -1,7 +1,6 @@
-import {
-  IOtp,
-  OtpModel,
-} from '../../../infrastructure/database/model/otp.model';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import type { IOtp } from '../../../infrastructure/database/model/otp.model';
+import { OtpModel } from '../../../infrastructure/database/model/otp.model';
 import { BaseRepository } from '../base.repository';
 import type { IOtpRepository } from '../../../domain/repositories/otp.repository.interface';
 import { OTP } from '../../../domain/entities/otp.entity';
@@ -39,14 +38,14 @@ export class OtpRepository
       otpSendAt: otp.otpSendAt,
       otpType: otp.otpType,
     });
-    console.log('check here the value id comming', doc);
-
     return this.toEntity(doc);
   }
 
   async MatchOTP(data: { email: string; otp: string }): Promise<OTP | null> {
     const Userdata = await super.findOne({ email: data.email });
-    if (!Userdata) return null;
+    if (!Userdata) {
+      return null;
+    }
     return this.toEntity(Userdata);
   }
 

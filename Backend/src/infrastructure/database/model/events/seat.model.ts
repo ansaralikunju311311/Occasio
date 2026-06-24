@@ -1,5 +1,6 @@
-import mongoose, { Schema, Document } from 'mongoose';
-import { EventStatus } from '../../../../common/enums/eventstatus-enum';
+import type { Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
+
 import { SeatStatus } from '../../../../common/enums/searstatus-enum';
 export interface ISeat extends Document {
   eventId: Schema.Types.ObjectId;

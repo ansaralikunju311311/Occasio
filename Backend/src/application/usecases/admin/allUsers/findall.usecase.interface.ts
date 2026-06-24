@@ -1,5 +1,5 @@
-import { UserResponseDto } from '../../../../application/dtos/responses/user-response.dto';
-import {
+import type { UserResponseDto } from '../../../../application/dtos/responses/user-response.dto';
+import type {
   PaginationParams,
   PaginatedResponse,
 } from '../../../../common/interfaces/pagination.interface';

@@ -1,5 +1,6 @@
-import { OTP } from '../../domain/entities/otp.entity';
-import { OtpResponseDto } from '../../application/dtos/responses/otp-response.dto';
+import type { OTP } from '../../domain/entities/otp.entity';
+import type { OtpResponseDto } from '../../application/dtos/responses/otp-response.dto';
+
 import { BaseMapper } from './base.mapper';
 
 export class OtpMapper extends BaseMapper<OTP, OtpResponseDto> {

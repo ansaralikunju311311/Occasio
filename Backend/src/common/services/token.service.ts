@@ -1,10 +1,11 @@
-import { ITokenService } from '../../domain/services/token.service.interface';
-import jwt, { SignOptions } from 'jsonwebtoken';
-import { StringValue } from 'ms';
+import type { SignOptions } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
+import type { StringValue } from 'ms';
+
+import type { ITokenService } from '../../domain/services/token.service.interface';
 
 export class CreateToken implements ITokenService {
   generateAccessToken(payload: object): string {
-    console.log('ACCESS SECRET:', process.env.JWT_ACCESS_SECRET);
     const options: SignOptions = {
       expiresIn: process.env.JWT_ACCESS_EXPIRES as StringValue,
     };

@@ -1,6 +1,8 @@
-import { NextFunction, Response, Request } from 'express';
+import type { NextFunction, Response, Request } from 'express';
+
 import { HttpStatus } from '../../common/constants/http-status';
 import { UserModel } from '../../infrastructure/database/model/user.model';
+import { logger } from '../../common/logger/logger';
 
 export const requireRole = (roles: string[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -25,11 +27,14 @@ export const requireRole = (roles: string[]) => {
       }
 
       if (req.authUser) {
-        req.authUser.role = dbUser.role as any;
+        req.authUser.role = dbUser.role as string;
       }
       next();
     } catch (error) {
-      console.error('requireRole error:', error);
+      logger.error(
+        'requireRole error:',
+        error instanceof Error ? error : new Error(String(error)),
+      );
       return res.status(500).json({ message: 'Internal Server Error' });
     }
   };

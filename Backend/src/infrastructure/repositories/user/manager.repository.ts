@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { EventManager } from '../../../domain/entities/manager.entity';
-import { IEventManagerRepository } from '../../../domain/repositories/manger.repository.interface';
+import type { IEventManagerRepository } from '../../../domain/repositories/manger.repository.interface';
 import { EventManagerModel } from '../../database/model/manager.model';
 import { BaseRepository } from '../base.repository';
-import { IEventManagerDocument } from '../../database/model/manager.model';
+import type { IEventManagerDocument } from '../../database/model/manager.model';
 export class ManagerRepository
   extends BaseRepository<IEventManagerDocument>
   implements IEventManagerRepository
@@ -27,7 +28,9 @@ export class ManagerRepository
   }
   async findByIdManager(id: string): Promise<EventManager | null> {
     const manager = await super.findOne({ userId: id } as any);
-    if (!manager) return null;
+    if (!manager) {
+      return null;
+    }
     return this.toEntity(manager);
   }
   private toEntity(doc: any): EventManager {

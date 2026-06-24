@@ -1,13 +1,14 @@
-import { ICreateOrderUseCase } from './createOrder.usecase.interface';
-import { IPaymentGateway } from '../../../../domain/services/payment-gateway.interface';
-import { IEventRepository } from '../../../../domain/repositories/event/event.repository.interface';
-import { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
-import { ISubscriptionRepository } from '../../../../domain/repositories/subscription/subscription.repository.interface';
-import { IBookingRepository } from '../../../../domain/repositories/booking/booking.repository.interface';
+import type { IPaymentGateway } from '../../../../domain/services/payment-gateway.interface';
+import type { IEventRepository } from '../../../../domain/repositories/event/event.repository.interface';
+import type { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
+import type { ISubscriptionRepository } from '../../../../domain/repositories/subscription/subscription.repository.interface';
+import type { IBookingRepository } from '../../../../domain/repositories/booking/booking.repository.interface';
 import { Booking } from '../../../../domain/entities/booking.entity';
 import { BookingStatus } from '../../../../infrastructure/database/model/booking.model';
 import { SeatModel } from '../../../../infrastructure/database/model/events/seat.model';
 import { SeatStatus } from '../../../../common/enums/searstatus-enum';
+
+import type { ICreateOrderUseCase } from './createOrder.usecase.interface';
 
 export class CreateOrderUseCase implements ICreateOrderUseCase {
   constructor(
@@ -15,7 +16,7 @@ export class CreateOrderUseCase implements ICreateOrderUseCase {
     private _eventRepository: IEventRepository,
     private _userRepository: IUserRepository,
     private _subscriptionRepository: ISubscriptionRepository,
-    private _bookingRepository: IBookingRepository
+    private _bookingRepository: IBookingRepository,
   ) {}
 
   async execute(
@@ -23,8 +24,8 @@ export class CreateOrderUseCase implements ICreateOrderUseCase {
     userId: string,
     amount?: number,
     bookingType?: 'physical' | 'online',
-    seats?: string[]
-  ): Promise<any> {
+    seats?: string[],
+  ): Promise<unknown> {
     if (!amount) {
       // Event publishing fee flow (fixed amount 99)
       await this._eventRepository.validateOwnershipAndDraft(eventId, userId);
@@ -52,7 +53,7 @@ export class CreateOrderUseCase implements ICreateOrderUseCase {
 
       if (alreadyBooked.length > 0) {
         throw new Error(
-          `Some seats are already booked: ${alreadyBooked.map((s) => s.seatNumber).join(', ')}`
+          `Some seats are already booked: ${alreadyBooked.map((s) => s.seatNumber).join(', ')}`,
         );
       }
     }
@@ -61,18 +62,25 @@ export class CreateOrderUseCase implements ICreateOrderUseCase {
     let commissionPercentage = 10; // Default 10% if no active subscription
 
     if (creator && creator.activeSubscription) {
-      const plan = await this._subscriptionRepository.findPlanById(creator.activeSubscription);
+      const plan = await this._subscriptionRepository.findPlanById(
+        creator.activeSubscription,
+      );
       if (plan) {
         commissionPercentage = plan.commissionPercentage;
       }
     }
 
-    const commissionAmount = parseFloat((amount * (commissionPercentage / 100)).toFixed(2));
+    const commissionAmount = parseFloat(
+      (amount * (commissionPercentage / 100)).toFixed(2),
+    );
     const totalAmount = amount;
     const organizerRevenue = parseFloat((amount - commissionAmount).toFixed(2));
 
     // 3. Create Razorpay order
-    const order = await this._paymentGateway.createOrder(eventId, totalAmount);
+    const order = (await this._paymentGateway.createOrder(
+      eventId,
+      totalAmount,
+    )) as { id: string };
 
     // 4. Create pending booking record in the database
     const booking = new Booking(
@@ -85,7 +93,7 @@ export class CreateOrderUseCase implements ICreateOrderUseCase {
       commissionAmount,
       organizerRevenue,
       BookingStatus.PENDING,
-      order.id // Razorpay Order ID
+      order.id, // Razorpay Order ID
     );
 
     await this._bookingRepository.saveBooking(booking);

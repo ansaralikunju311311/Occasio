@@ -1,6 +1,6 @@
-import { PaymentPurpose } from '../../common/enums/payment-purpose.enum';
-import { PaymentStatus } from '../../common/enums/payment-status.enum';
-import { PaymentMethod } from '../../common/enums/payment-method.enum';
+import type { PaymentPurpose } from '../../common/enums/payment-purpose.enum';
+import type { PaymentStatus } from '../../common/enums/payment-status.enum';
+import type { PaymentMethod } from '../../common/enums/payment-method.enum';
 
 export class Payment {
   constructor(
@@ -16,6 +16,6 @@ export class Payment {
     public bookingId?: string,
     public paidAt?: Date,
     public createdAt?: Date,
-    public updatedAt?: Date
+    public updatedAt?: Date,
   ) {}
 }

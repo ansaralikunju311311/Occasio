@@ -1,14 +1,15 @@
-import { IVerifySubscriptionPaymentUseCase } from './verifySubscriptionPayment.usecase.interface';
-import { IPaymentGateway } from '../../../../domain/services/payment-gateway.interface';
-import { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
-import { IPaymentRepository } from '../../../../domain/repositories/payment/payment.repository.interface';
-import { ISubscriptionRepository } from '../../../../domain/repositories/subscription/subscription.repository.interface';
-import { IManagerSubscriptionRepository } from '../../../../domain/repositories/imanager-subscription.repository';
-import { ManagerPlan } from '../../../../common/enums/manager-plan.enum';
+import type { IPaymentGateway } from '../../../../domain/services/payment-gateway.interface';
+import type { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
+import type { IPaymentRepository } from '../../../../domain/repositories/payment/payment.repository.interface';
+import type { ISubscriptionRepository } from '../../../../domain/repositories/subscription/subscription.repository.interface';
+import type { IManagerSubscriptionRepository } from '../../../../domain/repositories/imanager-subscription.repository';
+import type { ManagerPlan } from '../../../../common/enums/manager-plan.enum';
 import { Payment } from '../../../../domain/entities/payment.entity';
 import { PaymentPurpose } from '../../../../common/enums/payment-purpose.enum';
 import { PaymentStatus } from '../../../../common/enums/payment-status.enum';
 import { PaymentMethod } from '../../../../common/enums/payment-method.enum';
+
+import type { IVerifySubscriptionPaymentUseCase } from './verifySubscriptionPayment.usecase.interface';
 
 export class VerifySubscriptionPaymentUseCase implements IVerifySubscriptionPaymentUseCase {
   constructor(
@@ -16,7 +17,7 @@ export class VerifySubscriptionPaymentUseCase implements IVerifySubscriptionPaym
     private _userRepository: IUserRepository,
     private _paymentRepository: IPaymentRepository,
     private _subscriptionRepository: ISubscriptionRepository,
-    private _managerSubscriptionRepository: IManagerSubscriptionRepository
+    private _managerSubscriptionRepository: IManagerSubscriptionRepository,
   ) {}
 
   async execute(
@@ -26,14 +27,19 @@ export class VerifySubscriptionPaymentUseCase implements IVerifySubscriptionPaym
       razorpay_signature: string;
       planId: string;
     },
-    userId: string
-  ): Promise<any> {
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, planId } = data;
+    userId: string,
+  ): Promise<Record<string, unknown>> {
+    const {
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
+      planId,
+    } = data;
 
     const isValid = this._paymentGateway.verifySignature(
       razorpay_order_id,
       razorpay_payment_id,
-      razorpay_signature
+      razorpay_signature,
     );
 
     if (!isValid) {
@@ -41,16 +47,23 @@ export class VerifySubscriptionPaymentUseCase implements IVerifySubscriptionPaym
     }
 
     const user = await this._userRepository.findByIdUser(userId);
-    if (!user) throw new Error('User not found');
+    if (!user) {
+      throw new Error('User not found');
+    }
 
     const targetPlan = await this._subscriptionRepository.findPlanById(planId);
-    if (!targetPlan) throw new Error('Target plan not found');
+    if (!targetPlan) {
+      throw new Error('Target plan not found');
+    }
 
     // Prevent downgrade
     if (user.activeSubscription) {
-      const managerSub = await this._managerSubscriptionRepository.findById(user.activeSubscription);
+      const managerSub = await this._managerSubscriptionRepository.findById(
+        user.activeSubscription,
+      );
       if (managerSub) {
-        const currentPlanDef = await this._subscriptionRepository.findPlanByName(managerSub.plan);
+        const currentPlanDef =
+          await this._subscriptionRepository.findPlanByName(managerSub.plan);
         if (currentPlanDef && targetPlan.price < currentPlanDef.price) {
           throw new Error('You cannot downgrade to a lower tier plan.');
         }
@@ -64,13 +77,16 @@ export class VerifySubscriptionPaymentUseCase implements IVerifySubscriptionPaym
         endDate.setMonth(endDate.getMonth() + 1);
         managerSub.endDate = endDate;
 
-        await this._managerSubscriptionRepository.update(managerSub.id as string, {
-          plan: managerSub.plan,
-          eventLimit: managerSub.eventLimit,
-          eventsUsed: managerSub.eventsUsed,
-          startDate: managerSub.startDate,
-          endDate: managerSub.endDate
-        });
+        await this._managerSubscriptionRepository.update(
+          managerSub.id as string,
+          {
+            plan: managerSub.plan,
+            eventLimit: managerSub.eventLimit,
+            eventsUsed: managerSub.eventsUsed,
+            startDate: managerSub.startDate,
+            endDate: managerSub.endDate,
+          },
+        );
       } else {
         throw new Error('Manager Subscription not found.');
       }
@@ -93,7 +109,7 @@ export class VerifySubscriptionPaymentUseCase implements IVerifySubscriptionPaym
       razorpay_payment_id,
       undefined,
       undefined,
-      new Date()
+      new Date(),
     );
 
     await this._paymentRepository.savePayment(payment);

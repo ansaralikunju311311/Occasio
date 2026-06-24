@@ -1,14 +1,14 @@
-import { Request, Response } from 'express';
-import { ICreateOrderUseCase } from '../../application/usecases/payment/createOrder/createOrder.usecase.interface';
-import { IVerifyPaymentUseCase } from '../../application/usecases/payment/verifyPayment/verifyPayment.usecase.interface';
-import { IGetBreakdownUseCase } from '../../application/usecases/payment/getBreakdown/getBreakdown.usecase';
-import { IBookingRepository } from '../../domain/repositories/booking/booking.repository.interface';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import type { Request, Response } from 'express';
 
-import { ICreateSubscriptionOrderUseCase } from '../../application/usecases/payment/createSubscriptionOrder/createSubscriptionOrder.usecase.interface';
-import { IVerifySubscriptionPaymentUseCase } from '../../application/usecases/payment/verifySubscriptionPayment/verifySubscriptionPayment.usecase.interface';
+import type { ICreateOrderUseCase } from '../../application/usecases/payment/createOrder/createOrder.usecase.interface';
+import type { IVerifyPaymentUseCase } from '../../application/usecases/payment/verifyPayment/verifyPayment.usecase.interface';
+import type { IGetBreakdownUseCase } from '../../application/usecases/payment/getBreakdown/getBreakdown.usecase';
+import type { ICreateSubscriptionOrderUseCase } from '../../application/usecases/payment/createSubscriptionOrder/createSubscriptionOrder.usecase.interface';
+import type { IVerifySubscriptionPaymentUseCase } from '../../application/usecases/payment/verifySubscriptionPayment/verifySubscriptionPayment.usecase.interface';
 import { HttpStatus } from '../../common/constants/http-status';
-import { IGetMyBookingUseCase } from '../../application/usecases/booking/getMybookings/getmybooking.usecase.interface';
-import { IGetManagerBookingUseCase } from '../../application/usecases/booking/getManagerbookings/getmanagerbooking.usecase.interface';
+import type { IGetMyBookingUseCase } from '../../application/usecases/booking/getMybookings/getmybooking.usecase.interface';
+import type { IGetManagerBookingUseCase } from '../../application/usecases/booking/getManagerbookings/getmanagerbooking.usecase.interface';
 
 export class PaymentController {
   constructor(
@@ -18,7 +18,7 @@ export class PaymentController {
     private _createSubscriptionOrderUseCase: ICreateSubscriptionOrderUseCase,
     private _verifySubscriptionPaymentUseCase: IVerifySubscriptionPaymentUseCase,
     private _getMybookingUseCase: IGetMyBookingUseCase,
-    private _getManagerBookingUseCase: IGetManagerBookingUseCase
+    private _getManagerBookingUseCase: IGetManagerBookingUseCase,
   ) {}
 
   createSubscriptionOrder = async (req: Request, res: Response) => {
@@ -27,17 +27,24 @@ export class PaymentController {
       const userId = (req as any).user?.id || (req as any).authUser?.userId;
 
       if (!userId) {
-        return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Unauthorized' });
+        return res
+          .status(HttpStatus.UNAUTHORIZED)
+          .json({ message: 'Unauthorized' });
       }
 
-      const order = await this._createSubscriptionOrderUseCase.execute(userId, planId);
+      const order = await this._createSubscriptionOrderUseCase.execute(
+        userId,
+        planId,
+      );
 
       return res.status(HttpStatus.OK).json({
         success: true,
         order,
       });
     } catch (error: any) {
-      return res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: error.message });
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ success: false, message: error.message });
     }
   };
 
@@ -46,14 +53,21 @@ export class PaymentController {
       const userId = (req as any).user?.id || (req as any).authUser?.userId;
 
       if (!userId) {
-        return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Unauthorized' });
+        return res
+          .status(HttpStatus.UNAUTHORIZED)
+          .json({ message: 'Unauthorized' });
       }
 
-      const result = await this._verifySubscriptionPaymentUseCase.execute(req.body, userId);
+      const result = await this._verifySubscriptionPaymentUseCase.execute(
+        req.body,
+        userId,
+      );
 
       return res.status(HttpStatus.OK).json(result);
     } catch (error: any) {
-      return res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: error.message });
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ success: false, message: error.message });
     }
   };
 
@@ -63,7 +77,9 @@ export class PaymentController {
       const userId = (req as any).user?.id || (req as any).authUser?.userId;
 
       if (!userId) {
-        return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Unauthorized' });
+        return res
+          .status(HttpStatus.UNAUTHORIZED)
+          .json({ message: 'Unauthorized' });
       }
 
       const order = await this._createOrderUseCase.execute(eventId, userId);
@@ -73,7 +89,9 @@ export class PaymentController {
         order,
       });
     } catch (error: any) {
-      return res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: error.message });
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ success: false, message: error.message });
     }
   };
 
@@ -83,7 +101,9 @@ export class PaymentController {
       const userId = (req as any).user?.id || (req as any).authUser?.userId;
 
       if (!userId) {
-        return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Unauthorized' });
+        return res
+          .status(HttpStatus.UNAUTHORIZED)
+          .json({ message: 'Unauthorized' });
       }
 
       const order = await this._createOrderUseCase.execute(
@@ -91,7 +111,7 @@ export class PaymentController {
         userId,
         amount,
         bookingType,
-        selectedSeats
+        selectedSeats,
       );
 
       return res.status(HttpStatus.OK).json({
@@ -99,7 +119,9 @@ export class PaymentController {
         order,
       });
     } catch (error: any) {
-      return res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: error.message });
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ success: false, message: error.message });
     }
   };
 
@@ -109,13 +131,20 @@ export class PaymentController {
       const amount = parseFloat(req.query.amount as string);
 
       if (!eventId || isNaN(amount)) {
-        return res.status(HttpStatus.BAD_REQUEST).json({ message: 'Invalid query parameters' });
+        return res
+          .status(HttpStatus.BAD_REQUEST)
+          .json({ message: 'Invalid query parameters' });
       }
 
-      const breakdown = await this._getBreakdownUseCase.execute(eventId, amount);
+      const breakdown = await this._getBreakdownUseCase.execute(
+        eventId,
+        amount,
+      );
       return res.status(HttpStatus.OK).json({ success: true, breakdown });
     } catch (error: any) {
-      return res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: error.message });
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ success: false, message: error.message });
     }
   };
 
@@ -123,16 +152,24 @@ export class PaymentController {
     try {
       const userId = (req as any).user?.id || (req as any).authUser?.userId;
       if (!userId) {
-        return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Unauthorized' });
+        return res
+          .status(HttpStatus.UNAUTHORIZED)
+          .json({ message: 'Unauthorized' });
       }
 
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
 
-      const result = await this._getMybookingUseCase.execute(userId,page,limit)
+      const result = await this._getMybookingUseCase.execute(
+        userId,
+        page,
+        limit,
+      );
       return res.status(HttpStatus.OK).json({ success: true, ...result });
     } catch (error: any) {
-      return res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: error.message });
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ success: false, message: error.message });
     }
   };
 
@@ -140,17 +177,24 @@ export class PaymentController {
     try {
       const managerId = (req as any).user?.id || (req as any).authUser?.userId;
       if (!managerId) {
-        return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Unauthorized' });
+        return res
+          .status(HttpStatus.UNAUTHORIZED)
+          .json({ message: 'Unauthorized' });
       }
 
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
 
-
-      const result = await this._getManagerBookingUseCase.execute(managerId,page,limit)
+      const result = await this._getManagerBookingUseCase.execute(
+        managerId,
+        page,
+        limit,
+      );
       return res.status(HttpStatus.OK).json({ success: true, ...result });
     } catch (error: any) {
-      return res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: error.message });
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ success: false, message: error.message });
     }
   };
 
@@ -159,14 +203,18 @@ export class PaymentController {
       const userId = (req as any).user?.id || (req as any).authUser?.userId;
 
       if (!userId) {
-        return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Unauthorized' });
+        return res
+          .status(HttpStatus.UNAUTHORIZED)
+          .json({ message: 'Unauthorized' });
       }
 
       const result = await this._verifyPaymentUseCase.execute(req.body, userId);
 
       return res.status(HttpStatus.OK).json(result);
     } catch (error: any) {
-      return res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: error.message });
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ success: false, message: error.message });
     }
   };
 }

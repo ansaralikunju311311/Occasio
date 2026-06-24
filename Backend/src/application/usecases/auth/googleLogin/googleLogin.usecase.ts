@@ -1,32 +1,27 @@
-import { ITokenService } from "../../../../domain/services/token.service.interface";
-import { IGoogleLoginUseCase } from "./googleLogin.usecase.interface";
+import type { ITokenService } from '../../../../domain/services/token.service.interface';
 
-export class GoogleLogin implements IGoogleLoginUseCase
-{
-    constructor(
-     private _tokenService : ITokenService
-    ){}
+import type { IGoogleLoginUseCase } from './googleLogin.usecase.interface';
 
+export class GoogleLogin implements IGoogleLoginUseCase {
+  constructor(private _tokenService: ITokenService) {}
 
-    async execute(userId: string, role: string): Promise<{ accessToken: string; refreshToken: string; }> {
-       
-          const accessToken =  this._tokenService.generateAccessToken({
-            userId,
-            role
+  async execute(
+    userId: string,
+    role: string,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
+    const accessToken = this._tokenService.generateAccessToken({
+      userId,
+      role,
+    });
 
-          })
+    const refreshToken = this._tokenService.generateRefreshToken({
+      userId,
+      role,
+    });
 
-
-
-          const refreshToken =  this._tokenService.generateRefreshToken({
-            userId,role
-          })
-
-
-          return{
-            refreshToken,
-            accessToken
-          }
-
-    }
+    return {
+      refreshToken,
+      accessToken,
+    };
+  }
 }

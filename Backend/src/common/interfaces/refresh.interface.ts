@@ -1,3 +1,3 @@
 export interface IRefreshTokenUseCase {
-   execute(refreshToken: string): Promise<string>
+  execute(refreshToken: string): Promise<string>;
 }

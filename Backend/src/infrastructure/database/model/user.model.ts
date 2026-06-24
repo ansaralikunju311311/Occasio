@@ -1,4 +1,6 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import type { Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
+
 import { UserRole } from '../../../common/enums/userrole-enum';
 import { UserStatus } from '../../../common/enums/userstatus-enum';
 import { UpgradeStatus } from '../../../common/enums/upgrade-enums';

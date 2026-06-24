@@ -1,14 +1,15 @@
-import { UpdatePasswordDto } from '../../../dtos/updatepassword.dto';
+import type { UpdatePasswordDto } from '../../../dtos/updatepassword.dto';
 import { HttpStatus } from '../../../../common/constants/http-status';
 import { ErrorMessage } from '../../../../common/enums/message-enum';
 import { AppError } from '../../../../common/errors/apperror';
-import { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
-import { IHashServive } from '../../../../domain/services/hash.service.interface';
+import type { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
+import type { IHashServive } from '../../../../domain/services/hash.service.interface';
 import { userMapper } from '../../../../common/mappers/user.mapper';
 import { UserStatus } from '../../../../common/enums/userstatus-enum';
 import { User } from '../../../../domain/entities/user.entity';
-import { UserResponseDto } from '../../../../application/dtos/responses/user-response.dto';
-import { IUpdateUseCase } from './update.usecase.interface';
+import type { UserResponseDto } from '../../../../application/dtos/responses/user-response.dto';
+
+import type { IUpdateUseCase } from './update.usecase.interface';
 export class UpdatePasswordUseCase implements IUpdateUseCase {
   constructor(
     private _userRepository: IUserRepository,
@@ -26,9 +27,7 @@ export class UpdatePasswordUseCase implements IUpdateUseCase {
       data.currentPassword,
       user.password,
     );
-    console.log('matching');
     if (!isMatch) {
-      console.log('the password is not matching');
       throw new AppError(
         ErrorMessage.INCORRECT_PASSWORD,
         HttpStatus.UNAUTHORIZED,

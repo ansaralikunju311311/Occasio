@@ -1,17 +1,16 @@
-import { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
-import { IHashServive } from '../../../../domain/services/hash.service.interface';
+import type { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
+import type { IHashServive } from '../../../../domain/services/hash.service.interface';
 import { userMapper } from '../../../../common/mappers/user.mapper';
-
 import { HttpStatus } from '../../../../common/constants/http-status';
 import { AppError } from '../../../../common/errors/apperror';
 import { UserStatus } from '../../../../common/enums/userstatus-enum';
 import { UserRole } from '../../../../common/enums/userrole-enum';
 // import { AdminLoginDto } from "../../dtos/adminlogin.dto";
-import { LoginDto } from '../../../../application/dtos/login.dto';
-import { LoginResponseDto } from '../../../dtos/loginResponse.dto';
-import { ITokenService } from '../../../../domain/services/token.service.interface';
+import type { LoginDto } from '../../../../application/dtos/login.dto';
+import type { LoginResponseDto } from '../../../dtos/loginResponse.dto';
+import type { ITokenService } from '../../../../domain/services/token.service.interface';
 import { ErrorMessage } from '../../../../common/enums/message-enum';
-import { ILoginUsecase } from '../login/login.usecase.interface';
+import type { ILoginUsecase } from '../login/login.usecase.interface';
 export class AdminLoginUseCase implements ILoginUsecase {
   constructor(
     private _userRepository: IUserRepository,
@@ -24,13 +23,11 @@ export class AdminLoginUseCase implements ILoginUsecase {
     const user = await this._userRepository.findByEmail(data.email);
 
     //    console.log(value)
-    console.log('user', user);
     if (!user) {
       throw new AppError(ErrorMessage.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
-    if (user.role != UserRole.ADMIN) {
-      console.log('user.role', user.role);
+    if (user.role !== UserRole.ADMIN) {
       throw new AppError(
         ErrorMessage.NO_PERMISSION_ADMIN,
         HttpStatus.UNAUTHORIZED,

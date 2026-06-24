@@ -1,0 +1,148 @@
+
+> backend@1.0.0 lint
+> eslint .
+
+
+C:\Users\ansar\OneDrive\Desktop\Occasio\Backend\src\application\usecases\booking\lockseats\lock-seats.usecase.interface.ts
+  2:11  warning  Replace `userId:┬╖string,┬╖eventId:┬╖string,┬╖seatIds:┬╖string[]` with `ΓÉìΓÅÄ┬╖┬╖┬╖┬╖userId:┬╖string,ΓÉìΓÅÄ┬╖┬╖┬╖┬╖eventId:┬╖string,ΓÉìΓÅÄ┬╖┬╖┬╖┬╖seatIds:┬╖string[],ΓÉìΓÅÄ┬╖┬╖`  prettier/prettier
+
+C:\Users\ansar\OneDrive\Desktop\Occasio\Backend\src\application\usecases\payment\getBreakdown\getBreakdown.usecase.ts
+  16:17  warning  Replace `eventId:┬╖string,┬╖amount:┬╖number` with `ΓÉìΓÅÄ┬╖┬╖┬╖┬╖eventId:┬╖string,ΓÉìΓÅÄ┬╖┬╖┬╖┬╖amount:┬╖number,ΓÉìΓÅÄ┬╖┬╖`  prettier/prettier
+
+C:\Users\ansar\OneDrive\Desktop\Occasio\Backend\src\application\usecases\payment\verifyPayment\verifyPayment.usecase.ts
+  85:20  warning  Replace `┬╖blockName:┬╖string;┬╖category?:┬╖{┬╖price:┬╖number;┬╖name:┬╖string┬╖}` with `ΓÉìΓÅÄ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖blockName:┬╖string;ΓÉìΓÅÄ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖category?:┬╖{┬╖price:┬╖number;┬╖name:┬╖string┬╖};ΓÉìΓÅÄ┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖`  prettier/prettier
+
+C:\Users\ansar\OneDrive\Desktop\Occasio\Backend\src\application\usecases\subscription\updateplan\updateplan.usecase.ts
+  4:1  warning  All imports in the declaration are only used as types. Use `import type`  @typescript-eslint/consistent-type-imports
+
+C:\Users\ansar\OneDrive\Desktop\Occasio\Backend\src\common\interfaces\pagination.interface.ts
+  5:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ansar\OneDrive\Desktop\Occasio\Backend\src\common\mappers\event.mapper.ts
+  44:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  58:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  61:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  63:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ansar\OneDrive\Desktop\Occasio\Backend\src\common\mappers\plan.mapper.ts
+  3:44  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ansar\OneDrive\Desktop\Occasio\Backend\src\common\services\location.service.ts
+  16:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ansar\OneDrive\Desktop\Occasio\Backend\src\common\services\refreshtoken.service.ts
+  8:75  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ansar\OneDrive\Desktop\Occasio\Backend\src\domain\repositories\event\event.repository.interface.ts
+  12:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  12:74  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  14:22  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  41:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ansar\OneDrive\Desktop\Occasio\Backend\src\domain\repositories\imanager-subscription.repository.ts
+   6:15  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  13:15  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ansar\OneDrive\Desktop\Occasio\Backend\src\domain\repositories\seats\seat.repository.interface.ts
+   8:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  12:59  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  12:73  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  14:60  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ansar\OneDrive\Desktop\Occasio\Backend\src\domain\repositories\user.repository.interface.ts
+  6:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ansar\OneDrive\Desktop\Occasio\Backend\src\domain\services\token.service.interface.ts
+  4:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  5:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ansar\OneDrive\Desktop\Occasio\Backend\src\domain\services\transaction-manager.interface.ts
+  2:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  3:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  4:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ansar\OneDrive\Desktop\Occasio\Backend\src\infrastructure\repositories\event\event.repository.ts
+   29:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   46:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  125:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  125:47  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  181:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  185:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  208:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  210:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  261:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  263:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  274:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ansar\OneDrive\Desktop\Occasio\Backend\src\infrastructure\repositories\manager-subscription\manager-subscription.repository.ts
+  10:15  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  15:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  43:15  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  45:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  57:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ansar\OneDrive\Desktop\Occasio\Backend\src\infrastructure\repositories\payment\payment.repository.ts
+  31:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  33:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ansar\OneDrive\Desktop\Occasio\Backend\src\infrastructure\repositories\seatrepo\seat.repository.ts
+  12:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  62:15  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  63:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  73:15  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ansar\OneDrive\Desktop\Occasio\Backend\src\infrastructure\repositories\user\manager.repository.ts
+  24:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  29:59  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  35:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ansar\OneDrive\Desktop\Occasio\Backend\src\infrastructure\repositories\user\otp.repository.ts
+  57:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ansar\OneDrive\Desktop\Occasio\Backend\src\infrastructure\repositories\user\user.repository.ts
+  46:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  71:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ansar\OneDrive\Desktop\Occasio\Backend\src\infrastructure\services\mongotransation.service.ts
+  12:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  17:27  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ansar\OneDrive\Desktop\Occasio\Backend\src\presentation\controllers\auth.controller.ts
+  175:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ansar\OneDrive\Desktop\Occasio\Backend\src\presentation\controllers\booking.controller.ts
+  20:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  33:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  48:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  65:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ansar\OneDrive\Desktop\Occasio\Backend\src\presentation\controllers\payment.controller.ts
+   26:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   26:55  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   43:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   52:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   52:55  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   66:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   76:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   76:55  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   90:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  100:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  100:55  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  120:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  143:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  152:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  152:55  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  168:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  177:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  177:58  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  193:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  202:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  202:55  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  213:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ansar\OneDrive\Desktop\Occasio\Backend\src\presentation\controllers\user.controller.ts
+  77:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+Γ£û 86 problems (0 errors, 86 warnings)
+  0 errors and 4 warnings potentially fixable with the `--fix` option.
+

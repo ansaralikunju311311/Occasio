@@ -1,6 +1,6 @@
-import { UserRole } from '../../../common/enums/userrole-enum';
-import { UserStatus } from '../../../common/enums/userstatus-enum';
-import { UpgradeStatus } from '../../../common/enums/upgrade-enums';
+import type { UserRole } from '../../../common/enums/userrole-enum';
+import type { UserStatus } from '../../../common/enums/userstatus-enum';
+import type { UpgradeStatus } from '../../../common/enums/upgrade-enums';
 
 export interface UserResponseDto {
   id: string;
@@ -12,7 +12,7 @@ export interface UserResponseDto {
   applyingupgrade: UpgradeStatus;
   rejectedAt: Date | null;
   reapplyAt: Date | null;
-  activeSubscription?: any;
+  activeSubscription?: string | null;
   eventsCreated?: number;
   createdAt?: Date;
   updatedAt?: Date;

@@ -1,4 +1,10 @@
-import { Model, FilterQuery, UpdateQuery, HydratedDocument } from 'mongoose';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import type {
+  Model,
+  FilterQuery,
+  UpdateQuery,
+  HydratedDocument,
+} from 'mongoose';
 
 export abstract class BaseRepository<T> {
   constructor(protected model: Model<T>) {}
@@ -19,9 +25,11 @@ export abstract class BaseRepository<T> {
   async updateById(
     id: string,
     data: UpdateQuery<T>,
-    options?: any
+    options?: any,
   ): Promise<HydratedDocument<T> | null> {
-    return this.model.findByIdAndUpdate(id, data, { new: true, ...options }).exec() as any;
+    return this.model
+      .findByIdAndUpdate(id, data, { new: true, ...options })
+      .exec() as any;
   }
 
   async findAll(filter: FilterQuery<T> = {}): Promise<HydratedDocument<T>[]> {
@@ -45,8 +53,10 @@ export abstract class BaseRepository<T> {
   async updateOne(
     filter: FilterQuery<T>,
     data: UpdateQuery<T>,
-    options?: any
+    options?: any,
   ): Promise<HydratedDocument<T> | null> {
-    return this.model.findOneAndUpdate(filter, data, { new: true, ...options }).exec() as any;
+    return this.model
+      .findOneAndUpdate(filter, data, { new: true, ...options })
+      .exec() as any;
   }
 }

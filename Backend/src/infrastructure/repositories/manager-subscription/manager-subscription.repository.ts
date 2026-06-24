@@ -1,20 +1,29 @@
-import { IManagerSubscriptionRepository } from '../../../domain/repositories/imanager-subscription.repository';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import type { IManagerSubscriptionRepository } from '../../../domain/repositories/imanager-subscription.repository';
 import { ManagerSubscription } from '../../../domain/entities/manager-subscription.entity';
 import { ManagerSubscriptionModel } from '../../database/model/manager-subscription.model';
-import { PlanType } from '../../../common/enums/plan-enum';
-import { ManagerPlan } from '../../../common/enums/manager-plan.enum';
+import type { PlanType } from '../../../common/enums/plan-enum';
+import type { ManagerPlan } from '../../../common/enums/manager-plan.enum';
 
 export class ManagerSubscriptionRepository implements IManagerSubscriptionRepository {
-  async create(subscription: ManagerSubscription, session?: any): Promise<ManagerSubscription> {
-    const createdDocs = await ManagerSubscriptionModel.create([{
-      userId: subscription.userId as any,
-      plan: subscription.plan as unknown as PlanType,
-      status: subscription.status,
-      eventLimit: subscription.eventLimit,
-      eventsUsed: subscription.eventsUsed,
-      startDate: subscription.startDate,
-      endDate: subscription.endDate,
-    }], { session });
+  async create(
+    subscription: ManagerSubscription,
+    session?: any,
+  ): Promise<ManagerSubscription> {
+    const createdDocs = await ManagerSubscriptionModel.create(
+      [
+        {
+          userId: subscription.userId as any,
+          plan: subscription.plan as unknown as PlanType,
+          status: subscription.status,
+          eventLimit: subscription.eventLimit,
+          eventsUsed: subscription.eventsUsed,
+          startDate: subscription.startDate,
+          endDate: subscription.endDate,
+        },
+      ],
+      { session },
+    );
 
     return this._toEntity(createdDocs[0]);
   }
@@ -26,15 +35,23 @@ export class ManagerSubscriptionRepository implements IManagerSubscriptionReposi
 
   async findByUserId(userId: string): Promise<ManagerSubscription[]> {
     const docs = await ManagerSubscriptionModel.find({ userId }).exec();
-    return docs.map(doc => this._toEntity(doc));
+    return docs.map((doc) => this._toEntity(doc));
   }
 
-  async update(id: string, updateData: Partial<ManagerSubscription>, session?: any): Promise<ManagerSubscription | null> {
+  async update(
+    id: string,
+    updateData: Partial<ManagerSubscription>,
+    session?: any,
+  ): Promise<ManagerSubscription | null> {
     const mappedUpdateData: any = { ...updateData };
     if (updateData.plan !== undefined) {
       mappedUpdateData.plan = updateData.plan as unknown as PlanType;
     }
-    const doc = await ManagerSubscriptionModel.findByIdAndUpdate(id, mappedUpdateData, { new: true, session }).exec();
+    const doc = await ManagerSubscriptionModel.findByIdAndUpdate(
+      id,
+      mappedUpdateData,
+      { new: true, session },
+    ).exec();
     return doc ? this._toEntity(doc) : null;
   }
 
@@ -49,7 +66,7 @@ export class ManagerSubscriptionRepository implements IManagerSubscriptionReposi
       doc.startDate,
       doc.endDate,
       doc.createdAt,
-      doc.updatedAt
+      doc.updatedAt,
     );
   }
 }

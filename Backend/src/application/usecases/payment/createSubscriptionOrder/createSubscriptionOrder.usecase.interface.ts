@@ -1,3 +1,3 @@
 export interface ICreateSubscriptionOrderUseCase {
-  execute(userId: string, planId: string): Promise<any>;
+  execute(userId: string, planId: string): Promise<unknown>;
 }

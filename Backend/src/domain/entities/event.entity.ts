@@ -1,5 +1,7 @@
 import { EventType } from '../../common/enums/event-type';
-import { EventStatus } from '../../common/enums/eventstatus-enum';
+import type { EventStatus } from '../../common/enums/eventstatus-enum';
+
+import type { User } from './user.entity';
 export class Events {
   constructor(
     public readonly id: string | null,
@@ -25,10 +27,15 @@ export class Events {
     public createdBy: string,
     public status: EventStatus,
     public picture: string,
-    public creatorDetails?: any,
+    public creatorDetails?: User,
     public seatLayoutId?: string,
-    public SeatLayout?: any,
-    public seats?: any[],
+    public SeatLayout?: {
+      blocks?: {
+        blockName: string;
+        category?: { price: number; name: string };
+      }[];
+    },
+    public seats?: Record<string, unknown>[],
     public isPublished?: boolean,
     public isDeleted?: boolean,
     public deletedAt?: Date,

@@ -1,5 +1,5 @@
-import { ManagerPlan } from '../../common/enums/manager-plan.enum';
-import { ManagerSubscriptionStatus } from '../../common/enums/manager-subscription-status.enum';
+import type { ManagerPlan } from '../../common/enums/manager-plan.enum';
+import type { ManagerSubscriptionStatus } from '../../common/enums/manager-subscription-status.enum';
 
 export class ManagerSubscription {
   constructor(

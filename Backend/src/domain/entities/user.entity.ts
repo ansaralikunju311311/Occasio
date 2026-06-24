@@ -1,7 +1,7 @@
-import { UserRole } from '../../common/enums/userrole-enum';
-import { UserStatus } from '../../common/enums/userstatus-enum';
+import type { UserRole } from '../../common/enums/userrole-enum';
+import type { UserStatus } from '../../common/enums/userstatus-enum';
 // import { UserOtp } from "../../../../common/enums/user-otp.enum";
-import { UpgradeStatus } from '../../common/enums/upgrade-enums';
+import type { UpgradeStatus } from '../../common/enums/upgrade-enums';
 export class User {
   constructor(
     public readonly id: string | null,
@@ -14,7 +14,7 @@ export class User {
     public applyingupgrade: UpgradeStatus,
     public rejectedAt: Date | null,
     public reapplyAt: Date | null,
-    public activeSubscription?: string | any,
+    public activeSubscription?: string | null,
     public eventsCreated: number = 0,
   ) {}
 }

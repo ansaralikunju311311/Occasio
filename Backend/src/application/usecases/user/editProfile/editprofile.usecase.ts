@@ -1,9 +1,10 @@
-import { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
+import type { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
 import { User } from '../../../../domain/entities/user.entity';
-import { EditProfileDto } from '../../../../application/dtos/editprofile.dto';
-import { IEditProfileUseCase } from './editprofile.usecase.interface';
-import { UserResponseDto } from '../../../../application/dtos/responses/user-response.dto';
+import type { EditProfileDto } from '../../../../application/dtos/editprofile.dto';
+import type { UserResponseDto } from '../../../../application/dtos/responses/user-response.dto';
 import { userMapper } from '../../../../common/mappers/user.mapper';
+
+import type { IEditProfileUseCase } from './editprofile.usecase.interface';
 
 export class EditProfileUseCase implements IEditProfileUseCase {
   constructor(private _userRepository: IUserRepository) {}
@@ -11,7 +12,9 @@ export class EditProfileUseCase implements IEditProfileUseCase {
   async execute(datas: EditProfileDto): Promise<UserResponseDto | null> {
     const data = await this._userRepository.findByIdUser(datas.userId);
 
-    if (!data) return null;
+    if (!data) {
+      return null;
+    }
 
     const newUser = new User(
       null,

@@ -1,5 +1,7 @@
-import mongoose, { Document, Schema } from 'mongoose';
-import {PlanType} from '../../../common/enums/plan-enum';
+import type { Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
+
+import { PlanType } from '../../../common/enums/plan-enum';
 import { ManagerSubscriptionStatus } from '../../../common/enums/manager-subscription-status.enum';
 
 export interface IManagerSubscriptionDocument extends Document {
@@ -49,4 +51,8 @@ const managerSubscriptionSchema = new Schema<IManagerSubscriptionDocument>(
   { timestamps: true },
 );
 
-export const ManagerSubscriptionModel = mongoose.model<IManagerSubscriptionDocument>('ManagerSubscription', managerSubscriptionSchema);
+export const ManagerSubscriptionModel =
+  mongoose.model<IManagerSubscriptionDocument>(
+    'ManagerSubscription',
+    managerSubscriptionSchema,
+  );

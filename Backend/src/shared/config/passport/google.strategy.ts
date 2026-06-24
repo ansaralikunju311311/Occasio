@@ -1,13 +1,15 @@
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import { UserModel } from '../../../infrastructure/database/model/user.model';
+
 import { UserRole } from '../../../common/enums/userrole-enum';
+import { UserModel } from '../../../infrastructure/database/model/user.model';
+import { logger } from '../../../common/logger/logger';
 
 passport.use(
   new GoogleStrategy(
     {
-      clientID: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      clientID: process.env.GOOGLE_CLIENT_ID ?? '',
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? '',
       callbackURL: '/api/auth/google/callback',
       passReqToCallback: true,
     },
@@ -25,7 +27,7 @@ passport.use(
               role = state.role;
             }
           } catch (error: unknown) {
-            console.error('Error parsing profile state:', error);
+            logger.error('Error parsing profile state:', error);
           }
         }
 

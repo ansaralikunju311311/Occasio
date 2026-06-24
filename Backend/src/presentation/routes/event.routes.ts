@@ -1,4 +1,5 @@
 import { Router } from 'express';
+
 import { verifyAccessToken } from '../middlewares/verifyAccessToken.middleware';
 import { requireRole } from '../middlewares/requireRole.middleware';
 import { UserRole } from '../../common/enums/userrole-enum';
@@ -37,7 +38,16 @@ router.get(
   controller.myEvents.bind(controller),
 );
 
-
-router.put("/update/:id", verifyAccessToken, requireRole([UserRole.EVENT_MANAGER]), controller.updateEvents.bind(controller));
-router.delete("/:id", verifyAccessToken, requireRole([UserRole.EVENT_MANAGER, UserRole.ADMIN]), controller.deleteEvent.bind(controller));
+router.put(
+  '/update/:id',
+  verifyAccessToken,
+  requireRole([UserRole.EVENT_MANAGER]),
+  controller.updateEvents.bind(controller),
+);
+router.delete(
+  '/:id',
+  verifyAccessToken,
+  requireRole([UserRole.EVENT_MANAGER, UserRole.ADMIN]),
+  controller.deleteEvent.bind(controller),
+);
 export default router;

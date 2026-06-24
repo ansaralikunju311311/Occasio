@@ -1,5 +1,7 @@
-import mongoose, { Document, Schema } from "mongoose";
-import { PlanType } from "../../../../common/enums/plan-enum";
+import type { Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
+
+import { PlanType } from '../../../../common/enums/plan-enum';
 
 export interface IPlanDocument extends Document {
   name: PlanType;
@@ -42,10 +44,10 @@ const PlanSchema = new Schema<IPlanDocument>(
       default: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export const SubscriptionModel = mongoose.model<IPlanDocument>(
-  "Subscription",
-  PlanSchema
+  'Subscription',
+  PlanSchema,
 );

@@ -1,8 +1,7 @@
-import { IVerifyPaymentUseCase } from './verifyPayment.usecase.interface';
-import { IPaymentGateway } from '../../../../domain/services/payment-gateway.interface';
-import { IEventRepository } from '../../../../domain/repositories/event/event.repository.interface';
-import { IPaymentRepository } from '../../../../domain/repositories/payment/payment.repository.interface';
-import { IBookingRepository } from '../../../../domain/repositories/booking/booking.repository.interface';
+import type { IPaymentGateway } from '../../../../domain/services/payment-gateway.interface';
+import type { IEventRepository } from '../../../../domain/repositories/event/event.repository.interface';
+import type { IPaymentRepository } from '../../../../domain/repositories/payment/payment.repository.interface';
+import type { IBookingRepository } from '../../../../domain/repositories/booking/booking.repository.interface';
 import { Payment } from '../../../../domain/entities/payment.entity';
 import { PaymentPurpose } from '../../../../common/enums/payment-purpose.enum';
 import { PaymentStatus } from '../../../../common/enums/payment-status.enum';
@@ -11,12 +10,14 @@ import { BookingStatus } from '../../../../infrastructure/database/model/booking
 import { SeatModel } from '../../../../infrastructure/database/model/events/seat.model';
 import { SeatStatus } from '../../../../common/enums/searstatus-enum';
 
+import type { IVerifyPaymentUseCase } from './verifyPayment.usecase.interface';
+
 export class VerifyPaymentUseCase implements IVerifyPaymentUseCase {
   constructor(
     private _paymentGateway: IPaymentGateway,
     private _eventRepository: IEventRepository,
     private _paymentRepository: IPaymentRepository,
-    private _bookingRepository: IBookingRepository
+    private _bookingRepository: IBookingRepository,
   ) {}
 
   async execute(
@@ -26,15 +27,20 @@ export class VerifyPaymentUseCase implements IVerifyPaymentUseCase {
       razorpay_signature: string;
       eventId: string;
     },
-    userId: string
-  ): Promise<any> {
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, eventId } = data;
+    userId: string,
+  ): Promise<Record<string, unknown>> {
+    const {
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
+      eventId,
+    } = data;
 
     // 1. Verify Razorpay Signature
     const isValid = this._paymentGateway.verifySignature(
       razorpay_order_id,
       razorpay_payment_id,
-      razorpay_signature
+      razorpay_signature,
     );
 
     if (!isValid) {
@@ -42,16 +48,26 @@ export class VerifyPaymentUseCase implements IVerifyPaymentUseCase {
     }
 
     // 2. Check if a pending booking exists for this order
-    const booking = await this._bookingRepository.findBookingByPaymentId(razorpay_order_id);
+    const booking =
+      await this._bookingRepository.findBookingByPaymentId(razorpay_order_id);
 
     if (booking) {
       // TICKET BOOKING FLOW
       // Update booking to SUCCESS
-      await this._bookingRepository.updateBookingStatus(booking.id!, BookingStatus.CONFIRMED);
+      await this._bookingRepository.updateBookingStatus(
+        booking.id ?? '',
+        BookingStatus.CONFIRMED,
+      );
 
       // If physical booking, update/insert seat statuses to BOOKED in DB
-      if (booking.bookingType === 'physical' && booking.seats && booking.seats.length > 0) {
-        const event = await this._eventRepository.findByIdEvents(booking.eventId);
+      if (
+        booking.bookingType === 'physical' &&
+        booking.seats &&
+        booking.seats.length > 0
+      ) {
+        const event = await this._eventRepository.findByIdEvents(
+          booking.eventId,
+        );
         const layoutId = event?.seatLayoutId;
         const layout = event?.SeatLayout;
 
@@ -66,7 +82,11 @@ export class VerifyPaymentUseCase implements IVerifyPaymentUseCase {
 
           if (layout && layout.blocks) {
             const blockDetails = layout.blocks.find(
-              (b: any) => b.blockName.trim().toUpperCase() === block.trim().toUpperCase()
+              (b: {
+                blockName: string;
+                category?: { price: number; name: string };
+              }) =>
+                b.blockName.trim().toUpperCase() === block.trim().toUpperCase(),
             );
             if (blockDetails) {
               price = blockDetails.category?.price ?? price;
@@ -88,7 +108,7 @@ export class VerifyPaymentUseCase implements IVerifyPaymentUseCase {
               categoryName,
               status: SeatStatus.BOOKED,
             },
-            { upsert: true, new: true }
+            { upsert: true, new: true },
           );
         }
       }
@@ -104,10 +124,10 @@ export class VerifyPaymentUseCase implements IVerifyPaymentUseCase {
         PaymentStatus.SUCCESS,
         razorpay_payment_id,
         eventId,
-        booking.id!,
+        booking.id ?? '',
         new Date(),
         undefined,
-        undefined
+        undefined,
       );
 
       await this._paymentRepository.savePayment(payment);
@@ -136,7 +156,7 @@ export class VerifyPaymentUseCase implements IVerifyPaymentUseCase {
         undefined,
         new Date(),
         undefined,
-        undefined
+        undefined,
       );
 
       await this._paymentRepository.savePayment(payment);

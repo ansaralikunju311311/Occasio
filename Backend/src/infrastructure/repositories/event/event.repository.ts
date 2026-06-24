@@ -1,13 +1,18 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import type mongoose from 'mongoose';
+
 import { BaseRepository } from '../../repositories/base.repository';
 import { Events } from '../../../domain/entities/event.entity';
-import { IEventRepository } from '../../../domain/repositories/event/event.repository.interface';
-import { IEventDocument } from '../../../infrastructure/database/model/events/event.model';
+import type { IEventRepository } from '../../../domain/repositories/event/event.repository.interface';
+import type { IEventDocument } from '../../../infrastructure/database/model/events/event.model';
 import { EventModel } from '../../../infrastructure/database/model/events/event.model';
-import mongoose from 'mongoose';
 import { SeatModel } from '../../../infrastructure/database/model/events/seat.model';
 import { SeatLayoutModel } from '../../../infrastructure/database/model/events/seatLayout.model';
-import { PaginationParams, PaginatedResponse } from '../../../common/interfaces/pagination.interface';
-import { UpdateEventDTO } from '../../../application/dtos/updateevent.dto';
+import type {
+  PaginationParams,
+  PaginatedResponse,
+} from '../../../common/interfaces/pagination.interface';
+import type { UpdateEventDTO } from '../../../application/dtos/updateevent.dto';
 import { EventStatus } from '../../../common/enums/eventstatus-enum';
 
 export class EventRepository
@@ -35,7 +40,9 @@ export class EventRepository
     return this.toEntity(events);
   }
 
-  async findAllEvents(params: PaginationParams): Promise<PaginatedResponse<Events>> {
+  async findAllEvents(
+    params: PaginationParams,
+  ): Promise<PaginatedResponse<Events>> {
     const { page = 1, limit = 10, search, eventType, upcoming } = params;
     const query: any = { isDeleted: { $ne: true } };
 
@@ -108,12 +115,13 @@ export class EventRepository
       .populate('createdBy')
       .populate('seatLayoutId')
       .populate('seats');
-
-    console.log('events are coming in this area', events);
     return events ? this.toEntity(events) : null;
   }
 
-  async findEvents(userId: string, params: PaginationParams): Promise<PaginatedResponse<Events>> {
+  async findEvents(
+    userId: string,
+    params: PaginationParams,
+  ): Promise<PaginatedResponse<Events>> {
     const { page = 1, limit = 10, search } = params;
     const query: any = { createdBy: userId as any };
 
@@ -180,15 +188,19 @@ export class EventRepository
     return layout;
   }
 
-  async deleteSeatsByEventId(eventId: string, session?: mongoose.ClientSession) {
+  async deleteSeatsByEventId(
+    eventId: string,
+    session?: mongoose.ClientSession,
+  ) {
     await SeatModel.deleteMany({ eventId }, { session });
   }
 
-  async deleteLayoutByEventId(eventId: string, session?: mongoose.ClientSession) {
+  async deleteLayoutByEventId(
+    eventId: string,
+    session?: mongoose.ClientSession,
+  ) {
     await SeatLayoutModel.deleteMany({ eventId }, { session });
   }
-
-
 
   async updateEvent(
     eventId: string,
@@ -200,11 +212,10 @@ export class EventRepository
     if (unsetData) {
       updateQuery.$unset = unsetData;
     }
-    const updated = await this.model.findByIdAndUpdate(
-      eventId,
-      updateQuery,
-      { new: true, session },
-    );
+    const updated = await this.model.findByIdAndUpdate(eventId, updateQuery, {
+      new: true,
+      session,
+    });
     return updated ? this.toEntity(updated) : null;
   }
   async deleteEvent(id: string): Promise<boolean> {
@@ -215,7 +226,10 @@ export class EventRepository
     return !!result;
   }
 
-  async validateOwnershipAndDraft(eventId: string, userId: string): Promise<Events> {
+  async validateOwnershipAndDraft(
+    eventId: string,
+    userId: string,
+  ): Promise<Events> {
     const event = await this.model.findOne({
       _id: eventId,
       createdBy: userId,
@@ -256,8 +270,6 @@ export class EventRepository
     } else {
       createdById = manager.createdBy?.toString() || '';
     }
-
-
 
     let seatLayoutId: string = '';
     let seatLayoutDetails: any = null;
