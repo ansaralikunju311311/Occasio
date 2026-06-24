@@ -2,7 +2,6 @@ import { EventStatus } from "../../../../common/enums/eventstatus-enum";
 import { IEventRepository } from "../../../../domain/repositories/event/event.repository.interface";
 import { ISeatRepository } from "../../../../domain/repositories/seats/seat.repository.interface"
 import { ILockSeatsUseCase } from "./lock-seats.usecase.interface";
-
 export class LockSeatsUseCase implements ILockSeatsUseCase {
   constructor(
     private _eventRepository: IEventRepository,

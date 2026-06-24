@@ -189,7 +189,7 @@ export class AuthController {
       this._sessionService.setRefreshToken(res, refreshToken);
     }
 
-    res.redirect(`http://localhost:5173/oauth-success?token=${accessToken}`);
+    res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/oauth-success?token=${accessToken}`);
   });
 
   adminlogin = catchAsync(async (req: Request, res: Response) => {
