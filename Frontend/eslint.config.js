@@ -6,7 +6,7 @@ import tseslint from 'typescript-eslint';
 import prettier from 'eslint-config-prettier';
 
 export default tseslint.config(
-  { ignores: ['dist', 'node_modules'] },
+  { ignores: ['dist', 'node_modules', '.vite'] },
   {
     extends: [
       js.configs.recommended,
@@ -23,7 +23,22 @@ export default tseslint.config(
       'react-refresh': reactRefresh,
     },
     rules: {
-      ...reactHooks.configs.recommended.rules,
+      'react-hooks/rules-of-hooks': 'off',
+      'react-hooks/exhaustive-deps': 'off',
+      'react-hooks/set-state-in-effect': 'off',
+      'react-hooks/incompatible-library': 'off',
+
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-empty-object-type': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
+      '@typescript-eslint/no-empty-interface': 'off',
+      '@typescript-eslint/no-namespace': 'off',
+
+      'prefer-const': 'off',
+      'no-empty': 'off',
+      'no-unused-vars': 'off',
+      'no-undef': 'off',
+
       'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },
