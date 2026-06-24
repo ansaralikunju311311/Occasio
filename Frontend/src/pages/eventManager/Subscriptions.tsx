@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { api } from '../../services/api';
 import { setAuth } from '../../redux/slices/authSlice';
+import { API_ENDPOINTS } from '../../constants';
 import { paymentService } from '../../services/payment.service';
 
 const Subscriptions = () => {
@@ -21,7 +22,7 @@ const Subscriptions = () => {
     if (user?.role === 'EVENT_MANAGER') {
       setIsLoadingSubscription(true);
       api
-        .get('/user/my-subscription')
+        .get(API_ENDPOINTS.USER_MY_SUBSCRIPTION)
         .then((res) => {
           if (res.data.success) {
             // It might be null if they don't have one yet
@@ -51,7 +52,7 @@ const Subscriptions = () => {
       const numericPrice = parseFloat(price.replace('₹', ''));
 
       if (numericPrice === 0) {
-        const res = await api.post('/user/subscribe', { planId });
+        const res = await api.post(API_ENDPOINTS.USER_SUBSCRIBE, { planId });
         if (res.data.success) {
           toast.success('Successfully subscribed to plan!');
           dispatch(setAuth({ user: res.data.user }));
@@ -66,7 +67,7 @@ const Subscriptions = () => {
           async () => {
             toast.success('Payment successful! Your subscription is upgraded.');
             // Refetch user data
-            const res = await api.get('/auth/me');
+            const res = await api.get(API_ENDPOINTS.AUTH_ME);
             if (res.data) {
               dispatch(setAuth({ user: res.data.user }));
             }

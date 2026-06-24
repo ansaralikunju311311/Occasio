@@ -1,6 +1,7 @@
 import { useAppSelector } from '../../redux/hook';
 import { useState, useEffect } from 'react';
 import { api } from '../../services/api';
+import { API_ENDPOINTS } from '../../constants';
 import HomeButton from '../../components/common/HomeButton';
 
 const EventManagerDashboard = () => {
@@ -10,7 +11,7 @@ const EventManagerDashboard = () => {
   useEffect(() => {
     if (user?.role === 'EVENT_MANAGER') {
       api
-        .get('/user/my-subscription')
+        .get(API_ENDPOINTS.USER_MY_SUBSCRIPTION)
         .then((res) => {
           if (res.data.success) {
             setMySubscription(res.data.subscription);

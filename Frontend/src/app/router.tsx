@@ -3,6 +3,7 @@ import { lazy, Suspense, useEffect, useState } from 'react';
 import { useAppDispatch } from '../redux/hook.ts';
 import { setAuth, logout } from '../redux/slices/authSlice.ts';
 import { api } from '../services/api.ts';
+import { API_ENDPOINTS } from '../constants';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import MainLayout from '../layouts/MainLayout';
 
@@ -248,7 +249,7 @@ export const RouterWrapper = () => {
 
   const restoreSession = async () => {
     try {
-      const res = await api.get('/auth/me');
+      const res = await api.get(API_ENDPOINTS.AUTH_ME);
       if (res.data) {
         dispatch(
           setAuth({

@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../../redux/hook';
 import { logout } from '../../redux/slices/authSlice';
 import { api } from '../../services/api';
+import { API_ENDPOINTS } from '../../constants';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -14,7 +15,7 @@ const Navbar = () => {
   console.log('checking this is working', user);
   const handleLogout = async () => {
     try {
-      const response = await api.post('/auth/logout');
+      const response = await api.post(API_ENDPOINTS.AUTH_LOGOUT);
       console.log(response);
       localStorage.removeItem('accessToken');
       dispatch(logout());

@@ -56,6 +56,8 @@ export const API_ENDPOINTS = {
   USER_PROFILE: '/user/profile',
   USER_UPGRADE_ROLE: '/user/upgraderole',
   USER_REAPPLY: '/user/reapply',
+  USER_MY_SUBSCRIPTION: '/user/my-subscription',
+  USER_SUBSCRIBE: '/user/subscribe',
 };
 
 export const APP_MESSAGES = {

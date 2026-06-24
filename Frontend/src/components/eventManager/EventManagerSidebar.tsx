@@ -2,6 +2,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../redux/hook';
 import { logout } from '../../redux/slices/authSlice';
 import { api } from '../../services/api';
+import { API_ENDPOINTS } from '../../constants';
 import { toast } from 'sonner';
 import { useState } from 'react';
 
@@ -30,7 +31,7 @@ const EventManagerSidebar = () => {
   const handlelogout = async () => {
     console.log('fvnfjnvdfjvndfj');
     try {
-      const response = await api.post('/auth/logout');
+      const response = await api.post(API_ENDPOINTS.AUTH_LOGOUT);
       localStorage.removeItem('accessToken');
       dispatch(logout());
 

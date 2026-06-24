@@ -2,6 +2,7 @@
 import { useForm } from 'react-hook-form';
 import type { LoginDataType } from '../../types/auth.type';
 import { api } from '../../services/api';
+import { API_ENDPOINTS } from '../../constants';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import PasswordInput from '../../components/common/PasswordInput';
@@ -21,7 +22,7 @@ const AdminLogin = () => {
 
   const onSubmit = async (data: LoginDataType) => {
     try {
-      const response = await api.post('/auth/admin/login', {
+      const response = await api.post(API_ENDPOINTS.AUTH_ADMIN_LOGIN, {
         email: data.email,
         password: data.password,
         role: 'ADMIN',

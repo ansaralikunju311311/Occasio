@@ -3,6 +3,7 @@ import { useForm, type SubmitHandler } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { api } from '../../services/api';
+import { API_ENDPOINTS } from '../../constants';
 import { paymentService } from '../../services/payment.service';
 import HomeButton from '../../components/common/HomeButton';
 
@@ -71,7 +72,7 @@ const CreateEvent = () => {
   ]);
 
   const eventMutation = useMutation({
-    mutationFn: (payload: any) => api.post('/events/creation', payload),
+    mutationFn: (payload: any) => api.post(API_ENDPOINTS.EVENT_CREATION, payload),
     onSuccess: (response: any) => {
       const createdEvent = response.data.creation;
       if (createdEvent.status === 'LIVE' || createdEvent.status === 'ACTIVE') {

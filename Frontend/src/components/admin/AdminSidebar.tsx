@@ -2,6 +2,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { logout } from '../../redux/slices/authSlice';
 import { useAppDispatch } from '../../redux/hook';
 import { api } from '../../services/api';
+import { API_ENDPOINTS } from '../../constants';
 import { useState } from 'react';
 
 const AdminSidebar = () => {
@@ -12,7 +13,7 @@ const AdminSidebar = () => {
   const navigate = useNavigate();
   const handlelogout = async () => {
     try {
-      const response = await api.post('/auth/logout');
+      const response = await api.post(API_ENDPOINTS.AUTH_LOGOUT);
 
       dispatch(logout());
       localStorage.removeItem('accessToken');
