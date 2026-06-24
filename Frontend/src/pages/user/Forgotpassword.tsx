@@ -24,7 +24,13 @@ const Forgotpassword = () => {
       const error = forgotMutation.error as any;
       toast.error(error.response?.data?.message || 'Failed to send OTP');
     }
-  }, [forgotMutation.isSuccess, forgotMutation.isError, forgotMutation.data, forgotMutation.error, navigate]);
+  }, [
+    forgotMutation.isSuccess,
+    forgotMutation.isError,
+    forgotMutation.data,
+    forgotMutation.error,
+    navigate,
+  ]);
 
   const {
     register,

@@ -149,7 +149,9 @@ const AdminPayments = () => {
                 <div className="text-xs text-gray-500 mt-1">Method: {payment.paymentMethod}</div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm font-medium text-gray-900">{payment.userId?.name || 'Unknown'}</div>
+                <div className="text-sm font-medium text-gray-900">
+                  {payment.userId?.name || 'Unknown'}
+                </div>
                 <div className="text-sm text-gray-500">{payment.userId?.email || ''}</div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
@@ -167,7 +169,8 @@ const AdminPayments = () => {
                 )}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
-                {payment.currency === 'INR' ? '₹' : payment.currency} {payment.amount.toLocaleString()}
+                {payment.currency === 'INR' ? '₹' : payment.currency}{' '}
+                {payment.amount.toLocaleString()}
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <span

@@ -18,10 +18,14 @@ const EventsPage = () => {
   const navigate = useNavigate();
 
   // Advanced Geolocation & Sorting state
-  const [userCoords, setUserCoords] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [userCoords, setUserCoords] = useState<{ latitude: number; longitude: number } | null>(
+    null
+  );
   const [nearbyOnly, setNearbyOnly] = useState(false);
   const [nearbyRadius, setNearbyRadius] = useState(100); // 100km default
-  const [locationStatus, setLocationStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [locationStatus, setLocationStatus] = useState<'idle' | 'loading' | 'success' | 'error'>(
+    'idle'
+  );
   const [sortBy, setSortBy] = useState('DATE_ASC'); // DATE_ASC, DATE_DESC, PRICE_ASC, PRICE_DESC, TITLE_ASC, DISTANCE_ASC
 
   useEffect(() => {
@@ -174,13 +178,25 @@ const EventsPage = () => {
       return a.title.localeCompare(b.title);
     }
     if (sortBy === 'PRICE_ASC') {
-      const priceA = a.eventType?.toUpperCase() === 'ONLINE' ? Number(a.price) || 0 : getMinSeatPrice(a) || Number(a.price) || 0;
-      const priceB = b.eventType?.toUpperCase() === 'ONLINE' ? Number(b.price) || 0 : getMinSeatPrice(b) || Number(b.price) || 0;
+      const priceA =
+        a.eventType?.toUpperCase() === 'ONLINE'
+          ? Number(a.price) || 0
+          : getMinSeatPrice(a) || Number(a.price) || 0;
+      const priceB =
+        b.eventType?.toUpperCase() === 'ONLINE'
+          ? Number(b.price) || 0
+          : getMinSeatPrice(b) || Number(b.price) || 0;
       return priceA - priceB;
     }
     if (sortBy === 'PRICE_DESC') {
-      const priceA = a.eventType?.toUpperCase() === 'ONLINE' ? Number(a.price) || 0 : getMinSeatPrice(a) || Number(a.price) || 0;
-      const priceB = b.eventType?.toUpperCase() === 'ONLINE' ? Number(b.price) || 0 : getMinSeatPrice(b) || Number(b.price) || 0;
+      const priceA =
+        a.eventType?.toUpperCase() === 'ONLINE'
+          ? Number(a.price) || 0
+          : getMinSeatPrice(a) || Number(a.price) || 0;
+      const priceB =
+        b.eventType?.toUpperCase() === 'ONLINE'
+          ? Number(b.price) || 0
+          : getMinSeatPrice(b) || Number(b.price) || 0;
       return priceB - priceA;
     }
     if (sortBy === 'DISTANCE_ASC' && userCoords) {
@@ -224,7 +240,7 @@ const EventsPage = () => {
                 iconClassName="h-5 w-5 text-slate-500"
               />
             </div>
-            
+
             <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto">
               {['ALL', EventType.ONLINE, EventType.OFFLINE, EventType.HYBRID].map((type) => (
                 <button
@@ -246,7 +262,9 @@ const EventsPage = () => {
           <div className="flex flex-col md:flex-row gap-6 items-center justify-between pt-4 border-t border-slate-800/40">
             {/* Sort Controls */}
             <div className="flex items-center gap-3 w-full md:w-auto">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Sort By:</span>
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                Sort By:
+              </span>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
@@ -281,8 +299,14 @@ const EventsPage = () => {
                       : 'bg-slate-900/60 border-slate-800/80 text-slate-400 hover:text-white hover:border-slate-700'
                   }`}
                 >
-                  <span className={`w-2 h-2 rounded-full ${userCoords ? 'bg-emerald-400 animate-pulse' : 'bg-slate-600'}`}></span>
-                  {locationStatus === 'loading' ? 'Detecting...' : userCoords ? 'Location Detected' : 'Detect Location'}
+                  <span
+                    className={`w-2 h-2 rounded-full ${userCoords ? 'bg-emerald-400 animate-pulse' : 'bg-slate-600'}`}
+                  ></span>
+                  {locationStatus === 'loading'
+                    ? 'Detecting...'
+                    : userCoords
+                      ? 'Location Detected'
+                      : 'Detect Location'}
                 </button>
 
                 {userCoords && (
@@ -300,7 +324,9 @@ const EventsPage = () => {
 
               {nearbyOnly && userCoords && (
                 <div className="flex items-center gap-3 w-full sm:w-64">
-                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider whitespace-nowrap">Radius: {nearbyRadius} km</span>
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider whitespace-nowrap">
+                    Radius: {nearbyRadius} km
+                  </span>
                   <input
                     type="range"
                     min="10"
@@ -358,7 +384,7 @@ const EventsPage = () => {
                       alt={event.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                     />
-                    
+
                     {/* Event Type Badge */}
                     <div className="absolute top-4 left-4 flex gap-2">
                       <span className="px-3 py-1 rounded-full bg-slate-950/70 backdrop-blur-md text-[10px] font-bold text-indigo-400 border border-indigo-500/30 uppercase tracking-wider">
@@ -471,7 +497,9 @@ const EventsPage = () => {
                                 {onlinePrice > 0 && (
                                   <span className="text-slate-300 text-xs">
                                     Online:{' '}
-                                    <span className="text-indigo-400 font-bold">₹{onlinePrice}</span>
+                                    <span className="text-indigo-400 font-bold">
+                                      ₹{onlinePrice}
+                                    </span>
                                   </span>
                                 )}
                                 {!minSeatPrice && !onlinePrice && (
@@ -546,9 +574,7 @@ const EventsPage = () => {
                 />
               </svg>
             </div>
-            <h3 className="text-2xl font-bold text-white mb-3 tracking-tight">
-              No Events Found
-            </h3>
+            <h3 className="text-2xl font-bold text-white mb-3 tracking-tight">No Events Found</h3>
             <p className="text-slate-400 max-w-md mx-auto font-light">
               Try adjusting your search query, sorting, or filters.
             </p>

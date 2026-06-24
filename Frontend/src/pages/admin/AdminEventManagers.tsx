@@ -48,14 +48,17 @@ const AdminEventManagers = () => {
 
   const handleManager = (userId: string, status: string) => {
     const newstatus = status === 'ACTIVE' ? 'BLOCK' : 'ACTIVE';
-    blockMutation.mutate({ id: userId, status: newstatus }, {
-      onSuccess: () => {
-        toast.success('Manager status updated successfully.');
-      },
-      onError: (error: any) => {
-        toast.error(error.response?.data?.message || 'Failed to update manager status.');
-      },
-    });
+    blockMutation.mutate(
+      { id: userId, status: newstatus },
+      {
+        onSuccess: () => {
+          toast.success('Manager status updated successfully.');
+        },
+        onError: (error: any) => {
+          toast.error(error.response?.data?.message || 'Failed to update manager status.');
+        },
+      }
+    );
   };
 
   const detailView = async (id: string, email: string) => {

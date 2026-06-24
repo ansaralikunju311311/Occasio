@@ -267,35 +267,35 @@ const EventManagerSidebar = () => {
 
         {/* Management Section */}
         {user?.role === 'EVENT_MANAGER' && (
-        <div className="space-y-2">
-          <h3 className="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-4">
-            Event Management
-          </h3>
-          {managementLinks.map((link) => {
-            const isActive = location.pathname === link.path;
-            return (
-              <Link
-                key={link.name}
-                to={link.path}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 group relative ${
-                  isActive
-                    ? 'bg-linear-to-r from-teal-500/10 to-emerald-600/10 text-teal-400 border border-teal-500/20 shadow-[0_0_15px_rgb(20,184,166,0.05)]'
-                    : 'text-slate-400 hover:bg-slate-800/50 hover:text-white border border-transparent'
-                }`}
-              >
-                {isActive && (
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-teal-500 rounded-r-full"></div>
-                )}
-                <div
-                  className={`${isActive ? 'text-teal-400' : 'text-slate-500 group-hover:text-teal-400 transition-colors'}`}
+          <div className="space-y-2">
+            <h3 className="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-4">
+              Event Management
+            </h3>
+            {managementLinks.map((link) => {
+              const isActive = location.pathname === link.path;
+              return (
+                <Link
+                  key={link.name}
+                  to={link.path}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 group relative ${
+                    isActive
+                      ? 'bg-linear-to-r from-teal-500/10 to-emerald-600/10 text-teal-400 border border-teal-500/20 shadow-[0_0_15px_rgb(20,184,166,0.05)]'
+                      : 'text-slate-400 hover:bg-slate-800/50 hover:text-white border border-transparent'
+                  }`}
                 >
-                  {link.icon}
-                </div>
-                {link.name}
-              </Link>
-            );
-          })}
-        </div>
+                  {isActive && (
+                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-teal-500 rounded-r-full"></div>
+                  )}
+                  <div
+                    className={`${isActive ? 'text-teal-400' : 'text-slate-500 group-hover:text-teal-400 transition-colors'}`}
+                  >
+                    {link.icon}
+                  </div>
+                  {link.name}
+                </Link>
+              );
+            })}
+          </div>
         )}
       </nav>
 

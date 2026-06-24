@@ -120,27 +120,38 @@ const UserBookings = () => {
               </tr>
             }
             renderRow={(booking: Booking) => (
-              <tr key={booking.id} className="hover:bg-slate-800/20 transition-colors duration-150 text-slate-300 text-sm">
+              <tr
+                key={booking.id}
+                className="hover:bg-slate-800/20 transition-colors duration-150 text-slate-300 text-sm"
+              >
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
                     <img
-                      src={booking.eventId.picture || 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30'}
+                      src={
+                        booking.eventId.picture ||
+                        'https://images.unsplash.com/photo-1492684223066-81342ee5ff30'
+                      }
                       alt={booking.eventId.title}
                       className="w-12 h-12 rounded-lg object-cover border border-white/10 shrink-0"
                     />
-                    <div className="font-bold text-white max-w-[200px] truncate" title={booking.eventId.title}>
+                    <div
+                      className="font-bold text-white max-w-[200px] truncate"
+                      title={booking.eventId.title}
+                    >
                       {booking.eventId.title}
                     </div>
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  {booking.eventId?.startTime ? new Date(booking.eventId.startTime).toLocaleString('en-IN', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  }) : 'N/A'}
+                  {booking.eventId?.startTime
+                    ? new Date(booking.eventId.startTime).toLocaleString('en-IN', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })
+                    : 'N/A'}
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex flex-col gap-1">
@@ -153,7 +164,10 @@ const UserBookings = () => {
                       </span>
                     </div>
                     {booking.eventId.location?.address && (
-                      <span className="text-slate-400 text-xs truncate max-w-[180px]" title={booking.eventId.location.address}>
+                      <span
+                        className="text-slate-400 text-xs truncate max-w-[180px]"
+                        title={booking.eventId.location.address}
+                      >
                         {booking.eventId.location.address}
                       </span>
                     )}
@@ -175,8 +189,8 @@ const UserBookings = () => {
                       booking.status === 'SUCCESS'
                         ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
                         : booking.status === 'PENDING'
-                        ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
-                        : 'bg-red-500/10 text-red-400 border-red-500/20'
+                          ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                          : 'bg-red-500/10 text-red-400 border-red-500/20'
                     }`}
                   >
                     {booking.status}

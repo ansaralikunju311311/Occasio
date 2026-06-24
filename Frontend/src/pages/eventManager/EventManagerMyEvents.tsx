@@ -48,7 +48,11 @@ const EventManagerMyEvents = () => {
   };
 
   const handleCancel = async (id: string) => {
-    if (window.confirm('Are you sure you want to cancel (delete) this event? This action cannot be undone.')) {
+    if (
+      window.confirm(
+        'Are you sure you want to cancel (delete) this event? This action cannot be undone.'
+      )
+    ) {
       setIsDeletingId(id);
       try {
         await deleteMutation.mutateAsync(id);
@@ -395,7 +399,10 @@ const EventManagerMyEvents = () => {
                               <div className="flex flex-col gap-1 pt-1 border-t border-slate-800/50">
                                 {blocks.map((b: any, i: number) => {
                                   const name =
-                                    b.category?.name || b.blockName || b.blocName || `Block ${i + 1}`;
+                                    b.category?.name ||
+                                    b.blockName ||
+                                    b.blocName ||
+                                    `Block ${i + 1}`;
                                   const price = b.category?.price;
                                   return (
                                     <div key={i} className="flex items-center gap-2 text-xs">
@@ -460,7 +467,12 @@ const EventManagerMyEvents = () => {
                           className="p-2 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-lg transition-colors inline-block"
                           title="View details"
                         >
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
                             <path
                               strokeLinecap="round"
                               strokeLinejoin="round"
@@ -480,9 +492,16 @@ const EventManagerMyEvents = () => {
                           onClick={() => handleEdit(event.id)}
                           disabled={isStarted}
                           className="p-2 text-indigo-400 hover:text-white hover:bg-indigo-700/50 rounded-lg transition-colors inline-block disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-                          title={isStarted ? 'Cannot edit event after it has started' : 'Edit event'}
+                          title={
+                            isStarted ? 'Cannot edit event after it has started' : 'Edit event'
+                          }
                         >
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
                             <path
                               strokeLinecap="round"
                               strokeLinejoin="round"
@@ -496,7 +515,11 @@ const EventManagerMyEvents = () => {
                           onClick={() => handleCancel(event.id)}
                           disabled={isStarted || isDeletingId === event.id}
                           className="p-2 text-rose-400 hover:text-white hover:bg-rose-700/50 rounded-lg transition-colors inline-block disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-                          title={isStarted ? 'Cannot cancel event after it has started' : 'Cancel (Delete) event'}
+                          title={
+                            isStarted
+                              ? 'Cannot cancel event after it has started'
+                              : 'Cancel (Delete) event'
+                          }
                         >
                           {isDeletingId === event.id ? (
                             <div className="w-4 h-4 border-2 border-rose-400/20 border-t-rose-400 rounded-full animate-spin" />

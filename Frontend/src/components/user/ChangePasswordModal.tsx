@@ -37,7 +37,13 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, onClo
       const message = error.response?.data?.message || 'Something went wrong. Please try again.';
       toast.error(message);
     }
-  }, [updatePasswordMutation.isSuccess, updatePasswordMutation.isError, updatePasswordMutation.error, reset, onClose]);
+  }, [
+    updatePasswordMutation.isSuccess,
+    updatePasswordMutation.isError,
+    updatePasswordMutation.error,
+    reset,
+    onClose,
+  ]);
 
   const onSubmit = (data: ResetPassword) => {
     updatePasswordMutation.mutate({

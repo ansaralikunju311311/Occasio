@@ -25,7 +25,13 @@ const SignupPage = () => {
         toast.error('Something went wrong');
       }
     }
-  }, [signupMutation.isSuccess, signupMutation.isError, signupMutation.data, signupMutation.error, navigate]);
+  }, [
+    signupMutation.isSuccess,
+    signupMutation.isError,
+    signupMutation.data,
+    signupMutation.error,
+    navigate,
+  ]);
 
   const {
     register,

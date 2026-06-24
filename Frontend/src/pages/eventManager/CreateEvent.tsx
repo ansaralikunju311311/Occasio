@@ -133,7 +133,9 @@ const CreateEvent = () => {
     setLayoutBlocks((prev) => {
       const newBlocks = [...prev];
       const blockCopy = { ...newBlocks[blockIndex] };
-      let rowsCopy = blockCopy.rows.filter((_: any, i: number) => i !== rowIndex).map((r: any, i: number) => ({ ...r, rowNumber: i + 1 }));
+      let rowsCopy = blockCopy.rows
+        .filter((_: any, i: number) => i !== rowIndex)
+        .map((r: any, i: number) => ({ ...r, rowNumber: i + 1 }));
       blockCopy.rows = rowsCopy;
       newBlocks[blockIndex] = blockCopy;
       return newBlocks;
@@ -145,7 +147,10 @@ const CreateEvent = () => {
       const newBlocks = [...prev];
       const blockCopy = { ...newBlocks[blockIndex] };
       const rowsCopy = [...blockCopy.rows];
-      rowsCopy[rowIndex] = { ...rowsCopy[rowIndex], columns: columns === '' ? '' : Number(columns) };
+      rowsCopy[rowIndex] = {
+        ...rowsCopy[rowIndex],
+        columns: columns === '' ? '' : Number(columns),
+      };
       blockCopy.rows = rowsCopy;
       newBlocks[blockIndex] = blockCopy;
       return newBlocks;
@@ -212,17 +217,26 @@ const CreateEvent = () => {
         return;
       }
 
-      if ((data.eventType === EventType.ONLINE || data.eventType === EventType.HYBRID) && (!data.maxOnlineUsers || data.maxOnlineUsers <= 0)) {
+      if (
+        (data.eventType === EventType.ONLINE || data.eventType === EventType.HYBRID) &&
+        (!data.maxOnlineUsers || data.maxOnlineUsers <= 0)
+      ) {
         toast.error('Online capacity is required!');
         setIsUploading(false);
         return;
       }
 
-      const isOfflineOrHybrid = data.eventType === EventType.OFFLINE || data.eventType === EventType.HYBRID;
+      const isOfflineOrHybrid =
+        data.eventType === EventType.OFFLINE || data.eventType === EventType.HYBRID;
       if (isOfflineOrHybrid) {
         // Simple loop validation (preserving existing logic)
         for (const block of layoutBlocks) {
-          if (!block.blockName.trim() || !block.category.name || block.category.price === '' || Number(block.category.price) < 0) {
+          if (
+            !block.blockName.trim() ||
+            !block.category.name ||
+            block.category.price === '' ||
+            Number(block.category.price) < 0
+          ) {
             toast.error('Please complete all block details!');
             setIsUploading(false);
             return;
@@ -230,16 +244,25 @@ const CreateEvent = () => {
         }
       }
 
-      eventMutation.mutate({
-        ...data,
-        location: isOfflineOrHybrid ? { type: 'Point', coordinates: [Number(data.longitude), Number(data.latitude)], address: null } : null,
-        startTime: new Date(data.startTime),
-        endTime: new Date(data.endTime),
-        picture: bannerUrl,
-        layout: isOfflineOrHybrid ? { blocks: layoutBlocks } : undefined,
-      }, {
-        onSettled: () => setIsUploading(false)
-      });
+      eventMutation.mutate(
+        {
+          ...data,
+          location: isOfflineOrHybrid
+            ? {
+                type: 'Point',
+                coordinates: [Number(data.longitude), Number(data.latitude)],
+                address: null,
+              }
+            : null,
+          startTime: new Date(data.startTime),
+          endTime: new Date(data.endTime),
+          picture: bannerUrl,
+          layout: isOfflineOrHybrid ? { blocks: layoutBlocks } : undefined,
+        },
+        {
+          onSettled: () => setIsUploading(false),
+        }
+      );
     } catch (err) {
       toast.error('Image upload failed');
       setIsUploading(false);
@@ -524,7 +547,6 @@ const CreateEvent = () => {
                   <p className="text-red-500 text-xs mt-1">{errors.address.message}</p>
                 )}
               </div>
-
             </div>
           </div>
         )}
@@ -982,7 +1004,8 @@ const CreateEvent = () => {
                 Draft Created!
               </h2>
               <p className="text-slate-400 mb-8 mt-4">
-                Your event is currently a <strong>DRAFT</strong>. To make it <strong>LIVE</strong> and publish it to the platform, you need to complete the scheduling payment.
+                Your event is currently a <strong>DRAFT</strong>. To make it <strong>LIVE</strong>{' '}
+                and publish it to the platform, you need to complete the scheduling payment.
               </p>
 
               <div className="grid grid-cols-1 gap-3 w-full">
@@ -994,8 +1017,19 @@ const CreateEvent = () => {
                   {isPaying ? (
                     <span className="flex items-center">
                       <svg className="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
                       </svg>
                       Processing...
                     </span>

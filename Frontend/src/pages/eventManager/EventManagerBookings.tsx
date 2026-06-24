@@ -147,9 +147,7 @@ const EventManagerBookings = () => {
                     />
                   </svg>
                   <p className="text-base font-medium text-gray-900">No bookings found</p>
-                  <p className="text-sm mt-1">
-                    Your events haven't received any bookings yet.
-                  </p>
+                  <p className="text-sm mt-1">Your events haven't received any bookings yet.</p>
                 </div>
               </td>
             </tr>
@@ -157,11 +155,17 @@ const EventManagerBookings = () => {
           renderRow={(booking: Booking) => (
             <tr key={booking.id} className="hover:bg-gray-50 transition-colors duration-150">
               <td className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm font-medium text-gray-900">{booking.eventId?.title || 'Unknown Event'}</div>
-                <div className="text-xs text-gray-500 mt-1 capitalize">Type: {booking.bookingType}</div>
+                <div className="text-sm font-medium text-gray-900">
+                  {booking.eventId?.title || 'Unknown Event'}
+                </div>
+                <div className="text-xs text-gray-500 mt-1 capitalize">
+                  Type: {booking.bookingType}
+                </div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm font-medium text-gray-900">{booking.userId?.name || 'Unknown'}</div>
+                <div className="text-sm font-medium text-gray-900">
+                  {booking.userId?.name || 'Unknown'}
+                </div>
                 <div className="text-sm text-gray-500">{booking.userId?.email || ''}</div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
@@ -187,11 +191,13 @@ const EventManagerBookings = () => {
                 </span>
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
-                {booking.createdAt ? new Date(booking.createdAt).toLocaleDateString('en-IN', {
-                  day: 'numeric',
-                  month: 'short',
-                  year: 'numeric'
-                }) : 'N/A'}
+                {booking.createdAt
+                  ? new Date(booking.createdAt).toLocaleDateString('en-IN', {
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric',
+                    })
+                  : 'N/A'}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <button
@@ -228,29 +234,42 @@ const EventManagerBookings = () => {
                 className="text-slate-400 hover:text-slate-600 transition-colors bg-slate-100 hover:bg-slate-200 p-2 rounded-full"
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
-            
+
             <div className="p-6 space-y-8">
               {/* Event Section */}
               <div>
-                <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-slate-100 pb-2">Event Information</h3>
+                <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-slate-100 pb-2">
+                  Event Information
+                </h3>
                 <div className="flex gap-4">
                   {selectedBooking.eventId?.picture && (
-                    <img 
-                      src={selectedBooking.eventId.picture} 
-                      alt={selectedBooking.eventId.title} 
+                    <img
+                      src={selectedBooking.eventId.picture}
+                      alt={selectedBooking.eventId.title}
                       className="w-24 h-24 rounded-xl object-cover border border-slate-200"
                     />
                   )}
                   <div>
-                    <h4 className="text-lg font-bold text-slate-800">{selectedBooking.eventId?.title || 'Unknown Event'}</h4>
-                    <p className="text-sm text-slate-500 mt-1 capitalize">{selectedBooking.eventId?.eventType} Event</p>
+                    <h4 className="text-lg font-bold text-slate-800">
+                      {selectedBooking.eventId?.title || 'Unknown Event'}
+                    </h4>
+                    <p className="text-sm text-slate-500 mt-1 capitalize">
+                      {selectedBooking.eventId?.eventType} Event
+                    </p>
                     {selectedBooking.eventId?.startTime && (
                       <p className="font-medium text-slate-600">
-                        {selectedBooking.eventId?.startTime ? new Date(selectedBooking.eventId.startTime).toLocaleString() : 'N/A'}
+                        {selectedBooking.eventId?.startTime
+                          ? new Date(selectedBooking.eventId.startTime).toLocaleString()
+                          : 'N/A'}
                       </p>
                     )}
                     {selectedBooking.eventId?.location?.address && (
@@ -269,16 +288,22 @@ const EventManagerBookings = () => {
 
               {/* User Section */}
               <div>
-                <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-slate-100 pb-2">Attendee Information</h3>
+                <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-slate-100 pb-2">
+                  Attendee Information
+                </h3>
                 <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <p className="text-xs text-slate-500 mb-1">Name</p>
-                      <p className="text-sm font-semibold text-slate-800">{selectedBooking.userId?.name || 'N/A'}</p>
+                      <p className="text-sm font-semibold text-slate-800">
+                        {selectedBooking.userId?.name || 'N/A'}
+                      </p>
                     </div>
                     <div>
                       <p className="text-xs text-slate-500 mb-1">Email</p>
-                      <p className="text-sm font-semibold text-slate-800 break-all">{selectedBooking.userId?.email || 'N/A'}</p>
+                      <p className="text-sm font-semibold text-slate-800 break-all">
+                        {selectedBooking.userId?.email || 'N/A'}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -286,23 +311,31 @@ const EventManagerBookings = () => {
 
               {/* Booking Data Section */}
               <div>
-                <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-slate-100 pb-2">Booking Transaction</h3>
+                <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-slate-100 pb-2">
+                  Booking Transaction
+                </h3>
                 <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <p className="text-xs text-slate-500 mb-1">Status</p>
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusBadgeColor(selectedBooking.status)}`}>
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusBadgeColor(selectedBooking.status)}`}
+                      >
                         {selectedBooking.status}
                       </span>
                     </div>
                     <div>
                       <p className="text-xs text-slate-500 mb-1">Booking Type</p>
-                      <p className="text-sm font-semibold text-slate-800 capitalize">{selectedBooking.bookingType}</p>
+                      <p className="text-sm font-semibold text-slate-800 capitalize">
+                        {selectedBooking.bookingType}
+                      </p>
                     </div>
                     <div>
                       <p className="text-xs text-slate-500 mb-1">Seats Booked</p>
                       <p className="text-sm font-semibold text-slate-800">
-                        {selectedBooking.seats?.length ? selectedBooking.seats.join(', ') : 'Virtual / None'}
+                        {selectedBooking.seats?.length
+                          ? selectedBooking.seats.join(', ')
+                          : 'Virtual / None'}
                       </p>
                     </div>
                     <div>
@@ -316,21 +349,27 @@ const EventManagerBookings = () => {
                   <div className="border-t border-slate-200 pt-4 mt-2">
                     <div className="flex justify-between items-center text-sm mb-2">
                       <span className="text-slate-500">Total Paid by User</span>
-                      <span className="font-semibold text-slate-800">₹{selectedBooking.totalAmount}</span>
+                      <span className="font-semibold text-slate-800">
+                        ₹{selectedBooking.totalAmount}
+                      </span>
                     </div>
                     <div className="flex justify-between items-center text-sm mb-2">
                       <span className="text-slate-500">Platform Commission</span>
-                      <span className="text-red-500">-₹{selectedBooking.commissionAmount || 0}</span>
+                      <span className="text-red-500">
+                        -₹{selectedBooking.commissionAmount || 0}
+                      </span>
                     </div>
                     <div className="flex justify-between items-center text-base pt-2 border-t border-slate-200">
                       <span className="font-bold text-slate-800">Your Net Revenue</span>
-                      <span className="font-black text-teal-600">₹{selectedBooking.organizerRevenue || 0}</span>
+                      <span className="font-black text-teal-600">
+                        ₹{selectedBooking.organizerRevenue || 0}
+                      </span>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-            
+
             <div className="p-4 border-t border-slate-100 bg-slate-50 rounded-b-2xl flex justify-end">
               <button
                 onClick={() => setSelectedBooking(null)}

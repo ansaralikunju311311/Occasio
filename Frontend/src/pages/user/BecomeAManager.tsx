@@ -104,7 +104,13 @@ const BecomeAManager: React.FC = () => {
       const error = upgradeMutation.error as any;
       toast.error(error.response?.data?.message || 'Failed to submit application.');
     }
-  }, [upgradeMutation.isSuccess, upgradeMutation.isError, upgradeMutation.data, upgradeMutation.error, dispatch]);
+  }, [
+    upgradeMutation.isSuccess,
+    upgradeMutation.isError,
+    upgradeMutation.data,
+    upgradeMutation.error,
+    dispatch,
+  ]);
 
   const reapplyMutation = useReapply();
 
@@ -119,7 +125,14 @@ const BecomeAManager: React.FC = () => {
       const error = reapplyMutation.error as any;
       toast.error(error.response?.data?.message || 'Failed to re-apply.');
     }
-  }, [reapplyMutation.isSuccess, reapplyMutation.isError, reapplyMutation.data, reapplyMutation.error, dispatch, navigate]);
+  }, [
+    reapplyMutation.isSuccess,
+    reapplyMutation.isError,
+    reapplyMutation.data,
+    reapplyMutation.error,
+    dispatch,
+    navigate,
+  ]);
 
   const uploadImageToCloudinary = async (file: File) => {
     const formData = new FormData();

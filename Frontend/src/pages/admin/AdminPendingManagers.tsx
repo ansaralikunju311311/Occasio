@@ -58,7 +58,6 @@ const AdminPendingManagers = () => {
 
   const handleManagerDetails = async (userId: string) => {
     try {
-
       // Using service directly for one-off detail fetch for simplicity in current UI flow
       // but we could also use useAdminPendingManagerDetails if we managed the ID state
       const response = await adminService.getPendingManagerDetails(userId);
@@ -83,7 +82,6 @@ const AdminPendingManagers = () => {
       console.error('Failed to fetch manager details:', error);
       toast.error(error.response?.data?.message || 'Failed to load manager details.');
     } finally {
-
     }
   };
 
@@ -101,18 +99,21 @@ const AdminPendingManagers = () => {
   };
 
   const handleRejection = (id: string, reason: string) => {
-    rejectMutation.mutate({ id, reason }, {
-      onSuccess: () => {
-        toast.success('Manager application rejected.');
-        setIsModalOpen(false);
-        setIsRejectionModalOpen(false);
-        setRejectionReason('');
-      },
-      onError: (error: any) => {
-        console.error('Rejection failed:', error);
-        toast.error('Failed to reject manager application.');
-      },
-    });
+    rejectMutation.mutate(
+      { id, reason },
+      {
+        onSuccess: () => {
+          toast.success('Manager application rejected.');
+          setIsModalOpen(false);
+          setIsRejectionModalOpen(false);
+          setRejectionReason('');
+        },
+        onError: (error: any) => {
+          console.error('Rejection failed:', error);
+          toast.error('Failed to reject manager application.');
+        },
+      }
+    );
   };
 
   const getInitials = (name: string) => {
@@ -220,9 +221,7 @@ const AdminPendingManagers = () => {
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {manager.createdAt
-                    ? new Date(manager.createdAt).toLocaleDateString()
-                    : 'Recent'}
+                  {manager.createdAt ? new Date(manager.createdAt).toLocaleDateString() : 'Recent'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <button

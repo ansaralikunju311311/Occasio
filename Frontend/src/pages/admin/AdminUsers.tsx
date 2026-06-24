@@ -52,14 +52,17 @@ const AdminUsers = () => {
 
   const handleUser = (userId: string, userStatus: string) => {
     const newstatus = userStatus === 'ACTIVE' ? 'BLOCK' : 'ACTIVE';
-    blockMutation.mutate({ id: userId, status: newstatus }, {
-      onSuccess: () => {
-        toast.success('User status updated successfully.');
-      },
-      onError: (error: any) => {
-        toast.error(error.response?.data?.message || 'Failed to update user status.');
-      },
-    });
+    blockMutation.mutate(
+      { id: userId, status: newstatus },
+      {
+        onSuccess: () => {
+          toast.success('User status updated successfully.');
+        },
+        onError: (error: any) => {
+          toast.error(error.response?.data?.message || 'Failed to update user status.');
+        },
+      }
+    );
   };
 
   const detailsView = async (userId: string) => {

@@ -201,11 +201,15 @@ const Checkout = () => {
                   <div className="mt-6 p-5 rounded-2xl bg-slate-950/50 border border-slate-800/80 space-y-3">
                     <div className="flex justify-between text-xs text-slate-400">
                       <span>Platform Commission ({breakdown.commissionPercentage}%)</span>
-                      <span className="text-purple-400 font-semibold">₹{breakdown.commissionAmount}</span>
+                      <span className="text-purple-400 font-semibold">
+                        ₹{breakdown.commissionAmount}
+                      </span>
                     </div>
                     <div className="flex justify-between text-xs text-slate-400">
                       <span>Organizer Revenue</span>
-                      <span className="text-teal-400 font-semibold">₹{breakdown.organizerRevenue}</span>
+                      <span className="text-teal-400 font-semibold">
+                        ₹{breakdown.organizerRevenue}
+                      </span>
                     </div>
                     <div className="text-[10px] text-slate-500 italic">
                       Split policy applied based on Creator tier: {breakdown.planName}
@@ -215,9 +219,7 @@ const Checkout = () => {
 
                 <div className="flex justify-between items-center pt-4 text-xl">
                   <span className="font-bold">Total Amount</span>
-                  <span className="font-black text-indigo-400">
-                    ₹{total}
-                  </span>
+                  <span className="font-black text-indigo-400">₹{total}</span>
                 </div>
               </div>
             </section>

@@ -85,7 +85,6 @@ const ResetPassword: React.FC = () => {
     }
   };
 
-
   return (
     <div className="min-h-screen flex bg-gray-50">
       {/* Left Side Image Section */}

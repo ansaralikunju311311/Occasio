@@ -163,26 +163,24 @@ const EditEvent = () => {
   //   });
   // };
 
+  const updateRowColumns = (blockIndex: number, rowIndex: number, columns: number | string) => {
+    setLayoutBlocks((prev) => {
+      const newBlocks = [...prev];
+      const blockCopy = { ...newBlocks[blockIndex] };
+      const rowsCopy = [...blockCopy.rows];
 
+      const value = Number(columns);
 
-   const updateRowColumns = (blockIndex: number, rowIndex: number, columns: number | string) => {
-  setLayoutBlocks((prev) => {
-    const newBlocks = [...prev];
-    const blockCopy = { ...newBlocks[blockIndex] };
-    const rowsCopy = [...blockCopy.rows];
+      rowsCopy[rowIndex] = {
+        ...rowsCopy[rowIndex],
+        columns: isNaN(value) ? 0 : value, // ✅ FIX
+      };
 
-    const value = Number(columns);
-
-    rowsCopy[rowIndex] = {
-      ...rowsCopy[rowIndex],
-      columns: isNaN(value) ? 0 : value, // ✅ FIX
-    };
-
-    blockCopy.rows = rowsCopy;
-    newBlocks[blockIndex] = blockCopy;
-    return newBlocks;
-  });
-};
+      blockCopy.rows = rowsCopy;
+      newBlocks[blockIndex] = blockCopy;
+      return newBlocks;
+    });
+  };
 
   const uploadImageToCloudinary = async (file: File) => {
     const formData = new FormData();
@@ -215,15 +213,14 @@ const EditEvent = () => {
     const start = new Date(data.startTime);
     const end = new Date(data.endTime);
 
-
     for (const block of layoutBlocks) {
-  for (const row of block.rows) {
-    if (!row.columns || Number(row.columns) <= 0) {
-      toast.error("Each row must have at least 1 seat");
-      return;
+      for (const row of block.rows) {
+        if (!row.columns || Number(row.columns) <= 0) {
+          toast.error('Each row must have at least 1 seat');
+          return;
+        }
+      }
     }
-  }
-}
     if (end <= start) {
       toast.error('End time must be after start time!');
       return;
@@ -236,10 +233,16 @@ const EditEvent = () => {
         bannerUrl = await uploadImageToCloudinary(data.banner[0]);
       }
 
-      const isOfflineOrHybrid = data.eventType === EventType.OFFLINE || data.eventType === EventType.HYBRID;
+      const isOfflineOrHybrid =
+        data.eventType === EventType.OFFLINE || data.eventType === EventType.HYBRID;
       if (isOfflineOrHybrid) {
         for (const block of layoutBlocks) {
-          if (!block.blockName.trim() || !block.category.name || block.category.price === '' || Number(block.category.price) < 0) {
+          if (
+            !block.blockName.trim() ||
+            !block.category.name ||
+            block.category.price === '' ||
+            Number(block.category.price) < 0
+          ) {
             toast.error('Please complete all block details!');
             setIsUploading(false);
             return;
@@ -349,8 +352,17 @@ const EditEvent = () => {
                     onClick={() => {
                       setValue('eventType', type.id);
                       // When switching to OFFLINE/HYBRID but no blocks yet, init empty block
-                      if ((type.id === EventType.OFFLINE || type.id === EventType.HYBRID) && layoutBlocks.length === 0) {
-                        setLayoutBlocks([{ blockName: '', category: { name: '', price: '' }, rows: [{ rowNumber: 1, columns: '' }] }]);
+                      if (
+                        (type.id === EventType.OFFLINE || type.id === EventType.HYBRID) &&
+                        layoutBlocks.length === 0
+                      ) {
+                        setLayoutBlocks([
+                          {
+                            blockName: '',
+                            category: { name: '', price: '' },
+                            rows: [{ rowNumber: 1, columns: '' }],
+                          },
+                        ]);
                       }
                     }}
                     className={`flex items-center justify-center px-4 py-3 rounded-xl border transition-all font-medium ${
@@ -433,7 +445,10 @@ const EditEvent = () => {
           <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-2xl p-8 shadow-xl">
             <h2 className="text-xl font-semibold text-white mb-6">Seat Layout</h2>
             {layoutBlocks.map((block, blockIndex) => (
-              <div key={blockIndex} className="bg-slate-800/40 border border-slate-700 rounded-xl p-5 mb-4">
+              <div
+                key={blockIndex}
+                className="bg-slate-800/40 border border-slate-700 rounded-xl p-5 mb-4"
+              >
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                   <input
                     type="text"
@@ -474,24 +489,40 @@ const EditEvent = () => {
                         className="bg-slate-900/50 border border-slate-700 rounded-lg px-3 py-2 text-white w-24"
                       />
                       {block.rows.length > 1 && (
-                        <button type="button" onClick={() => removeRow(blockIndex, rowIndex)} className="text-red-400">
+                        <button
+                          type="button"
+                          onClick={() => removeRow(blockIndex, rowIndex)}
+                          className="text-red-400"
+                        >
                           Remove
                         </button>
                       )}
                     </div>
                   ))}
-                  <button type="button" onClick={() => addRow(blockIndex)} className="text-teal-400 text-sm">
+                  <button
+                    type="button"
+                    onClick={() => addRow(blockIndex)}
+                    className="text-teal-400 text-sm"
+                  >
                     + Add Row
                   </button>
                 </div>
                 {layoutBlocks.length > 1 && (
-                  <button type="button" onClick={() => removeBlock(blockIndex)} className="text-red-400 mt-4 block">
+                  <button
+                    type="button"
+                    onClick={() => removeBlock(blockIndex)}
+                    className="text-red-400 mt-4 block"
+                  >
                     Remove Block
                   </button>
                 )}
               </div>
             ))}
-            <button type="button" onClick={addBlock} className="w-full py-2 border border-dashed border-slate-700 text-slate-400 rounded-xl">
+            <button
+              type="button"
+              onClick={addBlock}
+              className="w-full py-2 border border-dashed border-slate-700 text-slate-400 rounded-xl"
+            >
               + Add Block
             </button>
           </div>
@@ -502,7 +533,12 @@ const EditEvent = () => {
           <h2 className="text-xl font-semibold text-white mb-6 flex items-center">
             <span className="p-2 bg-teal-500/10 rounded-lg mr-3 text-teal-400 border border-teal-500/20">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"
+                />
               </svg>
             </span>
             Ticketing &amp; Capacity
@@ -528,7 +564,9 @@ const EditEvent = () => {
                     className={`w-full bg-slate-800/50 border rounded-xl pl-8 pr-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500/50 transition-all ${errors.price ? 'border-red-500 focus:border-red-500' : 'border-slate-700 focus:border-teal-500'}`}
                   />
                 </div>
-                {errors.price && <p className="text-red-500 text-xs mt-1">{errors.price.message}</p>}
+                {errors.price && (
+                  <p className="text-red-500 text-xs mt-1">{errors.price.message}</p>
+                )}
               </div>
             )}
             {(selectedEventType === EventType.ONLINE || selectedEventType === EventType.HYBRID) && (
@@ -547,7 +585,9 @@ const EditEvent = () => {
                   min="1"
                   className={`w-full bg-slate-800/50 border rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500/50 transition-all ${errors.maxOnlineUsers ? 'border-red-500 focus:border-red-500' : 'border-slate-700 focus:border-teal-500'}`}
                 />
-                {errors.maxOnlineUsers && <p className="text-red-500 text-xs mt-1">{errors.maxOnlineUsers.message}</p>}
+                {errors.maxOnlineUsers && (
+                  <p className="text-red-500 text-xs mt-1">{errors.maxOnlineUsers.message}</p>
+                )}
               </div>
             )}
           </div>
@@ -573,12 +613,21 @@ const EditEvent = () => {
               </button>
             </div>
           ) : (
-            <input type="file" accept="image/*" {...register('banner', { onChange: handleImageChange })} className="text-slate-400" />
+            <input
+              type="file"
+              accept="image/*"
+              {...register('banner', { onChange: handleImageChange })}
+              className="text-slate-400"
+            />
           )}
         </div>
 
         <div className="flex justify-end gap-4">
-          <button type="button" onClick={() => navigate(-1)} className="px-6 py-3 border border-slate-700 text-slate-300 rounded-xl">
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="px-6 py-3 border border-slate-700 text-slate-300 rounded-xl"
+          >
             Cancel
           </button>
           <button

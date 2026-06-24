@@ -54,8 +54,8 @@ const AdminPlans = () => {
     if (formData.commissionPercentage < 0 || formData.commissionPercentage > 100) {
       newErrors.commissionPercentage = 'Commission must be between 0 and 100';
     }
-    
-    const validFeatures = formData.features.filter(f => f.trim() !== '');
+
+    const validFeatures = formData.features.filter((f) => f.trim() !== '');
     if (validFeatures.length === 0) {
       newErrors.features = 'At least one feature is required';
     }
@@ -66,27 +66,30 @@ const AdminPlans = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validate()) {
       toast.error('Please fix the errors in the form');
       return;
     }
 
-    const cleanedFeatures = formData.features.filter(f => f.trim() !== '');
+    const cleanedFeatures = formData.features.filter((f) => f.trim() !== '');
     const dataToSend = { ...formData, features: cleanedFeatures };
 
     if (editingPlan) {
-      updatePlanMutation.mutate({ id: editingPlan.id, data: dataToSend }, {
-        onSuccess: () => {
-          toast.success('Plan updated successfully');
-          setIsModalOpen(false);
-          setEditingPlan(null);
-          setErrors({});
-        },
-        onError: (err: any) => {
-          toast.error(err.response?.data?.message || 'Failed to update plan');
+      updatePlanMutation.mutate(
+        { id: editingPlan.id, data: dataToSend },
+        {
+          onSuccess: () => {
+            toast.success('Plan updated successfully');
+            setIsModalOpen(false);
+            setEditingPlan(null);
+            setErrors({});
+          },
+          onError: (err: any) => {
+            toast.error(err.response?.data?.message || 'Failed to update plan');
+          },
         }
-      });
+      );
     } else {
       createPlanMutation.mutate(dataToSend, {
         onSuccess: () => {
@@ -97,7 +100,7 @@ const AdminPlans = () => {
         },
         onError: (err: any) => {
           toast.error(err.response?.data?.message || 'Failed to create plan');
-        }
+        },
       });
     }
   };
@@ -138,10 +141,15 @@ const AdminPlans = () => {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-white tracking-tight">Subscription Plans</h1>
-          <p className="text-slate-400 mt-1">Manage platform tiers and pricing for event managers.</p>
+          <p className="text-slate-400 mt-1">
+            Manage platform tiers and pricing for event managers.
+          </p>
         </div>
         <button
-          onClick={() => { resetForm(); setIsModalOpen(true); }}
+          onClick={() => {
+            resetForm();
+            setIsModalOpen(true);
+          }}
           className="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-2.5 rounded-xl font-bold transition-all shadow-lg shadow-emerald-500/20 active:scale-95 flex items-center gap-2"
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -176,7 +184,10 @@ const AdminPlans = () => {
             </tr>
           }
           renderRow={(plan: Plan) => (
-            <tr key={plan.id} className="border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors">
+            <tr
+              key={plan.id}
+              className="border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors"
+            >
               <td className="px-6 py-4">
                 <span className="font-bold text-white">{plan.name}</span>
               </td>
@@ -184,12 +195,14 @@ const AdminPlans = () => {
               <td className="px-6 py-4 text-slate-300">{plan.eventLimit} Events</td>
               <td className="px-6 py-4 text-slate-300">{plan.commissionPercentage}%</td>
               <td className="px-6 py-4">
-                <span className={`px-2 py-1 rounded-full text-xs font-bold ${plan.isActive ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
+                <span
+                  className={`px-2 py-1 rounded-full text-xs font-bold ${plan.isActive ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}
+                >
                   {plan.isActive ? 'Active' : 'Inactive'}
                 </span>
               </td>
               <td className="px-6 py-4 text-right">
-                <button 
+                <button
                   onClick={() => openEditModal(plan)}
                   className="text-emerald-400 hover:text-emerald-300 font-bold text-sm transition-colors"
                 >
@@ -209,9 +222,17 @@ const AdminPlans = () => {
               <h2 className="text-2xl font-bold text-white">
                 {editingPlan ? 'Edit Subscription Plan' : 'Create New Subscription Plan'}
               </h2>
-              <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-white transition-colors">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="text-slate-400 hover:text-white transition-colors"
+              >
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
@@ -219,7 +240,9 @@ const AdminPlans = () => {
             <form onSubmit={handleSubmit} className="p-8 space-y-6">
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-400 uppercase tracking-wider">Plan Name</label>
+                  <label className="text-sm font-bold text-slate-400 uppercase tracking-wider">
+                    Plan Name
+                  </label>
                   <select
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -231,7 +254,9 @@ const AdminPlans = () => {
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-400 uppercase tracking-wider">Price (USD)</label>
+                  <label className="text-sm font-bold text-slate-400 uppercase tracking-wider">
+                    Price (USD)
+                  </label>
                   <input
                     type="number"
                     value={formData.price}
@@ -243,38 +268,54 @@ const AdminPlans = () => {
                   {errors.price && <p className="text-red-500 text-xs mt-1">{errors.price}</p>}
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-400 uppercase tracking-wider">Event Limit</label>
+                  <label className="text-sm font-bold text-slate-400 uppercase tracking-wider">
+                    Event Limit
+                  </label>
                   <input
                     type="number"
                     value={formData.eventLimit}
-                    onChange={(e) => setFormData({ ...formData, eventLimit: Number(e.target.value) })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, eventLimit: Number(e.target.value) })
+                    }
                     className={`w-full bg-[#070b14] border ${errors.eventLimit ? 'border-red-500' : 'border-slate-800'} rounded-xl px-4 py-3 text-white focus:outline-hidden focus:border-emerald-500/50 transition-all`}
                     placeholder="10"
                     min="1"
                   />
-                  {errors.eventLimit && <p className="text-red-500 text-xs mt-1">{errors.eventLimit}</p>}
+                  {errors.eventLimit && (
+                    <p className="text-red-500 text-xs mt-1">{errors.eventLimit}</p>
+                  )}
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-400 uppercase tracking-wider">Commission (%)</label>
+                  <label className="text-sm font-bold text-slate-400 uppercase tracking-wider">
+                    Commission (%)
+                  </label>
                   <input
                     type="number"
                     value={formData.commissionPercentage}
-                    onChange={(e) => setFormData({ ...formData, commissionPercentage: Number(e.target.value) })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, commissionPercentage: Number(e.target.value) })
+                    }
                     className={`w-full bg-[#070b14] border ${errors.commissionPercentage ? 'border-red-500' : 'border-slate-800'} rounded-xl px-4 py-3 text-white focus:outline-hidden focus:border-emerald-500/50 transition-all`}
                     placeholder="5"
                     min="0"
                     max="100"
                   />
-                  {errors.commissionPercentage && <p className="text-red-500 text-xs mt-1">{errors.commissionPercentage}</p>}
+                  {errors.commissionPercentage && (
+                    <p className="text-red-500 text-xs mt-1">{errors.commissionPercentage}</p>
+                  )}
                 </div>
               </div>
 
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <label className="text-sm font-bold text-slate-400 uppercase tracking-wider">Features</label>
+                  <label className="text-sm font-bold text-slate-400 uppercase tracking-wider">
+                    Features
+                  </label>
                   {errors.features && <p className="text-red-500 text-xs">{errors.features}</p>}
                 </div>
-                <div className={`space-y-3 max-h-48 overflow-y-auto pr-2 custom-scrollbar ${errors.features ? 'p-2 border border-red-500/20 rounded-xl' : ''}`}>
+                <div
+                  className={`space-y-3 max-h-48 overflow-y-auto pr-2 custom-scrollbar ${errors.features ? 'p-2 border border-red-500/20 rounded-xl' : ''}`}
+                >
                   {formData.features.map((feature, index) => (
                     <div key={index} className="flex gap-2">
                       <input
@@ -290,8 +331,18 @@ const AdminPlans = () => {
                         className="p-2 text-slate-500 hover:text-red-400 transition-colors"
                         disabled={formData.features.length === 1}
                       >
-                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                          />
                         </svg>
                       </button>
                     </div>
@@ -303,7 +354,12 @@ const AdminPlans = () => {
                   className="text-emerald-400 hover:text-emerald-300 text-sm font-bold flex items-center gap-1 transition-colors"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 4v16m8-8H4"
+                    />
                   </svg>
                   Add Feature
                 </button>
@@ -322,9 +378,11 @@ const AdminPlans = () => {
                   disabled={createPlanMutation.isPending || updatePlanMutation.isPending}
                   className="flex-1 px-6 py-3.5 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-white font-bold rounded-2xl transition-all shadow-lg shadow-emerald-500/20 active:scale-95"
                 >
-                  {createPlanMutation.isPending || updatePlanMutation.isPending 
-                    ? 'Processing...' 
-                    : editingPlan ? 'Update Plan' : 'Create Plan'}
+                  {createPlanMutation.isPending || updatePlanMutation.isPending
+                    ? 'Processing...'
+                    : editingPlan
+                      ? 'Update Plan'
+                      : 'Create Plan'}
                 </button>
               </div>
             </form>

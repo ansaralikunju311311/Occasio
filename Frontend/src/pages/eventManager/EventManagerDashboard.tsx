@@ -9,13 +9,14 @@ const EventManagerDashboard = () => {
 
   useEffect(() => {
     if (user?.role === 'EVENT_MANAGER') {
-      api.get('/user/my-subscription')
-        .then(res => {
+      api
+        .get('/user/my-subscription')
+        .then((res) => {
           if (res.data.success) {
             setMySubscription(res.data.subscription);
           }
         })
-        .catch(err => console.error("Error fetching subscription", err));
+        .catch((err) => console.error('Error fetching subscription', err));
     }
   }, [user]);
 
@@ -39,19 +40,29 @@ const EventManagerDashboard = () => {
             <HomeButton />
           </div>
         </div>
-        
+
         {mySubscription && (
           <div className="bg-slate-900/60 border border-teal-500/30 p-4 rounded-2xl flex items-center gap-4">
             <div className="w-12 h-12 rounded-full bg-teal-500/10 flex items-center justify-center text-teal-400 border border-teal-500/20">
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                />
               </svg>
             </div>
             <div>
-              <p className="text-xs text-slate-400 uppercase font-bold tracking-wider mb-1">Active Plan</p>
+              <p className="text-xs text-slate-400 uppercase font-bold tracking-wider mb-1">
+                Active Plan
+              </p>
               <h4 className="text-lg font-bold text-teal-400">{mySubscription.plan} TIER</h4>
               <p className="text-xs font-medium text-slate-300 mt-1">
-                Expires: {mySubscription.endDate ? new Date(mySubscription.endDate).toLocaleDateString() : 'Lifetime'}
+                Expires:{' '}
+                {mySubscription.endDate
+                  ? new Date(mySubscription.endDate).toLocaleDateString()
+                  : 'Lifetime'}
               </p>
             </div>
           </div>

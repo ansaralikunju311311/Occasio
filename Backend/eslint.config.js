@@ -47,7 +47,12 @@ module.exports = [
       eqeqeq: 'error',
       curly: 'error',
 
-      'prettier/prettier': 'warn',
+      'prettier/prettier': [
+        'warn',
+        {
+          endOfLine: 'auto',
+        },
+      ],
 
       'import/order': [
         'warn',

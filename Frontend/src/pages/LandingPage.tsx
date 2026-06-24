@@ -56,7 +56,9 @@ const LandingPage = () => {
 
         <div className="relative z-10 max-w-4xl mx-auto">
           <span className="inline-block py-1 px-3 rounded-full bg-indigo-500/10 text-indigo-400 text-sm font-semibold mb-6 shadow-sm border border-indigo-500/20">
-            {user ? `Welcome Back to Occasio - ${user.email}   ${user.id}` : 'The New Standard for Events'}
+            {user
+              ? `Welcome Back to Occasio - ${user.email}   ${user.id}`
+              : 'The New Standard for Events'}
           </span>
 
           <h1 className="text-5xl md:text-7xl font-extrabold leading-tight tracking-tight mb-8 text-white">
@@ -271,149 +273,55 @@ const LandingPage = () => {
         ) : events.length > 0 ? (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {events.map((event: any) => (
-              <div
-                key={event.id}
-                onClick={() => navigate(`/event/${event.id}`)}
-                className="group relative bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-[2rem] overflow-hidden hover:border-indigo-500/40 hover:shadow-[0_20px_50px_-12px_rgba(99,102,241,0.2)] transition-all duration-500 flex flex-col h-full cursor-pointer"
-              >
-                <div className="aspect-video w-full overflow-hidden relative">
-                  <img
-                    src={
-                      event.picture ||
-                      'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2070&auto=format&fit=crop'
-                    }
-                    alt={event.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  />
-                  <div className="absolute top-4 left-4 flex gap-2">
-                    <span className="px-3 py-1 rounded-full bg-slate-950/70 backdrop-blur-md text-[10px] font-bold text-indigo-400 border border-indigo-500/30 uppercase tracking-wider">
-                      {event.eventType}
-                    </span>
-                  </div>
-                  {(() => {
-                    const type = event.eventType?.toUpperCase();
-                    const minSeatPrice = getMinSeatPrice(event);
-                    const onlinePrice = Number(event.price) || 0;
-
-                    let isFree = false;
-                    if (type === 'ONLINE') isFree = onlinePrice === 0;
-                    else if (type === 'OFFLINE')
-                      isFree = (minSeatPrice === null || minSeatPrice === 0) && onlinePrice === 0;
-                    else if (type === 'HYBRID')
-                      isFree = onlinePrice === 0 && (minSeatPrice === null || minSeatPrice === 0);
-                    else isFree = onlinePrice === 0;
-
-                    return (
-                      isFree && (
-                        <div className="absolute top-4 right-4">
-                          <span className="px-3 py-1 rounded-full bg-emerald-500 text-[10px] font-bold text-white uppercase tracking-wider shadow-lg">
-                            Free
-                          </span>
-                        </div>
-                      )
-                    );
-                  })()}
-                </div>
-
-                <div className="p-8 flex flex-col flex-1">
-                  <div className="flex items-center gap-2 text-indigo-400 text-[10px] font-bold mb-4 uppercase tracking-[0.2em] break-words">
-                    <svg
-                      className="w-3.5 h-3.5 shrink-0"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2.5}
-                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                      />
-                    </svg>
-                    <span>
-                      {formatDate(event.startTime)}{' '}
-                      {event.endTime && ` - ${formatDate(event.endTime)}`}
-                    </span>
-                  </div>
-                  <h3 className="text-2xl font-bold text-white mb-3 line-clamp-1 group-hover:text-indigo-400 transition-colors tracking-tight">
-                    {event.title}
-                  </h3>
-                  <p className="text-slate-400 text-sm line-clamp-2 mb-8 font-light leading-relaxed">
-                    {event.description}
-                  </p>
-
-                  <div className="flex items-center justify-between mt-auto pt-6 border-t border-slate-800/60">
-                    <div className="text-white font-bold text-sm">
-                      {(() => {
-                        const type = event.eventType?.toUpperCase();
-                        const minSeatPrice = getMinSeatPrice(event);
-                        const onlinePrice = event.price;
-
-                        if (type === 'ONLINE') {
-                          return onlinePrice > 0 ? (
-                            <span>₹{onlinePrice}</span>
-                          ) : (
-                            <span className="text-emerald-400">Free</span>
-                          );
-                        }
-
-                        if (type === 'OFFLINE') {
-                          if (minSeatPrice !== null) {
-                            return (
-                              <span className="text-slate-300">
-                                Starts from{' '}
-                                <span className="text-white text-lg">₹{minSeatPrice}</span>
-                              </span>
-                            );
-                          }
-                          return onlinePrice > 0 ? (
-                            <span>₹{onlinePrice}</span>
-                          ) : (
-                            <span className="text-emerald-400">Free</span>
-                          );
-                        }
-
-                        if (type === 'HYBRID') {
-                          return (
-                            <div className="flex flex-col gap-0.5">
-                              {minSeatPrice !== null && (
-                                <span className="text-slate-300 text-xs">
-                                  Venue:{' '}
-                                  <span className="text-white font-bold">₹{minSeatPrice}+</span>
-                                </span>
-                              )}
-                              {onlinePrice > 0 && (
-                                <span className="text-slate-300 text-xs">
-                                  Online:{' '}
-                                  <span className="text-indigo-400 font-bold">₹{onlinePrice}</span>
-                                </span>
-                              )}
-                              {!minSeatPrice && !onlinePrice && (
-                                <span className="text-emerald-400">Free</span>
-                              )}
-                            </div>
-                          );
-                        }
-
-                        // Fallback
-                        return onlinePrice > 0 ? (
-                          <span>₹{onlinePrice}</span>
-                        ) : (
-                          <span className="text-emerald-400">Free</span>
-                        );
-                      })()}
+              {events.map((event: any) => (
+                <div
+                  key={event.id}
+                  onClick={() => navigate(`/event/${event.id}`)}
+                  className="group relative bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-[2rem] overflow-hidden hover:border-indigo-500/40 hover:shadow-[0_20px_50px_-12px_rgba(99,102,241,0.2)] transition-all duration-500 flex flex-col h-full cursor-pointer"
+                >
+                  <div className="aspect-video w-full overflow-hidden relative">
+                    <img
+                      src={
+                        event.picture ||
+                        'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2070&auto=format&fit=crop'
+                      }
+                      alt={event.title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
+                    <div className="absolute top-4 left-4 flex gap-2">
+                      <span className="px-3 py-1 rounded-full bg-slate-950/70 backdrop-blur-md text-[10px] font-bold text-indigo-400 border border-indigo-500/30 uppercase tracking-wider">
+                        {event.eventType}
+                      </span>
                     </div>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigate(`/event/${event.id}`);
-                      }}
-                      className="text-indigo-400 hover:text-white text-sm font-semibold flex items-center transition-colors group/btn"
-                    >
-                      View Details
+                    {(() => {
+                      const type = event.eventType?.toUpperCase();
+                      const minSeatPrice = getMinSeatPrice(event);
+                      const onlinePrice = Number(event.price) || 0;
+
+                      let isFree = false;
+                      if (type === 'ONLINE') isFree = onlinePrice === 0;
+                      else if (type === 'OFFLINE')
+                        isFree = (minSeatPrice === null || minSeatPrice === 0) && onlinePrice === 0;
+                      else if (type === 'HYBRID')
+                        isFree = onlinePrice === 0 && (minSeatPrice === null || minSeatPrice === 0);
+                      else isFree = onlinePrice === 0;
+
+                      return (
+                        isFree && (
+                          <div className="absolute top-4 right-4">
+                            <span className="px-3 py-1 rounded-full bg-emerald-500 text-[10px] font-bold text-white uppercase tracking-wider shadow-lg">
+                              Free
+                            </span>
+                          </div>
+                        )
+                      );
+                    })()}
+                  </div>
+
+                  <div className="p-8 flex flex-col flex-1">
+                    <div className="flex items-center gap-2 text-indigo-400 text-[10px] font-bold mb-4 uppercase tracking-[0.2em] break-words">
                       <svg
-                        className="w-4 h-4 ml-2 transform group-hover/btn:translate-x-1 transition-transform"
+                        className="w-3.5 h-3.5 shrink-0"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -422,14 +330,110 @@ const LandingPage = () => {
                           strokeLinecap="round"
                           strokeLinejoin="round"
                           strokeWidth={2.5}
-                          d="M9 5l7 7-7 7"
+                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                         />
                       </svg>
-                    </button>
+                      <span>
+                        {formatDate(event.startTime)}{' '}
+                        {event.endTime && ` - ${formatDate(event.endTime)}`}
+                      </span>
+                    </div>
+                    <h3 className="text-2xl font-bold text-white mb-3 line-clamp-1 group-hover:text-indigo-400 transition-colors tracking-tight">
+                      {event.title}
+                    </h3>
+                    <p className="text-slate-400 text-sm line-clamp-2 mb-8 font-light leading-relaxed">
+                      {event.description}
+                    </p>
+
+                    <div className="flex items-center justify-between mt-auto pt-6 border-t border-slate-800/60">
+                      <div className="text-white font-bold text-sm">
+                        {(() => {
+                          const type = event.eventType?.toUpperCase();
+                          const minSeatPrice = getMinSeatPrice(event);
+                          const onlinePrice = event.price;
+
+                          if (type === 'ONLINE') {
+                            return onlinePrice > 0 ? (
+                              <span>₹{onlinePrice}</span>
+                            ) : (
+                              <span className="text-emerald-400">Free</span>
+                            );
+                          }
+
+                          if (type === 'OFFLINE') {
+                            if (minSeatPrice !== null) {
+                              return (
+                                <span className="text-slate-300">
+                                  Starts from{' '}
+                                  <span className="text-white text-lg">₹{minSeatPrice}</span>
+                                </span>
+                              );
+                            }
+                            return onlinePrice > 0 ? (
+                              <span>₹{onlinePrice}</span>
+                            ) : (
+                              <span className="text-emerald-400">Free</span>
+                            );
+                          }
+
+                          if (type === 'HYBRID') {
+                            return (
+                              <div className="flex flex-col gap-0.5">
+                                {minSeatPrice !== null && (
+                                  <span className="text-slate-300 text-xs">
+                                    Venue:{' '}
+                                    <span className="text-white font-bold">₹{minSeatPrice}+</span>
+                                  </span>
+                                )}
+                                {onlinePrice > 0 && (
+                                  <span className="text-slate-300 text-xs">
+                                    Online:{' '}
+                                    <span className="text-indigo-400 font-bold">
+                                      ₹{onlinePrice}
+                                    </span>
+                                  </span>
+                                )}
+                                {!minSeatPrice && !onlinePrice && (
+                                  <span className="text-emerald-400">Free</span>
+                                )}
+                              </div>
+                            );
+                          }
+
+                          // Fallback
+                          return onlinePrice > 0 ? (
+                            <span>₹{onlinePrice}</span>
+                          ) : (
+                            <span className="text-emerald-400">Free</span>
+                          );
+                        })()}
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/event/${event.id}`);
+                        }}
+                        className="text-indigo-400 hover:text-white text-sm font-semibold flex items-center transition-colors group/btn"
+                      >
+                        View Details
+                        <svg
+                          className="w-4 h-4 ml-2 transform group-hover/btn:translate-x-1 transition-transform"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2.5}
+                            d="M9 5l7 7-7 7"
+                          />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
             </div>
 
             <div className="mt-16 flex justify-center">

@@ -12,12 +12,24 @@ export const paymentService = {
     const response = await api.post(API_ENDPOINTS.PAYMENTS_ORDER, { eventId });
     return response.data;
   },
-  createTicketOrder: async (eventId: string, amount: number, selectedSeats?: string[], bookingType?: string) => {
-    const response = await api.post(API_ENDPOINTS.PAYMENTS_TICKET_ORDER, { eventId, amount, selectedSeats, bookingType });
+  createTicketOrder: async (
+    eventId: string,
+    amount: number,
+    selectedSeats?: string[],
+    bookingType?: string
+  ) => {
+    const response = await api.post(API_ENDPOINTS.PAYMENTS_TICKET_ORDER, {
+      eventId,
+      amount,
+      selectedSeats,
+      bookingType,
+    });
     return response.data;
   },
   getPriceBreakdown: async (eventId: string, amount: number) => {
-    const response = await api.get(`${API_ENDPOINTS.PAYMENTS_PRICE_BREAKDOWN}?eventId=${eventId}&amount=${amount}`);
+    const response = await api.get(
+      `${API_ENDPOINTS.PAYMENTS_PRICE_BREAKDOWN}?eventId=${eventId}&amount=${amount}`
+    );
     return response.data;
   },
   getMyBookings: async () => {
@@ -25,7 +37,9 @@ export const paymentService = {
     return response.data;
   },
   getManagerBookings: async (page: number = 1, limit: number = 10) => {
-    const response = await api.get(`${API_ENDPOINTS.PAYMENTS_MANAGER_BOOKINGS}?page=${page}&limit=${limit}`);
+    const response = await api.get(
+      `${API_ENDPOINTS.PAYMENTS_MANAGER_BOOKINGS}?page=${page}&limit=${limit}`
+    );
     return response.data;
   },
 
@@ -54,7 +68,12 @@ export const paymentService = {
     return response.data;
   },
 
-  openRazorpayCheckout: (orderData: any, eventId: string, onSuccess: () => void, onError: (err: any) => void) => {
+  openRazorpayCheckout: (
+    orderData: any,
+    eventId: string,
+    onSuccess: () => void,
+    onError: (err: any) => void
+  ) => {
     const options = {
       key: import.meta.env.VITE_RAZORPAY_KEY_ID,
       amount: orderData.amount,
@@ -96,7 +115,12 @@ export const paymentService = {
     rzp.open();
   },
 
-  openRazorpaySubscriptionCheckout: (orderData: any, planId: string, onSuccess: () => void, onError: (err: any) => void) => {
+  openRazorpaySubscriptionCheckout: (
+    orderData: any,
+    planId: string,
+    onSuccess: () => void,
+    onError: (err: any) => void
+  ) => {
     const options = {
       key: import.meta.env.VITE_RAZORPAY_KEY_ID,
       amount: orderData.amount,

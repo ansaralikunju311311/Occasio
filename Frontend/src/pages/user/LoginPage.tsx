@@ -30,7 +30,14 @@ const LoginPage = () => {
         toast.error('Something went wrong');
       }
     }
-  }, [loginMutation.isSuccess, loginMutation.isError, loginMutation.data, loginMutation.error, dispatch, navigate]);
+  }, [
+    loginMutation.isSuccess,
+    loginMutation.isError,
+    loginMutation.data,
+    loginMutation.error,
+    dispatch,
+    navigate,
+  ]);
 
   const {
     register,

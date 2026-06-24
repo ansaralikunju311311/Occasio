@@ -12,9 +12,7 @@ export const usePendingManagers = (params?: any) => {
   return useQuery({
     queryKey: ['pendingManagers', params],
     queryFn: () =>
-      adminService
-        .getUsers({ ...params, applyingupgrade: 'PENDING' })
-        .then((res) => res.data),
+      adminService.getUsers({ ...params, applyingupgrade: 'PENDING' }).then((res) => res.data),
   });
 };
 
@@ -38,26 +36,22 @@ export const useEventManagers = (params?: any) => {
   return useQuery({
     queryKey: ['adminManagers', params],
     queryFn: () =>
-      adminService
-        .getUsers({ ...params, role: 'EVENT_MANAGER' })
-        .then((res) => res.data),
+      adminService.getUsers({ ...params, role: 'EVENT_MANAGER' }).then((res) => res.data),
   });
 };
 
 export const useAllUsers = (params?: any) => {
   return useQuery({
     queryKey: ['adminUsers', params],
-    queryFn: () =>
-      adminService
-        .getUsers({ ...params, role: 'USER' })
-        .then((res) => res.data),
+    queryFn: () => adminService.getUsers({ ...params, role: 'USER' }).then((res) => res.data),
   });
 };
 
 export const useAdminManagerDetails = (id: string, email?: string) => {
   return useQuery({
     queryKey: ['adminManager', id],
-    queryFn: () => adminService.getManagerDetails(id).then((res) => ({ ...res.data, authEmail: email })),
+    queryFn: () =>
+      adminService.getManagerDetails(id).then((res) => ({ ...res.data, authEmail: email })),
     enabled: !!id,
   });
 };
@@ -65,7 +59,8 @@ export const useAdminManagerDetails = (id: string, email?: string) => {
 export const useBlockUser = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, status }: { id: string; status: string }) => adminService.blockUnblockUser(id, status),
+    mutationFn: ({ id, status }: { id: string; status: string }) =>
+      adminService.blockUnblockUser(id, status),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['adminUsers'] });
       queryClient.invalidateQueries({ queryKey: ['adminManagers'] });
@@ -88,7 +83,8 @@ export const useApproveManager = () => {
 export const useRejectManager = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, reason }: { id: string; reason: string }) => adminService.rejectManager(id, reason),
+    mutationFn: ({ id, reason }: { id: string; reason: string }) =>
+      adminService.rejectManager(id, reason),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['adminUsers'] });
       queryClient.invalidateQueries({ queryKey: ['pendingManagers'] });

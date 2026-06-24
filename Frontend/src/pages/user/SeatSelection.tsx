@@ -21,7 +21,6 @@ interface GroupedBlock {
   rows: { rowNumber: number; seats: Seat[] }[];
 }
 
-
 const groupSeats = (existingSeats: Seat[], layoutBlocks: any[] = []): GroupedBlock[] => {
   const busySeatMap = new Map<string, Seat>();
   for (const s of existingSeats) {
@@ -51,7 +50,7 @@ const groupSeats = (existingSeats: Seat[], layoutBlocks: any[] = []): GroupedBlo
           } else {
             const seatNumber = `${trimmedBlockName}-${rowNumber}-${c}`;
             seats.push({
-              id: `v-${key}`, 
+              id: `v-${key}`,
               block: trimmedBlockName,
               row: rowNumber,
               column: c,
@@ -78,7 +77,6 @@ const groupSeats = (existingSeats: Seat[], layoutBlocks: any[] = []): GroupedBlo
   return blocks;
 };
 
-
 interface SeatBtnProps {
   seat: Seat;
   isSelected: boolean;
@@ -95,14 +93,24 @@ const SeatBtn = ({ seat, isSelected, onClick }: SeatBtnProps) => {
     cls = 'bg-gray-200 border-gray-200 text-gray-400 cursor-not-allowed';
     content = (
       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M6 18L18 6M6 6l12 12"
+        />
       </svg>
     );
   } else if (seat.status === 'HELD') {
     cls = 'bg-amber-50 border-amber-400 text-amber-600 cursor-not-allowed';
     content = (
       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+        />
       </svg>
     );
   } else if (isSelected) {
@@ -134,7 +142,6 @@ const SeatBtn = ({ seat, isSelected, onClick }: SeatBtnProps) => {
     </button>
   );
 };
-
 
 interface BlockSectionProps {
   block: GroupedBlock;
@@ -219,7 +226,12 @@ const Legend = () => {
       cls: 'border-amber-400 bg-amber-50 text-amber-600',
       icon: (
         <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+          />
         </svg>
       ),
     },
@@ -228,7 +240,12 @@ const Legend = () => {
       cls: 'border-gray-200 bg-gray-200 text-gray-400',
       icon: (
         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M6 18L18 6M6 6l12 12"
+          />
         </svg>
       ),
     },
@@ -248,7 +265,6 @@ const Legend = () => {
   );
 };
 
-
 const Stage = () => (
   <div className="flex flex-col items-center mt-10 mb-2">
     <div className="w-[60%] h-10 rounded-b-[50%] bg-linear-to-b from-gray-200 to-gray-100 border border-gray-200 flex items-center justify-center">
@@ -257,8 +273,15 @@ const Stage = () => (
   </div>
 );
 
-
-const OnlinePassCard = ({ price, maxSlots, bookedSlots }: { price: number; maxSlots?: number; bookedSlots?: number }) => {
+const OnlinePassCard = ({
+  price,
+  maxSlots,
+  bookedSlots,
+}: {
+  price: number;
+  maxSlots?: number;
+  bookedSlots?: number;
+}) => {
   const max = maxSlots || 0;
   const booked = bookedSlots || 0;
   const remaining = Math.max(0, max - booked);
@@ -287,7 +310,9 @@ const OnlinePassCard = ({ price, maxSlots, bookedSlots }: { price: number; maxSl
       </p>
 
       {max > 0 && (
-        <div className={`px-4 py-2 mb-6 rounded-lg font-bold text-sm ${isFull ? 'bg-red-50 text-red-500' : 'bg-emerald-50 text-emerald-600'}`}>
+        <div
+          className={`px-4 py-2 mb-6 rounded-lg font-bold text-sm ${isFull ? 'bg-red-50 text-red-500' : 'bg-emerald-50 text-emerald-600'}`}
+        >
           {isFull ? 'Sold Out' : `${remaining} Slots Remaining`}
         </div>
       )}
@@ -299,7 +324,6 @@ const OnlinePassCard = ({ price, maxSlots, bookedSlots }: { price: number; maxSl
     </div>
   );
 };
-
 
 const SeatSelection = () => {
   const { id } = useParams();
@@ -337,7 +361,9 @@ const SeatSelection = () => {
 
   const selectedSeatDetails = useMemo(() => {
     const all = groupedBlocks.flatMap((b) => b.rows.flatMap((r) => r.seats));
-    return selectedSeats.map((sNum) => all.find((s) => s.seatNumber === sNum)).filter(Boolean) as Seat[];
+    return selectedSeats
+      .map((sNum) => all.find((s) => s.seatNumber === sNum))
+      .filter(Boolean) as Seat[];
   }, [selectedSeats, groupedBlocks]);
 
   const isOnlineMode = event?.eventType === 'ONLINE' || bookingType === 'online';
@@ -370,12 +396,14 @@ const SeatSelection = () => {
       // Pass the seatNumbers to the backend to lock them
       await bookingService.lockSeats(event.id, selectedSeats);
       const lockExpiresAt = new Date().getTime() + 5 * 60 * 1000;
-      
+
       navigate(`/checkout/${event.id}`, {
         state: { selectedSeats, bookingType: 'physical', totalPrice, lockExpiresAt },
       });
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to lock seats. Some seats may have been taken.');
+      toast.error(
+        error.response?.data?.message || 'Failed to lock seats. Some seats may have been taken.'
+      );
     } finally {
       setIsLocking(false);
     }
@@ -469,7 +497,11 @@ const SeatSelection = () => {
                 <Legend />
               </div>
             ) : (
-              <OnlinePassCard price={event.price ?? 0} maxSlots={maxOnlineSlots} bookedSlots={bookedOnlineSlots} />
+              <OnlinePassCard
+                price={event.price ?? 0}
+                maxSlots={maxOnlineSlots}
+                bookedSlots={bookedOnlineSlots}
+              />
             )}
           </div>
 
