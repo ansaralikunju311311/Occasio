@@ -2,8 +2,6 @@
 import type { IManagerSubscriptionRepository } from '../../../domain/repositories/imanager-subscription.repository';
 import { ManagerSubscription } from '../../../domain/entities/manager-subscription.entity';
 import { ManagerSubscriptionModel } from '../../database/model/manager-subscription.model';
-import type { PlanType } from '../../../common/enums/plan-enum';
-import type { ManagerPlan } from '../../../common/enums/manager-plan.enum';
 
 export class ManagerSubscriptionRepository implements IManagerSubscriptionRepository {
   async create(
@@ -14,7 +12,7 @@ export class ManagerSubscriptionRepository implements IManagerSubscriptionReposi
       [
         {
           userId: subscription.userId as any,
-          plan: subscription.plan as unknown as PlanType,
+          plan: subscription.plan,
           status: subscription.status,
           eventLimit: subscription.eventLimit,
           eventsUsed: subscription.eventsUsed,
@@ -44,9 +42,6 @@ export class ManagerSubscriptionRepository implements IManagerSubscriptionReposi
     session?: any,
   ): Promise<ManagerSubscription | null> {
     const mappedUpdateData: any = { ...updateData };
-    if (updateData.plan !== undefined) {
-      mappedUpdateData.plan = updateData.plan as unknown as PlanType;
-    }
     const doc = await ManagerSubscriptionModel.findByIdAndUpdate(
       id,
       mappedUpdateData,
@@ -59,7 +54,7 @@ export class ManagerSubscriptionRepository implements IManagerSubscriptionReposi
     return new ManagerSubscription(
       doc._id.toString(),
       doc.userId.toString(),
-      doc.plan as unknown as ManagerPlan,
+      doc.plan,
       doc.status,
       doc.eventLimit,
       doc.eventsUsed,
@@ -70,3 +65,4 @@ export class ManagerSubscriptionRepository implements IManagerSubscriptionReposi
     );
   }
 }
+

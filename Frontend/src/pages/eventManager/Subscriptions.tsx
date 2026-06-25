@@ -88,8 +88,8 @@ const Subscriptions = () => {
     // Basic logic to determine if current plan
     const planId = plan.id || plan._id;
     const isCurrent =
-      (mySubscription && mySubscription.plan === plan.name) ||
-      (!user?.activeSubscription && plan.name === 'FREE');
+      (mySubscription && mySubscription.plan?.toUpperCase() === plan.name?.toUpperCase()) ||
+      (!user?.activeSubscription && plan.name?.toUpperCase() === 'FREE');
 
     return {
       id: planId,
@@ -100,7 +100,7 @@ const Subscriptions = () => {
       limit: plan.eventLimit === 0 ? 'Unlimited events' : `Up to ${plan.eventLimit} events/month`,
       description: `Get ${plan.eventLimit === 0 ? 'unlimited' : plan.eventLimit} events per month with a low ${plan.commissionPercentage}% commission rate.`,
       features: plan.features,
-      color: plan.name === 'PRO' ? 'teal' : plan.name === 'ELITE' ? 'indigo' : 'slate',
+      color: plan.name?.toUpperCase() === 'PRO' ? 'teal' : plan.name?.toUpperCase() === 'ELITE' ? 'indigo' : 'slate',
       buttonText:
         user?.role === 'USER'
           ? 'Upgrade to Event Manager'
@@ -108,8 +108,9 @@ const Subscriptions = () => {
             ? 'Current Plan'
             : `Upgrade to ${plan.name}`,
       isCurrent: user?.role === 'USER' ? false : isCurrent,
-      popular: plan.name === 'PRO',
+      popular: plan.name?.toUpperCase() === 'PRO',
     };
+
   });
 
   return (
@@ -264,8 +265,9 @@ const Subscriptions = () => {
                           : 'bg-slate-500'
                     }`}
                     style={{
-                      width: plan.name === 'Free' ? '30%' : plan.name === 'Pro' ? '60%' : '90%',
+                      width: plan.name?.toUpperCase() === 'FREE' ? '30%' : plan.name?.toUpperCase() === 'PRO' ? '60%' : '90%',
                     }}
+
                   ></div>
                 </div>
                 <div className="flex justify-between items-center">

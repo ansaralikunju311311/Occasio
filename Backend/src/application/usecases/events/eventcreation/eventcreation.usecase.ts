@@ -11,8 +11,11 @@ import { normalizeCoordinates } from '../../../../common/utils/geo.utils';
 import type { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
 import type { ISubscriptionRepository } from '../../../../domain/repositories/subscription/subscription.repository.interface';
 import type { IManagerSubscriptionRepository } from '../../../../domain/repositories/imanager-subscription.repository';
-import { ManagerPlan } from '../../../../common/enums/manager-plan.enum';
 import type { ManagerSubscription } from '../../../../domain/entities/manager-subscription.entity';
+
+
+
+
 
 import type { IEventCreationUseCase } from './eventcreation.usecase.interface';
 
@@ -85,9 +88,10 @@ export class EventCretionUseCase implements IEventCreationUseCase {
       }
 
       let status = EventStatus.DRAFT;
-      if (activeSub && activeSub.plan !== ManagerPlan.FREE) {
+      if (activeSub && activeSub.plan.toUpperCase() !== 'FREE') {
         status = EventStatus.LIVE;
       }
+
 
       let location = data.location;
 

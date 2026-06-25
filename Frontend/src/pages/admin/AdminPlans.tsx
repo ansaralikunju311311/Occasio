@@ -49,7 +49,11 @@ const AdminPlans = () => {
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
+    if (!formData.name || !formData.name.trim()) {
+      newErrors.name = 'Plan name is required';
+    }
     if (formData.price < 0) newErrors.price = 'Price cannot be negative';
+
     if (formData.eventLimit <= 0) newErrors.eventLimit = 'Event limit must be at least 1';
     if (formData.commissionPercentage < 0 || formData.commissionPercentage > 100) {
       newErrors.commissionPercentage = 'Commission must be between 0 and 100';
@@ -167,15 +171,20 @@ const AdminPlans = () => {
 
       <div className="bg-[#0a0f16] border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
         <Table
+          tableClassName="w-full text-left border-collapse"
+          theadClassName="bg-slate-900/60 border-b border-slate-800"
+          trHeadClassName="text-slate-400 text-xs uppercase tracking-wider font-semibold"
+          tbodyClassName="divide-y divide-slate-800/60"
           columns={[
-            { header: 'Plan Name' },
-            { header: 'Price' },
-            { header: 'Event Limit' },
-            { header: 'Commission' },
-            { header: 'Status' },
-            { header: 'Actions', className: 'text-right' },
+            { header: 'Plan Name', className: 'px-6 py-4' },
+            { header: 'Price', className: 'px-6 py-4' },
+            { header: 'Event Limit', className: 'px-6 py-4' },
+            { header: 'Commission', className: 'px-6 py-4' },
+            { header: 'Status', className: 'px-6 py-4' },
+            { header: 'Actions', className: 'px-6 py-4 text-right' },
           ]}
           data={plans}
+
           emptyState={
             <tr>
               <td colSpan={6} className="px-6 py-12 text-center text-slate-500">
@@ -243,16 +252,16 @@ const AdminPlans = () => {
                   <label className="text-sm font-bold text-slate-400 uppercase tracking-wider">
                     Plan Name
                   </label>
-                  <select
+                  <input
+                    type="text"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full bg-[#070b14] border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-hidden focus:border-emerald-500/50 transition-all"
-                  >
-                    <option value="FREE">FREE</option>
-                    <option value="PRO">PRO</option>
-                    <option value="ELITE">ELITE</option>
-                  </select>
+                    className={`w-full bg-[#070b14] border ${errors.name ? 'border-red-500' : 'border-slate-800'} rounded-xl px-4 py-3 text-white focus:outline-hidden focus:border-emerald-500/50 transition-all`}
+                    placeholder="e.g. GOLD"
+                  />
+                  {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
                 </div>
+
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-slate-400 uppercase tracking-wider">
                     Price (USD)

@@ -1,8 +1,8 @@
-import type { PlanType } from '../../common/enums/plan-enum';
 export interface CreatePlanDto {
-  name: PlanType;
+  name: string;
   price: number;
   eventLimit: number;
   commissionPercentage: number;
   features?: string[];
 }
+

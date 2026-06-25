@@ -3,8 +3,8 @@ import type { IUserRepository } from '../../../../domain/repositories/user.repos
 import type { IPaymentRepository } from '../../../../domain/repositories/payment/payment.repository.interface';
 import type { ISubscriptionRepository } from '../../../../domain/repositories/subscription/subscription.repository.interface';
 import type { IManagerSubscriptionRepository } from '../../../../domain/repositories/imanager-subscription.repository';
-import type { ManagerPlan } from '../../../../common/enums/manager-plan.enum';
 import { Payment } from '../../../../domain/entities/payment.entity';
+
 import { PaymentPurpose } from '../../../../common/enums/payment-purpose.enum';
 import { PaymentStatus } from '../../../../common/enums/payment-status.enum';
 import { PaymentMethod } from '../../../../common/enums/payment-method.enum';
@@ -68,9 +68,9 @@ export class VerifySubscriptionPaymentUseCase implements IVerifySubscriptionPaym
           throw new Error('You cannot downgrade to a lower tier plan.');
         }
 
-        // 1. Assign new subscription details and reset eventsUsed
-        managerSub.plan = targetPlan.name as unknown as ManagerPlan;
+        managerSub.plan = targetPlan.name;
         managerSub.eventLimit = targetPlan.eventLimit;
+
         managerSub.eventsUsed = 0;
         managerSub.startDate = new Date();
         const endDate = new Date(managerSub.startDate);

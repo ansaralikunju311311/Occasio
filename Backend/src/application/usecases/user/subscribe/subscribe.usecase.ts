@@ -1,8 +1,8 @@
 import type { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
 import type { ISubscriptionRepository } from '../../../../domain/repositories/subscription/subscription.repository.interface';
 import type { IManagerSubscriptionRepository } from '../../../../domain/repositories/imanager-subscription.repository';
-import type { ManagerPlan } from '../../../../common/enums/manager-plan.enum';
 import type { UserResponseDto } from '../../../dtos/responses/user-response.dto';
+
 import { userMapper } from '../../../../common/mappers/user.mapper';
 
 import type { ISubscribeUseCase } from './subscribe.usecase.interface';
@@ -44,8 +44,9 @@ export class SubscribeUseCase implements ISubscribeUseCase {
           throw new Error('You cannot downgrade to a lower tier plan.');
         }
 
-        managerSub.plan = plan.name as unknown as ManagerPlan;
+        managerSub.plan = plan.name;
         managerSub.eventLimit = plan.eventLimit;
+
         managerSub.eventsUsed = 0;
         managerSub.startDate = new Date();
         const endDate = new Date(managerSub.startDate);

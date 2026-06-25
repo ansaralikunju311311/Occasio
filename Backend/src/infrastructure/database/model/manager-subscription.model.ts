@@ -1,12 +1,11 @@
 import type { Document } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
 
-import { PlanType } from '../../../common/enums/plan-enum';
 import { ManagerSubscriptionStatus } from '../../../common/enums/manager-subscription-status.enum';
 
 export interface IManagerSubscriptionDocument extends Document {
   userId: mongoose.Types.ObjectId;
-  plan: PlanType;
+  plan: string;
   status: ManagerSubscriptionStatus;
   eventLimit: number;
   eventsUsed: number;
@@ -23,9 +22,9 @@ const managerSubscriptionSchema = new Schema<IManagerSubscriptionDocument>(
     },
     plan: {
       type: String,
-      enum: Object.values(PlanType),
       required: true,
     },
+
     status: {
       type: String,
       enum: Object.values(ManagerSubscriptionStatus),

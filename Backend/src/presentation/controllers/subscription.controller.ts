@@ -2,7 +2,6 @@ import type { Request, Response } from 'express';
 
 import { HttpStatus } from '../../common/constants/http-status';
 import { catchAsync } from '../../common/utils/catchAsync';
-import type { PlanType } from '../../common/enums/plan-enum';
 import type { CreatePlanDto } from '../../application/dtos/createplan.dto';
 import type { ICreatePlanUseCase } from '../../application/usecases/subscription/createPlan/createplan.usecase.interface';
 import type { IGetPlansUseCase } from '../../application/usecases/subscription/getPlan/getplan.usecase.interface';
@@ -18,7 +17,7 @@ export class PlanController {
 
   createPlans = catchAsync(async (req: Request, res: Response) => {
     const dto: CreatePlanDto = {
-      name: req.body.name as PlanType,
+      name: String(req.body.name),
       price: Number(req.body.price),
       eventLimit: Number(req.body.eventLimit),
       commissionPercentage: Number(req.body.commissionPercentage),
@@ -39,8 +38,9 @@ export class PlanController {
     const id = req.params.id as string;
     const dto: Partial<CreatePlanDto> = {};
     if (req.body.name !== undefined) {
-      dto.name = req.body.name as PlanType;
+      dto.name = String(req.body.name);
     }
+
     if (req.body.price !== undefined) {
       dto.price = Number(req.body.price);
     }

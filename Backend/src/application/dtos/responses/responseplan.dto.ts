@@ -1,7 +1,6 @@
-import type { PlanType } from '../../../common/enums/plan-enum';
 export interface ResponsePlanDto {
   id: string;
-  name: PlanType;
+  name: string;
   price: number;
   eventLimit: number;
   commissionPercentage: number;
@@ -10,3 +9,4 @@ export interface ResponsePlanDto {
   createdAt: Date;
   updatedAt: Date;
 }
+

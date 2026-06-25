@@ -1,10 +1,8 @@
 import type { Document } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
 
-import { PlanType } from '../../../../common/enums/plan-enum';
-
 export interface IPlanDocument extends Document {
-  name: PlanType;
+  name: string;
   price: number;
   eventLimit: number;
   commissionPercentage: number;
@@ -20,8 +18,8 @@ const PlanSchema = new Schema<IPlanDocument>(
       type: String,
       required: true,
       unique: true,
-      enum: Object.values(PlanType),
     },
+
     price: {
       type: Number,
       required: true,

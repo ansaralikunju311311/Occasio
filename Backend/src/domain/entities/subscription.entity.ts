@@ -1,9 +1,8 @@
-import type { PlanType } from '../../common/enums/plan-enum';
 export class Subscription {
   constructor(
     public readonly id: string | null,
 
-    public name: PlanType,
+    public name: string,
     public price: number,
     public eventLimit: number,
     public commissionPercentage: number,
@@ -13,3 +12,4 @@ export class Subscription {
     public updatedAt?: Date,
   ) {}
 }
+

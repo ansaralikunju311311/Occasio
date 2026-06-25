@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import HomeButton from '../../components/common/HomeButton';
 import { paymentService } from '../../services/payment.service';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
@@ -31,6 +31,9 @@ const UserBookings = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const isDashboard = pathname.startsWith('/eventmanager');
+
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -54,8 +57,10 @@ const UserBookings = () => {
   if (loading) return <LoadingSpinner />;
 
   return (
-    <div className="animate-fade-in-up">
-      <div className="mb-8">
+    <div className={isDashboard ? "animate-fade-in-up" : "min-h-screen bg-slate-950 pt-28 pb-16 px-6 text-slate-100 animate-fade-in-up"}>
+      <div className={isDashboard ? "" : "max-w-7xl mx-auto"}>
+        <div className="mb-8">
+
         <h1 className="text-3xl font-bold text-white tracking-tight">
           My <span className="text-purple-400">Bookings</span>
         </h1>
@@ -223,7 +228,11 @@ const UserBookings = () => {
         </div>
       )}
     </div>
+  </div>
+
+
   );
 };
 
 export default UserBookings;
+

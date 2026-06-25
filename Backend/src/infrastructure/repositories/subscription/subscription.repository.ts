@@ -45,8 +45,11 @@ export class SubscriptionRepository
   }
 
   async findPlanByName(name: string): Promise<Subscription | null> {
-    const plan = await this.model.findOne({ name });
+    const plan = await this.model.findOne({
+      name: { $regex: `^${name}$`, $options: 'i' },
+    });
     if (!plan) {
+
       return null;
     }
     return new Subscription(
