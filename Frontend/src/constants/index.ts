@@ -30,6 +30,7 @@ export const API_ENDPOINTS = {
   PAYMENTS_VERIFY: '/payments/verify',
   PAYMENTS_SUBSCRIPTION_ORDER: '/payments/subscription-order',
   PAYMENTS_VERIFY_SUBSCRIPTION: '/payments/verify-subscription',
+  PAYMENTS_WALLET_PAY: '/payments/wallet-pay',
 
   // Bookings Locking / Lock seats
   BOOKINGS_LOCK_SEATS: '/bookings/lock-seats',
@@ -46,13 +47,14 @@ export const API_ENDPOINTS = {
   ADMIN_APPROVE_MANAGER: (id: string) => `/admin/approval/${id}`,
   ADMIN_REJECT_MANAGER: (id: string) => `/admin/rejection/${id}`,
   ADMIN_PAYMENTS: '/admin/payments',
+  ADMIN_DASHBOARD_STATS: '/admin/dashboard-stats',
 
-  // Subscription Plans
   PLANS_GET: '/plans/getplans',
   PLANS_CREATE: '/plans/createplans',
   PLANS_UPDATE: (id: string) => `/plans/updateplan/${id}`,
+  EVENTS_MANAGER_STATS: '/events/manager-stats',
 
-  // User
+
   USER_PROFILE: '/user/profile',
   USER_UPGRADE_ROLE: '/user/upgraderole',
   USER_REAPPLY: '/user/reapply',

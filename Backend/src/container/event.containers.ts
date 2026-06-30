@@ -10,6 +10,7 @@ import { BookingRepository } from '../infrastructure/repositories/booking/bookin
 import { UserRepository } from '../infrastructure/repositories/user/user.repository';
 import { SubscriptionRepository } from '../infrastructure/repositories/subscription/subscription.repository';
 import { ManagerSubscriptionRepository } from '../infrastructure/repositories/manager-subscription/manager-subscription.repository';
+import { PaymentRepository } from '../infrastructure/repositories/payment/payment.repository';
 
 export const MakeEventController = () => {
   const eventRepository = new EventRepository();
@@ -17,6 +18,7 @@ export const MakeEventController = () => {
   const userRepository = new UserRepository();
   const subscriptionRepository = new SubscriptionRepository();
   const managerSubscriptionRepository = new ManagerSubscriptionRepository();
+  const paymentRepository = new PaymentRepository();
 
   const eventCretionUseCase = new EventCretionUseCase(
     eventRepository,
@@ -32,7 +34,12 @@ export const MakeEventController = () => {
     bookingRepository,
   );
   const updateEventsUseCase = new UpdateEventUseCase(eventRepository);
-  const deleteEventUseCase = new DeleteEventUseCase(eventRepository);
+  const deleteEventUseCase = new DeleteEventUseCase(
+    eventRepository,
+    bookingRepository,
+    paymentRepository,
+    userRepository,
+  );
 
   return new EventController(
     eventCretionUseCase,

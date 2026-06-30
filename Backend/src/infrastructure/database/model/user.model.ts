@@ -16,6 +16,7 @@ export interface IUserDocument extends Document {
   reapplyAt: Date | null;
   activeSubscription?: mongoose.Types.ObjectId;
   eventsCreated: number;
+  walletBalance: number;
 }
 
 const userSchema = new Schema<IUserDocument>(
@@ -81,6 +82,10 @@ const userSchema = new Schema<IUserDocument>(
       default: null,
     },
     eventsCreated: {
+      type: Number,
+      default: 0,
+    },
+    walletBalance: {
       type: Number,
       default: 0,
     },

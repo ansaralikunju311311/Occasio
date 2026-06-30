@@ -6,6 +6,7 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { toast } from 'sonner';
 import { APP_MESSAGES } from '../../constants';
 import { Table } from '../../components/common/Table';
+import { Pagination } from '../../components/common/Pagination';
 
 interface Booking {
   id: string;
@@ -30,18 +31,26 @@ interface Booking {
 const UserBookings = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [metadata, setMetadata] = useState<any>(null);
+  const itemsPerPage = 10;
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const isDashboard = pathname.startsWith('/eventmanager');
 
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   useEffect(() => {
     const fetchBookings = async () => {
       try {
         setLoading(true);
-        const res = await paymentService.getMyBookings();
+        const res = await paymentService.getMyBookings(currentPage, itemsPerPage);
         if (res.success) {
           setBookings(res.data || []);
+          setMetadata(res.metadata);
         }
       } catch (err: any) {
         console.error('Failed to fetch bookings:', err);
@@ -52,7 +61,7 @@ const UserBookings = () => {
     };
 
     fetchBookings();
-  }, []);
+  }, [currentPage]);
 
   if (loading) return <LoadingSpinner />;
 
@@ -225,6 +234,15 @@ const UserBookings = () => {
               </tr>
             )}
           />
+          {metadata && metadata.total > 0 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={metadata.totalPages}
+              totalItems={metadata.total}
+              itemsPerPage={itemsPerPage}
+              onPageChange={handlePageChange}
+            />
+          )}
         </div>
       )}
     </div>

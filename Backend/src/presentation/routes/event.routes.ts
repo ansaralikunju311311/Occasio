@@ -52,4 +52,12 @@ router.delete(
   controller.deleteEvent.bind(controller),
 );
 
+router.get(
+  ApiEndpoints.Events.ManagerStats,
+  verifyAccessToken,
+  requireRole([UserRole.EVENT_MANAGER]),
+  controller.getManagerStats.bind(controller),
+);
+
 export default router;
+

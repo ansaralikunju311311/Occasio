@@ -220,6 +220,7 @@ export class EventRepository
   }
   async deleteEvent(id: string): Promise<boolean> {
     const result = await this.model.findByIdAndUpdate(id, {
+      status: EventStatus.CANCELED,
       isDeleted: true,
       deletedAt: new Date(),
     });

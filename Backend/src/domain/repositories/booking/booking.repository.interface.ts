@@ -22,4 +22,5 @@ export interface IBookingRepository {
     params: PaginationParams,
   ): Promise<PaginatedResponse<Booking>>;
   getOnlineBookedCount(eventId: string): Promise<number>;
+  findConfirmedBookingsByEventId(eventId: string): Promise<Booking[]>;
 }

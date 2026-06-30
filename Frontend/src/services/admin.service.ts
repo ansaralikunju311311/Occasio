@@ -19,4 +19,6 @@ export const adminService = {
 
   // Payments
   getPaymentHistory: (params?: any) => api.get(API_ENDPOINTS.ADMIN_PAYMENTS, { params }),
+  getDashboardStats: () => api.get(API_ENDPOINTS.ADMIN_DASHBOARD_STATS),
 };
+

@@ -11,6 +11,7 @@ import type { VerifySubscriptionPaymentDto } from '../../application/dtos/verify
 import { HttpStatus } from '../../common/constants/http-status';
 import type { IGetMyBookingUseCase } from '../../application/usecases/booking/getMybookings/getmybooking.usecase.interface';
 import type { IGetManagerBookingUseCase } from '../../application/usecases/booking/getManagerbookings/getmanagerbooking.usecase.interface';
+import type { IWalletPayUseCase } from '../../application/usecases/payment/walletPay/walletPay.usecase.interface';
 import { catchAsync } from '../../common/utils/catchAsync';
 import { AppError } from '../../common/errors/apperror';
 import { sendSuccess } from '../../common/utils/response';
@@ -24,7 +25,29 @@ export class PaymentController {
     private _verifySubscriptionPaymentUseCase: IVerifySubscriptionPaymentUseCase,
     private _getMybookingUseCase: IGetMyBookingUseCase,
     private _getManagerBookingUseCase: IGetManagerBookingUseCase,
+    private _walletPayUseCase: IWalletPayUseCase,
   ) {}
+
+  walletPay = catchAsync(
+    async (req: Request, res: Response): Promise<void> => {
+      const { eventId, amount, selectedSeats, bookingType } = req.body;
+      const userId = (req as any).user?.id || (req as any).authUser?.userId;
+
+      if (!userId) {
+        throw new AppError('Unauthorized', HttpStatus.UNAUTHORIZED);
+      }
+
+      const result = await this._walletPayUseCase.execute(
+        eventId,
+        userId,
+        amount,
+        bookingType,
+        selectedSeats,
+      );
+
+      sendSuccess(res, result, 'Tickets booked successfully using wallet balance', HttpStatus.OK, result);
+    },
+  );
 
   createSubscriptionOrder = catchAsync(
     async (req: Request, res: Response): Promise<void> => {

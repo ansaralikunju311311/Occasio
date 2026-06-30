@@ -16,5 +16,6 @@ export class User {
     public reapplyAt: Date | null,
     public activeSubscription?: string | null,
     public eventsCreated: number = 0,
+    public walletBalance: number = 0,
   ) {}
 }

@@ -69,6 +69,18 @@ const Profile = () => {
           </div>
         </div>
 
+        {/* Wallet Balance Card */}
+        <div className="mb-8 p-6 bg-gradient-to-br from-indigo-900/40 via-purple-900/20 to-slate-900/40 border border-indigo-500/20 rounded-2xl flex items-center justify-between shadow-lg backdrop-blur-md">
+          <div className="space-y-1">
+            <span className="text-xs font-bold text-indigo-400 uppercase tracking-wider">My Digital Wallet</span>
+            <h3 className="text-3xl font-black text-white">₹{user?.walletBalance ?? 0}</h3>
+            <p className="text-[10px] text-slate-400">Refunds are credited here automatically.</p>
+          </div>
+          <div className="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-2xl text-indigo-400">
+            💳
+          </div>
+        </div>
+
         <div className="space-y-6">
           <div>
             <label className="block text-sm font-semibold text-slate-400 mb-2 uppercase tracking-wider">

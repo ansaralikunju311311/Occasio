@@ -6,6 +6,9 @@ import HomeButton from '../../components/common/HomeButton';
 import { useEventDetails } from '../../hooks/useEvents';
 import { paymentService } from '../../services/payment.service';
 import { bookingService } from '../../services/booking.service';
+import { useAppSelector, useAppDispatch } from '../../redux/hook';
+import { setAuth } from '../../redux/slices/authSlice';
+import { authService } from '../../services/auth.service';
 
 interface PriceBreakdown {
   commissionPercentage: number;
@@ -22,6 +25,9 @@ const Checkout = () => {
   const [breakdown, setBreakdown] = useState<PriceBreakdown | null>(null);
   const [loadingBreakdown, setLoadingBreakdown] = useState(true);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<'razorpay' | 'wallet'>('razorpay');
+  const user = useAppSelector((state) => state.auth.user);
+  const dispatch = useAppDispatch();
 
   const { selectedSeats = [], bookingType = 'physical', lockExpiresAt } = location.state || {};
   const { data: event, isLoading: loading, isError } = useEventDetails(id);
@@ -113,27 +119,68 @@ const Checkout = () => {
         return;
       }
 
-      // 1. Create Ticket Order (Backend handles Pending Booking + Razorpay Order)
-      const orderResponse = await paymentService.createTicketOrder(
-        id,
-        amountToPay,
-        selectedSeats,
-        bookingType
-      );
+      if (paymentMethod === 'wallet') {
+        if ((user?.walletBalance || 0) < amountToPay) {
+          toast.error('Insufficient wallet balance');
+          setIsPaying(false);
+          return;
+        }
 
-      // 2. Open Razorpay Checkout
-      paymentService.openRazorpayCheckout(
-        orderResponse.order,
-        id,
-        () => {
+        const response = await paymentService.walletPay({
+          eventId: id,
+          amount: amountToPay,
+          selectedSeats,
+          bookingType,
+        });
+
+        if (response.success) {
           toast.success('Payment successful! Your tickets are booked.');
+          try {
+            const meRes = await authService.me();
+            const meData = meRes.data;
+            if (meData.success && meData.data?.user) {
+              dispatch(setAuth({ user: meData.data.user }));
+            }
+          } catch (meErr) {
+            console.error('Failed to sync updated user balance:', meErr);
+          }
           navigate('/eventmanager/user-bookings');
-        },
-        (err: any) => {
-          toast.error(err.message || 'Payment failed or verification error');
+        } else {
+          toast.error(response.message || 'Wallet payment failed');
           setIsPaying(false);
         }
-      );
+      } else {
+        // 1. Create Ticket Order (Backend handles Pending Booking + Razorpay Order)
+        const orderResponse = await paymentService.createTicketOrder(
+          id,
+          amountToPay,
+          selectedSeats,
+          bookingType
+        );
+
+        // 2. Open Razorpay Checkout
+        paymentService.openRazorpayCheckout(
+          orderResponse.order,
+          id,
+          async () => {
+            toast.success('Payment successful! Your tickets are booked.');
+            try {
+              const meRes = await authService.me();
+              const meData = meRes.data;
+              if (meData.success && meData.data?.user) {
+                dispatch(setAuth({ user: meData.data.user }));
+              }
+            } catch (meErr) {
+              console.error('Failed to sync user profile:', meErr);
+            }
+            navigate('/eventmanager/user-bookings');
+          },
+          (err: any) => {
+            toast.error(err.message || 'Payment failed or verification error');
+            setIsPaying(false);
+          }
+        );
+      }
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Failed to initiate payment');
       setIsPaying(false);
@@ -224,9 +271,18 @@ const Checkout = () => {
               </div>
             </section>
 
-            <section className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-8">
+            <section className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 space-y-4">
               <h3 className="text-lg font-bold mb-4">Payment Method</h3>
-              <div className="p-4 rounded-2xl border border-indigo-500/50 bg-indigo-500/5 flex items-center justify-between">
+              
+              {/* Razorpay Option */}
+              <div 
+                onClick={() => setPaymentMethod('razorpay')}
+                className={`p-4 rounded-2xl border cursor-pointer flex items-center justify-between transition-all duration-300 ${
+                  paymentMethod === 'razorpay' 
+                    ? 'border-indigo-500/50 bg-indigo-500/5' 
+                    : 'border-slate-800 hover:border-slate-700 bg-slate-950/20'
+                }`}
+              >
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-lg bg-indigo-500/20 text-indigo-400">
                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -243,8 +299,45 @@ const Checkout = () => {
                     <p className="text-[10px] text-slate-400">Secure payment via Razorpay</p>
                   </div>
                 </div>
-                <div className="w-5 h-5 rounded-full border-4 border-indigo-500 bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]"></div>
+                <div className={`w-5 h-5 rounded-full border-4 transition-all ${
+                  paymentMethod === 'razorpay' 
+                    ? 'border-indigo-500 bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]' 
+                    : 'border-slate-700 bg-transparent'
+                }`}></div>
               </div>
+
+              {/* Wallet Option */}
+              <div 
+                onClick={() => setPaymentMethod('wallet')}
+                className={`p-4 rounded-2xl border cursor-pointer flex items-center justify-between transition-all duration-300 ${
+                  paymentMethod === 'wallet' 
+                    ? 'border-indigo-500/50 bg-indigo-500/5' 
+                    : 'border-slate-800 hover:border-slate-700 bg-slate-950/20'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center">
+                    <span className="text-xl">💳</span>
+                  </div>
+                  <div>
+                    <p className="font-bold text-sm">Occasio Wallet</p>
+                    <p className="text-[10px] text-slate-400">
+                      Balance: <span className="font-semibold text-teal-400">₹{user?.walletBalance ?? 0}</span>
+                    </p>
+                  </div>
+                </div>
+                <div className={`w-5 h-5 rounded-full border-4 transition-all ${
+                  paymentMethod === 'wallet' 
+                    ? 'border-indigo-500 bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]' 
+                    : 'border-slate-700 bg-transparent'
+                }`}></div>
+              </div>
+
+              {paymentMethod === 'wallet' && (user?.walletBalance ?? 0) < total && (
+                <p className="text-xs text-red-500 font-semibold bg-red-500/10 p-3 rounded-xl border border-red-500/20">
+                  ⚠️ Your wallet balance is insufficient to complete this purchase. Please choose another payment method.
+                </p>
+              )}
             </section>
           </div>
 
@@ -286,7 +379,7 @@ const Checkout = () => {
 
               <button
                 onClick={handlePayment}
-                disabled={isPaying}
+                disabled={isPaying || (paymentMethod === 'wallet' && (user?.walletBalance ?? 0) < total)}
                 className="w-full py-4 bg-linear-to-r from-indigo-500 to-purple-600 rounded-2xl font-black text-lg shadow-[0_20px_40px_-10px_rgba(99,102,241,0.4)] hover:shadow-[0_25px_50px_-12px_rgba(99,102,241,0.5)] active:scale-95 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isPaying ? 'Processing...' : 'Pay Now'}

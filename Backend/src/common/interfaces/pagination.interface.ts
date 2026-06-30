@@ -6,6 +6,7 @@ export interface PaginationParams {
   applyingupgrade?: string;
   eventType?: string;
   upcoming?: boolean;
+  purpose?: string;
 }
 
 export interface PaginatedResponse<T> {

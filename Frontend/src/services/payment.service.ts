@@ -26,14 +26,25 @@ export const paymentService = {
     });
     return response.data;
   },
+  walletPay: async (payload: {
+    eventId: string;
+    amount: number;
+    selectedSeats?: string[];
+    bookingType?: string;
+  }) => {
+    const response = await api.post(API_ENDPOINTS.PAYMENTS_WALLET_PAY, payload);
+    return response.data;
+  },
   getPriceBreakdown: async (eventId: string, amount: number) => {
     const response = await api.get(
       `${API_ENDPOINTS.PAYMENTS_PRICE_BREAKDOWN}?eventId=${eventId}&amount=${amount}`
     );
     return response.data;
   },
-  getMyBookings: async () => {
-    const response = await api.get(API_ENDPOINTS.PAYMENTS_MY_BOOKINGS);
+  getMyBookings: async (page: number = 1, limit: number = 10) => {
+    const response = await api.get(
+      `${API_ENDPOINTS.PAYMENTS_MY_BOOKINGS}?page=${page}&limit=${limit}`
+    );
     return response.data;
   },
   getManagerBookings: async (page: number = 1, limit: number = 10) => {

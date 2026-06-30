@@ -14,6 +14,7 @@ export interface UserResponseDto {
   reapplyAt: Date | null;
   activeSubscription?: string | null;
   eventsCreated?: number;
+  walletBalance?: number;
   createdAt?: Date;
   updatedAt?: Date;
 }

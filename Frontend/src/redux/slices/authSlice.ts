@@ -12,6 +12,7 @@ interface User {
   reapplyAt?: string | null;
   activeSubscription?: string;
   eventsCreated?: number;
+  walletBalance?: number;
 }
 
 interface AuthState {

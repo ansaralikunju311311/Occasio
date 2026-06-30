@@ -26,13 +26,14 @@ interface Payment {
 
 const AdminPayments = () => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedPurpose, setSelectedPurpose] = useState('');
   const itemsPerPage = 10;
 
   const {
     data: responseData,
     isLoading,
     error,
-  } = usePaymentHistory({ page: currentPage, limit: itemsPerPage });
+  } = usePaymentHistory({ page: currentPage, limit: itemsPerPage, purpose: selectedPurpose || undefined });
 
   const payments = responseData?.payments || [];
   const metadata = responseData?.metadata;
@@ -40,6 +41,11 @@ const AdminPayments = () => {
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handlePurposeChange = (purpose: string) => {
+    setSelectedPurpose(purpose);
+    setCurrentPage(1);
   };
 
   const getStatusBadgeColor = (status: string) => {
@@ -79,6 +85,22 @@ const AdminPayments = () => {
           <p className="text-sm text-gray-500 mt-1">
             View all transactions, including event scheduling fees, bookings, and subscriptions.
           </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <label htmlFor="purposeFilter" className="text-sm font-medium text-gray-700">
+            Filter by:
+          </label>
+          <select
+            id="purposeFilter"
+            value={selectedPurpose}
+            onChange={(e) => handlePurposeChange(e.target.value)}
+            className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-indigo-500 focus:outline-hidden focus:ring-1 focus:ring-indigo-500"
+          >
+            <option value="">All Transactions</option>
+            <option value="BOOKING">Bookings</option>
+            <option value="SUBSCRIPTION">Subscriptions</option>
+            <option value="EVENT_PUBLISH">Event Publishing</option>
+          </select>
         </div>
       </div>
 

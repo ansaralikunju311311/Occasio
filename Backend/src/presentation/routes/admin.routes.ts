@@ -65,4 +65,12 @@ router.get(
   controller.getAllPayments.bind(controller),
 );
 
+router.get(
+  ApiEndpoints.Admin.DashboardStats,
+  verifyAccessToken,
+  requireRole([UserRole.ADMIN]),
+  controller.getDashboardStats.bind(controller),
+);
+
 export default router;
+

@@ -22,6 +22,11 @@ router.post(
   verifyAccessToken,
   controller.verifyPayment,
 );
+router.post(
+  ApiEndpoints.Payments.WalletPay,
+  verifyAccessToken,
+  controller.walletPay,
+);
 router.get(
   ApiEndpoints.Payments.PriceBreakdown,
   verifyAccessToken,

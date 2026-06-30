@@ -32,8 +32,11 @@ export class PaymentRepository implements IPaymentRepository {
   async getAllPayments(
     params: PaginationParams,
   ): Promise<PaginatedResponse<PaymentResponseDto>> {
-    const { page = 1, limit = 10 } = params;
+    const { page = 1, limit = 10, purpose } = params;
     const query: any = {};
+    if (purpose) {
+      query.purpose = purpose;
+    }
 
     const skip = (page - 1) * limit;
 
@@ -108,5 +111,10 @@ export class PaymentRepository implements IPaymentRepository {
       bookingType: 'online',
       status: 'CONFIRMED',
     });
+  }
+
+  async findPaymentByBookingId(bookingId: string): Promise<Payment | null> {
+    const doc = await PaymentModel.findOne({ bookingId, paymentStatus: 'SUCCESS' });
+    return doc ? this.toEntity(doc) : null;
   }
 }

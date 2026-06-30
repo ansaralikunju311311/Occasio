@@ -175,4 +175,8 @@ export class BookingRepository implements IBookingRepository {
       status: 'CONFIRMED',
     });
   }
+  async findConfirmedBookingsByEventId(eventId: string): Promise<Booking[]> {
+    const docs = await BookingModel.find({ eventId, status: 'CONFIRMED' });
+    return docs.map((doc) => this.toEntity(doc));
+  }
 }

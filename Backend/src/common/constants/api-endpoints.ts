@@ -33,6 +33,7 @@ export const ApiEndpoints = {
     Rejection: '/rejection/:id',
     ManagerDetails: '/managerDetails/:id',
     Payments: '/payments',
+    DashboardStats: '/dashboard-stats',
   },
   Events: {
     Base: '/api/events',
@@ -43,7 +44,9 @@ export const ApiEndpoints = {
     MyEvents: '/myevents',
     Update: '/update/:id',
     Delete: '/:id',
+    ManagerStats: '/manager-stats',
   },
+
   Payments: {
     Base: '/api/payments',
     Order: '/order',
@@ -54,6 +57,7 @@ export const ApiEndpoints = {
     ManagerBookings: '/manager-bookings',
     SubscriptionOrder: '/subscription-order',
     VerifySubscription: '/verify-subscription',
+    WalletPay: '/wallet-pay',
   },
   Plans: {
     Base: '/api/plans',

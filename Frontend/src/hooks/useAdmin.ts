@@ -125,3 +125,11 @@ export const usePaymentHistory = (params?: any) => {
     queryFn: () => adminService.getPaymentHistory(params).then((res) => res.data),
   });
 };
+
+export const useAdminDashboardStats = () => {
+  return useQuery({
+    queryKey: ['adminDashboardStats'],
+    queryFn: () => adminService.getDashboardStats().then((res) => res.data),
+  });
+};
+

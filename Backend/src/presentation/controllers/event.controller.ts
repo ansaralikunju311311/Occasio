@@ -13,6 +13,10 @@ import { catchAsync } from '../../common/utils/catchAsync';
 import type { IDeleteEventUseCase } from '../../application/usecases/events/deleteevent/deleteevent.usecase.interface';
 import type { IUpdateEventUseCase } from '../../application/usecases/events/updatevent/updatevent.usecase.interface';
 import { sendSuccess } from '../../common/utils/response';
+import mongoose from 'mongoose';
+import { EventModel } from '../../infrastructure/database/model/events/event.model';
+import { BookingModel } from '../../infrastructure/database/model/booking.model';
+
 
 export class EventController {
   constructor(
@@ -161,4 +165,51 @@ export class EventController {
     const result = await this._deleteEventUseCase.execute(id);
     sendSuccess(res, result);
   });
+
+  getManagerStats = catchAsync(async (req: Request, res: Response) => {
+    const managerId = req.authUser?.userId;
+    if (!managerId) {
+      res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    const managerObjId = new mongoose.Types.ObjectId(managerId);
+
+    // Get manager events
+    const totalEvents = await EventModel.countDocuments({ createdBy: managerObjId });
+    const activeEvents = await EventModel.countDocuments({ createdBy: managerObjId, status: 'LIVE' });
+
+    // Aggregate booking counts & organizer revenue for manager's events
+    const managerEvents = await EventModel.find({ createdBy: managerObjId }, '_id');
+    const eventIds = managerEvents.map((e) => e._id);
+
+    const totalBookings = await BookingModel.countDocuments({
+      eventId: { $in: eventIds },
+      status: 'CONFIRMED',
+    });
+
+    const revenueResult = await BookingModel.aggregate([
+      { $match: { eventId: { $in: eventIds }, status: 'CONFIRMED' } },
+      { $group: { _id: null, totalRevenue: { $sum: '$organizerRevenue' } } },
+    ]);
+
+    const refundedResult = await BookingModel.aggregate([
+      { $match: { eventId: { $in: eventIds }, status: 'CANCELLED' } },
+      { $group: { _id: null, totalRefunded: { $sum: '$organizerRevenue' } } },
+    ]);
+
+    const totalRevenue = revenueResult[0]?.totalRevenue || 0;
+    const totalRefunded = refundedResult[0]?.totalRefunded || 0;
+
+    sendSuccess(res, undefined, undefined, HttpStatus.OK, {
+      stats: {
+        totalEvents,
+        activeEvents,
+        totalBookings,
+        totalRevenue: Math.round(totalRevenue),
+        totalRefunded: Math.round(totalRefunded),
+      },
+    });
+  });
 }
+

@@ -72,3 +72,11 @@ export const useDeleteEvent = () => {
     },
   });
 };
+
+export const useManagerStats = () => {
+  return useQuery({
+    queryKey: ['managerStats'],
+    queryFn: () => eventService.getManagerStats().then((res) => res.data),
+  });
+};
+

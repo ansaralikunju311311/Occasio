@@ -39,6 +39,7 @@ export class UserRepository
       applyingupgrade: user.applyingupgrade,
       rejectedAt: user.rejectedAt,
       reapplyAt: user.reapplyAt,
+      walletBalance: user.walletBalance,
     });
 
     return this.toEntity(doc);
@@ -58,6 +59,7 @@ export class UserRepository
         reapplyAt: user.reapplyAt,
         eventsCreated: user.eventsCreated,
         activeSubscription: user.activeSubscription,
+        walletBalance: user.walletBalance,
       },
       { session },
     );
@@ -88,6 +90,7 @@ export class UserRepository
           : doc.activeSubscription
         : undefined,
       doc.eventsCreated || 0,
+      doc.walletBalance || 0,
     );
   }
 }
