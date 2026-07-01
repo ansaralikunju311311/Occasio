@@ -32,9 +32,7 @@ const AdminPayments = lazy(() => import('../pages/admin/AdminPayments.tsx'));
 
 const EventManagerLayout = lazy(() => import('../layouts/EventManagerLayout.tsx'));
 const EventManagerDashboard = lazy(() => import('../pages/eventManager/EventManagerDashboard.tsx'));
-const EventManagerPlaceholder = lazy(
-  () => import('../pages/eventManager/EventManagerPlaceholder.tsx')
-);
+
 const EventManagerMyEvents = lazy(() => import('../pages/eventManager/EventManagerMyEvents.tsx'));
 const EventManagerBookings = lazy(() => import('../pages/eventManager/EventManagerBookings.tsx'));
 const CreateEvent = lazy(() => import('../pages/eventManager/CreateEvent.tsx'));
@@ -49,6 +47,7 @@ const Settings = lazy(() => import('../pages/user/Settings.tsx'));
 const BecomeAManager = lazy(() => import('../pages/user/BecomeAManager.tsx'));
 const SeatSelection = lazy(() => import('../pages/user/SeatSelection.tsx'));
 const Checkout = lazy(() => import('../pages/user/Checkout.tsx'));
+const UserWallet = lazy(() => import('../pages/user/UserWallet.tsx'));
 
 import ManagerGuard from '../components/common/ManagerGuard.tsx';
 import ProtectedRoute from '../components/common/ProtectedRoute.tsx';
@@ -220,11 +219,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'wallet',
-        element: (
-          <ManagerGuard>
-            <EventManagerPlaceholder />
-          </ManagerGuard>
-        ),
+        element: <UserWallet />,
       },
       {
         path: 'subscriptions',

@@ -15,6 +15,7 @@ import { ManagerSubscriptionRepository } from '../infrastructure/repositories/ma
 import { GetMyBookingUseCase } from '../application/usecases/booking/getMybookings/gertmybooking.usecase';
 import { GetManagerBookingUseCase } from '../application/usecases/booking/getManagerbookings/getmanagerbooking.usecase';
 import { WalletPayUseCase } from '../application/usecases/payment/walletPay/walletPay.usecase';
+import { GetWalletHistoryUseCase } from '../application/usecases/payment/getWalletHistory/getWalletHistory.usecase';
 
 export const MakePaymentController = () => {
   const paymentGateway = new RazorpayGateway();
@@ -76,6 +77,8 @@ export const MakePaymentController = () => {
     paymentRepository,
   );
 
+  const getWalletHistoryUseCase = new GetWalletHistoryUseCase(paymentRepository);
+
   return new PaymentController(
     createOrderUseCase,
     verifyPaymentUseCase,
@@ -85,5 +88,6 @@ export const MakePaymentController = () => {
     getMybookingUseCase,
     getManagerBookingUseCase,
     walletPayUseCase,
+    getWalletHistoryUseCase,
   );
 };

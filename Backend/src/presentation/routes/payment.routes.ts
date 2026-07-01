@@ -28,6 +28,11 @@ router.post(
   controller.walletPay,
 );
 router.get(
+  ApiEndpoints.Payments.WalletHistory,
+  verifyAccessToken,
+  controller.getWalletHistory,
+);
+router.get(
   ApiEndpoints.Payments.PriceBreakdown,
   verifyAccessToken,
   controller.getPriceBreakdown,

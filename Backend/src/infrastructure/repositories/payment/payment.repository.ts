@@ -117,4 +117,66 @@ export class PaymentRepository implements IPaymentRepository {
     const doc = await PaymentModel.findOne({ bookingId, paymentStatus: 'SUCCESS' });
     return doc ? this.toEntity(doc) : null;
   }
+
+  async getWalletHistory(
+    userId: string,
+    page: number,
+    limit: number,
+  ): Promise<PaginatedResponse<PaymentResponseDto>> {
+    const query: any = {
+      userId,
+      $or: [
+        { paymentMethod: 'WALLET' },
+        { purpose: 'REFUND' },
+      ],
+    };
+
+    const skip = (page - 1) * limit;
+
+    const [payments, total] = await Promise.all([
+      PaymentModel.find(query)
+        .populate('userId', 'name email picture')
+        .populate('eventId', 'title')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .exec(),
+      PaymentModel.countDocuments(query).exec(),
+    ]);
+
+    const mappedData: PaymentResponseDto[] = payments.map((doc: any) => ({
+      id: doc._id.toString(),
+      userId: {
+        id: doc.userId?._id?.toString() ?? '',
+        name: doc.userId?.name ?? '',
+        email: doc.userId?.email ?? '',
+        picture: doc.userId?.picture,
+      },
+      purpose: doc.purpose,
+      amount: doc.amount,
+      currency: doc.currency,
+      paymentMethod: doc.paymentMethod,
+      paymentStatus: doc.paymentStatus,
+      transactionId: doc.transactionId,
+      eventId: doc.eventId
+        ? {
+            id: doc.eventId._id.toString(),
+            title: doc.eventId.title,
+          }
+        : undefined,
+      bookingId: doc.bookingId?.toString(),
+      paidAt: doc.paidAt,
+      createdAt: doc.createdAt,
+    }));
+
+    return {
+      data: mappedData,
+      metadata: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
 }

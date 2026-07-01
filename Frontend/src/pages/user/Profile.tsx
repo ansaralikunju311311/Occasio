@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../../redux/hook';
 import ChangePasswordModal from '../../components/user/ChangePasswordModal';
 import HomeButton from '../../components/common/HomeButton';
@@ -69,17 +70,21 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* Wallet Balance Card */}
-        <div className="mb-8 p-6 bg-gradient-to-br from-indigo-900/40 via-purple-900/20 to-slate-900/40 border border-indigo-500/20 rounded-2xl flex items-center justify-between shadow-lg backdrop-blur-md">
+        <Link
+          to="/eventmanager/wallet"
+          className="mb-8 p-6 bg-gradient-to-br from-indigo-900/40 via-purple-900/20 to-slate-900/40 border border-indigo-500/20 rounded-2xl flex items-center justify-between shadow-lg backdrop-blur-md hover:scale-[1.01] transition-all duration-300 group block"
+        >
           <div className="space-y-1">
             <span className="text-xs font-bold text-indigo-400 uppercase tracking-wider">My Digital Wallet</span>
             <h3 className="text-3xl font-black text-white">₹{user?.walletBalance ?? 0}</h3>
-            <p className="text-[10px] text-slate-400">Refunds are credited here automatically.</p>
+            <p className="text-[10px] text-slate-400 group-hover:text-indigo-300 transition-colors">
+              Refunds are credited here automatically. Click to view history.
+            </p>
           </div>
-          <div className="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-2xl text-indigo-400">
+          <div className="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-2xl text-indigo-400 group-hover:bg-indigo-500/20 transition-all duration-300">
             💳
           </div>
-        </div>
+        </Link>
 
         <div className="space-y-6">
           <div>

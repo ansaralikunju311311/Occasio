@@ -58,6 +58,7 @@ export const ApiEndpoints = {
     SubscriptionOrder: '/subscription-order',
     VerifySubscription: '/verify-subscription',
     WalletPay: '/wallet-pay',
+    WalletHistory: '/wallet-history',
   },
   Plans: {
     Base: '/api/plans',

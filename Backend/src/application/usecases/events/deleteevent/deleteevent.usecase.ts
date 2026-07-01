@@ -5,6 +5,7 @@ import type { IUserRepository } from '../../../../domain/repositories/user.repos
 import type { IDeleteEventUseCase } from './deleteevent.usecase.interface';
 import { razorpayInstance } from '../../../../infrastructure/config/razorpay';
 import { logger } from '../../../../common/logger/logger';
+import { Payment } from '../../../../domain/entities/payment.entity';
 
 export class DeleteEventUseCase implements IDeleteEventUseCase {
   constructor(
@@ -59,6 +60,20 @@ export class DeleteEventUseCase implements IDeleteEventUseCase {
         if (user) {
           user.walletBalance = (user.walletBalance || 0) + booking.totalAmount;
           await this._userRepository.updateUser(user);
+          const refundPayment = new Payment(
+            null,
+            booking.userId,
+            'REFUND' as any,
+            booking.totalAmount,
+            'INR',
+            'WALLET',
+            'SUCCESS' as any,
+            `refund_${booking.id}_${Date.now()}`,
+            id,
+            booking.id ?? undefined,
+            new Date(),
+          );
+          await this._paymentRepository.savePayment(refundPayment);
           logger.info(`Credited ₹${booking.totalAmount} to user ${user.email}'s wallet. New balance: ₹${user.walletBalance}`);
         } else {
           logger.error(`Could not find user ${booking.userId} to credit refund wallet balance.`);

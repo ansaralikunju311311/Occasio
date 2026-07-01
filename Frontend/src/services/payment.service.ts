@@ -53,6 +53,12 @@ export const paymentService = {
     );
     return response.data;
   },
+  getWalletHistory: async (page: number = 1, limit: number = 10) => {
+    const response = await api.get(
+      `${API_ENDPOINTS.PAYMENTS_WALLET_HISTORY}?page=${page}&limit=${limit}`
+    );
+    return response.data;
+  },
 
   verifyPayment: async (paymentData: {
     razorpay_order_id: string;

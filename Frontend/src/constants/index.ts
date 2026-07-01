@@ -31,6 +31,7 @@ export const API_ENDPOINTS = {
   PAYMENTS_SUBSCRIPTION_ORDER: '/payments/subscription-order',
   PAYMENTS_VERIFY_SUBSCRIPTION: '/payments/verify-subscription',
   PAYMENTS_WALLET_PAY: '/payments/wallet-pay',
+  PAYMENTS_WALLET_HISTORY: '/payments/wallet-history',
 
   // Bookings Locking / Lock seats
   BOOKINGS_LOCK_SEATS: '/bookings/lock-seats',

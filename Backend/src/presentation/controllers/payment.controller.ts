@@ -12,6 +12,7 @@ import { HttpStatus } from '../../common/constants/http-status';
 import type { IGetMyBookingUseCase } from '../../application/usecases/booking/getMybookings/getmybooking.usecase.interface';
 import type { IGetManagerBookingUseCase } from '../../application/usecases/booking/getManagerbookings/getmanagerbooking.usecase.interface';
 import type { IWalletPayUseCase } from '../../application/usecases/payment/walletPay/walletPay.usecase.interface';
+import type { IGetWalletHistoryUseCase } from '../../application/usecases/payment/getWalletHistory/getWalletHistory.usecase.interface';
 import { catchAsync } from '../../common/utils/catchAsync';
 import { AppError } from '../../common/errors/apperror';
 import { sendSuccess } from '../../common/utils/response';
@@ -26,6 +27,7 @@ export class PaymentController {
     private _getMybookingUseCase: IGetMyBookingUseCase,
     private _getManagerBookingUseCase: IGetManagerBookingUseCase,
     private _walletPayUseCase: IWalletPayUseCase,
+    private _getWalletHistoryUseCase: IGetWalletHistoryUseCase,
   ) {}
 
   walletPay = catchAsync(
@@ -241,6 +243,28 @@ export class PaymentController {
       const result = await this._verifyPaymentUseCase.execute(dto, userId);
 
       sendSuccess(res, result, result.message as string, HttpStatus.OK, result);
+    },
+  );
+
+  getWalletHistory = catchAsync(
+    async (req: Request, res: Response): Promise<void> => {
+      const userId = (req as any).user?.id || (req as any).authUser?.userId;
+      if (!userId) {
+        throw new AppError('Unauthorized', HttpStatus.UNAUTHORIZED);
+      }
+
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+
+      const result = await this._getWalletHistoryUseCase.execute(
+        userId,
+        page,
+        limit,
+      );
+
+      sendSuccess(res, result.data, undefined, HttpStatus.OK, {
+        metadata: result.metadata,
+      });
     },
   );
 }

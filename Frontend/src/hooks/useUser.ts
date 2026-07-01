@@ -1,5 +1,6 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { userService } from '../services/user.service';
+import { paymentService } from '../services/payment.service';
 
 export const useUpdateProfile = () => {
   const queryClient = useQueryClient();
@@ -28,5 +29,12 @@ export const useReapply = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['me'] });
     },
+  });
+};
+
+export const useWalletHistory = (page: number, limit: number) => {
+  return useQuery({
+    queryKey: ['walletHistory', page, limit],
+    queryFn: () => paymentService.getWalletHistory(page, limit),
   });
 };

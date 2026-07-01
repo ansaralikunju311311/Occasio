@@ -11,4 +11,9 @@ export interface IPaymentRepository {
     params: PaginationParams,
   ): Promise<PaginatedResponse<PaymentResponseDto>>;
   findPaymentByBookingId(bookingId: string): Promise<Payment | null>;
+  getWalletHistory(
+    userId: string,
+    page: number,
+    limit: number,
+  ): Promise<PaginatedResponse<PaymentResponseDto>>;
 }
