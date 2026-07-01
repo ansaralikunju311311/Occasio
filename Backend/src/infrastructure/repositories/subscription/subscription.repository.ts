@@ -26,22 +26,38 @@ export class SubscriptionRepository
     );
   }
 
-  async findAllPlans(): Promise<Subscription[]> {
-    const plans = await this.model.find();
-    return plans.map(
-      (plan) =>
-        new Subscription(
-          plan._id as unknown as string,
-          plan.name,
-          plan.price,
-          plan.eventLimit,
-          plan.commissionPercentage,
-          plan.features as [],
-          plan.isActive,
-          plan.createdAt,
-          plan.updatedAt,
-        ),
-    );
+  async findAllPlans(params?: { page?: number; limit?: number }): Promise<{ plans: Subscription[]; total: number }> {
+    const page = params?.page;
+    const limit = params?.limit;
+
+    let plansQuery = this.model.find();
+    if (page !== undefined && limit !== undefined) {
+      const skip = (page - 1) * limit;
+      plansQuery = plansQuery.skip(skip).limit(limit);
+    }
+
+    const [plans, total] = await Promise.all([
+      plansQuery.exec(),
+      this.model.countDocuments().exec(),
+    ]);
+
+    return {
+      plans: plans.map(
+        (plan) =>
+          new Subscription(
+            plan._id as unknown as string,
+            plan.name,
+            plan.price,
+            plan.eventLimit,
+            plan.commissionPercentage,
+            plan.features as [],
+            plan.isActive,
+            plan.createdAt,
+            plan.updatedAt,
+          ),
+      ),
+      total,
+    };
   }
 
   async findPlanByName(name: string): Promise<Subscription | null> {

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { Table } from '../../components/common/Table';
 import { usePlans, useCreatePlan, useUpdatePlan } from '../../hooks/useAdmin';
+import { Pagination } from '../../components/common/Pagination';
 
 interface Plan {
   id: string;
@@ -14,9 +15,11 @@ interface Plan {
 }
 
 const AdminPlans = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPlan, setEditingPlan] = useState<Plan | null>(null);
-  const { data: plansData, isLoading, error } = usePlans();
+  const { data: plansData, isLoading, error } = usePlans({ page: currentPage, limit: itemsPerPage });
   const createPlanMutation = useCreatePlan();
   const updatePlanMutation = useUpdatePlan();
 
@@ -29,6 +32,11 @@ const AdminPlans = () => {
   });
 
   const plans = plansData?.plans || [];
+  const metadata = plansData?.metadata;
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   const handleFeatureChange = (index: number, value: string) => {
     const newFeatures = [...formData.features];
@@ -221,6 +229,16 @@ const AdminPlans = () => {
             </tr>
           )}
         />
+
+        {metadata && metadata.total > 0 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={metadata.totalPages}
+            totalItems={metadata.total}
+            itemsPerPage={itemsPerPage}
+            onPageChange={handlePageChange}
+          />
+        )}
       </div>
 
       {/* Create/Edit Modal */}

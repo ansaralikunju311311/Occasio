@@ -12,8 +12,7 @@ export const adminService = {
   rejectManager: (id: string, reason: string) =>
     api.patch(API_ENDPOINTS.ADMIN_REJECT_MANAGER(id), { reason }),
 
-  // Subscription Plans
-  getPlans: () => api.get(API_ENDPOINTS.PLANS_GET),
+  getPlans: (params?: any) => api.get(API_ENDPOINTS.PLANS_GET, { params }),
   createPlan: (data: any) => api.post(API_ENDPOINTS.PLANS_CREATE, data),
   updatePlan: (id: string, data: any) => api.patch(API_ENDPOINTS.PLANS_UPDATE(id), data),
 

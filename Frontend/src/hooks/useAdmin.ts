@@ -92,10 +92,10 @@ export const useRejectManager = () => {
   });
 };
 
-export const usePlans = () => {
+export const usePlans = (params?: any) => {
   return useQuery({
-    queryKey: ['adminPlans'],
-    queryFn: () => adminService.getPlans().then((res) => res.data),
+    queryKey: ['adminPlans', params],
+    queryFn: () => adminService.getPlans(params).then((res) => res.data),
   });
 };
 

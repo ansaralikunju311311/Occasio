@@ -8,9 +8,12 @@ import { api } from '../../services/api';
 import { setAuth } from '../../redux/slices/authSlice';
 import { API_ENDPOINTS } from '../../constants';
 import { paymentService } from '../../services/payment.service';
+import { Pagination } from '../../components/common/Pagination';
 
 const Subscriptions = () => {
-  const { data: plansData, isLoading, error } = usePlans();
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 3;
+  const { data: plansData, isLoading, error } = usePlans({ page: currentPage, limit: itemsPerPage });
   const { user } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -38,6 +41,11 @@ const Subscriptions = () => {
   if (error) return <div className="text-white text-center py-20">Error loading plans</div>;
 
   const apiPlans = plansData?.plans || [];
+  const metadata = plansData?.metadata;
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   const handleSubscribe = async (planId: string, price: string) => {
     if (user?.role === 'USER') {
@@ -329,6 +337,18 @@ const Subscriptions = () => {
           </div>
         ))}
       </div>
+
+      {metadata && metadata.total > 0 && (
+        <div className="max-w-6xl mx-auto px-4 mt-6">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={metadata.totalPages}
+            totalItems={metadata.total}
+            itemsPerPage={itemsPerPage}
+            onPageChange={handlePageChange}
+          />
+        </div>
+      )}
 
       {/* Bottom Info Section */}
       <div className="mt-20 max-w-4xl mx-auto p-8 rounded-[2.5rem] bg-indigo-500/5 border border-indigo-500/10 backdrop-blur-sm text-center animation-slide-up-delay">

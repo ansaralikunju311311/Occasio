@@ -14,9 +14,15 @@ export class UpdatePlanUseCase implements IUpdatePlanUseCase {
     data: Partial<CreatePlanDto>,
   ): Promise<ResponsePlanDto | null> {
     if (data.name) {
-      const existingPlan = await this._subscriptionRepository.findPlanByName(data.name);
-      if (existingPlan && existingPlan.id !== id) {
-        throw new AppError('A subscription plan with this name already exists', HttpStatus.CONFLICT);
+      const existingPlan = await this._subscriptionRepository.findPlanByName(
+        data.name,
+      );
+
+      if (existingPlan && String(existingPlan.id) !== String(id)) {
+        throw new AppError(
+          'A subscription plan with this name already exists',
+          HttpStatus.CONFLICT,
+        );
       }
     }
 
