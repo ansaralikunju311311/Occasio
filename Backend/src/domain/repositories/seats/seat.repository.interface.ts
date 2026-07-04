@@ -52,4 +52,9 @@ export interface ISeatRepository {
     categoryName: string;
     status: SeatStatus;
   }): Promise<void>;
+
+  checkBookedSeats(
+    eventId: string,
+    seatNumbers: string[],
+  ): Promise<string[]>;
 }

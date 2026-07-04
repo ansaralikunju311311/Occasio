@@ -6,7 +6,6 @@ import type { ISeatRepository } from '../../../../domain/repositories/seats/seat
 import type { IPaymentRepository } from '../../../../domain/repositories/payment/payment.repository.interface';
 import { Booking } from '../../../../domain/entities/booking.entity';
 import { BookingStatus } from '../../../../common/enums/booking-status.enum';
-import { SeatModel } from '../../../../infrastructure/database/model/events/seat.model';
 import { SeatStatus } from '../../../../common/enums/searstatus-enum';
 import { Payment } from '../../../../domain/entities/payment.entity';
 import { PaymentPurpose } from '../../../../common/enums/payment-purpose.enum';
@@ -52,15 +51,14 @@ export class WalletPayUseCase implements IWalletPayUseCase {
 
     // 3. Verify seats are not already booked (for physical booking)
     if (bookingType === 'physical' && seats && seats.length > 0) {
-      const alreadyBooked = await SeatModel.find({
+      const alreadyBooked = await this._seatRepository.checkBookedSeats(
         eventId,
-        seatNumber: { $in: seats },
-        status: SeatStatus.BOOKED,
-      });
+        seats,
+      );
 
       if (alreadyBooked.length > 0) {
         throw new Error(
-          `Some seats are already booked: ${alreadyBooked.map((s) => s.seatNumber).join(', ')}`,
+          `Some seats are already booked: ${alreadyBooked.join(', ')}`,
         );
       }
     }

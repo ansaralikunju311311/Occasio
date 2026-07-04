@@ -135,4 +135,16 @@ export class SeatRepository implements ISeatRepository {
       { upsert: true, new: true },
     );
   }
+
+  async checkBookedSeats(
+    eventId: string,
+    seatNumbers: string[],
+  ): Promise<string[]> {
+    const alreadyBooked = await SeatModel.find({
+      eventId,
+      seatNumber: { $in: seatNumbers },
+      status: SeatStatus.BOOKED,
+    });
+    return alreadyBooked.map((s) => s.seatNumber);
+  }
 }

@@ -39,6 +39,7 @@ export const MakePaymentController = () => {
     userRepository,
     subscriptionRepository,
     bookingRepository,
+    seatRepository,
   );
 
   const verifyPaymentUseCase = new VerifyPaymentUseCase(

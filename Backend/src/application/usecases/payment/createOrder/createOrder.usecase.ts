@@ -5,10 +5,8 @@ import type { ISubscriptionRepository } from '../../../../domain/repositories/su
 import type { IBookingRepository } from '../../../../domain/repositories/booking/booking.repository.interface';
 import { Booking } from '../../../../domain/entities/booking.entity';
 import { BookingStatus } from '../../../../common/enums/booking-status.enum';
-import { SeatModel } from '../../../../infrastructure/database/model/events/seat.model';
-import { SeatStatus } from '../../../../common/enums/searstatus-enum';
-
 import type { ICreateOrderUseCase } from './createOrder.usecase.interface';
+import { ISeatRepository } from '../../../../domain/repositories/seats/seat.repository.interface';
 
 export class CreateOrderUseCase implements ICreateOrderUseCase {
   constructor(
@@ -17,6 +15,7 @@ export class CreateOrderUseCase implements ICreateOrderUseCase {
     private _userRepository: IUserRepository,
     private _subscriptionRepository: ISubscriptionRepository,
     private _bookingRepository: IBookingRepository,
+    private _seatRepository: ISeatRepository,
   ) {}
 
   async execute(
@@ -31,7 +30,6 @@ export class CreateOrderUseCase implements ICreateOrderUseCase {
       return await this._paymentGateway.createOrder(eventId, 99);
     }
 
-    
     const event = await this._eventRepository.findByIdEvents(eventId);
     if (!event) {
       throw new Error('Event not found');
@@ -41,24 +39,21 @@ export class CreateOrderUseCase implements ICreateOrderUseCase {
       throw new Error('You cannot book your own event.');
     }
 
-  
     if (bookingType === 'physical' && seats && seats.length > 0) {
-      const alreadyBooked = await SeatModel.find({
+      const alreadyBooked = await this._seatRepository.checkBookedSeats(
         eventId,
-        seatNumber: { $in: seats },
-        status: SeatStatus.BOOKED,
-      });
+        seats,
+      );
 
       if (alreadyBooked.length > 0) {
         throw new Error(
-          `Some seats are already booked: ${alreadyBooked.map((s) => s.seatNumber).join(', ')}`,
+          `Some seats are already booked: ${alreadyBooked.join(', ')}`,
         );
       }
     }
 
     const creator = await this._userRepository.findByIdUser(event.createdBy);
-    let commissionPercentage = 10; // Default 10% if no active subscription
-
+    let commissionPercentage = 10;
     if (creator && creator.activeSubscription) {
       const plan = await this._subscriptionRepository.findPlanById(
         creator.activeSubscription,
@@ -74,7 +69,6 @@ export class CreateOrderUseCase implements ICreateOrderUseCase {
     const totalAmount = amount;
     const organizerRevenue = parseFloat((amount - commissionAmount).toFixed(2));
 
-    // 3. Create Razorpay order
     const order = (await this._paymentGateway.createOrder(
       eventId,
       totalAmount,
