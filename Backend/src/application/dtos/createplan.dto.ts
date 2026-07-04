@@ -5,4 +5,3 @@ export interface CreatePlanDto {
   commissionPercentage: number;
   features?: string[];
 }
-

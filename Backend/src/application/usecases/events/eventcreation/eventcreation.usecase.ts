@@ -13,10 +13,6 @@ import type { ISubscriptionRepository } from '../../../../domain/repositories/su
 import type { IManagerSubscriptionRepository } from '../../../../domain/repositories/imanager-subscription.repository';
 import type { ManagerSubscription } from '../../../../domain/entities/manager-subscription.entity';
 
-
-
-
-
 import type { IEventCreationUseCase } from './eventcreation.usecase.interface';
 
 export class EventCretionUseCase implements IEventCreationUseCase {
@@ -91,7 +87,6 @@ export class EventCretionUseCase implements IEventCreationUseCase {
       if (activeSub && activeSub.plan.toUpperCase() !== 'FREE') {
         status = EventStatus.LIVE;
       }
-
 
       let location = data.location;
 

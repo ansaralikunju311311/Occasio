@@ -26,7 +26,10 @@ export class SubscriptionRepository
     );
   }
 
-  async findAllPlans(params?: { page?: number; limit?: number }): Promise<{ plans: Subscription[]; total: number }> {
+  async findAllPlans(params?: {
+    page?: number;
+    limit?: number;
+  }): Promise<{ plans: Subscription[]; total: number }> {
     const page = params?.page;
     const limit = params?.limit;
 
@@ -65,7 +68,6 @@ export class SubscriptionRepository
       name: { $regex: `^${name}$`, $options: 'i' },
     });
     if (!plan) {
-
       return null;
     }
     return new Subscription(

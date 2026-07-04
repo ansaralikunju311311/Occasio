@@ -2,7 +2,6 @@ import type { IUserRepository } from '../../../../domain/repositories/user.repos
 import type { ISubscriptionRepository } from '../../../../domain/repositories/subscription/subscription.repository.interface';
 import type { IManagerSubscriptionRepository } from '../../../../domain/repositories/imanager-subscription.repository';
 import type { UserResponseDto } from '../../../dtos/responses/user-response.dto';
-
 import { userMapper } from '../../../../common/mappers/user.mapper';
 
 import type { ISubscribeUseCase } from './subscribe.usecase.interface';

@@ -4,7 +4,6 @@ import type { IPaymentRepository } from '../../../../domain/repositories/payment
 import type { ISubscriptionRepository } from '../../../../domain/repositories/subscription/subscription.repository.interface';
 import type { IManagerSubscriptionRepository } from '../../../../domain/repositories/imanager-subscription.repository';
 import { Payment } from '../../../../domain/entities/payment.entity';
-
 import { PaymentPurpose } from '../../../../common/enums/payment-purpose.enum';
 import { PaymentStatus } from '../../../../common/enums/payment-status.enum';
 import { PaymentMethod } from '../../../../common/enums/payment-method.enum';

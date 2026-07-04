@@ -77,7 +77,9 @@ export const MakePaymentController = () => {
     paymentRepository,
   );
 
-  const getWalletHistoryUseCase = new GetWalletHistoryUseCase(paymentRepository);
+  const getWalletHistoryUseCase = new GetWalletHistoryUseCase(
+    paymentRepository,
+  );
 
   return new PaymentController(
     createOrderUseCase,

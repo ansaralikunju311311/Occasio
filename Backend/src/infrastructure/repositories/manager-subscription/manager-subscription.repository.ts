@@ -65,4 +65,3 @@ export class ManagerSubscriptionRepository implements IManagerSubscriptionReposi
     );
   }
 }
-

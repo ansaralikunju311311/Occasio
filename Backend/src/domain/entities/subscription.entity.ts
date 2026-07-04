@@ -12,4 +12,3 @@ export class Subscription {
     public updatedAt?: Date,
   ) {}
 }
-

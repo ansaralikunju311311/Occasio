@@ -16,7 +16,6 @@ import { EventModel } from '../../infrastructure/database/model/events/event.mod
 import { BookingModel } from '../../infrastructure/database/model/booking.model';
 import { PaymentModel } from '../../infrastructure/database/model/payment/payment.model';
 
-
 export class AdminController {
   constructor(
     private _findallUsecase: IFindallUseCase,
@@ -104,7 +103,11 @@ export class AdminController {
     const limit = parseInt(req.query.limit as string) || 10;
     const purpose = req.query.purpose as string;
 
-    const result = await this._getAllPaymentsUseCase.execute({ page, limit, purpose });
+    const result = await this._getAllPaymentsUseCase.execute({
+      page,
+      limit,
+      purpose,
+    });
     sendSuccess(res, result?.data || [], undefined, HttpStatus.OK, {
       payments: result?.data || [],
       metadata: result?.metadata,
@@ -113,7 +116,9 @@ export class AdminController {
 
   getDashboardStats = catchAsync(async (req: Request, res: Response) => {
     const totalUsers = await UserModel.countDocuments();
-    const eventManagers = await UserModel.countDocuments({ role: 'EVENT_MANAGER' });
+    const eventManagers = await UserModel.countDocuments({
+      role: 'EVENT_MANAGER',
+    });
     const activeEvents = await EventModel.countDocuments({ status: 'LIVE' });
 
     // Aggregate booking commissions
@@ -137,7 +142,8 @@ export class AdminController {
     const commissionRevenue = bookingCommissions[0]?.total || 0;
     const subscriptionRevenue = subscriptionFees[0]?.total || 0;
     const publishingRevenue = publishingFees[0]?.total || 0;
-    const totalRevenue = commissionRevenue + subscriptionRevenue + publishingRevenue;
+    const totalRevenue =
+      commissionRevenue + subscriptionRevenue + publishingRevenue;
 
     sendSuccess(res, undefined, undefined, HttpStatus.OK, {
       stats: {
@@ -152,5 +158,3 @@ export class AdminController {
     });
   });
 }
-
-

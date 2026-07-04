@@ -1,4 +1,5 @@
 import type { Request, Response } from 'express-serve-static-core';
+import mongoose from 'mongoose';
 
 import { HttpStatus } from '../../common/constants/http-status';
 import { UserRole } from '../../common/enums/userrole-enum';
@@ -13,10 +14,8 @@ import { catchAsync } from '../../common/utils/catchAsync';
 import type { IDeleteEventUseCase } from '../../application/usecases/events/deleteevent/deleteevent.usecase.interface';
 import type { IUpdateEventUseCase } from '../../application/usecases/events/updatevent/updatevent.usecase.interface';
 import { sendSuccess } from '../../common/utils/response';
-import mongoose from 'mongoose';
 import { EventModel } from '../../infrastructure/database/model/events/event.model';
 import { BookingModel } from '../../infrastructure/database/model/booking.model';
-
 
 export class EventController {
   constructor(
@@ -176,11 +175,19 @@ export class EventController {
     const managerObjId = new mongoose.Types.ObjectId(managerId);
 
     // Get manager events
-    const totalEvents = await EventModel.countDocuments({ createdBy: managerObjId });
-    const activeEvents = await EventModel.countDocuments({ createdBy: managerObjId, status: 'LIVE' });
+    const totalEvents = await EventModel.countDocuments({
+      createdBy: managerObjId,
+    });
+    const activeEvents = await EventModel.countDocuments({
+      createdBy: managerObjId,
+      status: 'LIVE',
+    });
 
     // Aggregate booking counts & organizer revenue for manager's events
-    const managerEvents = await EventModel.find({ createdBy: managerObjId }, '_id');
+    const managerEvents = await EventModel.find(
+      { createdBy: managerObjId },
+      '_id',
+    );
     const eventIds = managerEvents.map((e) => e._id);
 
     const totalBookings = await BookingModel.countDocuments({
@@ -212,4 +219,3 @@ export class EventController {
     });
   });
 }
-

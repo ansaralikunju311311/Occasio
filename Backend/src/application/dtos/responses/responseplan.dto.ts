@@ -9,4 +9,3 @@ export interface ResponsePlanDto {
   createdAt: Date;
   updatedAt: Date;
 }
-

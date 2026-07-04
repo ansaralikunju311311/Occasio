@@ -30,26 +30,30 @@ export class PaymentController {
     private _getWalletHistoryUseCase: IGetWalletHistoryUseCase,
   ) {}
 
-  walletPay = catchAsync(
-    async (req: Request, res: Response): Promise<void> => {
-      const { eventId, amount, selectedSeats, bookingType } = req.body;
-      const userId = (req as any).user?.id || (req as any).authUser?.userId;
+  walletPay = catchAsync(async (req: Request, res: Response): Promise<void> => {
+    const { eventId, amount, selectedSeats, bookingType } = req.body;
+    const userId = (req as any).user?.id || (req as any).authUser?.userId;
 
-      if (!userId) {
-        throw new AppError('Unauthorized', HttpStatus.UNAUTHORIZED);
-      }
+    if (!userId) {
+      throw new AppError('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
 
-      const result = await this._walletPayUseCase.execute(
-        eventId,
-        userId,
-        amount,
-        bookingType,
-        selectedSeats,
-      );
+    const result = await this._walletPayUseCase.execute(
+      eventId,
+      userId,
+      amount,
+      bookingType,
+      selectedSeats,
+    );
 
-      sendSuccess(res, result, 'Tickets booked successfully using wallet balance', HttpStatus.OK, result);
-    },
-  );
+    sendSuccess(
+      res,
+      result,
+      'Tickets booked successfully using wallet balance',
+      HttpStatus.OK,
+      result,
+    );
+  });
 
   createSubscriptionOrder = catchAsync(
     async (req: Request, res: Response): Promise<void> => {

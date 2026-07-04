@@ -9,9 +9,14 @@ import type { ICreatePlanUseCase } from './createplan.usecase.interface';
 export class CreatePlanUseCase implements ICreatePlanUseCase {
   constructor(private _subscriptionRepository: ISubscriptionRepository) {}
   async execute(data: CreatePlanDto): Promise<ResponsePlanDto | null> {
-    const existingPlan = await this._subscriptionRepository.findPlanByName(data.name);
+    const existingPlan = await this._subscriptionRepository.findPlanByName(
+      data.name,
+    );
     if (existingPlan) {
-      throw new AppError('A subscription plan with this name already exists', HttpStatus.CONFLICT);
+      throw new AppError(
+        'A subscription plan with this name already exists',
+        HttpStatus.CONFLICT,
+      );
     }
 
     const subscription = new Subscription(

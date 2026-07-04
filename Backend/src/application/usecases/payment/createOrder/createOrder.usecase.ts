@@ -27,13 +27,11 @@ export class CreateOrderUseCase implements ICreateOrderUseCase {
     seats?: string[],
   ): Promise<unknown> {
     if (!amount) {
-      // Event publishing fee flow (fixed amount 99)
       await this._eventRepository.validateOwnershipAndDraft(eventId, userId);
       return await this._paymentGateway.createOrder(eventId, 99);
     }
 
-    // Ticket booking flow
-    // 1. Fetch event to validate existence and ownership
+    
     const event = await this._eventRepository.findByIdEvents(eventId);
     if (!event) {
       throw new Error('Event not found');
@@ -43,7 +41,7 @@ export class CreateOrderUseCase implements ICreateOrderUseCase {
       throw new Error('You cannot book your own event.');
     }
 
-    // 2. If physical booking, verify seats are not already booked in DB
+  
     if (bookingType === 'physical' && seats && seats.length > 0) {
       const alreadyBooked = await SeatModel.find({
         eventId,

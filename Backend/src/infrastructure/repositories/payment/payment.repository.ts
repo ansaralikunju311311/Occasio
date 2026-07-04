@@ -114,7 +114,10 @@ export class PaymentRepository implements IPaymentRepository {
   }
 
   async findPaymentByBookingId(bookingId: string): Promise<Payment | null> {
-    const doc = await PaymentModel.findOne({ bookingId, paymentStatus: 'SUCCESS' });
+    const doc = await PaymentModel.findOne({
+      bookingId,
+      paymentStatus: 'SUCCESS',
+    });
     return doc ? this.toEntity(doc) : null;
   }
 
@@ -125,10 +128,7 @@ export class PaymentRepository implements IPaymentRepository {
   ): Promise<PaginatedResponse<PaymentResponseDto>> {
     const query: any = {
       userId,
-      $or: [
-        { paymentMethod: 'WALLET' },
-        { purpose: 'REFUND' },
-      ],
+      $or: [{ paymentMethod: 'WALLET' }, { purpose: 'REFUND' }],
     };
 
     const skip = (page - 1) * limit;

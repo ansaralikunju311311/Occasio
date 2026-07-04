@@ -30,10 +30,17 @@ export class PlanController {
   });
 
   getPlans = catchAsync(async (req: Request, res: Response) => {
-    const page = req.query.page ? parseInt(req.query.page as string) : undefined;
-    const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
+    const page = req.query.page
+      ? parseInt(req.query.page as string)
+      : undefined;
+    const limit = req.query.limit
+      ? parseInt(req.query.limit as string)
+      : undefined;
 
-    const { plans, total } = await this._getPlansUseCase.execute({ page, limit });
+    const { plans, total } = await this._getPlansUseCase.execute({
+      page,
+      limit,
+    });
 
     const extra: Record<string, any> = { plans };
     if (page !== undefined && limit !== undefined) {

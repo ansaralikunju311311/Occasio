@@ -2,10 +2,11 @@ import type { IEventRepository } from '../../../../domain/repositories/event/eve
 import type { IBookingRepository } from '../../../../domain/repositories/booking/booking.repository.interface';
 import type { IPaymentRepository } from '../../../../domain/repositories/payment/payment.repository.interface';
 import type { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
-import type { IDeleteEventUseCase } from './deleteevent.usecase.interface';
 import { razorpayInstance } from '../../../../infrastructure/config/razorpay';
 import { logger } from '../../../../common/logger/logger';
 import { Payment } from '../../../../domain/entities/payment.entity';
+
+import type { IDeleteEventUseCase } from './deleteevent.usecase.interface';
 
 export class DeleteEventUseCase implements IDeleteEventUseCase {
   constructor(
@@ -25,24 +26,36 @@ export class DeleteEventUseCase implements IDeleteEventUseCase {
       throw new Error('Event has already started and cannot be deleted.');
     }
 
-    const confirmedBookings = await this._bookingRepository.findConfirmedBookingsByEventId(id);
+    const confirmedBookings =
+      await this._bookingRepository.findConfirmedBookingsByEventId(id);
 
     for (const booking of confirmedBookings) {
       try {
-        const payment = await this._paymentRepository.findPaymentByBookingId(booking.id ?? '');
+        const payment = await this._paymentRepository.findPaymentByBookingId(
+          booking.id ?? '',
+        );
         if (payment && payment.transactionId) {
-          const isMock = payment.transactionId.startsWith('mock_pay_') || payment.transactionId.startsWith('pay_mock');
+          const isMock =
+            payment.transactionId.startsWith('mock_pay_') ||
+            payment.transactionId.startsWith('pay_mock');
           if (!isMock) {
             try {
               await razorpayInstance.payments.refund(payment.transactionId, {
                 amount: booking.totalAmount * 100, // in paise
               });
-              logger.info(`Successfully refunded booking ${booking.id} via Razorpay (transaction: ${payment.transactionId})`);
+              logger.info(
+                `Successfully refunded booking ${booking.id} via Razorpay (transaction: ${payment.transactionId})`,
+              );
             } catch (rzErr: any) {
-              logger.error(`Razorpay refund API call failed for payment ID ${payment.transactionId}:`, rzErr);
+              logger.error(
+                `Razorpay refund API call failed for payment ID ${payment.transactionId}:`,
+                rzErr,
+              );
             }
           } else {
-            logger.info(`Skipped Razorpay refund for mock payment ID ${payment.transactionId}`);
+            logger.info(
+              `Skipped Razorpay refund for mock payment ID ${payment.transactionId}`,
+            );
           }
         }
       } catch (err: any) {
@@ -50,9 +63,15 @@ export class DeleteEventUseCase implements IDeleteEventUseCase {
       }
 
       try {
-        await this._bookingRepository.updateBookingStatus(booking.id ?? '', 'CANCELLED');
+        await this._bookingRepository.updateBookingStatus(
+          booking.id ?? '',
+          'CANCELLED',
+        );
       } catch (err: any) {
-        logger.error(`Failed to update booking status for ${booking.id} to CANCELLED:`, err);
+        logger.error(
+          `Failed to update booking status for ${booking.id} to CANCELLED:`,
+          err,
+        );
       }
 
       try {
@@ -74,12 +93,19 @@ export class DeleteEventUseCase implements IDeleteEventUseCase {
             new Date(),
           );
           await this._paymentRepository.savePayment(refundPayment);
-          logger.info(`Credited ₹${booking.totalAmount} to user ${user.email}'s wallet. New balance: ₹${user.walletBalance}`);
+          logger.info(
+            `Credited ₹${booking.totalAmount} to user ${user.email}'s wallet. New balance: ₹${user.walletBalance}`,
+          );
         } else {
-          logger.error(`Could not find user ${booking.userId} to credit refund wallet balance.`);
+          logger.error(
+            `Could not find user ${booking.userId} to credit refund wallet balance.`,
+          );
         }
       } catch (err: any) {
-        logger.error(`Failed to credit user ${booking.userId} wallet balance:`, err);
+        logger.error(
+          `Failed to credit user ${booking.userId} wallet balance:`,
+          err,
+        );
       }
     }
 

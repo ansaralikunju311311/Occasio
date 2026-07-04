@@ -1,6 +1,7 @@
 import type { IPaymentRepository } from '../../../../domain/repositories/payment/payment.repository.interface';
 import type { PaginatedResponse } from '../../../../common/interfaces/pagination.interface';
 import type { PaymentResponseDto } from '../../../../application/dtos/responses/payment-response.dto';
+
 import type { IGetWalletHistoryUseCase } from './getWalletHistory.usecase.interface';
 
 export class GetWalletHistoryUseCase implements IGetWalletHistoryUseCase {
