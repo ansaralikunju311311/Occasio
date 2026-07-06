@@ -229,6 +229,14 @@ const UserBookings = () => {
                     >
                       View Ticket
                     </button>
+                    {booking.status?.toUpperCase() !== 'CANCELLED' && booking.status?.toUpperCase() !== 'FAILED' && (
+                      <button
+                        onClick={() => toast.info('Cancellation functionality is not active.')}
+                        className="px-3 py-1.5 bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white text-xs font-bold rounded-lg border border-rose-500/20 transition-all cursor-pointer"
+                      >
+                        Cancel
+                      </button>
+                    )}
                   </div>
                 </td>
               </tr>

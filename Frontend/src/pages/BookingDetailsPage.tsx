@@ -178,20 +178,39 @@ const BookingDetailsPage = () => {
             My Bookings
           </button>
 
-          <button
-            onClick={handlePrint}
-            className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2 shadow-lg shadow-indigo-500/20 cursor-pointer"
-          >
-            <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
-              />
-            </svg>
-            Print Ticket
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={handlePrint}
+              className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2 shadow-lg shadow-indigo-500/20 cursor-pointer"
+            >
+              <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
+                />
+              </svg>
+              Print Ticket
+            </button>
+
+            {booking.status?.toUpperCase() !== 'CANCELLED' && booking.status?.toUpperCase() !== 'FAILED' && (
+              <button
+                onClick={() => toast.info('Cancellation functionality is not active.')}
+                className="px-5 py-2.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2 shadow-lg shadow-rose-500/20 cursor-pointer"
+              >
+                <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                Cancel Booking
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Ticket Outer Wrapper */}
