@@ -33,4 +33,13 @@ export const bookingService = {
     const response = await api.post(API_ENDPOINTS.BOOKINGS_FAILED, { seatIds });
     return response.data;
   },
+
+
+  cancelBooking: async (bookingId: string) => {
+    const response = await api.patch(API_ENDPOINTS.BOOKINGS_CANCEL(bookingId));
+    return response.data;
+  },
 };
+
+
+

@@ -38,6 +38,7 @@ export const API_ENDPOINTS = {
   BOOKINGS_PAYMENT_INTENT: '/bookings/payment-intent',
   BOOKINGS_CONFIRM: '/bookings/confirm',
   BOOKINGS_FAILED: '/bookings/failed',
+  BOOKINGS_CANCEL: (id: string) => `/bookings/cancel/${id}`,
 
   // Admin
   ADMIN_USERS: '/admin/users',
