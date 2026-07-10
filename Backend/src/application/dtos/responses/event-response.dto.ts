@@ -31,4 +31,6 @@ export interface EventResponseDto {
   deletedAt?: Date;
   createdAt?: Date;
   updatedAt?: Date;
+  publishedAt?: Date;
+  hasBookings?: boolean;
 }

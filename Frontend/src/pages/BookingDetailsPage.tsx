@@ -1,11 +1,11 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { paymentService } from '../services/payment.service';
-import { bookingService } from '../services/booking.service';
 import { useAppSelector } from '../redux/hook';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { toast } from 'sonner';
 import { APP_MESSAGES } from '../constants';
+import CancelBookingModal from '../components/user/CancelBookingModal';
 
 interface Booking {
   id: string;
@@ -34,6 +34,7 @@ const BookingDetailsPage = () => {
   const user = useAppSelector((state) => state.auth.user);
   const [booking, setBooking] = useState<Booking | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchBookingDetails = async () => {
@@ -110,22 +111,6 @@ const BookingDetailsPage = () => {
   };
 
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(booking.id)}&color=0f172a&bgcolor=ffffff`;
-
-  const CancelBooking = async () => {
-    if (!booking) return;
-    try {
-      const res = await bookingService.cancelBooking(booking.id);
-      if (res.success) {
-        toast.success('Booking cancelled successfully.');
-        setBooking((prev) => (prev ? { ...prev, status: 'CANCELLED' } : null));
-      } else {
-        toast.error(res.message || 'Failed to cancel booking.');
-      }
-    } catch (err: any) {
-      console.error('Failed to cancel booking:', err);
-      toast.error(err.response?.data?.message || 'An error occurred while cancelling the booking.');
-    }
-  };
 
   return (
     <div className="min-h-screen bg-slate-950 pt-24 pb-20 px-6">
@@ -213,10 +198,9 @@ const BookingDetailsPage = () => {
 
             {booking.status?.toUpperCase() !== 'CANCELLED' && booking.status?.toUpperCase() !== 'FAILED' && (
               <button
-                // onClick={() => toast.info('Cancellation functionality is not active.')}
-                onClick={CancelBooking}
+                onClick={() => setIsCancelModalOpen(true)}
                 className="px-5 py-2.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2 shadow-lg shadow-rose-500/20 cursor-pointer"
-                 >
+              >
                 <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path
                     strokeLinecap="round"
@@ -369,6 +353,17 @@ const BookingDetailsPage = () => {
           </div>
         </div>
       </div>
+
+      {booking && (
+        <CancelBookingModal
+          isOpen={isCancelModalOpen}
+          onClose={() => setIsCancelModalOpen(false)}
+          bookingId={booking.id}
+          onConfirmSuccess={() => {
+            setBooking((prev) => (prev ? { ...prev, status: 'CANCELLED' } : null));
+          }}
+        />
+      )}
     </div>
   );
 };

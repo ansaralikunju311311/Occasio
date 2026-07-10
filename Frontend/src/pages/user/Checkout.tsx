@@ -28,6 +28,8 @@ const Checkout = () => {
   const [paymentMethod, setPaymentMethod] = useState<'razorpay' | 'wallet'>('razorpay');
   const user = useAppSelector((state) => state.auth.user);
   const dispatch = useAppDispatch();
+  const [showRefundModal, setShowRefundModal] = useState(false);
+  const [agreedToRefundPolicy, setAgreedToRefundPolicy] = useState(false);
 
   const { selectedSeats = [], bookingType = 'physical', lockExpiresAt } = location.state || {};
   const { data: event, isLoading: loading, isError } = useEventDetails(id);
@@ -150,7 +152,6 @@ const Checkout = () => {
           setIsPaying(false);
         }
       } else {
-        // 1. Create Ticket Order (Backend handles Pending Booking + Razorpay Order)
         const orderResponse = await paymentService.createTicketOrder(
           id,
           amountToPay,
@@ -158,7 +159,6 @@ const Checkout = () => {
           bookingType
         );
 
-        // 2. Open Razorpay Checkout
         paymentService.openRazorpayCheckout(
           orderResponse.order,
           id,
@@ -378,7 +378,7 @@ const Checkout = () => {
               )}
 
               <button
-                onClick={handlePayment}
+                onClick={() => setShowRefundModal(true)}
                 disabled={isPaying || (paymentMethod === 'wallet' && (user?.walletBalance ?? 0) < total)}
                 className="w-full py-4 bg-linear-to-r from-indigo-500 to-purple-600 rounded-2xl font-black text-lg shadow-[0_20px_40px_-10px_rgba(99,102,241,0.4)] hover:shadow-[0_25px_50px_-12px_rgba(99,102,241,0.5)] active:scale-95 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
@@ -400,6 +400,248 @@ const Checkout = () => {
           </div>
         </div>
       </div>
+
+      {showRefundModal && (() => {
+        const getRefundModalData = () => {
+          const publishedAt = event?.publishedAt || event?.createdAt;
+          const startTime = event?.startTime;
+
+          if (!publishedAt || !startTime) {
+            return {
+              publishedDateText: 'N/A',
+              hoursBeforeStartText: 'N/A',
+              available: [
+                { label: 'More than 72 hours before starts', refund: '100% Refund' },
+                { label: 'Between 72 and 48 hours before starts', refund: '50% Refund' },
+                { label: 'Between 48 and 24 hours before starts', refund: '25% Refund' },
+                { label: 'Less than 24 hours before starts', refund: 'No Refund' },
+              ],
+              unavailable: [],
+              isCase4: false,
+            };
+          }
+
+          const pubDate = new Date(publishedAt);
+          const startDate = new Date(startTime);
+          const diffHours = (startDate.getTime() - pubDate.getTime()) / (1000 * 60 * 60);
+          const roundedHours = Math.round(diffHours);
+
+          const available: { label: string; refund: string; note?: string }[] = [];
+          const unavailable: { label: string; refund: string; reason: string }[] = [];
+
+          // 1. More than 72 hours before starts (100% refund)
+          if (diffHours >= 72) {
+            available.push({
+              label: 'More than 72 hours before starts',
+              refund: '100% Refund',
+            });
+          } else {
+            unavailable.push({
+              label: 'More than 72 hours before starts',
+              refund: '100% Refund',
+              reason: `Event was published only ${roundedHours} hours before starting (requires >= 72 hours).`,
+            });
+          }
+
+          // 2. Between 72 and 48 hours before starts (50% refund)
+          if (diffHours >= 72) {
+            available.push({
+              label: 'Between 72 and 48 hours before starts',
+              refund: '50% Refund',
+            });
+          } else {
+            unavailable.push({
+              label: 'Between 72 and 48 hours before starts',
+              refund: '50% Refund',
+              reason: `Event was published only ${roundedHours} hours before starting (requires >= 72 hours).`,
+            });
+          }
+
+          // 3. Between 48 and 24 hours before starts (25% refund or 50% refund)
+          if (diffHours >= 72) {
+            available.push({
+              label: 'Between 48 and 24 hours before starts',
+              refund: '25% Refund',
+            });
+          } else if (diffHours >= 48) {
+            available.push({
+              label: 'Between 48 and 24 hours before starts',
+              refund: '50% Refund',
+              note: 'Late publication bonus applied: 50% refund instead of 25% between 48h and 24h.',
+            });
+          } else {
+            unavailable.push({
+              label: 'Between 48 and 24 hours before starts',
+              refund: '25% Refund',
+              reason: `Event was published only ${roundedHours} hours before starting (requires >= 48 hours).`,
+            });
+          }
+
+          // 4. Case 3 specific: Between [pubHours] and 24 hours before starts (25% refund)
+          if (diffHours >= 24 && diffHours < 48) {
+            available.push({
+              label: `Between ${roundedHours} and 24 hours before starts`,
+              refund: '25% Refund',
+            });
+          } else if (diffHours < 24) {
+            unavailable.push({
+              label: `Between 24 hours and publish time before starts`,
+              refund: '25% Refund',
+              reason: `Event was published only ${roundedHours} hours before starting (requires >= 24 hours).`,
+            });
+          }
+
+          // 5. Less than 24 hours before starts (No refund)
+          available.push({
+            label: 'Less than 24 hours before starts',
+            refund: 'No Refund',
+          });
+
+          return {
+            publishedDateText: pubDate.toLocaleString('en-US', {
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+            }),
+            hoursBeforeStartText: `${roundedHours} hours`,
+            available,
+            unavailable,
+            isCase4: diffHours < 24,
+          };
+        };
+
+        const modalData = getRefundModalData();
+
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 max-w-lg w-full text-white shadow-2xl relative">
+              <div className="flex items-center gap-3.5 mb-5">
+                <div className="p-3 rounded-2xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold">Cancellation &amp; Refund Policy</h3>
+                  <p className="text-xs text-slate-400 mt-0.5">Please review the cancellation windows for this event</p>
+                </div>
+              </div>
+
+              <div className="space-y-5 mb-6 max-h-[360px] overflow-y-auto pr-1">
+                <div className="p-4 bg-slate-950/50 rounded-2xl border border-slate-800/60 space-y-2">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-slate-400">Event Published On:</span>
+                    <span className="font-semibold text-indigo-400">{modalData.publishedDateText}</span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-slate-400">Time Available For Bookings:</span>
+                    <span className="font-semibold text-purple-400">{modalData.hoursBeforeStartText}</span>
+                  </div>
+                </div>
+
+                {modalData.isCase4 && (
+                  <div className="p-4 rounded-xl border border-rose-500/20 bg-rose-500/5 text-rose-300 text-xs space-y-1.5">
+                    <p className="font-bold flex items-center gap-1.5 text-rose-400">
+                      <span>⚠️</span> Not Eligible for Cancellations
+                    </p>
+                    <p className="font-semibold text-rose-200">This event was published less than 24 hours before it starts.</p>
+                    <p className="text-[10px] text-rose-300/80">Cancellation is not available after booking. No refund will be provided.</p>
+                  </div>
+                )}
+
+                <div>
+                  <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2.5">
+                    Available Refund Policies
+                  </h4>
+                  <div className="space-y-2">
+                    {modalData.available.map((item, idx) => (
+                      <div key={idx} className="flex flex-col p-3.5 rounded-xl bg-emerald-500/5 border border-emerald-500/20 text-emerald-400 text-xs">
+                        <div className="flex justify-between items-center font-medium">
+                          <span>{item.label}</span>
+                          <span className="font-black uppercase tracking-wider bg-emerald-500/10 px-2 py-0.5 rounded text-[10px]">
+                            {item.refund}
+                          </span>
+                        </div>
+                        {item.note && (
+                          <p className="text-[10px] text-emerald-400/80 italic mt-1.5">{item.note}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {modalData.unavailable.length > 0 && (
+                  <div>
+                    <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2.5">
+                      Unavailable Policies (Never Offered)
+                    </h4>
+                    <div className="space-y-2">
+                      {modalData.unavailable.map((item, idx) => (
+                        <div key={idx} className="p-3.5 rounded-xl bg-slate-950/20 border border-slate-800/60 opacity-55 text-xs text-slate-400 flex flex-col gap-1">
+                          <div className="flex justify-between items-center line-through text-slate-500">
+                            <span>{item.label}</span>
+                            <span className="font-bold text-[9px] uppercase bg-slate-800 px-2 py-0.5 rounded">
+                              {item.refund}
+                            </span>
+                          </div>
+                          <p className="text-[10px] text-rose-400/80 font-medium italic flex items-center gap-1.5">
+                            <span>•</span> {item.reason}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div 
+                className="flex items-start gap-3 p-4 bg-slate-950/40 rounded-2xl border border-slate-800/60 mb-6 cursor-pointer select-none group hover:border-slate-700/60 transition-all duration-300"
+                onClick={() => setAgreedToRefundPolicy(!agreedToRefundPolicy)}
+              >
+                <div className="relative mt-0.5">
+                  <input
+                    type="checkbox"
+                    checked={agreedToRefundPolicy}
+                    onChange={(e) => setAgreedToRefundPolicy(e.target.checked)}
+                    className="peer appearance-none w-5 h-5 rounded-md border border-slate-700 checked:bg-indigo-500 checked:border-indigo-500 transition-all cursor-pointer"
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                  <svg className="absolute left-1 top-1 w-3 h-3 text-white pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <p className="text-xs text-slate-300 leading-relaxed font-light group-hover:text-white transition-colors">
+                  I have read and explicitly agree to the cancellation and refund policy terms for this event booking.
+                </p>
+              </div>
+
+              <div className="flex gap-4">
+                <button
+                  onClick={() => {
+                    setShowRefundModal(false);
+                    setAgreedToRefundPolicy(false);
+                  }}
+                  className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl font-bold text-sm transition-all"
+                >
+                  Go Back
+                </button>
+                <button
+                  onClick={() => {
+                    setShowRefundModal(false);
+                    handlePayment();
+                  }}
+                  disabled={!agreedToRefundPolicy}
+                  className="flex-1 py-3 bg-linear-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-xl font-bold text-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg disabled:shadow-none"
+                >
+                  Accept &amp; Pay
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 };

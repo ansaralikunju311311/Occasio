@@ -72,5 +72,7 @@ export const ApiEndpoints = {
     PaymentIntent: '/payment-intent',
     Confirm: '/confirm',
     Failed: '/failed',
+    cancel: '/cancel/:id',
+    RefundInfo: '/refund-info/:id',
   },
 } as const;

@@ -41,7 +41,7 @@ export class DeleteEventUseCase implements IDeleteEventUseCase {
           if (!isMock) {
             try {
               await razorpayInstance.payments.refund(payment.transactionId, {
-                amount: booking.totalAmount * 100, // in paise
+                amount: booking.totalAmount * 100,
               });
               logger.info(
                 `Successfully refunded booking ${booking.id} via Razorpay (transaction: ${payment.transactionId})`,

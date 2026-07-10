@@ -24,6 +24,7 @@ export class EventRepository
   }
 
   async createEvent(event: Events): Promise<Events> {
+    const isLive = event.status === EventStatus.LIVE;
     const events = await super.create({
       title: event.title,
       description: event.description,
@@ -36,6 +37,8 @@ export class EventRepository
       price: event.price,
       startTime: event.startTime,
       status: event.status,
+      isPublished: isLive,
+      publishedAt: isLive ? new Date() : undefined,
     });
     return this.toEntity(events);
   }
@@ -256,6 +259,9 @@ export class EventRepository
 
     event.status = EventStatus.LIVE;
     event.isPublished = true;
+    if (!event.publishedAt) {
+      event.publishedAt = new Date();
+    }
     const updated = await event.save();
     return this.toEntity(updated);
   }
@@ -304,6 +310,8 @@ export class EventRepository
       manager.isPublished,
       manager.isDeleted,
       manager.deletedAt,
+      manager.bookedTickets,
+      manager.publishedAt,
     );
   }
 }

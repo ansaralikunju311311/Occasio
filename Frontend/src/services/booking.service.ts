@@ -39,6 +39,11 @@ export const bookingService = {
     const response = await api.patch(API_ENDPOINTS.BOOKINGS_CANCEL(bookingId));
     return response.data;
   },
+
+  getRefundInfo: async (bookingId: string) => {
+    const response = await api.get(API_ENDPOINTS.BOOKINGS_REFUND_INFO(bookingId));
+    return response.data;
+  },
 };
 
 

@@ -28,6 +28,7 @@ export interface IEventDocument extends Document {
   isPublished: boolean;
   isDeleted: boolean;
   deletedAt: Date;
+  publishedAt?: Date;
 }
 
 const eventSchema = new Schema<IEventDocument>(
@@ -104,6 +105,10 @@ const eventSchema = new Schema<IEventDocument>(
       default: false,
     },
     deletedAt: {
+      type: Date,
+      default: null,
+    },
+    publishedAt: {
       type: Date,
       default: null,
     },

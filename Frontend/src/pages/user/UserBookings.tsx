@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import HomeButton from '../../components/common/HomeButton';
 import { paymentService } from '../../services/payment.service';
-import { bookingService } from '../../services/booking.service';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { toast } from 'sonner';
 import { APP_MESSAGES } from '../../constants';
 import { Table } from '../../components/common/Table';
 import { Pagination } from '../../components/common/Pagination';
+import CancelBookingModal from '../../components/user/CancelBookingModal';
 
 interface Booking {
   id: string;
@@ -38,27 +38,12 @@ const UserBookings = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const isDashboard = pathname.startsWith('/eventmanager');
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleCancel = async (bookingId: string) => {
-    try {
-      const res = await bookingService.cancelBooking(bookingId);
-      if (res.success) {
-        toast.success('Booking cancelled successfully.');
-        setBookings((prev) =>
-          prev.map((b) => (b.id === bookingId ? { ...b, status: 'CANCELLED' } : b))
-        );
-      } else {
-        toast.error(res.message || 'Failed to cancel booking.');
-      }
-    } catch (err: any) {
-      console.error('Failed to cancel booking:', err);
-      toast.error(err.response?.data?.message || 'An error occurred while cancelling the booking.');
-    }
   };
 
   useEffect(() => {
@@ -249,7 +234,10 @@ const UserBookings = () => {
                     </button>
                     {booking.status?.toUpperCase() !== 'CANCELLED' && booking.status?.toUpperCase() !== 'FAILED' && (
                       <button
-                        onClick={() => handleCancel(booking.id)}
+                        onClick={() => {
+                          setSelectedBookingId(booking.id);
+                          setIsCancelModalOpen(true);
+                        }}
                         className="px-3 py-1.5 bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white text-xs font-bold rounded-lg border border-rose-500/20 transition-all cursor-pointer"
                       >
                         Cancel
@@ -270,6 +258,22 @@ const UserBookings = () => {
             />
           )}
         </div>
+      )}
+
+      {selectedBookingId && (
+        <CancelBookingModal
+          isOpen={isCancelModalOpen}
+          onClose={() => {
+            setIsCancelModalOpen(false);
+            setSelectedBookingId(null);
+          }}
+          bookingId={selectedBookingId}
+          onConfirmSuccess={() => {
+            setBookings((prev) =>
+              prev.map((b) => (b.id === selectedBookingId ? { ...b, status: 'CANCELLED' } : b))
+            );
+          }}
+        />
       )}
     </div>
   </div>

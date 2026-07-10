@@ -179,4 +179,11 @@ export class BookingRepository implements IBookingRepository {
     const docs = await BookingModel.find({ eventId, status: 'CONFIRMED' });
     return docs.map((doc) => this.toEntity(doc));
   }
+  async hasBookings(eventId: string): Promise<boolean> {
+    const count = await BookingModel.countDocuments({
+      eventId,
+      status: { $in: ['CONFIRMED', 'PENDING'] },
+    });
+    return count > 0;
+  }
 }

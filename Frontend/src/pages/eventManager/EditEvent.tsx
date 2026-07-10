@@ -208,10 +208,18 @@ const EditEvent = () => {
     setImagePreview(null);
     setValue('banner', undefined);
   };
-
   const onSubmit: SubmitHandler<IEventFormInput> = async (data) => {
-    const start = new Date(data.startTime);
-    const end = new Date(data.endTime);
+    const start = event?.hasBookings ? new Date(event.startTime) : new Date(data.startTime);
+    const end = event?.hasBookings ? new Date(event.endTime) : new Date(data.endTime);
+
+    if (event?.hasBookings && data.startTime) {
+      const originalStart = new Date(event.startTime).getTime();
+      const newStart = new Date(data.startTime).getTime();
+      if (originalStart !== newStart) {
+        toast.error('Cannot modify start date or start time if the event has bookings.');
+        return;
+      }
+    }
 
     for (const block of layoutBlocks) {
       for (const row of block.rows) {
@@ -262,8 +270,8 @@ const EditEvent = () => {
                   address: data.address,
                 }
               : null,
-            startTime: new Date(data.startTime),
-            endTime: new Date(data.endTime),
+            startTime: start,
+            endTime: end,
             picture: bannerUrl,
             layout: isOfflineOrHybrid ? { blocks: layoutBlocks } : undefined,
           },
@@ -391,8 +399,15 @@ const EditEvent = () => {
                 />
               </svg>
             </span>
-            Date & Time
+            Date &amp; Time
           </h2>
+
+          {event?.hasBookings && (
+            <div className="mb-4 p-4 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-400 text-xs font-semibold flex items-center gap-2">
+              <span>⚠️</span>
+              <span>This event has active bookings. The start date and time cannot be modified.</span>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
@@ -400,7 +415,8 @@ const EditEvent = () => {
               <input
                 {...register('startTime', { required: 'Start time is required' })}
                 type="datetime-local"
-                className="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-teal-500"
+                disabled={!!event?.hasBookings}
+                className={`w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-teal-500 ${event?.hasBookings ? 'opacity-50 cursor-not-allowed' : ''}`}
               />
             </div>
             <div className="space-y-2">
@@ -408,7 +424,8 @@ const EditEvent = () => {
               <input
                 {...register('endTime', { required: 'End time is required' })}
                 type="datetime-local"
-                className="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-teal-500"
+                disabled={!!event?.hasBookings}
+                className={`w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-teal-500 ${event?.hasBookings ? 'opacity-50 cursor-not-allowed' : ''}`}
               />
             </div>
           </div>

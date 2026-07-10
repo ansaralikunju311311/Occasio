@@ -39,6 +39,7 @@ export const API_ENDPOINTS = {
   BOOKINGS_CONFIRM: '/bookings/confirm',
   BOOKINGS_FAILED: '/bookings/failed',
   BOOKINGS_CANCEL: (id: string) => `/bookings/cancel/${id}`,
+  BOOKINGS_REFUND_INFO: (id: string) => `/bookings/refund-info/${id}`,
 
   // Admin
   ADMIN_USERS: '/admin/users',

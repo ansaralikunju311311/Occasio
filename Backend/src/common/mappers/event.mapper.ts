@@ -39,6 +39,8 @@ export class EventMapper extends BaseMapper<Events, EventResponseDto> {
         : undefined,
       isDeleted: entity.isDeleted,
       deletedAt: entity.deletedAt,
+      publishedAt: entity.publishedAt,
+      hasBookings: entity.hasBookings,
     };
   }
 

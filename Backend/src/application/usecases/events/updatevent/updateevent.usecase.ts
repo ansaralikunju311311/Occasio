@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 
 import type { IEventRepository } from '../../../../domain/repositories/event/event.repository.interface';
+import type { IBookingRepository } from '../../../../domain/repositories/booking/booking.repository.interface';
 import { eventMapper } from '../../../../common/mappers/event.mapper';
 import type { EventResponseDto } from '../../../../application/dtos/responses/event-response.dto';
 import type { UpdateEventDTO } from '../../../../application/dtos/updateevent.dto';
@@ -12,7 +13,10 @@ import { normalizeCoordinates } from '../../../../common/utils/geo.utils';
 import type { IUpdateEventUseCase } from './updatevent.usecase.interface';
 
 export class UpdateEventUseCase implements IUpdateEventUseCase {
-  constructor(private _eventRepository: IEventRepository) {}
+  constructor(
+    private _eventRepository: IEventRepository,
+    private _bookingRepository: IBookingRepository,
+  ) {}
 
   async execute(
     eventId: string,
@@ -29,6 +33,19 @@ export class UpdateEventUseCase implements IUpdateEventUseCase {
         await session.abortTransaction();
         session.endSession();
         return null;
+      }
+
+      if (data.startTime) {
+        const currentStartTime = new Date(event.startTime).getTime();
+        const newStartTime = new Date(data.startTime).getTime();
+        if (currentStartTime !== newStartTime) {
+          const hasBookings = await this._bookingRepository.hasBookings(eventId);
+          if (hasBookings) {
+            await session.abortTransaction();
+            session.endSession();
+            throw new Error('Cannot modify start date or start time if the event has bookings.');
+          }
+        }
       }
 
       if (new Date(event.startTime) <= new Date()) {

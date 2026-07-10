@@ -22,6 +22,9 @@ export class EventDetailsUseCase implements IEventDetailsUseCase {
       events.bookedTickets = count;
     }
 
+    const hasBookings = await this._bookingRepository.hasBookings(id);
+    events.hasBookings = hasBookings;
+
     return eventMapper.toResponse(events);
   }
 }
