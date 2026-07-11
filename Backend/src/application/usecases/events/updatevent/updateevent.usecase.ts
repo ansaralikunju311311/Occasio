@@ -39,11 +39,14 @@ export class UpdateEventUseCase implements IUpdateEventUseCase {
         const currentStartTime = new Date(event.startTime).getTime();
         const newStartTime = new Date(data.startTime).getTime();
         if (currentStartTime !== newStartTime) {
-          const hasBookings = await this._bookingRepository.hasBookings(eventId);
+          const hasBookings =
+            await this._bookingRepository.hasBookings(eventId);
           if (hasBookings) {
             await session.abortTransaction();
             session.endSession();
-            throw new Error('Cannot modify start date or start time if the event has bookings.');
+            throw new Error(
+              'Cannot modify start date or start time if the event has bookings.',
+            );
           }
         }
       }

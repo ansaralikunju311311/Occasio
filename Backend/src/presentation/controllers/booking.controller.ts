@@ -7,7 +7,7 @@ import type { IFailBookingUseCase } from '../../application/usecases/booking/boo
 import { catchAsync } from '../../common/utils/catchAsync';
 import { HttpStatus } from '../../common/constants/http-status';
 import { sendSuccess } from '../../common/utils/response';
-import { ICancelBooking } from '../../application/usecases/booking/cancelbooking/cancelbooking.usecase.interface';
+import type { ICancelBooking } from '../../application/usecases/booking/cancelbooking/cancelbooking.usecase.interface';
 import { BookingModel } from '../../infrastructure/database/model/booking.model';
 import { calculateRefundPercentage } from '../../common/utils/refund';
 
@@ -18,7 +18,6 @@ export class BookingController {
     private _confirmBookingUseCase: IConfirmBookingUseCase,
     private _failBookingUseCase: IFailBookingUseCase,
     private _cancelBookingUseCase: ICancelBooking,
-
   ) {}
 
   lockSeats = catchAsync(async (req: Request, res: Response): Promise<void> => {
@@ -112,7 +111,7 @@ export class BookingController {
       }
       await this._cancelBookingUseCase.execute(bookingId, userId);
       sendSuccess(res, null, 'Booking cancelled successfully');
-    }
+    },
   );
 
   getRefundInfo = catchAsync(
@@ -124,20 +123,25 @@ export class BookingController {
         return;
       }
 
-      const booking = await BookingModel.findById(bookingId).populate('eventId');
+      const booking =
+        await BookingModel.findById(bookingId).populate('eventId');
       if (!booking) {
         res.status(HttpStatus.NOT_FOUND).json({ message: 'Booking not found' });
         return;
       }
 
       if (String(booking.userId) !== String(userId)) {
-        res.status(HttpStatus.FORBIDDEN).json({ message: 'Booking does not belong to this user' });
+        res
+          .status(HttpStatus.FORBIDDEN)
+          .json({ message: 'Booking does not belong to this user' });
         return;
       }
 
       const event = booking.eventId as any;
       if (!event) {
-        res.status(HttpStatus.NOT_FOUND).json({ message: 'Associated event not found' });
+        res
+          .status(HttpStatus.NOT_FOUND)
+          .json({ message: 'Associated event not found' });
         return;
       }
 
@@ -156,26 +160,29 @@ export class BookingController {
         refundPercentage = calculateRefundPercentage(
           event.publishedAt,
           event.startTime,
-          today
+          today,
         );
         if (refundPercentage === 0) {
           eligible = false;
-          message = 'Cancellation is not available less than 24 hours before the event starts.';
+          message =
+            'Cancellation is not available less than 24 hours before the event starts.';
         } else {
           eligible = true;
           message = 'Eligible for cancellation.';
         }
       }
 
-      const refundAmount = Math.round((booking.totalAmount * refundPercentage) / 100);
+      const refundAmount = Math.round(
+        (booking.totalAmount * refundPercentage) / 100,
+      );
 
       sendSuccess(res, {
         eligible,
         refundPercentage,
         refundAmount,
         totalAmount: booking.totalAmount,
-        message
+        message,
       });
-    }
+    },
   );
 }

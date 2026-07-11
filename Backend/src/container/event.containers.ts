@@ -33,7 +33,10 @@ export const MakeEventController = () => {
     eventRepository,
     bookingRepository,
   );
-  const updateEventsUseCase = new UpdateEventUseCase(eventRepository, bookingRepository);
+  const updateEventsUseCase = new UpdateEventUseCase(
+    eventRepository,
+    bookingRepository,
+  );
   const deleteEventUseCase = new DeleteEventUseCase(
     eventRepository,
     bookingRepository,

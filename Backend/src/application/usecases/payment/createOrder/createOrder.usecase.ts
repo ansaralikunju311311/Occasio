@@ -5,8 +5,9 @@ import type { ISubscriptionRepository } from '../../../../domain/repositories/su
 import type { IBookingRepository } from '../../../../domain/repositories/booking/booking.repository.interface';
 import { Booking } from '../../../../domain/entities/booking.entity';
 import { BookingStatus } from '../../../../common/enums/booking-status.enum';
+import type { ISeatRepository } from '../../../../domain/repositories/seats/seat.repository.interface';
+
 import type { ICreateOrderUseCase } from './createOrder.usecase.interface';
-import { ISeatRepository } from '../../../../domain/repositories/seats/seat.repository.interface';
 
 export class CreateOrderUseCase implements ICreateOrderUseCase {
   constructor(

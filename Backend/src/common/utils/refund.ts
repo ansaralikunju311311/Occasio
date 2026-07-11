@@ -1,7 +1,7 @@
 export function calculateRefundPercentage(
   publishedAt: Date | string | undefined | null,
   startTime: Date | string,
-  cancelTime: Date | string = new Date()
+  cancelTime: Date | string = new Date(),
 ): number {
   if (!publishedAt) {
     // If publishedAt is missing, fallback to 0% (no cancellation/refund)

@@ -1,11 +1,12 @@
-import { IBookingRepository } from '../../../../domain/repositories/booking/booking.repository.interface';
-import { ICancelBooking } from './cancelbooking.usecase.interface';
+import type { IBookingRepository } from '../../../../domain/repositories/booking/booking.repository.interface';
 import { BookingStatus } from '../../../../common/enums/booking-status.enum';
-import { IEventRepository } from '../../../../domain/repositories/event/event.repository.interface';
+import type { IEventRepository } from '../../../../domain/repositories/event/event.repository.interface';
 import { UserRepository } from '../../../../infrastructure/repositories/user/user.repository';
 import { PaymentRepository } from '../../../../infrastructure/repositories/payment/payment.repository';
 import { Payment } from '../../../../domain/entities/payment.entity';
 import { calculateRefundPercentage } from '../../../../common/utils/refund';
+
+import type { ICancelBooking } from './cancelbooking.usecase.interface';
 
 export class CancelBooking implements ICancelBooking {
   private _userRepository = new UserRepository();
@@ -42,7 +43,7 @@ export class CancelBooking implements ICancelBooking {
     const refundPercentage = calculateRefundPercentage(
       eventDetails.publishedAt,
       eventDetails.startTime,
-      today
+      today,
     );
 
     if (refundPercentage === 0) {
@@ -76,7 +77,7 @@ export class CancelBooking implements ICancelBooking {
           `refund_${bookingDetails.id}_${Date.now()}`,
           bookingDetails.eventId,
           bookingDetails.id ?? undefined,
-          new Date()
+          new Date(),
         );
         await this._paymentRepository.savePayment(refundPayment);
       }

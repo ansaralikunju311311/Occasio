@@ -10,7 +10,6 @@ import { ResendotpUseCase } from '../application/usecases/auth/resendotp/resend.
 import { GetmeUseCase } from '../application/usecases/auth/restore/getme.usecase';
 import { ForgotpasswordUsecase } from '../application/usecases/auth/forgotpassword/forgot.usecase';
 import { LoginUseCase } from '../application/usecases/auth/login/login.usecase';
-// import  {ITokenService}  from "domain/services/token.service.interface"
 import { UpdatePasswordUseCase } from '../application/usecases/auth/updatepassword/updatepassword.usecase';
 import { ResetPasswordUseCase } from '../application/usecases/auth/resetPassword/reset.usecase';
 import { AdminLoginUseCase } from '../application/usecases/auth/adminLogin/adminLogin.usecase';

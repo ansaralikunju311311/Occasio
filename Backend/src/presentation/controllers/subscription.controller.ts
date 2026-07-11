@@ -42,7 +42,7 @@ export class PlanController {
       limit,
     });
 
-    const extra: Record<string, any> = { plans };
+    const extra: Record<string, unknown> = { plans };
     if (page !== undefined && limit !== undefined) {
       extra.metadata = {
         total,

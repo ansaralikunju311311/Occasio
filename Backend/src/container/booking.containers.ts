@@ -30,7 +30,10 @@ export const makebookingController = () => {
   );
   const failBookingUseCase = new FailBookingUseCase(seatRepository);
 
-  const cancelBookingUseCase = new CancelBooking(bookingRepository,eventRepository);
+  const cancelBookingUseCase = new CancelBooking(
+    bookingRepository,
+    eventRepository,
+  );
 
   return new BookingController(
     lockSeatsUseCase,
