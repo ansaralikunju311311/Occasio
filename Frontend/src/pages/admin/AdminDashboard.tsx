@@ -1,5 +1,6 @@
 import { useAppSelector } from '../../redux/hook';
 import { useAdminDashboardStats } from '../../hooks/useAdmin';
+import { AdminDashboardCharts } from '../../components/common/DashboardCharts';
 
 const AdminDashboard = () => {
   const user = useAppSelector((state) => state.auth.user);
@@ -77,6 +78,11 @@ const AdminDashboard = () => {
           </div>
         ))}
       </div>
+
+      {/* Dynamic Graphs Section */}
+      {statsData.trend && statsData.trend.length > 0 && (
+        <AdminDashboardCharts trend={statsData.trend} />
+      )}
 
       {/* Revenue Section */}
       <div className="mb-6">

@@ -4,6 +4,7 @@ import { api } from '../../services/api';
 import { API_ENDPOINTS } from '../../constants';
 import HomeButton from '../../components/common/HomeButton';
 import { useManagerStats } from '../../hooks/useEvents';
+import { ManagerDashboardCharts } from '../../components/common/DashboardCharts';
 
 const EventManagerDashboard = () => {
   const user = useAppSelector((state) => state.auth.user);
@@ -142,6 +143,14 @@ const EventManagerDashboard = () => {
           </div>
         ))}
       </div>
+
+      {/* Dynamic Graphs Section */}
+      {statsData.trend && statsData.trend.length > 0 && (
+        <ManagerDashboardCharts
+          trend={statsData.trend}
+          eventDistribution={statsData.eventDistribution || []}
+        />
+      )}
     </div>
   );
 };

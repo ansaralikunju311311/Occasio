@@ -19,6 +19,7 @@ const EventManagerMyEvents = () => {
   const deleteMutation = useDeleteEvent();
   const [isDeletingId, setIsDeletingId] = useState<string | null>(null);
   const [isSchedulingId, setIsSchedulingId] = useState<string | null>(null);
+  const [eventToCancel, setEventToCancel] = useState<any>(null);
 
   const {
     data: responseData,
@@ -47,21 +48,18 @@ const EventManagerMyEvents = () => {
     navigate(`/eventmanager/edit-event/${id}`);
   };
 
-  const handleCancel = async (id: string) => {
-    if (
-      window.confirm(
-        'Are you sure you want to cancel (delete) this event? This action cannot be undone.'
-      )
-    ) {
-      setIsDeletingId(id);
-      try {
-        await deleteMutation.mutateAsync(id);
-        toast.success('Event cancelled successfully.');
-      } catch (err) {
-        toast.error('Failed to cancel event.');
-      } finally {
-        setIsDeletingId(null);
-      }
+  const handleCancelConfirm = async () => {
+    if (!eventToCancel) return;
+    const id = eventToCancel.id;
+    setIsDeletingId(id);
+    try {
+      await deleteMutation.mutateAsync(id);
+      toast.success('Event cancelled successfully.');
+      setEventToCancel(null);
+    } catch (err) {
+      toast.error('Failed to cancel event.');
+    } finally {
+      setIsDeletingId(null);
     }
   };
 
@@ -512,7 +510,7 @@ const EventManagerMyEvents = () => {
                         </button>
 
                         <button
-                          onClick={() => handleCancel(event.id)}
+                          onClick={() => setEventToCancel(event)}
                           disabled={isStarted || isDeletingId === event.id}
                           className="p-2 text-rose-400 hover:text-white hover:bg-rose-700/50 rounded-lg transition-colors inline-block disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
                           title={
@@ -564,6 +562,70 @@ const EventManagerMyEvents = () => {
 
       {/* Event Details Modal */}
       <EventDetailsModal event={selectedEvent} onClose={() => setSelectedEvent(null)} />
+
+      {/* Cancel Event Confirmation Modal */}
+      {eventToCancel && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
+          <div
+            className="absolute inset-0"
+            onClick={() => !isDeletingId && setEventToCancel(null)}
+          ></div>
+          <div className="relative bg-[#0a0f16] border border-slate-800 rounded-2xl shadow-2xl p-6 w-full max-w-md animate-fade-in-up">
+            {/* Header / Icon */}
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-12 h-12 rounded-full bg-rose-500/10 flex items-center justify-center border border-rose-500/20 text-rose-500 shrink-0">
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-white">Cancel Event</h3>
+                <p className="text-xs text-slate-500 font-mono mt-0.5">ID: {eventToCancel.id}</p>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="space-y-3 mb-6">
+              <p className="text-slate-300 text-sm leading-relaxed">
+                Are you sure you want to cancel (delete) the event <span className="text-white font-semibold">"{eventToCancel.title}"</span>?
+              </p>
+              <div className="bg-rose-500/5 border border-rose-500/10 rounded-xl p-3 text-rose-400 text-xs flex gap-2 leading-relaxed">
+                <svg className="w-4 h-4 shrink-0 mt-0.5 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>
+                  This action cannot be undone. All active bookings and sessions for this event will be canceled.
+                </span>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-3">
+              <button
+                onClick={() => setEventToCancel(null)}
+                disabled={isDeletingId === eventToCancel.id}
+                className="flex-1 px-4 py-2.5 bg-slate-800/50 hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl transition-colors border border-slate-700"
+              >
+                Go Back
+              </button>
+              <button
+                onClick={handleCancelConfirm}
+                disabled={isDeletingId === eventToCancel.id}
+                className="flex-1 px-4 py-2.5 bg-rose-600 hover:bg-rose-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl transition-colors flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(239,68,68,0.1)] hover:shadow-[0_0_20px_rgba(239,68,68,0.2)]"
+              >
+                {isDeletingId === eventToCancel.id ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                    Cancelling...
+                  </>
+                ) : (
+                  'Cancel Event'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

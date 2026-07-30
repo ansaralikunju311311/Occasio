@@ -10,7 +10,11 @@ const bookingController = makebookingController();
 // Apply auth middleware to all booking routes
 // router.use(verifyAccessToken);
 
-router.post(ApiEndpoints.Bookings.LockSeats, bookingController.lockSeats);
+router.post(
+  ApiEndpoints.Bookings.LockSeats,
+  verifyAccessToken,
+  bookingController.lockSeats,
+);
 router.post(
   ApiEndpoints.Bookings.PaymentIntent,
   verifyAccessToken,
