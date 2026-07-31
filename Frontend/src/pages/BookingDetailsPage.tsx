@@ -262,7 +262,7 @@ const BookingDetailsPage = () => {
           </div>
 
           {/* Ticket Body Content */}
-          <div className="p-8 grid md:grid-cols-3 gap-8 items-center border-b border-dashed border-slate-800/80">
+          <div className="p-4 sm:p-6 md:p-8 grid md:grid-cols-3 gap-6 sm:gap-8 items-center border-b border-dashed border-slate-800/80">
             {/* Details */}
             <div className="md:col-span-2 space-y-6">
               <div>
@@ -315,7 +315,7 @@ const BookingDetailsPage = () => {
           </div>
 
           {/* Receipt Info Panel */}
-          <div className="p-8 bg-slate-900/20 grid grid-cols-2 md:grid-cols-4 gap-6 items-center">
+          <div className="p-4 sm:p-6 md:p-8 bg-slate-900/20 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 items-center">
             <div>
               <h4 className="print-text-muted text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
                 Booking Type

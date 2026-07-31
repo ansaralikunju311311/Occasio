@@ -56,8 +56,8 @@ const Profile = () => {
         </div>
       </div>
 
-      <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-2xl p-8 shadow-xl max-w-2xl text-accent-white">
-        <div className="flex items-center gap-6 mb-8 pb-8 border-b border-slate-800/60 ">
+      <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/60 rounded-2xl p-4 sm:p-6 md:p-8 shadow-xl max-w-2xl text-accent-white">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 mb-8 pb-8 border-b border-slate-800/60">
           <div className="w-24 h-24 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-3xl">
             👤
           </div>

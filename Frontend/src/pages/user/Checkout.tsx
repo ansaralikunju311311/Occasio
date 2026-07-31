@@ -201,7 +201,7 @@ const Checkout = () => {
                 Review Your Booking
               </h1>
 
-              <div className="flex gap-6 mb-8 p-4 bg-slate-950/40 rounded-2xl border border-slate-800/50">
+              <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 mb-8 p-4 bg-slate-950/40 rounded-2xl border border-slate-800/50">
                 <img
                   src={
                     event.picture || 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30'

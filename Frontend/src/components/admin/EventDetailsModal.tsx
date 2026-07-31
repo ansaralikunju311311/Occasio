@@ -193,7 +193,7 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({ event, onClose })
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="bg-slate-900/50 p-4 rounded-xl border border-slate-800">
                   <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
                     <svg
@@ -300,7 +300,7 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({ event, onClose })
                       </svg>
                       Ticket Categories & Seats
                     </h3>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                       {blocks.map((b: any, i: number) => {
                         const name =
                           b.category?.name || b.blockName || b.blocName || `Block ${i + 1}`;

@@ -150,7 +150,7 @@ const EventManagerMyEvents = () => {
   };
 
   return (
-    <div className="p-8 w-full min-h-screen bg-[#070b14]">
+    <div className="w-full min-h-screen">
       {/* Header Section */}
       <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>

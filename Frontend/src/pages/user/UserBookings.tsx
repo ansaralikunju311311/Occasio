@@ -69,7 +69,7 @@ const UserBookings = () => {
   if (loading) return <LoadingSpinner />;
 
   return (
-    <div className={isDashboard ? "animate-fade-in-up" : "min-h-screen bg-slate-950 pt-28 pb-16 px-6 text-slate-100 animate-fade-in-up"}>
+    <div className={isDashboard ? "animate-fade-in-up" : "min-h-screen bg-slate-950 pt-6 sm:pt-8 pb-16 px-4 sm:px-6 text-slate-100 animate-fade-in-up"}>
       <div className={isDashboard ? "" : "max-w-7xl mx-auto"}>
         <div className="mb-8">
 

@@ -212,11 +212,11 @@ const Subscriptions = () => {
       )}
 
       {/* Plans grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto px-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto px-2 sm:px-4">
         {plans.map((plan: any, index: number) => (
           <div
             key={plan.name}
-            className={`relative group bg-[#0a0f16] border rounded-[2.5rem] p-8 transition-all duration-500 flex flex-col h-full hover:-translate-y-2
+            className={`relative group bg-[#0a0f16] border rounded-3xl lg:rounded-[2.5rem] p-6 sm:p-8 transition-all duration-500 flex flex-col h-full hover:-translate-y-2
               ${plan.popular ? 'border-teal-500/50 shadow-[0_0_40px_-10px_rgb(20,184,166,0.2)]' : 'border-slate-800 hover:border-slate-700 shadow-xl'}
               ${index === 0 ? 'animation-slide-up' : index === 1 ? 'animation-slide-up-delay' : 'stagger-animation'}
             `}

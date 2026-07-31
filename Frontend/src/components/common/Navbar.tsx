@@ -9,11 +9,11 @@ import NotificationBell from './NotificationBell';
 
 const Navbar = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user, isAuthenticated } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  console.log('checking this is working', user);
   const handleLogout = async () => {
     try {
       const response = await api.post(API_ENDPOINTS.AUTH_LOGOUT);
@@ -28,13 +28,19 @@ const Navbar = () => {
     }
   };
 
+  const closeMobileMenu = () => setIsMobileMenuOpen(false);
+
   return (
-    <header className="fixed w-full z-50 bg-slate-950/80 backdrop-blur-lg shadow-sm border-b border-slate-800 transition-all duration-300">
-      <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-slate-950/90 backdrop-blur-lg shadow-sm border-b border-slate-800 transition-all duration-300">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
         <h1 className="text-2xl font-bold bg-linear-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent tracking-tight">
-          <Link to="/">Occasio</Link>
+          <Link to="/" onClick={closeMobileMenu}>
+            Occasio
+          </Link>
         </h1>
-        <nav className="space-x-8 flex items-center pr-4">
+
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex space-x-6 lg:space-x-8 items-center">
           <Link
             to="/"
             className="text-sm font-medium text-slate-300 hover:text-white transition-colors"
@@ -59,7 +65,7 @@ const Navbar = () => {
               <NotificationBell />
               <button
                 onClick={() => setShowLogoutModal(true)}
-                className="text-sm font-medium text-slate-300 hover:text-white transition-colors"
+                className="text-sm font-medium text-slate-300 hover:text-white transition-colors cursor-pointer"
               >
                 Logout
               </button>
@@ -87,7 +93,92 @@ const Navbar = () => {
             </>
           )}
         </nav>
+
+        {/* Mobile menu button */}
+        <div className="flex md:hidden items-center gap-3">
+          {isAuthenticated && <NotificationBell />}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="p-2 text-slate-400 hover:text-white focus:outline-none rounded-lg border border-slate-800 bg-slate-900/50"
+            aria-label="Toggle Menu"
+          >
+            {isMobileMenuOpen ? (
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            ) : (
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            )}
+          </button>
+        </div>
       </div>
+
+      {/* Mobile Drawer Menu */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden bg-slate-950/95 border-b border-slate-800 px-6 py-6 space-y-4 animate-fade-in">
+          <Link
+            to="/"
+            onClick={closeMobileMenu}
+            className="block text-base font-medium text-slate-200 hover:text-indigo-400 transition-colors py-2"
+          >
+            Home
+          </Link>
+          <Link
+            to="/events"
+            onClick={closeMobileMenu}
+            className="block text-base font-medium text-slate-200 hover:text-indigo-400 transition-colors py-2"
+          >
+            Events
+          </Link>
+
+          {isAuthenticated && user ? (
+            <>
+              <Link
+                to="/bookings"
+                onClick={closeMobileMenu}
+                className="block text-base font-medium text-slate-200 hover:text-indigo-400 transition-colors py-2"
+              >
+                My Bookings
+              </Link>
+              <Link
+                to={user.role === 'ADMIN' ? '/admin/dashboard' : '/eventmanager'}
+                onClick={closeMobileMenu}
+                className="block text-center text-base font-medium px-5 py-3 rounded-xl bg-linear-to-r from-indigo-500 to-purple-600 text-white transition-all shadow-md"
+              >
+                {user.role === 'ADMIN' ? 'Admin Panel' : 'Dashboard'}
+              </Link>
+              <button
+                onClick={() => {
+                  closeMobileMenu();
+                  setShowLogoutModal(true);
+                }}
+                className="w-full text-left text-base font-medium text-red-400 hover:text-red-300 transition-colors py-2"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <div className="pt-2 flex flex-col gap-3">
+              <Link
+                to="/login"
+                onClick={closeMobileMenu}
+                className="block text-center text-base font-medium py-3 rounded-xl bg-slate-900 border border-slate-700 text-white"
+              >
+                Login
+              </Link>
+              <Link
+                to="/signup"
+                onClick={closeMobileMenu}
+                className="block text-center text-base font-medium py-3 rounded-xl bg-linear-to-r from-indigo-500 to-purple-600 text-white"
+              >
+                Sign Up
+              </Link>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Logout Confirmation Modal */}
       {showLogoutModal && (

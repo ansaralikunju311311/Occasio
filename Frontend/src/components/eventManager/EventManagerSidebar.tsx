@@ -8,39 +8,21 @@ import { useState } from 'react';
 
 const EventManagerSidebar = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
 
-  // const handlelogout = async ()=>{
-  //    console.log("happen this c all")
-  //     try {
-  //         const response = await api.post("/auth/logout");
-  //         console.log("wyting for this",response)
-  //     dispatch(
-  //         logout()
-  //     )
-  //     navigate("/login")
-  //     } catch (error) {
-  //         console.log(error)
-  //     }
-
-  // }
-
   const handlelogout = async () => {
-    console.log('fvnfjnvdfjvndfj');
     try {
       const response = await api.post(API_ENDPOINTS.AUTH_LOGOUT);
       localStorage.removeItem('accessToken');
       dispatch(logout());
-
-      console.log('the event come here?');
-
       navigate('/');
       console.log(response);
     } catch (error: any) {
-      console.log('errpr', error);
+      console.log('error', error);
       if (error.response) {
         toast.error(error.response.data.message || 'Logout failed');
       } else {
@@ -208,13 +190,13 @@ const EventManagerSidebar = () => {
   ];
 
   return (
-    <aside className="fixed top-0 left-0 h-screen w-64 bg-[#070b14] border-r border-slate-800/60 flex flex-col z-50">
-      {/* Brand / Logo */}
-      <div className="h-20 flex items-center justify-center border-b border-slate-800/60">
-        <div className="inline-flex items-center gap-3">
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-teal-500/10 border border-teal-500/30">
+    <>
+      {/* Mobile Header Bar */}
+      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-[#070b14]/95 border-b border-slate-800/60 flex items-center justify-between px-4 z-40 backdrop-blur-md">
+        <div className="inline-flex items-center gap-2">
+          <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-teal-500/10 border border-teal-500/30">
             <svg
-              className="w-5 h-5 text-teal-400"
+              className="w-4 h-4 text-teal-400"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -227,68 +209,98 @@ const EventManagerSidebar = () => {
               />
             </svg>
           </div>
-          <span className="text-xl font-bold tracking-tight text-white">
+          <span className="text-lg font-bold text-white">
             Occasio <span className="text-indigo-400">Dashboard</span>
           </span>
         </div>
+        <button
+          onClick={() => setIsMobileOpen(!isMobileOpen)}
+          className="p-2 text-slate-400 hover:text-white rounded-lg border border-slate-800 bg-slate-900/50"
+          aria-label="Toggle Navigation"
+        >
+          {isMobileOpen ? (
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          ) : (
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          )}
+        </button>
       </div>
 
-      {/* Navigation Sections */}
-      <nav className="flex-1 overflow-y-auto py-6 px-4 space-y-8 custom-scrollbar">
-        {/* Personal Section */}
-        <div className="space-y-2">
-          <h3 className="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-4">
-            Personal
-          </h3>
-          {personalLinks.map((link) => {
-            const isActive = location.pathname === link.path;
-            return (
-              <Link
-                key={link.name}
-                to={link.path}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 group relative ${
-                  isActive
-                    ? 'bg-linear-to-r from-indigo-500/10 to-purple-600/10 text-indigo-400 border border-indigo-500/20 shadow-[0_0_15px_rgb(99,102,241,0.05)]'
-                    : 'text-slate-400 hover:bg-slate-800/50 hover:text-white border border-transparent'
-                }`}
+      {/* Backdrop for Mobile */}
+      {isMobileOpen && (
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-45 md:hidden"
+          onClick={() => setIsMobileOpen(false)}
+        ></div>
+      )}
+
+      {/* Sidebar Container */}
+      <aside
+        className={`fixed top-0 left-0 h-screen w-64 bg-[#070b14] border-r border-slate-800/60 flex flex-col z-50 transition-transform duration-300 ${
+          isMobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+        }`}
+      >
+        {/* Brand / Logo */}
+        <div className="h-20 flex items-center justify-between px-6 border-b border-slate-800/60">
+          <div className="inline-flex items-center gap-3">
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-teal-500/10 border border-teal-500/30">
+              <svg
+                className="w-5 h-5 text-teal-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
               >
-                {isActive && (
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-indigo-500 rounded-r-full"></div>
-                )}
-                <div
-                  className={`${isActive ? 'text-indigo-400' : 'text-slate-500 group-hover:text-indigo-400 transition-colors'}`}
-                >
-                  {link.icon}
-                </div>
-                {link.name}
-              </Link>
-            );
-          })}
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                />
+              </svg>
+            </div>
+            <span className="text-xl font-bold tracking-tight text-white">
+              Occasio <span className="text-indigo-400">Dashboard</span>
+            </span>
+          </div>
+          <button
+            onClick={() => setIsMobileOpen(false)}
+            className="md:hidden text-slate-400 hover:text-white"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
 
-        {/* Management Section */}
-        {user?.role === 'EVENT_MANAGER' && (
+        {/* Navigation Sections */}
+        <nav className="flex-1 overflow-y-auto py-6 px-4 space-y-8 custom-scrollbar">
+          {/* Personal Section */}
           <div className="space-y-2">
             <h3 className="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-4">
-              Event Management
+              Personal
             </h3>
-            {managementLinks.map((link) => {
+            {personalLinks.map((link) => {
               const isActive = location.pathname === link.path;
               return (
                 <Link
                   key={link.name}
                   to={link.path}
+                  onClick={() => setIsMobileOpen(false)}
                   className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 group relative ${
                     isActive
-                      ? 'bg-linear-to-r from-teal-500/10 to-emerald-600/10 text-teal-400 border border-teal-500/20 shadow-[0_0_15px_rgb(20,184,166,0.05)]'
+                      ? 'bg-linear-to-r from-indigo-500/10 to-purple-600/10 text-indigo-400 border border-indigo-500/20 shadow-[0_0_15px_rgb(99,102,241,0.05)]'
                       : 'text-slate-400 hover:bg-slate-800/50 hover:text-white border border-transparent'
                   }`}
                 >
                   {isActive && (
-                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-teal-500 rounded-r-full"></div>
+                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-indigo-500 rounded-r-full"></div>
                   )}
                   <div
-                    className={`${isActive ? 'text-teal-400' : 'text-slate-500 group-hover:text-teal-400 transition-colors'}`}
+                    className={`${isActive ? 'text-indigo-400' : 'text-slate-500 group-hover:text-indigo-400 transition-colors'}`}
                   >
                     {link.icon}
                   </div>
@@ -297,75 +309,102 @@ const EventManagerSidebar = () => {
               );
             })}
           </div>
-        )}
-      </nav>
 
-      {/* Account / Logout */}
-      <div className="p-4 border-t border-slate-800/60">
-        {/* <button className="flex w-full items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-semibold text-slate-400 hover:bg-red-500/10 hover:text-red-400 border border-transparent hover:border-red-500/20 transition-all duration-200 group"
-//              onClick={() => {
-//     console.log("BUTTON CLICKED");
-//   }} 
- >
-                    <svg className="w-5 h-5 text-slate-500 group-hover:text-red-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
-                    Logout
-                </button> */}
-        <button
-          className="flex w-full items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-semibold text-slate-400 hover:bg-red-500/10 hover:text-red-400 border border-transparent hover:border-red-500/20 transition-all duration-200 group"
-          onClick={() => setShowLogoutModal(true)}
-        >
-          <svg
-            className="w-5 h-5 text-slate-500 group-hover:text-red-400 transition-colors"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
+          {/* Management Section */}
+          {user?.role === 'EVENT_MANAGER' && (
+            <div className="space-y-2">
+              <h3 className="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-4">
+                Event Management
+              </h3>
+              {managementLinks.map((link) => {
+                const isActive = location.pathname === link.path;
+                return (
+                  <Link
+                    key={link.name}
+                    to={link.path}
+                    onClick={() => setIsMobileOpen(false)}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 group relative ${
+                      isActive
+                        ? 'bg-linear-to-r from-teal-500/10 to-emerald-600/10 text-teal-400 border border-teal-500/20 shadow-[0_0_15px_rgb(20,184,166,0.05)]'
+                        : 'text-slate-400 hover:bg-slate-800/50 hover:text-white border border-transparent'
+                    }`}
+                  >
+                    {isActive && (
+                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-teal-500 rounded-r-full"></div>
+                    )}
+                    <div
+                      className={`${isActive ? 'text-teal-400' : 'text-slate-500 group-hover:text-teal-400 transition-colors'}`}
+                    >
+                      {link.icon}
+                    </div>
+                    {link.name}
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+        </nav>
+
+        {/* Account / Logout */}
+        <div className="p-4 border-t border-slate-800/60">
+          <button
+            className="flex w-full items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-semibold text-slate-400 hover:bg-red-500/10 hover:text-red-400 border border-transparent hover:border-red-500/20 transition-all duration-200 group cursor-pointer"
+            onClick={() => {
+              setIsMobileOpen(false);
+              setShowLogoutModal(true);
+            }}
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-            />
-          </svg>
-          Logout
-        </button>
-      </div>
+            <svg
+              className="w-5 h-5 text-slate-500 group-hover:text-red-400 transition-colors"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+              />
+            </svg>
+            Logout
+          </button>
+        </div>
 
-      {/* Logout Confirmation Modal */}
-      {showLogoutModal && (
-        <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-[#070b14]/80 backdrop-blur-sm"
-            onClick={() => setShowLogoutModal(false)}
-          ></div>
-          <div className="relative bg-[#0a0f16] border border-slate-800 rounded-2xl shadow-2xl p-6 w-full max-w-sm animate-fade-in-up">
-            <h3 className="text-xl font-bold text-white mb-2">Confirm Logout</h3>
-            <p className="text-slate-400 text-sm mb-6">
-              Are you sure you want to exit the manager dashboard?
-            </p>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowLogoutModal(false)}
-                className="flex-1 px-4 py-2.5 bg-slate-800/50 hover:bg-slate-800 text-white text-sm font-semibold rounded-xl transition-colors border border-slate-700"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => {
-                  setShowLogoutModal(false);
-                  handlelogout();
-                }}
-                className="flex-1 px-4 py-2.5 bg-red-500/10 hover:bg-red-500/20 text-red-500 text-sm font-semibold rounded-xl transition-colors border border-red-500/20 shadow-[0_0_15px_rgba(239,68,68,0.1)] hover:shadow-[0_0_20px_rgba(239,68,68,0.2)]"
-              >
-                Logout
-              </button>
+        {/* Logout Confirmation Modal */}
+        {showLogoutModal && (
+          <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
+            <div
+              className="absolute inset-0 bg-[#070b14]/80 backdrop-blur-sm"
+              onClick={() => setShowLogoutModal(false)}
+            ></div>
+            <div className="relative bg-[#0a0f16] border border-slate-800 rounded-2xl shadow-2xl p-6 w-full max-w-sm animate-fade-in-up">
+              <h3 className="text-xl font-bold text-white mb-2">Confirm Logout</h3>
+              <p className="text-slate-400 text-sm mb-6">
+                Are you sure you want to exit the manager dashboard?
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowLogoutModal(false)}
+                  className="flex-1 px-4 py-2.5 bg-slate-800/50 hover:bg-slate-800 text-white text-sm font-semibold rounded-xl transition-colors border border-slate-700"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    setShowLogoutModal(false);
+                    handlelogout();
+                  }}
+                  className="flex-1 px-4 py-2.5 bg-red-500/10 hover:bg-red-500/20 text-red-500 text-sm font-semibold rounded-xl transition-colors border border-red-500/20 shadow-[0_0_15px_rgba(239,68,68,0.1)] hover:shadow-[0_0_20px_rgba(239,68,68,0.2)]"
+                >
+                  Logout
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </aside>
+        )}
+      </aside>
+    </>
   );
 };
 

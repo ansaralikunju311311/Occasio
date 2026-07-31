@@ -49,7 +49,7 @@ const AdminDashboard = () => {
         </h2>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
         {platformOverviewStats.map((stat, i) => (
           <div
             key={i}
@@ -94,7 +94,7 @@ const AdminDashboard = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {/* Total Revenue Card (Highly Emphasized) */}
         <div className="bg-gradient-to-br from-emerald-950/40 to-slate-900/40 backdrop-blur-xl border border-emerald-500/40 rounded-2xl p-6 shadow-xl shadow-emerald-950/5 hover:border-emerald-400 transition-all duration-300 group relative overflow-hidden">
           <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl -mr-6 -mt-6"></div>

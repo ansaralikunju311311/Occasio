@@ -409,9 +409,9 @@ const BecomeAManager: React.FC = () => {
 
                 <form
                   onSubmit={handleSubmit(onSubmit)}
-                  className="bg-slate-900/40 backdrop-blur-3xl border border-white/10 p-8 lg:p-10 rounded-[2.5rem] shadow-2xl space-y-6"
+                  className="bg-slate-900/40 backdrop-blur-3xl border border-white/10 p-5 sm:p-8 lg:p-10 rounded-3xl lg:rounded-[2.5rem] shadow-2xl space-y-6"
                 >
-                  <div className="grid md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label className="text-sm font-semibold text-slate-300 ml-1">Full Name</label>
                       <input
@@ -444,7 +444,7 @@ const BecomeAManager: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="grid md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label className="text-sm font-semibold text-slate-300 ml-1">
                         Type of Organization

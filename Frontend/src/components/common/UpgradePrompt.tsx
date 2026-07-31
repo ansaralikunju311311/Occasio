@@ -52,7 +52,7 @@ const UpgradePrompt = () => {
         </button>
       </div>
 
-      <div className="mt-12 pt-8 border-t border-slate-800/60 w-full grid grid-cols-3 gap-4">
+      <div className="mt-12 pt-8 border-t border-slate-800/60 w-full grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="text-center">
           <div className="text-indigo-400 font-bold text-xl mb-1">Create</div>
           <div className="text-slate-500 text-xs uppercase tracking-widest font-semibold text-[10px]">

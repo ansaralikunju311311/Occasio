@@ -348,7 +348,7 @@ const EditEvent = () => {
               <label className="text-sm font-medium text-slate-300">
                 Event Type <span className="text-red-500">*</span>
               </label>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {[
                   { id: EventType.ONLINE, label: 'Online' },
                   { id: EventType.OFFLINE, label: 'Offline' },

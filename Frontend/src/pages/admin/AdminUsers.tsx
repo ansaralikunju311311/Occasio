@@ -117,7 +117,7 @@ const AdminUsers = () => {
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
+    <div className="w-full max-w-7xl mx-auto space-y-6">
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -344,7 +344,7 @@ const AdminUsers = () => {
 
               {/* Modal Body */}
               <div className="p-6 space-y-5">
-                <div className="grid grid-cols-2 gap-y-4 gap-x-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-6">
                   <div className="col-span-2">
                     <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-1">
                       Email Identifier

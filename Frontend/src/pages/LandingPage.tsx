@@ -153,7 +153,7 @@ const LandingPage = () => {
             Everything you need for the perfect event experience.
           </p>
         </div>
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Feature 1 */}
           <div className="group p-10 bg-slate-900/40 backdrop-blur-md rounded-3xl shadow-xl border border-slate-800 hover:border-indigo-500/30 hover:shadow-[0_0_40px_-10px_rgb(99,102,241,0.15)] hover:-translate-y-2 transition-all duration-300">
             <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mb-8 group-hover:bg-indigo-500 group-hover:border-transparent transition-all duration-300">

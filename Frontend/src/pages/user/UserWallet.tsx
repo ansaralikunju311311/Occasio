@@ -18,8 +18,8 @@ const UserWallet = () => {
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="w-full max-w-7xl mx-auto space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-white tracking-tight">My Digital Wallet</h1>
           <p className="text-slate-400 mt-1">
@@ -28,7 +28,7 @@ const UserWallet = () => {
         </div>
       </div>
 
-      <div className="p-6 bg-gradient-to-br from-indigo-900/40 via-purple-900/20 to-slate-900/40 border border-indigo-500/20 rounded-2xl flex items-center justify-between shadow-lg backdrop-blur-md max-w-2xl">
+      <div className="p-4 sm:p-6 bg-gradient-to-br from-indigo-900/40 via-purple-900/20 to-slate-900/40 border border-indigo-500/20 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-lg backdrop-blur-md max-w-2xl">
         <div className="space-y-1">
           <span className="text-xs font-bold text-indigo-400 uppercase tracking-wider">Current Balance</span>
           <h3 className="text-4xl font-black text-white">₹{user?.walletBalance ?? 0}</h3>
