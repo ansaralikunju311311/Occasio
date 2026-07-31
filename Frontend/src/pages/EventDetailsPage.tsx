@@ -124,10 +124,21 @@ const EventDetailsPage = () => {
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-linear-to-t from-slate-950/80 via-transparent to-transparent"></div>
-              <div className="absolute bottom-6 left-6">
+              <div className="absolute bottom-6 left-6 flex items-center gap-2">
                 <span className="px-4 py-1.5 rounded-full bg-indigo-500/20 backdrop-blur-md text-xs font-bold text-indigo-400 border border-indigo-500/30 uppercase tracking-[0.2em]">
                   {event.eventType}
                 </span>
+                {event.status === 'LIVE' && (
+                  <span className="px-4 py-1.5 rounded-full bg-emerald-500/20 backdrop-blur-md text-xs font-bold text-emerald-400 border border-emerald-500/30 uppercase tracking-[0.2em] flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    LIVE
+                  </span>
+                )}
+                {event.status === 'ACTIVE' && (
+                  <span className="px-4 py-1.5 rounded-full bg-teal-500/20 backdrop-blur-md text-xs font-bold text-teal-400 border border-teal-500/30 uppercase tracking-[0.2em]">
+                    ACTIVE
+                  </span>
+                )}
               </div>
             </div>
 
@@ -213,6 +224,26 @@ const EventDetailsPage = () => {
                 </svg>
                 <span>{formatDate(event.startTime)}</span>
               </div>
+
+              {/* Live Banner */}
+              {event.status === 'LIVE' && (
+                <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-4 flex items-center gap-3 shadow-[0_0_30px_rgba(16,185,129,0.15)]">
+                  <div className="p-2 rounded-xl bg-emerald-500/20 text-emerald-400 shrink-0">
+                    <span className="relative flex h-3 w-3">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                    </span>
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-extrabold text-emerald-400 uppercase tracking-widest flex items-center gap-2">
+                      Event is Live Now
+                    </h3>
+                    <p className="text-xs text-slate-300 mt-0.5 font-light">
+                      This event has started and is currently streaming live!
+                    </p>
+                  </div>
+                </div>
+              )}
 
               {/* Event Title */}
               <h1 className="text-3xl md:text-4xl font-extrabold text-white leading-tight tracking-tight">

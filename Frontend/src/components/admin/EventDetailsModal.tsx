@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useStartEvent } from '../../hooks/useEvents';
+import { toast } from 'sonner';
 
 interface EventDetailsModalProps {
   event: any;
@@ -6,11 +8,29 @@ interface EventDetailsModalProps {
 }
 
 const EventDetailsModal: React.FC<EventDetailsModalProps> = ({ event, onClose }) => {
+  const startMutation = useStartEvent();
+  const [isStarting, setIsStarting] = useState(false);
+
   if (!event) return null;
+
+  const handleStart = async () => {
+    setIsStarting(true);
+    try {
+      await startMutation.mutateAsync(event.id);
+      toast.success('Event is now LIVE!');
+      onClose();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || err.message || 'Failed to start event.');
+    } finally {
+      setIsStarting(false);
+    }
+  };
 
   const getStatusStyle = (status: string) => {
     switch (status) {
       case 'ACTIVE':
+        return 'bg-teal-500/10 text-teal-400 border-teal-500/20';
+      case 'LIVE':
         return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
       case 'UPCOMING':
         return 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20';
@@ -314,7 +334,35 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({ event, onClose })
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-slate-800 flex justify-end">
+        <div className="p-4 border-t border-slate-800 flex justify-end items-center gap-3">
+          {event.status === 'ACTIVE' && (
+            <button
+              onClick={handleStart}
+              disabled={isStarting}
+              className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg transition-all flex items-center gap-2 disabled:opacity-50 cursor-pointer shadow-[0_0_15px_rgba(16,185,129,0.3)]"
+            >
+              {isStarting ? (
+                <>
+                  <div className="w-3.5 h-3.5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                  Starting Event...
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Start Event
+                </>
+              )}
+            </button>
+          )}
+          {event.status === 'LIVE' && (
+            <span className="px-3 py-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-bold uppercase rounded-lg flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              Event Live
+            </span>
+          )}
           <button
             onClick={onClose}
             className="px-6 py-2 bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium rounded-lg transition-colors"

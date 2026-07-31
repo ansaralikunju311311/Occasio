@@ -6,6 +6,7 @@ import { EventDetailsUseCase } from '../application/usecases/events/eventdetails
 import { MyEventsUseCase } from '../application/usecases/events/myevents/myevents.usecase';
 import { UpdateEventUseCase } from '../application/usecases/events/updatevent/updateevent.usecase';
 import { DeleteEventUseCase } from '../application/usecases/events/deleteevent/deleteevent.usecase';
+import { StartEventUseCase } from '../application/usecases/events/startevent/startevent.usecase';
 import { BookingRepository } from '../infrastructure/repositories/booking/booking.repository';
 import { UserRepository } from '../infrastructure/repositories/user/user.repository';
 import { SubscriptionRepository } from '../infrastructure/repositories/subscription/subscription.repository';
@@ -43,6 +44,10 @@ export const MakeEventController = () => {
     paymentRepository,
     userRepository,
   );
+  const startEventUseCase = new StartEventUseCase(
+    eventRepository,
+    bookingRepository,
+  );
 
   return new EventController(
     eventCretionUseCase,
@@ -51,5 +56,6 @@ export const MakeEventController = () => {
     myEventsUseCase,
     updateEventsUseCase,
     deleteEventUseCase,
+    startEventUseCase,
   );
 };

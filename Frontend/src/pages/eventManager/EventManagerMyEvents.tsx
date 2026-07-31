@@ -7,7 +7,7 @@ import { Table } from '../../components/common/Table';
 import { SearchBar } from '../../components/common/SearchBar';
 import { Pagination } from '../../components/common/Pagination';
 import EventDetailsModal from '../../components/admin/EventDetailsModal';
-import { useMyEvents, useDeleteEvent } from '../../hooks/useEvents';
+import { useMyEvents, useDeleteEvent, useStartEvent } from '../../hooks/useEvents';
 
 const EventManagerMyEvents = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -17,9 +17,23 @@ const EventManagerMyEvents = () => {
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const navigate = useNavigate();
   const deleteMutation = useDeleteEvent();
+  const startMutation = useStartEvent();
   const [isDeletingId, setIsDeletingId] = useState<string | null>(null);
   const [isSchedulingId, setIsSchedulingId] = useState<string | null>(null);
+  const [isStartingId, setIsStartingId] = useState<string | null>(null);
   const [eventToCancel, setEventToCancel] = useState<any>(null);
+
+  const handleStartEvent = async (id: string) => {
+    setIsStartingId(id);
+    try {
+      await startMutation.mutateAsync(id);
+      toast.success('Event is now LIVE!');
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || err.message || 'Failed to start event.');
+    } finally {
+      setIsStartingId(null);
+    }
+  };
 
   const {
     data: responseData,
@@ -71,7 +85,7 @@ const EventManagerMyEvents = () => {
         orderResponse.order,
         event.id,
         () => {
-          toast.success('Payment successful! Event is now LIVE.');
+          toast.success('Payment successful! Event is now scheduled & ACTIVE.');
           setIsSchedulingId(null);
           window.location.reload();
         },
@@ -209,7 +223,7 @@ const EventManagerMyEvents = () => {
         />
 
         <div className="flex bg-slate-900/50 p-1 rounded-xl border border-slate-700/50 w-full md:w-auto">
-          {['ALL', 'ACTIVE', 'UPCOMING', 'ENDED'].map((status) => (
+          {['ALL', 'ACTIVE', 'LIVE', 'DRAFT', 'ENDED'].map((status) => (
             <button
               key={status}
               onClick={() => setStatusFilter(status)}
@@ -441,13 +455,42 @@ const EventManagerMyEvents = () => {
                       </span>
                     ) : (
                       <>
+                        {event.status === 'ACTIVE' && (
+                          <button
+                            onClick={() => handleStartEvent(event.id)}
+                            disabled={isStartingId === event.id}
+                            className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold rounded-lg transition-all inline-flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-[0_0_12px_rgba(16,185,129,0.3)] hover:shadow-[0_0_18px_rgba(16,185,129,0.5)]"
+                            title="Start event to make it LIVE"
+                          >
+                            {isStartingId === event.id ? (
+                              <>
+                                <div className="w-3 h-3 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                                Starting...
+                              </>
+                            ) : (
+                              <>
+                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Start Event
+                              </>
+                            )}
+                          </button>
+                        )}
+                        {event.status === 'LIVE' && (
+                          <span className="px-2.5 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold uppercase rounded-lg inline-flex items-center gap-1.5">
+                            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            Event Live
+                          </span>
+                        )}
                         {event.status === 'DRAFT' && (
                           <button
                             onClick={() => {
                               handleScheduleClick(event);
                             }}
                             disabled={isSchedulingId === event.id}
-                            className="px-3 py-1 bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-bold rounded-lg transition-all flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-3 py-1 bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-bold rounded-lg transition-all inline-flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
                             title="Complete payment to publish"
                           >
                             {isSchedulingId === event.id ? (

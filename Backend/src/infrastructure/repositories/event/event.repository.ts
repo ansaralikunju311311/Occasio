@@ -253,11 +253,14 @@ export class EventRepository
       throw new Error('Event not found during publishing');
     }
 
-    if (event.status === EventStatus.LIVE && event.isPublished) {
+    if (
+      (event.status === EventStatus.ACTIVE || event.status === EventStatus.LIVE) &&
+      event.isPublished
+    ) {
       return this.toEntity(event); // Already published
     }
 
-    event.status = EventStatus.LIVE;
+    event.status = EventStatus.ACTIVE;
     event.isPublished = true;
     if (!event.publishedAt) {
       event.publishedAt = new Date();

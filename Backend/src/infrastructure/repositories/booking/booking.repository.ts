@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import mongoose from 'mongoose';
 import type { IBookingRepository } from '../../../domain/repositories/booking/booking.repository.interface';
 import { Booking } from '../../../domain/entities/booking.entity';
 import { BookingModel } from '../../database/model/booking.model';
@@ -176,7 +177,20 @@ export class BookingRepository implements IBookingRepository {
     });
   }
   async findConfirmedBookingsByEventId(eventId: string): Promise<Booking[]> {
-    const docs = await BookingModel.find({ eventId, status: 'CONFIRMED' });
+    const filter: any = {
+      status: { $in: ['CONFIRMED', 'confirmed', 'SUCCESS', 'success', 'COMPLETED', 'completed'] },
+    };
+
+    if (mongoose.Types.ObjectId.isValid(eventId)) {
+      filter.$or = [
+        { eventId: eventId },
+        { eventId: new mongoose.Types.ObjectId(eventId) },
+      ];
+    } else {
+      filter.eventId = eventId;
+    }
+
+    const docs = await BookingModel.find(filter);
     return docs.map((doc) => this.toEntity(doc));
   }
   async hasBookings(eventId: string): Promise<boolean> {

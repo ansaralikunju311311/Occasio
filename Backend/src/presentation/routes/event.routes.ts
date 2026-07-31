@@ -59,4 +59,11 @@ router.get(
   controller.getManagerStats.bind(controller),
 );
 
+router.patch(
+  ApiEndpoints.Events.Start,
+  verifyAccessToken,
+  requireRole([UserRole.EVENT_MANAGER]),
+  controller.startEvent.bind(controller),
+);
+
 export default router;

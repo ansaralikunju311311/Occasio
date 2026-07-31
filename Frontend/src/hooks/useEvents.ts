@@ -73,6 +73,18 @@ export const useDeleteEvent = () => {
   });
 };
 
+export const useStartEvent = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => eventService.startEvent(id),
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+      queryClient.invalidateQueries({ queryKey: ['myEvents'] });
+      queryClient.invalidateQueries({ queryKey: ['event', id] });
+    },
+  });
+};
+
 export const useManagerStats = () => {
   return useQuery({
     queryKey: ['managerStats'],

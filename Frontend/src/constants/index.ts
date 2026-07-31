@@ -20,6 +20,7 @@ export const API_ENDPOINTS = {
   EVENTS_MY: '/events/myevents',
   EVENT_UPDATE: (id: string) => `/events/update/${id}`,
   EVENT_DELETE: (id: string) => `/events/${id}`,
+  EVENT_START: (id: string) => `/events/${id}/start`,
 
   // Payments & Bookings
   PAYMENTS_ORDER: '/payments/order',

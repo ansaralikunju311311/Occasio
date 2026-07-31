@@ -45,6 +45,7 @@ export const ApiEndpoints = {
     Update: '/update/:id',
     Delete: '/:id',
     ManagerStats: '/manager-stats',
+    Start: '/:eventId/start',
   },
 
   Payments: {

@@ -20,12 +20,14 @@
 // }
 
 import type { EventType } from '../../common/enums/event-type';
+import type { EventStatus } from '../../common/enums/eventstatus-enum';
 
 export interface UpdateEventDTO {
   title?: string;
   description?: string;
   picture?: string;
   eventType?: EventType;
+  status?: EventStatus;
 
   startTime?: Date;
   endTime?: Date;

@@ -5,6 +5,7 @@ import { api } from '../../services/api';
 import { API_ENDPOINTS } from '../../constants';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import NotificationBell from './NotificationBell';
 
 const Navbar = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -55,6 +56,7 @@ const Navbar = () => {
               >
                 My Bookings
               </Link>
+              <NotificationBell />
               <button
                 onClick={() => setShowLogoutModal(true)}
                 className="text-sm font-medium text-slate-300 hover:text-white transition-colors"

@@ -9,6 +9,7 @@ export const eventService = {
   getMyEvents: (params?: any) => api.get(API_ENDPOINTS.EVENTS_MY, { params }),
   updateEvent: (id: string, payload: any) => api.put(API_ENDPOINTS.EVENT_UPDATE(id), payload),
   deleteEvent: (id: string) => api.delete(API_ENDPOINTS.EVENT_DELETE(id)),
+  startEvent: (id: string) => api.patch(API_ENDPOINTS.EVENT_START(id)),
   getManagerStats: () => api.get(API_ENDPOINTS.EVENTS_MANAGER_STATS),
 };
 

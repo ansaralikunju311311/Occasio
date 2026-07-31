@@ -13,6 +13,7 @@ import type { IMyEventsUseCase } from '../../application/usecases/events/myevent
 import { catchAsync } from '../../common/utils/catchAsync';
 import type { IDeleteEventUseCase } from '../../application/usecases/events/deleteevent/deleteevent.usecase.interface';
 import type { IUpdateEventUseCase } from '../../application/usecases/events/updatevent/updatevent.usecase.interface';
+import type { IStartEventUseCase } from '../../application/usecases/events/startevent/startevent.usecase.interface';
 import { sendSuccess } from '../../common/utils/response';
 import { EventModel } from '../../infrastructure/database/model/events/event.model';
 import { BookingModel } from '../../infrastructure/database/model/booking.model';
@@ -25,6 +26,7 @@ export class EventController {
     private _myEventsUseCase: IMyEventsUseCase,
     private _updateEventsUseCase: IUpdateEventUseCase,
     private _deleteEventUseCase: IDeleteEventUseCase,
+    private _startEventUseCase: IStartEventUseCase,
   ) {}
 
   eventCreation = catchAsync(async (req: Request, res: Response) => {
@@ -260,25 +262,27 @@ export class EventController {
       status: 'CONFIRMED',
     });
 
-    const eventDistribution = managerEvents.map((event) => {
-      const eventBookings = allBookings.filter(
-        (b) => b.eventId.toString() === event._id.toString(),
-      );
-      const totalAmount = eventBookings.reduce(
-        (sum, b) => sum + b.organizerRevenue,
-        0,
-      );
-      const ticketsSold = eventBookings.reduce(
-        (sum, b) => sum + b.seats.length,
-        0,
-      );
-      return {
-        eventId: event._id,
-        title: event.title,
-        revenue: Math.round(totalAmount),
-        ticketsSold,
-      };
-    }).sort((a, b) => b.revenue - a.revenue);
+    const eventDistribution = managerEvents
+      .map((event) => {
+        const eventBookings = allBookings.filter(
+          (b) => b.eventId.toString() === event._id.toString(),
+        );
+        const totalAmount = eventBookings.reduce(
+          (sum, b) => sum + b.organizerRevenue,
+          0,
+        );
+        const ticketsSold = eventBookings.reduce(
+          (sum, b) => sum + b.seats.length,
+          0,
+        );
+        return {
+          eventId: event._id,
+          title: event.title,
+          revenue: Math.round(totalAmount),
+          ticketsSold,
+        };
+      })
+      .sort((a, b) => b.revenue - a.revenue);
 
     sendSuccess(res, undefined, undefined, HttpStatus.OK, {
       stats: {
@@ -290,6 +294,20 @@ export class EventController {
         trend,
         eventDistribution,
       },
+    });
+  });
+
+  startEvent = catchAsync(async (req: Request, res: Response) => {
+    const eventId = (req.params.eventId || req.params.id) as string;
+    const managerId = req.authUser?.userId;
+    if (!managerId) {
+      res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    const result = await this._startEventUseCase.execute(eventId, managerId);
+    sendSuccess(res, result, 'Event started successfully', HttpStatus.OK, {
+      event: result,
     });
   });
 }

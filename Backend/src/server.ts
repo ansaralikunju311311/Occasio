@@ -3,18 +3,17 @@ import '../src/shared/loader/env';
 import { createServer } from 'http';
 
 import { Server } from 'socket.io';
-import jwt from 'jsonwebtoken'
+import jwt from 'jsonwebtoken';
+
 import app from './app';
-import { AuthUser } from './common/type/auth.type';
+import type { AuthUser } from './common/type/auth.type';
 import { initializaApp } from './shared/loader/index';
 import { CreateToken } from './common/services/token.service';
 import { seatLockCleanupService } from './infrastructure/services/seat-lock-cleanup.service';
+import { socketService } from './infrastructure/services/socket.service';
 import { logger } from './common/logger/logger';
-import { verifyAccessToken } from './presentation/middlewares/verifyAccessToken.middleware';
 
-import { HttpStatus } from './common/constants/http-status';
-
-const tokenService = new CreateToken()
+const tokenService = new CreateToken();
 const startServer = async (): Promise<void> => {
   try {
     await initializaApp();
@@ -22,65 +21,59 @@ const startServer = async (): Promise<void> => {
     const PORT = process.env.PORT || 5000;
 
     const httpServer = createServer(app);
-    
-    const io = new Server(httpServer,{
-      cors:{
-        origin:process.env.CLIENT_URL || 'http://localhost:5173',
-        credentials:true,
+
+    const io = new Server(httpServer, {
+      cors: {
+        origin: true,
+        credentials: true,
       },
     });
 
+    socketService.setIO(io);
 
-//     io.use((socket, next) => {
-//     const token = socket.handshake.auth.token;
-   
-//    socket.data.user = token;
-//   console.log('Socket token:', token);
+    io.use((socket, next) => {
+      try {
+        let token = socket.handshake.auth?.token || socket.handshake.headers?.authorization;
 
-//   if (!token) {
-//     return next(new Error('Unauthorized'));
-//   }
+        if (!token) {
+          return next(new Error('Authentication required'));
+        }
 
-//       const payload = tokenService.verifyAccessToken(token) as AuthUser;
-//       console.log('for the checking the', payload);
-//   next();
-// });
-      io.use((socket, next) => {
-  try {
-    const token = socket.handshake.auth?.token;
+        if (token.startsWith('Bearer ')) {
+          token = token.slice(7);
+        }
 
-    if (!token) {
-      return next(new Error("Authentication required"));
-    }
+        const decode = tokenService.verifyAccessToken(token) as AuthUser;
 
-    // const decoded = verifyAccessToken(token);
-    const decode = tokenService.verifyAccessToken(token) as AuthUser
+        socket.data.user = decode;
+        console.log('⚡ Socket client authenticated successfully:', decode);
 
-    socket.data.user = decode;
-    console.log('for what inside that',decode)
+        next();
+      } catch (error) {
+        console.log('❌ Socket authentication error:', error);
+        if (error instanceof jwt.TokenExpiredError) {
+          return next(new Error('TOKEN_EXPIRED'));
+        }
 
-    next();
-  } catch (error) {
-    console.log('error')
-    if (error instanceof jwt.TokenExpiredError) {
-      return next(new Error("TOKEN_EXPIRED"));
-    }
-
-    return next(new Error("INVALID_TOKEN"));
-  }
-});
+        return next(new Error('INVALID_TOKEN'));
+      }
+    });
     io.on('connection', (socket) => {
-      logger.info(`the socket is connected${socket.id}`);
-      console.log(`the connected user${socket.data.user.userId}`)
-      const user = socket.data.user.userId;
-      socket.join(`user${user}`)
-    })
+      const user = socket.data.user?.userId || socket.data.user?.id;
+      logger.info(`Socket connected: ${socket.id}, User ID: ${user}`);
+      if (user) {
+        const uStr = user.toString();
+        socket.join(`user${uStr}`);
+        socket.join(uStr);
+        console.log(`Socket ${socket.id} joined rooms: user${uStr} and ${uStr}`);
+      }
+    });
     // app.listen(PORT, () => {
     //   logger.info(`the server is running properly on port ${PORT}`);
     // });
     httpServer.listen(PORT, () => {
-      logger.info(`the server is running properly on port${PORT}`)
-    })
+      logger.info(`the server is running properly on port${PORT}`);
+    });
   } catch (error: unknown) {
     logger.error('Failed to start server:', error);
   }
