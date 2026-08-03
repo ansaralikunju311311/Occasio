@@ -27,7 +27,8 @@ const EventManagerMyEvents = () => {
     setIsStartingId(id);
     try {
       await startMutation.mutateAsync(id);
-      toast.success('Event is now LIVE!');
+      toast.success('Event is now LIVE! Redirecting to studio...');
+      navigate(`/eventmanager/live/${id}`);
     } catch (err: any) {
       toast.error(err.response?.data?.message || err.message || 'Failed to start event.');
     } finally {
@@ -479,10 +480,14 @@ const EventManagerMyEvents = () => {
                           </button>
                         )}
                         {event.status === 'LIVE' && (
-                          <span className="px-2.5 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold uppercase rounded-lg inline-flex items-center gap-1.5">
-                            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                            Event Live
-                          </span>
+                          <button
+                            onClick={() => navigate(`/eventmanager/live/${event.id}`)}
+                            className="px-3 py-1 bg-rose-600 hover:bg-rose-500 text-white text-[10px] font-bold rounded-lg transition-all inline-flex items-center gap-1.5 shadow-[0_0_12px_rgba(225,29,72,0.3)] hover:shadow-[0_0_18px_rgba(225,29,72,0.5)] cursor-pointer"
+                            title="Open Live Stream Studio"
+                          >
+                            <span className="w-2 h-2 rounded-full bg-white animate-pulse"></span>
+                            Live Studio
+                          </button>
                         )}
                         {event.status === 'DRAFT' && (
                           <button

@@ -38,6 +38,8 @@ const EventManagerBookings = lazy(() => import('../pages/eventManager/EventManag
 const CreateEvent = lazy(() => import('../pages/eventManager/CreateEvent.tsx'));
 const EditEvent = lazy(() => import('../pages/eventManager/EditEvent.tsx'));
 const Subscriptions = lazy(() => import('../pages/eventManager/Subscriptions.tsx'));
+const EventManagerLivePage = lazy(() => import('../pages/eventManager/EventManagerLivePage.tsx'));
+const UserLivePage = lazy(() => import('../pages/user/UserLivePage.tsx'));
 
 // New Personal Dashboard Pages
 const Profile = lazy(() => import('../pages/user/Profile.tsx'));
@@ -84,6 +86,14 @@ export const router = createBrowserRouter([
       },
       { path: '/seat-selection/:id', element: <SeatSelection /> },
       { path: '/checkout/:id', element: <Checkout /> },
+      {
+        path: '/live/:id',
+        element: (
+          <ProtectedRoute>
+            <UserLivePage />
+          </ProtectedRoute>
+        ),
+      },
     ],
   },
 
@@ -224,6 +234,14 @@ export const router = createBrowserRouter([
       {
         path: 'subscriptions',
         element: <Subscriptions />,
+      },
+      {
+        path: 'live/:id',
+        element: (
+          <ManagerGuard>
+            <EventManagerLivePage />
+          </ManagerGuard>
+        ),
       },
     ],
   },

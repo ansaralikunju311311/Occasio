@@ -76,4 +76,7 @@ export const ApiEndpoints = {
     cancel: '/cancel/:id',
     RefundInfo: '/refund-info/:id',
   },
+  Live: {
+    Base: '/api/live',
+  },
 } as const;

@@ -13,6 +13,8 @@ import { seatLockCleanupService } from './infrastructure/services/seat-lock-clea
 import { socketService } from './infrastructure/services/socket.service';
 import { logger } from './common/logger/logger';
 
+import { registerLiveSocketHandler } from './infrastructure/services/live-socket.handler';
+
 const tokenService = new CreateToken();
 const startServer = async (): Promise<void> => {
   try {
@@ -67,6 +69,8 @@ const startServer = async (): Promise<void> => {
         socket.join(uStr);
         console.log(`Socket ${socket.id} joined rooms: user${uStr} and ${uStr}`);
       }
+
+      registerLiveSocketHandler(io, socket);
     });
     // app.listen(PORT, () => {
     //   logger.info(`the server is running properly on port ${PORT}`);

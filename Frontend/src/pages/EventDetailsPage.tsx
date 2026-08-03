@@ -227,21 +227,30 @@ const EventDetailsPage = () => {
 
               {/* Live Banner */}
               {event.status === 'LIVE' && (
-                <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-4 flex items-center gap-3 shadow-[0_0_30px_rgba(16,185,129,0.15)]">
-                  <div className="p-2 rounded-xl bg-emerald-500/20 text-emerald-400 shrink-0">
-                    <span className="relative flex h-3 w-3">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
-                    </span>
+                <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-[0_0_30px_rgba(16,185,129,0.15)]">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-xl bg-emerald-500/20 text-emerald-400 shrink-0">
+                      <span className="relative flex h-3 w-3">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                      </span>
+                    </div>
+                    <div>
+                      <h3 className="text-xs font-extrabold text-emerald-400 uppercase tracking-widest flex items-center gap-2">
+                        Event is Live Now
+                      </h3>
+                      <p className="text-xs text-slate-300 mt-0.5 font-light">
+                        This event is currently streaming live!
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-xs font-extrabold text-emerald-400 uppercase tracking-widest flex items-center gap-2">
-                      Event is Live Now
-                    </h3>
-                    <p className="text-xs text-slate-300 mt-0.5 font-light">
-                      This event has started and is currently streaming live!
-                    </p>
-                  </div>
+
+                  <button
+                    onClick={() => navigate(`/live/${event.id}`)}
+                    className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/30 transition-all text-xs uppercase tracking-wider flex items-center gap-2 shrink-0 cursor-pointer"
+                  >
+                    <span>🔴</span> Join Live Stream
+                  </button>
                 </div>
               )}
 

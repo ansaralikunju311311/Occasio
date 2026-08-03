@@ -12,6 +12,7 @@ import planRoutes from '../src/presentation/routes/plans.routes';
 import bookingRoutes from './presentation/routes/booking.routes';
 import paymentRoutes from './presentation/routes/payment.routes';
 import userRoutes from './presentation/routes/user.routes';
+import liveRoutes from './presentation/routes/live.routes';
 import { ApiEndpoints } from './common/constants/api-endpoints';
 import './shared/config/passport/google.strategy';
 
@@ -31,6 +32,8 @@ app.use(ApiEndpoints.Auth.Base, authRoutes);
 app.use(ApiEndpoints.User.Base, userRoutes);
 app.use(ApiEndpoints.Admin.Base, adminRoutes);
 app.use(ApiEndpoints.Events.Base, eventRoutes); // Restore original
+app.use(ApiEndpoints.Events.Base, liveRoutes);
+app.use(ApiEndpoints.Live.Base, liveRoutes);
 app.use(ApiEndpoints.Payments.Base, paymentRoutes);
 app.use(ApiEndpoints.Plans.Base, planRoutes);
 app.use(ApiEndpoints.Bookings.Base, bookingRoutes);
