@@ -42,4 +42,16 @@ export class RazorpayGateway implements IPaymentGateway {
 
     return generated_signature === signature;
   }
+
+  async refund(transactionId: string, amount: number): Promise<void> {
+    try {
+      await razorpayInstance.payments.refund(transactionId, {
+        amount: amount * 100,
+      });
+      logger.info(`Successfully refunded transaction ${transactionId} via Razorpay`);
+    } catch (error) {
+      logger.error(`Razorpay refund API call failed for transaction ${transactionId}:`, error);
+      throw error;
+    }
+  }
 }

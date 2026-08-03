@@ -1,5 +1,3 @@
-import mongoose from 'mongoose';
-
 import type { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
 import { userMapper } from '../../../../common/mappers/user.mapper';
 import type { UserResponseDto } from '../../../../application/dtos/responses/user-response.dto';
@@ -13,6 +11,7 @@ import { ManagerSubscriptionStatus } from '../../../../common/enums/manager-subs
 import type { ISubscriptionRepository } from '../../../../domain/repositories/subscription/subscription.repository.interface';
 import { PlanType } from '../../../../common/enums/plan-enum';
 import { logger } from '../../../../common/logger/logger';
+import type { ITransactionManager } from '../../../../domain/services/transaction-manager.interface';
 
 import type { IApprovalUseCase } from './managerapproval.usecase.interface';
 export class ManagerApprovalUseCase implements IApprovalUseCase {
@@ -21,6 +20,7 @@ export class ManagerApprovalUseCase implements IApprovalUseCase {
     private _emailService: EmailSerive,
     private _managerSubscriptionRepository: IManagerSubscriptionRepository,
     private _subscriptionRepository: ISubscriptionRepository,
+    private _transactionManager: ITransactionManager,
   ) {}
   async execute(id: string): Promise<UserResponseDto | null> {
     const user = await this._userRepository.findByIdUser(id);
@@ -29,8 +29,7 @@ export class ManagerApprovalUseCase implements IApprovalUseCase {
       return null;
     }
 
-    const session = await mongoose.startSession();
-    session.startTransaction();
+    const session = await this._transactionManager.start();
 
     try {
       const freePlan = await this._subscriptionRepository.findPlanByName(
@@ -63,7 +62,7 @@ export class ManagerApprovalUseCase implements IApprovalUseCase {
 
       const updatedUser = await this._userRepository.updateUser(user, session);
 
-      await session.commitTransaction();
+      await this._transactionManager.commit(session);
 
       if (updatedUser) {
         await this._emailService.sendApprovalEmail(
@@ -74,11 +73,9 @@ export class ManagerApprovalUseCase implements IApprovalUseCase {
 
       return updatedUser ? userMapper.toResponse(updatedUser) : null;
     } catch (error) {
-      await session.abortTransaction();
+      await this._transactionManager.rollback(session);
       logger.error('Transaction aborted due to error:', error);
       throw error;
-    } finally {
-      session.endSession();
     }
   }
 }

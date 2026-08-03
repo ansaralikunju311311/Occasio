@@ -3,7 +3,7 @@ import type { IBookingRepository } from '../../../domain/repositories/booking/bo
 import { EventStatus } from '../../../common/enums/eventstatus-enum';
 import { AppError } from '../../../common/errors/apperror';
 import { HttpStatus } from '../../../common/constants/http-status';
-import { socketService } from '../../../infrastructure/services/socket.service';
+import type { INotificationService } from '../../../domain/services/notification-service.interface';
 import { eventMapper } from '../../../common/mappers/event.mapper';
 import type { EventResponseDto } from '../../dtos/responses/event-response.dto';
 import { logger } from '../../../common/logger/logger';
@@ -12,6 +12,7 @@ export class StartLiveUseCase {
   constructor(
     private _eventRepository: IEventRepository,
     private _bookingRepository: IBookingRepository,
+    private _notificationService: INotificationService,
   ) {}
 
   async execute(eventId: string, managerId: string): Promise<EventResponseDto> {
@@ -83,8 +84,8 @@ export class StartLiveUseCase {
       };
 
       for (const userId of bookedUserIds) {
-        socketService.notifyUser(userId, 'event_live', notificationPayload);
-        socketService.notifyUser(userId, 'notification', notificationPayload);
+        this._notificationService.notifyUser(userId, 'event_live', notificationPayload);
+        this._notificationService.notifyUser(userId, 'notification', notificationPayload);
       }
     } catch (notificationError) {
       logger.error(

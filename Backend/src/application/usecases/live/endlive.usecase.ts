@@ -2,13 +2,16 @@ import type { IEventRepository } from '../../../domain/repositories/event/event.
 import { EventStatus } from '../../../common/enums/eventstatus-enum';
 import { AppError } from '../../../common/errors/apperror';
 import { HttpStatus } from '../../../common/constants/http-status';
-import { socketService } from '../../../infrastructure/services/socket.service';
+import type { INotificationService } from '../../../domain/services/notification-service.interface';
 import { eventMapper } from '../../../common/mappers/event.mapper';
 import type { EventResponseDto } from '../../dtos/responses/event-response.dto';
 import { logger } from '../../../common/logger/logger';
 
 export class EndLiveUseCase {
-  constructor(private _eventRepository: IEventRepository) {}
+  constructor(
+    private _eventRepository: IEventRepository,
+    private _notificationService: INotificationService,
+  ) {}
 
   async execute(eventId: string, managerId: string): Promise<EventResponseDto> {
     const event = await this._eventRepository.findByIdEvents(eventId);
@@ -48,13 +51,10 @@ export class EndLiveUseCase {
 
     // Broadcast stream ended to live room
     try {
-      const io = socketService.getIO();
-      if (io) {
-        io.to(`live_event_${eventId}`).emit('event_ended', {
-          eventId,
-          message: 'The live stream has ended.',
-        });
-      }
+      this._notificationService.toRoomEmit(`live_event_${eventId}`, 'event_ended', {
+        eventId,
+        message: 'The live stream has ended.',
+      });
     } catch (err) {
       logger.error(`[EndLiveUseCase] Socket broadcast error: ${String(err)}`);
     }

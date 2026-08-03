@@ -1,8 +1,8 @@
 import type { IBookingRepository } from '../../../../domain/repositories/booking/booking.repository.interface';
 import { BookingStatus } from '../../../../common/enums/booking-status.enum';
 import type { IEventRepository } from '../../../../domain/repositories/event/event.repository.interface';
-import { UserRepository } from '../../../../infrastructure/repositories/user/user.repository';
-import { PaymentRepository } from '../../../../infrastructure/repositories/payment/payment.repository';
+import type { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
+import type { IPaymentRepository } from '../../../../domain/repositories/payment/payment.repository.interface';
 import { Payment } from '../../../../domain/entities/payment.entity';
 import { PaymentPurpose } from '../../../../common/enums/payment-purpose.enum';
 import { PaymentStatus } from '../../../../common/enums/payment-status.enum';
@@ -11,12 +11,11 @@ import { calculateRefundPercentage } from '../../../../common/utils/refund';
 import type { ICancelBooking } from './cancelbooking.usecase.interface';
 
 export class CancelBooking implements ICancelBooking {
-  private _userRepository = new UserRepository();
-  private _paymentRepository = new PaymentRepository();
-
   constructor(
     private _booking: IBookingRepository,
     private _event: IEventRepository,
+    private _userRepository: IUserRepository,
+    private _paymentRepository: IPaymentRepository,
   ) {}
 
   async execute(bookingId: string, userId: string): Promise<void> {

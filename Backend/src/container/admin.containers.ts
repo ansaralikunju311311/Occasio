@@ -17,6 +17,8 @@ import { PaymentRepository } from '../infrastructure/repositories/payment/paymen
 import { SubscriptionRepository } from '../infrastructure/repositories/subscription/subscription.repository';
 import { GetAllPaymentsUseCase } from '../application/usecases/payment/getAllPayments/getAllPayments.usecase';
 
+import { MongoTransactionManager } from '../infrastructure/services/mongotransation.service';
+
 export const makeAdminController = () => {
   const adminRepository = new AdminRepository();
   const userRepository = new UserRepository();
@@ -25,6 +27,7 @@ export const makeAdminController = () => {
   const paymentRepository = new PaymentRepository();
   const managerSubscriptionRepository = new ManagerSubscriptionRepository();
   const subscriptionRepository = new SubscriptionRepository();
+  const transactionManager = new MongoTransactionManager();
 
   const findAllUseCase = new FindAllUseCase(adminRepository);
   const userManageUseCase = new UserManageUseCase(userRepository);
@@ -37,6 +40,7 @@ export const makeAdminController = () => {
     emailService,
     managerSubscriptionRepository,
     subscriptionRepository,
+    transactionManager,
   );
   const managerRejectionUseCase = new ManagerRejectionUseCase(
     userRepository,

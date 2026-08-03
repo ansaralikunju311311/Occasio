@@ -1,8 +1,9 @@
 import type { Server } from 'socket.io';
 
 import { logger } from '../../common/logger/logger';
+import type { INotificationService } from '../../domain/services/notification-service.interface';
 
-export class SocketService {
+export class SocketService implements INotificationService {
   private static instance: SocketService;
   private io: Server | null = null;
 
@@ -23,6 +24,17 @@ export class SocketService {
 
   public getIO(): Server | null {
     return this.io;
+  }
+
+  public toRoomEmit(room: string, eventName: string, data: unknown): void {
+    if (!this.io) {
+      logger.warn(
+        `SocketService: Cannot emit to room ${room}, IO server not set.`,
+      );
+      return;
+    }
+    logger.info(`SocketService: Emitting ${eventName} to room ${room}`);
+    this.io.to(room).emit(eventName, data);
   }
 
   public notifyUser(userId: string, eventName: string, data: unknown): void {

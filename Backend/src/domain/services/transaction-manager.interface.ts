@@ -1,7 +1,9 @@
-import type mongoose from 'mongoose';
+export interface IDbSession {
+  // Database-agnostic session marker
+}
 
 export interface ITransactionManager {
-  start(): Promise<mongoose.ClientSession>;
-  commit(session: mongoose.ClientSession): Promise<void>;
-  rollback(session: mongoose.ClientSession): Promise<void>;
+  start(): Promise<IDbSession>;
+  commit(session: IDbSession): Promise<void>;
+  rollback(session: IDbSession): Promise<void>;
 }

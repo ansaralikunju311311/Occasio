@@ -17,5 +17,13 @@ export class Payment {
     public paidAt?: Date,
     public createdAt?: Date,
     public updatedAt?: Date,
+    public userDetails?: {
+      name: string;
+      email: string;
+      picture?: string;
+    },
+    public eventDetails?: {
+      title: string;
+    },
   ) {}
 }

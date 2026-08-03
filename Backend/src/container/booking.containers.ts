@@ -5,6 +5,8 @@ import { FailBookingUseCase } from '../application/usecases/booking/bookingfaile
 import { EventRepository } from '../infrastructure/repositories/event/event.repository';
 import { SeatRepository } from '../infrastructure/repositories/seatrepo/seat.repository';
 import { BookingRepository } from '../infrastructure/repositories/booking/booking.repository';
+import { UserRepository } from '../infrastructure/repositories/user/user.repository';
+import { PaymentRepository } from '../infrastructure/repositories/payment/payment.repository';
 import { QrCode } from '../common/services/qrcode.service';
 import { BookingController } from '../presentation/controllers/booking.controller';
 import { MongoTransactionManager } from '../infrastructure/services/mongotransation.service';
@@ -13,6 +15,8 @@ export const makebookingController = () => {
   const eventRepository = new EventRepository();
   const seatRepository = new SeatRepository();
   const bookingRepository = new BookingRepository();
+  const userRepository = new UserRepository();
+  const paymentRepository = new PaymentRepository();
   const qrCode = new QrCode();
 
   const transactionManager = new MongoTransactionManager();
@@ -33,6 +37,8 @@ export const makebookingController = () => {
   const cancelBookingUseCase = new CancelBooking(
     bookingRepository,
     eventRepository,
+    userRepository,
+    paymentRepository,
   );
 
   return new BookingController(

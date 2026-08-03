@@ -1,3 +1,4 @@
+import type { IDbSession } from '../../../domain/services/transaction-manager.interface';
 import mongoose from 'mongoose';
 
 import { BaseRepository } from '../../repositories/base.repository';
@@ -11,7 +12,6 @@ import type {
   PaginationParams,
   PaginatedResponse,
 } from '../../../common/interfaces/pagination.interface';
-import type { UpdateEventDTO } from '../../../application/dtos/updateevent.dto';
 import { EventStatus } from '../../../common/enums/eventstatus-enum';
 import type { User } from '../../../domain/entities/user.entity';
 
@@ -23,8 +23,9 @@ export class EventRepository
     super(EventModel);
   }
 
-  async createEvent(event: Events): Promise<Events> {
+  async createEvent(event: Events, session?: IDbSession): Promise<Events> {
     const isLive = event.status === EventStatus.LIVE;
+    const mongoSession = session as unknown as mongoose.ClientSession;
     const events = await super.create({
       title: event.title,
       description: event.description,
@@ -41,7 +42,7 @@ export class EventRepository
       status: event.status,
       isPublished: isLive,
       publishedAt: isLive ? new Date() : undefined,
-    });
+    }, { session: mongoSession });
     return this.toEntity(events);
   }
 
@@ -171,66 +172,72 @@ export class EventRepository
   async updateEventLayout(
     eventId: string,
     layoutId: string | null,
-    session?: mongoose.ClientSession,
+    session?: IDbSession,
   ) {
+    const mongoSession = session as unknown as mongoose.ClientSession;
     if (!layoutId) {
       await this.model.findByIdAndUpdate(
         eventId,
         { $unset: { seatLayoutId: '' } },
-        { session },
+        { session: mongoSession },
       );
     } else {
       await this.model.findByIdAndUpdate(
         eventId,
         { seatLayoutId: layoutId },
-        { session },
+        { session: mongoSession },
       );
     }
   }
 
   async createSeats(
     seats: Record<string, unknown>[],
-    session?: mongoose.ClientSession,
+    session?: IDbSession,
   ) {
-    await SeatModel.insertMany(seats, { session });
+    const mongoSession = session as unknown as mongoose.ClientSession;
+    await SeatModel.insertMany(seats, { session: mongoSession });
   }
 
   async createSeatLayout(
     data: Record<string, unknown>,
-    session?: mongoose.ClientSession,
+    session?: IDbSession,
   ): Promise<{ _id: string | null; [key: string]: unknown }> {
-    const [layout] = await SeatLayoutModel.create([data], { session });
+    const mongoSession = session as unknown as mongoose.ClientSession;
+    const [layout] = await SeatLayoutModel.create([data], { session: mongoSession });
     const obj = layout.toObject();
     return { ...obj, _id: obj._id?.toString() || null };
   }
 
   async deleteSeatsByEventId(
     eventId: string,
-    session?: mongoose.ClientSession,
+    session?: IDbSession,
   ) {
-    await SeatModel.deleteMany({ eventId }, { session });
+    const mongoSession = session as unknown as mongoose.ClientSession;
+    await SeatModel.deleteMany({ eventId }, { session: mongoSession });
   }
 
   async deleteLayoutByEventId(
     eventId: string,
-    session?: mongoose.ClientSession,
+    session?: IDbSession,
   ) {
-    await SeatLayoutModel.deleteMany({ eventId }, { session });
+    const mongoSession = session as unknown as mongoose.ClientSession;
+    await SeatLayoutModel.deleteMany({ eventId }, { session: mongoSession });
   }
 
   async updateEvent(
     eventId: string,
-    data: UpdateEventDTO,
-    session?: mongoose.ClientSession,
+    data: Partial<Events> & { layout?: any },
+    session?: IDbSession,
     unsetData?: Record<string, unknown>,
   ): Promise<Events | null> {
+    const mongoSession = session as unknown as mongoose.ClientSession;
     const updateQuery: mongoose.UpdateQuery<IEventDocument> = { $set: data };
     if (unsetData) {
       updateQuery.$unset = unsetData;
     }
     const updated = await this.model.findByIdAndUpdate(eventId, updateQuery, {
       new: true,
-      session,
+      session: mongoSession,
     });
     return updated ? this.toEntity(updated) : null;
   }

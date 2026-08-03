@@ -2,7 +2,7 @@ import type { IEventRepository } from '../../../../domain/repositories/event/eve
 import type { IBookingRepository } from '../../../../domain/repositories/booking/booking.repository.interface';
 import type { IPaymentRepository } from '../../../../domain/repositories/payment/payment.repository.interface';
 import type { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
-import { razorpayInstance } from '../../../../infrastructure/config/razorpay';
+import type { IPaymentGateway } from '../../../../domain/services/payment-gateway.interface';
 import { logger } from '../../../../common/logger/logger';
 import { Payment } from '../../../../domain/entities/payment.entity';
 import { PaymentPurpose } from '../../../../common/enums/payment-purpose.enum';
@@ -16,6 +16,7 @@ export class DeleteEventUseCase implements IDeleteEventUseCase {
     private _bookingRepository: IBookingRepository,
     private _paymentRepository: IPaymentRepository,
     private _userRepository: IUserRepository,
+    private _paymentGateway: IPaymentGateway,
   ) {}
 
   async execute(id: string): Promise<boolean> {
@@ -42,15 +43,13 @@ export class DeleteEventUseCase implements IDeleteEventUseCase {
             payment.transactionId.startsWith('pay_mock');
           if (!isMock) {
             try {
-              await razorpayInstance.payments.refund(payment.transactionId, {
-                amount: booking.totalAmount * 100,
-              });
+              await this._paymentGateway.refund(payment.transactionId, booking.totalAmount);
               logger.info(
-                `Successfully refunded booking ${booking.id} via Razorpay (transaction: ${payment.transactionId})`,
+                `Successfully refunded booking ${booking.id} via Gateway (transaction: ${payment.transactionId})`,
               );
             } catch (rzErr: unknown) {
               logger.error(
-                `Razorpay refund API call failed for payment ID ${payment.transactionId}:`,
+                `Payment gateway refund call failed for payment ID ${payment.transactionId}:`,
                 rzErr,
               );
             }

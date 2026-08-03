@@ -1,11 +1,9 @@
-import mongoose from 'mongoose';
-
+import type { ITransactionManager } from '../../../../domain/services/transaction-manager.interface';
 import type { IEventRepository } from '../../../../domain/repositories/event/event.repository.interface';
 import type { IBookingRepository } from '../../../../domain/repositories/booking/booking.repository.interface';
 import { eventMapper } from '../../../../common/mappers/event.mapper';
 import type { EventResponseDto } from '../../../../application/dtos/responses/event-response.dto';
 import type { UpdateEventDTO } from '../../../../application/dtos/updateevent.dto';
-// import { SeatStatus } from '../../../../common/enums/searstatus-enum';
 import { EventType } from '../../../../common/enums/event-type';
 import { getLocationName } from '../../../../common/services/location.service';
 import { normalizeCoordinates } from '../../../../common/utils/geo.utils';
@@ -16,6 +14,7 @@ export class UpdateEventUseCase implements IUpdateEventUseCase {
   constructor(
     private _eventRepository: IEventRepository,
     private _bookingRepository: IBookingRepository,
+    private _transactionManager: ITransactionManager,
   ) {}
 
   async execute(
@@ -23,15 +22,13 @@ export class UpdateEventUseCase implements IUpdateEventUseCase {
     managerId: string,
     data: UpdateEventDTO,
   ): Promise<EventResponseDto | null> {
-    const session = await mongoose.startSession();
-    session.startTransaction();
+    const session = await this._transactionManager.start();
 
     try {
       const event = await this._eventRepository.findByIdEvents(eventId);
 
       if (!event) {
-        await session.abortTransaction();
-        session.endSession();
+        await this._transactionManager.rollback(session);
         return null;
       }
 
@@ -42,8 +39,6 @@ export class UpdateEventUseCase implements IUpdateEventUseCase {
           const hasBookings =
             await this._bookingRepository.hasBookings(eventId);
           if (hasBookings) {
-            await session.abortTransaction();
-            session.endSession();
             throw new Error(
               'Cannot modify start date or start time if the event has bookings.',
             );
@@ -52,14 +47,11 @@ export class UpdateEventUseCase implements IUpdateEventUseCase {
       }
 
       if (new Date(event.startTime) <= new Date()) {
-        await session.abortTransaction();
-        session.endSession();
         throw new Error('Event has already started and cannot be edited.');
       }
 
       if (event.createdBy.toString() !== managerId) {
-        await session.abortTransaction();
-        session.endSession();
+        await this._transactionManager.rollback(session);
         return null;
       }
 
@@ -95,7 +87,7 @@ export class UpdateEventUseCase implements IUpdateEventUseCase {
 
       await this._eventRepository.updateEvent(
         eventId,
-        data,
+        data as any,
         session,
         unsetData,
       );
@@ -131,14 +123,12 @@ export class UpdateEventUseCase implements IUpdateEventUseCase {
         }
       }
 
-      await session.commitTransaction();
-      session.endSession();
+      await this._transactionManager.commit(session);
 
       const updatedEvent = await this._eventRepository.findByIdEvents(eventId);
       return updatedEvent ? eventMapper.toResponse(updatedEvent) : null;
     } catch (error) {
-      await session.abortTransaction();
-      session.endSession();
+      await this._transactionManager.rollback(session);
       throw error;
     }
   }

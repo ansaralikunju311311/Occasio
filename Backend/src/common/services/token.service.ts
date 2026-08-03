@@ -1,8 +1,8 @@
-import type { SignOptions, JwtPayload } from 'jsonwebtoken';
+import type { SignOptions } from 'jsonwebtoken';
 import jwt from 'jsonwebtoken';
 import type { StringValue } from 'ms';
 
-import type { ITokenService } from '../../domain/services/token.service.interface';
+import type { ITokenService, IDomainJwtPayload } from '../../domain/services/token.service.interface';
 import type { AuthUser } from '../type/auth.type';
 
 export class CreateToken implements ITokenService {
@@ -20,17 +20,17 @@ export class CreateToken implements ITokenService {
     return jwt.sign(payload, process.env.JWT_REFRESH_SECRET as string, options);
   }
 
-  verifyAccessToken(token: string): AuthUser | JwtPayload | string {
+  verifyAccessToken(token: string): AuthUser | IDomainJwtPayload | string {
     return jwt.verify(token, process.env.JWT_ACCESS_SECRET as string) as
       | AuthUser
-      | JwtPayload
+      | IDomainJwtPayload
       | string;
   }
 
-  verifyRefreshToken(token: string): AuthUser | JwtPayload | string {
+  verifyRefreshToken(token: string): AuthUser | IDomainJwtPayload | string {
     return jwt.verify(token, process.env.JWT_REFRESH_SECRET as string) as
       | AuthUser
-      | JwtPayload
+      | IDomainJwtPayload
       | string;
   }
 }

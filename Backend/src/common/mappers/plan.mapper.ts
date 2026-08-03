@@ -1,30 +1,18 @@
 import type { ResponsePlanDto } from '../../application/dtos/responses/responseplan.dto';
-import type { IPlanDocument } from '../../infrastructure/database/model/subscription/plan.model';
+import type { Subscription } from '../../domain/entities/subscription.entity';
 
 export const mapToResponsePlanDto = (
-  plan:
-    | IPlanDocument
-    | {
-        _id: { toString(): string } | string;
-        name: string;
-        price: number;
-        eventLimit: number;
-        commissionPercentage: number;
-        features?: string[];
-        isActive: boolean;
-        createdAt: Date;
-        updatedAt: Date;
-      },
+  plan: Subscription,
 ): ResponsePlanDto => {
   return {
-    id: typeof plan._id === 'string' ? plan._id : plan._id.toString(),
+    id: plan.id ?? '',
     name: plan.name,
     price: plan.price,
     eventLimit: plan.eventLimit,
     commissionPercentage: plan.commissionPercentage,
     features: plan.features || [],
     isActive: plan.isActive,
-    createdAt: plan.createdAt,
-    updatedAt: plan.updatedAt,
+    createdAt: plan.createdAt || new Date(),
+    updatedAt: plan.updatedAt || new Date(),
   };
 };

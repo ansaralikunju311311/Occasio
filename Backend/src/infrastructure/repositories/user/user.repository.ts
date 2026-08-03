@@ -1,3 +1,4 @@
+import type { IDbSession } from '../../../domain/services/transaction-manager.interface';
 import type mongoose from 'mongoose';
 
 import type { IUserRepository } from '../../../domain/repositories/user.repository.interface';
@@ -43,8 +44,9 @@ export class UserRepository
 
   async updateUser(
     user: User,
-    session?: mongoose.ClientSession,
+    session?: IDbSession,
   ): Promise<User> {
+    const mongoSession = session as unknown as mongoose.ClientSession;
     const doc = await super.updateOne(
       { email: user.email },
       {
@@ -61,7 +63,7 @@ export class UserRepository
           user.activeSubscription as unknown as mongoose.Schema.Types.ObjectId,
         walletBalance: user.walletBalance,
       },
-      { session },
+      { session: mongoSession },
     );
 
     if (!doc) {

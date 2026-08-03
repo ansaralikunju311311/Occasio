@@ -1,6 +1,5 @@
 import type mongoose from 'mongoose';
 
-import type { PaymentResponseDto } from '../../../application/dtos/responses/payment-response.dto';
 import type {
   PaginationParams,
   PaginatedResponse,
@@ -32,7 +31,7 @@ export class PaymentRepository implements IPaymentRepository {
 
   async getAllPayments(
     params: PaginationParams,
-  ): Promise<PaginatedResponse<PaymentResponseDto>> {
+  ): Promise<PaginatedResponse<Payment>> {
     const { page = 1, limit = 10, purpose } = params;
     const query: mongoose.FilterQuery<IPaymentDocument> = {};
     if (purpose) {
@@ -52,35 +51,7 @@ export class PaymentRepository implements IPaymentRepository {
       PaymentModel.countDocuments(query).exec(),
     ]);
 
-    const mappedData: PaymentResponseDto[] = payments.map((rawDoc) => {
-      const doc = rawDoc as unknown as Record<string, unknown>;
-      const u = (doc.userId || {}) as Record<string, unknown>;
-      const e = doc.eventId as Record<string, unknown> | undefined;
-      return {
-        id: (doc._id as mongoose.Types.ObjectId)?.toString() || '',
-        userId: {
-          id: (u._id as mongoose.Types.ObjectId)?.toString() ?? '',
-          name: (u.name as string) ?? '',
-          email: (u.email as string) ?? '',
-          picture: u.picture as string | undefined,
-        },
-        purpose: doc.purpose as PaymentResponseDto['purpose'],
-        amount: Number(doc.amount || 0),
-        currency: (doc.currency as string) || 'INR',
-        paymentMethod: doc.paymentMethod as PaymentResponseDto['paymentMethod'],
-        paymentStatus: doc.paymentStatus as PaymentResponseDto['paymentStatus'],
-        transactionId: doc.transactionId as string,
-        eventId: e
-          ? {
-              id: (e._id as mongoose.Types.ObjectId)?.toString() || '',
-              title: (e.title as string) || '',
-            }
-          : undefined,
-        bookingId: (doc.bookingId as mongoose.Types.ObjectId)?.toString(),
-        paidAt: doc.paidAt as Date | undefined,
-        createdAt: doc.createdAt as Date,
-      };
-    });
+    const mappedData = payments.map((rawDoc) => this.toEntity(rawDoc));
 
     return {
       data: mappedData,
@@ -94,20 +65,52 @@ export class PaymentRepository implements IPaymentRepository {
   }
 
   private toEntity(doc: IPaymentDocument): Payment {
+    const raw = doc as any;
+    
+    let userId = '';
+    let userDetails: any = undefined;
+    if (raw.userId) {
+      if (typeof raw.userId === 'object' && raw.userId._id) {
+        userId = raw.userId._id.toString();
+        userDetails = {
+          name: raw.userId.name || '',
+          email: raw.userId.email || '',
+          picture: raw.userId.picture,
+        };
+      } else {
+        userId = raw.userId.toString();
+      }
+    }
+
+    let eventId: string | undefined = undefined;
+    let eventDetails: any = undefined;
+    if (raw.eventId) {
+      if (typeof raw.eventId === 'object' && raw.eventId._id) {
+        eventId = raw.eventId._id.toString();
+        eventDetails = {
+          title: raw.eventId.title || '',
+        };
+      } else {
+        eventId = raw.eventId.toString();
+      }
+    }
+
     return new Payment(
-      doc._id?.toString() || null,
-      doc.userId.toString(),
-      doc.purpose,
-      doc.amount,
-      doc.currency,
-      doc.paymentMethod,
-      doc.paymentStatus,
-      doc.transactionId,
-      doc.eventId?.toString(),
-      doc.bookingId?.toString(),
-      doc.paidAt,
-      doc.createdAt,
-      doc.updatedAt,
+      raw._id?.toString() || null,
+      userId,
+      raw.purpose,
+      raw.amount,
+      raw.currency,
+      raw.paymentMethod,
+      raw.paymentStatus,
+      raw.transactionId,
+      eventId,
+      raw.bookingId?.toString(),
+      raw.paidAt,
+      raw.createdAt,
+      raw.updatedAt,
+      userDetails,
+      eventDetails,
     );
   }
 
@@ -131,7 +134,7 @@ export class PaymentRepository implements IPaymentRepository {
     userId: string,
     page: number,
     limit: number,
-  ): Promise<PaginatedResponse<PaymentResponseDto>> {
+  ): Promise<PaginatedResponse<Payment>> {
     const query: mongoose.FilterQuery<IPaymentDocument> = {
       userId: userId as unknown as mongoose.Types.ObjectId,
       $or: [{ paymentMethod: 'WALLET' }, { purpose: 'REFUND' }],
@@ -150,35 +153,7 @@ export class PaymentRepository implements IPaymentRepository {
       PaymentModel.countDocuments(query).exec(),
     ]);
 
-    const mappedData: PaymentResponseDto[] = payments.map((rawDoc) => {
-      const doc = rawDoc as unknown as Record<string, unknown>;
-      const u = (doc.userId || {}) as Record<string, unknown>;
-      const e = doc.eventId as Record<string, unknown> | undefined;
-      return {
-        id: (doc._id as mongoose.Types.ObjectId)?.toString() || '',
-        userId: {
-          id: (u._id as mongoose.Types.ObjectId)?.toString() ?? '',
-          name: (u.name as string) ?? '',
-          email: (u.email as string) ?? '',
-          picture: u.picture as string | undefined,
-        },
-        purpose: doc.purpose as PaymentResponseDto['purpose'],
-        amount: Number(doc.amount || 0),
-        currency: (doc.currency as string) || 'INR',
-        paymentMethod: doc.paymentMethod as PaymentResponseDto['paymentMethod'],
-        paymentStatus: doc.paymentStatus as PaymentResponseDto['paymentStatus'],
-        transactionId: doc.transactionId as string,
-        eventId: e
-          ? {
-              id: (e._id as mongoose.Types.ObjectId)?.toString() || '',
-              title: (e.title as string) || '',
-            }
-          : undefined,
-        bookingId: (doc.bookingId as mongoose.Types.ObjectId)?.toString(),
-        paidAt: doc.paidAt as Date | undefined,
-        createdAt: doc.createdAt as Date,
-      };
-    });
+    const mappedData = payments.map((rawDoc) => this.toEntity(rawDoc));
 
     return {
       data: mappedData,

@@ -1,5 +1,4 @@
-import type { ClientSession } from 'mongoose';
-
+import type { IDbSession } from '../../services/transaction-manager.interface';
 import type { SeatStatus } from '../../../common/enums/searstatus-enum';
 
 export interface ISeatData {
@@ -32,13 +31,13 @@ export interface ISeatRepository {
   findSeats(
     seatIds: string[],
     eventId: string,
-    session?: ClientSession,
+    session?: IDbSession,
   ): Promise<ISeatData[]>;
 
   markBooked(
     eventId: string,
     seatIds: string[],
-    session?: ClientSession,
+    session?: IDbSession,
   ): Promise<void>;
 
   upsertSeat(seatData: {

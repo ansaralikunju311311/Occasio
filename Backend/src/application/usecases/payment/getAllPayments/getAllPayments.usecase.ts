@@ -4,6 +4,7 @@ import type {
   PaginationParams,
 } from '../../../../common/interfaces/pagination.interface';
 import type { PaymentResponseDto } from '../../../../application/dtos/responses/payment-response.dto';
+import { paymentMapper } from '../../../../common/mappers/payment.mapper';
 
 import type { IGetAllPaymentsUseCase } from './getAllPayments.usecase.interface';
 
@@ -13,6 +14,10 @@ export class GetAllPaymentsUseCase implements IGetAllPaymentsUseCase {
   async execute(
     params: PaginationParams,
   ): Promise<PaginatedResponse<PaymentResponseDto>> {
-    return await this._paymentRepository.getAllPayments(params);
+    const result = await this._paymentRepository.getAllPayments(params);
+    return {
+      data: paymentMapper.toResponseArray(result.data),
+      metadata: result.metadata,
+    };
   }
 }

@@ -5,7 +5,7 @@ import { eventMapper } from '../../../../common/mappers/event.mapper';
 import type { EventResponseDto } from '../../../../application/dtos/responses/event-response.dto';
 import { AppError } from '../../../../common/errors/apperror';
 import { HttpStatus } from '../../../../common/constants/http-status';
-import { socketService } from '../../../../infrastructure/services/socket.service';
+import type { INotificationService } from '../../../../domain/services/notification-service.interface';
 import { logger } from '../../../../common/logger/logger';
 
 import type { IStartEventUseCase } from './startevent.usecase.interface';
@@ -14,6 +14,7 @@ export class StartEventUseCase implements IStartEventUseCase {
   constructor(
     private _eventRepository: IEventRepository,
     private _bookingRepository: IBookingRepository,
+    private _notificationService: INotificationService,
   ) {}
 
   async execute(eventId: string, managerId: string): Promise<EventResponseDto> {
@@ -102,8 +103,8 @@ export class StartEventUseCase implements IStartEventUseCase {
 
       // Notify only the users who booked this event
       for (const userId of bookedUserIds) {
-        socketService.notifyUser(userId, 'event_live', notificationPayload);
-        socketService.notifyUser(userId, 'notification', notificationPayload);
+        this._notificationService.notifyUser(userId, 'event_live', notificationPayload);
+        this._notificationService.notifyUser(userId, 'notification', notificationPayload);
       }
     } catch (notificationError) {
       logger.error(

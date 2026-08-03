@@ -7,6 +7,7 @@ import { JoinLiveUseCase } from '../application/usecases/live/joinlive.usecase';
 import { SendChatMessageUseCase } from '../application/usecases/live/sendchatmessage.usecase';
 import { GetChatHistoryUseCase } from '../application/usecases/live/getchathistory.usecase';
 import { LiveController } from '../presentation/controllers/live.controller';
+import { socketService } from '../infrastructure/services/socket.service';
 
 export const MakeLiveController = (): LiveController => {
   const eventRepository = new EventRepository();
@@ -16,8 +17,9 @@ export const MakeLiveController = (): LiveController => {
   const startLiveUseCase = new StartLiveUseCase(
     eventRepository,
     bookingRepository,
+    socketService,
   );
-  const endLiveUseCase = new EndLiveUseCase(eventRepository);
+  const endLiveUseCase = new EndLiveUseCase(eventRepository, socketService);
   const joinLiveUseCase = new JoinLiveUseCase(
     eventRepository,
     bookingRepository,

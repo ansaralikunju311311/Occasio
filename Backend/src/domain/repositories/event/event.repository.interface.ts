@@ -1,28 +1,26 @@
-import type mongoose from 'mongoose';
-
-import type { Events } from '../../../domain/entities/event.entity';
+import type { IDbSession } from '../../services/transaction-manager.interface';
+import type { Events } from '../../entities/event.entity';
 import type {
   PaginationParams,
   PaginatedResponse,
 } from '../../../common/interfaces/pagination.interface';
-import type { UpdateEventDTO } from '../../../application/dtos/updateevent.dto';
 
 export interface IEventRepository {
-  createEvent(event: Events, session?: mongoose.ClientSession): Promise<Events>;
+  createEvent(event: Events, session?: IDbSession): Promise<Events>;
   createSeatLayout(
     data: Record<string, unknown>,
-    session?: mongoose.ClientSession,
+    session?: IDbSession,
   ): Promise<{ _id: string | null; [key: string]: unknown }>;
 
   createSeats(
     seats: Record<string, unknown>[],
-    session?: mongoose.ClientSession,
+    session?: IDbSession,
   ): Promise<void>;
 
   updateEventLayout(
     eventId: string,
     layoutId: string | null,
-    session?: mongoose.ClientSession,
+    session?: IDbSession,
   ): Promise<void>;
   findAllEvents(
     params: PaginationParams,
@@ -42,18 +40,18 @@ export interface IEventRepository {
 
   updateEvent(
     eventId: string,
-    data: UpdateEventDTO,
-    session?: mongoose.ClientSession,
+    data: Partial<Events> & { layout?: any },
+    session?: IDbSession,
     unsetData?: Record<string, unknown>,
   ): Promise<Events | null>;
   deleteEvent(id: string): Promise<boolean>;
   deleteSeatsByEventId(
     eventId: string,
-    session?: mongoose.ClientSession,
+    session?: IDbSession,
   ): Promise<void>;
   deleteLayoutByEventId(
     eventId: string,
-    session?: mongoose.ClientSession,
+    session?: IDbSession,
   ): Promise<void>;
 
   validateOwnershipAndDraft(eventId: string, userId: string): Promise<Events>;

@@ -1,4 +1,5 @@
-import type { ClientSession } from 'mongoose';
+import type { IDbSession } from '../../../domain/services/transaction-manager.interface';
+import type mongoose from 'mongoose';
 
 import type {
   ISeatRepository,
@@ -69,12 +70,13 @@ export class SeatRepository implements ISeatRepository {
   async findSeats(
     seatIds: string[],
     eventId: string,
-    session?: ClientSession,
+    session?: IDbSession,
   ): Promise<ISeatData[]> {
+    const mongoSession = session as unknown as mongoose.ClientSession;
     const seats = (await SeatModel.find({
       seatNumber: { $in: seatIds },
       eventId,
-    }).session(session ?? null)) as unknown as ISeat[];
+    }).session(mongoSession ?? null)) as unknown as ISeat[];
 
     return seats.map((s: ISeat) => ({
       _id: s._id.toString(),
@@ -96,15 +98,16 @@ export class SeatRepository implements ISeatRepository {
   async markBooked(
     eventId: string,
     seatIds: string[],
-    session?: ClientSession,
+    session?: IDbSession,
   ): Promise<void> {
+    const mongoSession = session as unknown as mongoose.ClientSession;
     await SeatModel.updateMany(
       { seatNumber: { $in: seatIds }, eventId },
       {
         $set: { status: SeatStatus.BOOKED },
         $unset: { lockExpiresAt: 1 },
       },
-      { session },
+      { session: mongoSession },
     );
   }
 

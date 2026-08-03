@@ -1,3 +1,4 @@
+import type { IDbSession } from '../../../domain/services/transaction-manager.interface';
 import type mongoose from 'mongoose';
 
 import type { IManagerSubscriptionRepository } from '../../../domain/repositories/imanager-subscription.repository';
@@ -10,8 +11,9 @@ import {
 export class ManagerSubscriptionRepository implements IManagerSubscriptionRepository {
   async create(
     subscription: ManagerSubscription,
-    session?: mongoose.ClientSession,
+    session?: IDbSession,
   ): Promise<ManagerSubscription> {
+    const mongoSession = session as unknown as mongoose.ClientSession;
     const createdDocs = await ManagerSubscriptionModel.create(
       [
         {
@@ -24,7 +26,7 @@ export class ManagerSubscriptionRepository implements IManagerSubscriptionReposi
           endDate: subscription.endDate,
         },
       ],
-      { session },
+      { session: mongoSession },
     );
 
     return this._toEntity(createdDocs[0]);
@@ -43,14 +45,15 @@ export class ManagerSubscriptionRepository implements IManagerSubscriptionReposi
   async update(
     id: string,
     updateData: Partial<ManagerSubscription>,
-    session?: mongoose.ClientSession,
+    session?: IDbSession,
   ): Promise<ManagerSubscription | null> {
+    const mongoSession = session as unknown as mongoose.ClientSession;
     const mappedUpdateData: mongoose.UpdateQuery<IManagerSubscriptionDocument> =
       { ...updateData };
     const doc = await ManagerSubscriptionModel.findByIdAndUpdate(
       id,
       mappedUpdateData,
-      { new: true, session },
+      { new: true, session: mongoSession },
     ).exec();
     return doc ? this._toEntity(doc) : null;
   }

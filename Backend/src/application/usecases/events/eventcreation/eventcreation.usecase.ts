@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import type { ITransactionManager } from '../../../../domain/services/transaction-manager.interface';
 
 import { EventStatus } from '../../../../common/enums/eventstatus-enum';
 import { Events } from '../../../../domain/entities/event.entity';
@@ -21,6 +21,7 @@ export class EventCretionUseCase implements IEventCreationUseCase {
     private _userRepository: IUserRepository,
     private _subscriptionRepository: ISubscriptionRepository,
     private _managerSubscriptionRepository: IManagerSubscriptionRepository,
+    private _transactionManager: ITransactionManager,
   ) {}
 
   async execute(
@@ -58,8 +59,7 @@ export class EventCretionUseCase implements IEventCreationUseCase {
       // Logic for users without an active subscription
     }
 
-    const session = await mongoose.startSession();
-    session.startTransaction();
+    const session = await this._transactionManager.start();
 
     try {
       if (data.eventType !== 'ONLINE') {
@@ -174,12 +174,10 @@ export class EventCretionUseCase implements IEventCreationUseCase {
         );
       }
 
-      await session.commitTransaction();
-      session.endSession();
+      await this._transactionManager.commit(session);
       return event ? eventMapper.toResponse(event) : null;
     } catch (error) {
-      await session.abortTransaction();
-      session.endSession();
+      await this._transactionManager.rollback(session);
       throw error;
     }
   }

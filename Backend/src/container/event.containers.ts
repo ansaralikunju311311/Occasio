@@ -12,6 +12,9 @@ import { UserRepository } from '../infrastructure/repositories/user/user.reposit
 import { SubscriptionRepository } from '../infrastructure/repositories/subscription/subscription.repository';
 import { ManagerSubscriptionRepository } from '../infrastructure/repositories/manager-subscription/manager-subscription.repository';
 import { PaymentRepository } from '../infrastructure/repositories/payment/payment.repository';
+import { MongoTransactionManager } from '../infrastructure/services/mongotransation.service';
+import { socketService } from '../infrastructure/services/socket.service';
+import { RazorpayGateway } from '../infrastructure/services/payment/razorpay.gateway';
 
 export const MakeEventController = () => {
   const eventRepository = new EventRepository();
@@ -20,12 +23,15 @@ export const MakeEventController = () => {
   const subscriptionRepository = new SubscriptionRepository();
   const managerSubscriptionRepository = new ManagerSubscriptionRepository();
   const paymentRepository = new PaymentRepository();
+  const transactionManager = new MongoTransactionManager();
+  const razorpayGateway = new RazorpayGateway();
 
   const eventCretionUseCase = new EventCretionUseCase(
     eventRepository,
     userRepository,
     subscriptionRepository,
     managerSubscriptionRepository,
+    transactionManager,
   );
   const getEventsUseCase = new GetEventsUseCase(eventRepository);
   const myEventsUseCase = new MyEventsUseCase(eventRepository);
@@ -37,16 +43,19 @@ export const MakeEventController = () => {
   const updateEventsUseCase = new UpdateEventUseCase(
     eventRepository,
     bookingRepository,
+    transactionManager,
   );
   const deleteEventUseCase = new DeleteEventUseCase(
     eventRepository,
     bookingRepository,
     paymentRepository,
     userRepository,
+    razorpayGateway,
   );
   const startEventUseCase = new StartEventUseCase(
     eventRepository,
     bookingRepository,
+    socketService,
   );
 
   return new EventController(

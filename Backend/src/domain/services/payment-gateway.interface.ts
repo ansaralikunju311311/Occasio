@@ -9,4 +9,5 @@ export interface IPaymentGateway {
     paymentId: string,
     signature: string,
   ): boolean;
+  refund(transactionId: string, amount: number): Promise<void>;
 }
