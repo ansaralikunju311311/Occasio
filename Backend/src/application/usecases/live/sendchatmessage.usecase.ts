@@ -27,16 +27,25 @@ export class SendChatMessageUseCase {
 
     const isCreator = event.createdBy.toString() === userId;
     if (!isCreator) {
-      const confirmedBookings = await this._bookingRepository.findConfirmedBookingsByEventId(eventId);
+      const confirmedBookings =
+        await this._bookingRepository.findConfirmedBookingsByEventId(eventId);
       const hasBooking = confirmedBookings.some((b) => {
-        if (!b.userId) return false;
-        const u = b.userId as unknown as string | { _id?: { toString(): string } };
-        const bUserId = typeof u === 'string' ? u : u._id ? u._id.toString() : u.toString();
+        if (!b.userId) {
+          return false;
+        }
+        const u = b.userId as unknown as
+          | string
+          | { _id?: { toString(): string } };
+        const bUserId =
+          typeof u === 'string' ? u : u._id ? u._id.toString() : u.toString();
         return bUserId === userId;
       });
 
       if (!hasBooking) {
-        throw new AppError('You must have a confirmed booking to post messages', HttpStatus.FORBIDDEN);
+        throw new AppError(
+          'You must have a confirmed booking to post messages',
+          HttpStatus.FORBIDDEN,
+        );
       }
     }
 

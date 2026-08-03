@@ -39,11 +39,17 @@ export class JoinLiveUseCase {
       throw new AppError('Event is not currently LIVE', HttpStatus.BAD_REQUEST);
     }
 
-    const confirmedBookings = await this._bookingRepository.findConfirmedBookingsByEventId(eventId);
+    const confirmedBookings =
+      await this._bookingRepository.findConfirmedBookingsByEventId(eventId);
     const hasBooking = confirmedBookings.some((b) => {
-      if (!b.userId) return false;
-      const u = b.userId as unknown as string | { _id?: { toString(): string } };
-      const bUserId = typeof u === 'string' ? u : u._id ? u._id.toString() : u.toString();
+      if (!b.userId) {
+        return false;
+      }
+      const u = b.userId as unknown as
+        | string
+        | { _id?: { toString(): string } };
+      const bUserId =
+        typeof u === 'string' ? u : u._id ? u._id.toString() : u.toString();
       return bUserId === userId;
     });
 

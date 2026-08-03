@@ -9,9 +9,15 @@ import type { UpdateEventDTO } from '../../../application/dtos/updateevent.dto';
 
 export interface IEventRepository {
   createEvent(event: Events, session?: mongoose.ClientSession): Promise<Events>;
-  createSeatLayout(data: Record<string, unknown>, session?: mongoose.ClientSession): Promise<{ _id: string | null; [key: string]: unknown }>;
+  createSeatLayout(
+    data: Record<string, unknown>,
+    session?: mongoose.ClientSession,
+  ): Promise<{ _id: string | null; [key: string]: unknown }>;
 
-  createSeats(seats: Record<string, unknown>[], session?: mongoose.ClientSession): Promise<void>;
+  createSeats(
+    seats: Record<string, unknown>[],
+    session?: mongoose.ClientSession,
+  ): Promise<void>;
 
   updateEventLayout(
     eventId: string,

@@ -1,4 +1,5 @@
 import type mongoose from 'mongoose';
+
 import type { IUserRepository } from '../../../domain/repositories/user.repository.interface';
 import { User } from '../../../domain/entities/user.entity';
 import type { IUserDocument } from '../../database/model/user.model';
@@ -40,7 +41,10 @@ export class UserRepository
     return this.toEntity(doc);
   }
 
-  async updateUser(user: User, session?: mongoose.ClientSession): Promise<User> {
+  async updateUser(
+    user: User,
+    session?: mongoose.ClientSession,
+  ): Promise<User> {
     const doc = await super.updateOne(
       { email: user.email },
       {
@@ -53,7 +57,8 @@ export class UserRepository
         rejectedAt: user.rejectedAt || undefined,
         reapplyAt: user.reapplyAt || undefined,
         eventsCreated: user.eventsCreated,
-        activeSubscription: user.activeSubscription as unknown as mongoose.Schema.Types.ObjectId,
+        activeSubscription:
+          user.activeSubscription as unknown as mongoose.Schema.Types.ObjectId,
         walletBalance: user.walletBalance,
       },
       { session },
@@ -66,12 +71,18 @@ export class UserRepository
     return this.toEntity(doc);
   }
 
-  private toEntity(doc: IUserDocument | mongoose.HydratedDocument<IUserDocument> | Record<string, unknown>): User {
+  private toEntity(
+    doc:
+      | IUserDocument
+      | mongoose.HydratedDocument<IUserDocument>
+      | Record<string, unknown>,
+  ): User {
     const d = doc as Record<string, unknown>;
     let activeSubStr: string | undefined = undefined;
     if (d.activeSubscription) {
       const sub = d.activeSubscription as Record<string, unknown>;
-      activeSubStr = (sub._id as mongoose.Types.ObjectId)?.toString() || sub.toString();
+      activeSubStr =
+        (sub._id as mongoose.Types.ObjectId)?.toString() || sub.toString();
     }
 
     return new User(

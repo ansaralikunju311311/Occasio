@@ -1,14 +1,17 @@
 import mongoose from 'mongoose';
+
 import type { IBookingRepository } from '../../../domain/repositories/booking/booking.repository.interface';
 import { Booking } from '../../../domain/entities/booking.entity';
-import { BookingModel, BookingStatus } from '../../database/model/booking.model';
+import { BookingModel } from '../../database/model/booking.model';
 import type {
   PaginationParams,
   PaginatedResponse,
 } from '../../../common/interfaces/pagination.interface';
-
 import { EventModel } from '../../database/model/events/event.model';
-import type { IBookingDocument } from '../../database/model/booking.model';
+import type {
+  IBookingDocument,
+  BookingStatus,
+} from '../../database/model/booking.model';
 
 export class BookingRepository implements IBookingRepository {
   async saveBooking(booking: Booking): Promise<Booking> {
@@ -151,12 +154,23 @@ export class BookingRepository implements IBookingRepository {
     };
   }
 
-  private toEntity(doc: IBookingDocument | mongoose.HydratedDocument<IBookingDocument> | Record<string, unknown>): Booking {
+  private toEntity(
+    doc:
+      | IBookingDocument
+      | mongoose.HydratedDocument<IBookingDocument>
+      | Record<string, unknown>,
+  ): Booking {
     const d = doc as Record<string, unknown>;
-    const userIdStr = (d.userId as mongoose.Types.ObjectId)?.toString() || String(d.userId || '');
-    const eventIdStr = (d.eventId as mongoose.Types.ObjectId)?.toString() || String(d.eventId || '');
+    const userIdStr =
+      (d.userId as mongoose.Types.ObjectId)?.toString() ||
+      String(d.userId || '');
+    const eventIdStr =
+      (d.eventId as mongoose.Types.ObjectId)?.toString() ||
+      String(d.eventId || '');
     return new Booking(
-      (d._id as mongoose.Types.ObjectId)?.toString() || (d.id as string) || null,
+      (d._id as mongoose.Types.ObjectId)?.toString() ||
+        (d.id as string) ||
+        null,
       userIdStr,
       eventIdStr,
       (d.seats as string[]) || [],
@@ -181,7 +195,16 @@ export class BookingRepository implements IBookingRepository {
   }
   async findConfirmedBookingsByEventId(eventId: string): Promise<Booking[]> {
     const filter: mongoose.FilterQuery<IBookingDocument> = {
-      status: { $in: ['CONFIRMED', 'confirmed', 'SUCCESS', 'success', 'COMPLETED', 'completed'] as BookingStatus[] },
+      status: {
+        $in: [
+          'CONFIRMED',
+          'confirmed',
+          'SUCCESS',
+          'success',
+          'COMPLETED',
+          'completed',
+        ] as BookingStatus[],
+      },
     };
 
     if (mongoose.Types.ObjectId.isValid(eventId)) {

@@ -1,4 +1,5 @@
 import type mongoose from 'mongoose';
+
 import type { IOtp } from '../../../infrastructure/database/model/otp.model';
 import { OtpModel } from '../../../infrastructure/database/model/otp.model';
 import { BaseRepository } from '../base.repository';
@@ -55,7 +56,9 @@ export class OtpRepository
     return otpDetails ? this.toEntity(otpDetails) : null;
   }
 
-  private toEntity(doc: IOtp | mongoose.HydratedDocument<IOtp> | Record<string, unknown>): OTP {
+  private toEntity(
+    doc: IOtp | mongoose.HydratedDocument<IOtp> | Record<string, unknown>,
+  ): OTP {
     const d = doc as Record<string, unknown>;
     return new OTP(
       (d._id as mongoose.Types.ObjectId)?.toString() || (d.id as string) || '',

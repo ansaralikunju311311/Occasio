@@ -23,7 +23,10 @@ export class ChatRepository implements IChatRepository {
     );
   }
 
-  async getMessagesByEventId(eventId: string, limit = 100): Promise<ChatMessage[]> {
+  async getMessagesByEventId(
+    eventId: string,
+    limit = 100,
+  ): Promise<ChatMessage[]> {
     const docs = await ChatModel.find({ eventId })
       .sort({ createdAt: 1 })
       .limit(limit)

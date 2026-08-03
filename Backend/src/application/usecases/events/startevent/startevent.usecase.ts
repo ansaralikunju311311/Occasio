@@ -6,6 +6,8 @@ import type { EventResponseDto } from '../../../../application/dtos/responses/ev
 import { AppError } from '../../../../common/errors/apperror';
 import { HttpStatus } from '../../../../common/constants/http-status';
 import { socketService } from '../../../../infrastructure/services/socket.service';
+import { logger } from '../../../../common/logger/logger';
+
 import type { IStartEventUseCase } from './startevent.usecase.interface';
 
 export class StartEventUseCase implements IStartEventUseCase {
@@ -21,21 +23,34 @@ export class StartEventUseCase implements IStartEventUseCase {
       throw new AppError('Event not found', HttpStatus.NOT_FOUND);
     }
 
-    if (event.isDeleted) {
-      throw new AppError('Event has been deleted', HttpStatus.BAD_REQUEST);
-    }
+    const creatorId =
+      typeof event.createdBy === 'string'
+        ? event.createdBy
+        : (event.createdBy as { id?: string; _id?: string }).id ||
+          (event.createdBy as { _id?: string })._id?.toString() ||
+          String(event.createdBy);
 
-    if (event.createdBy.toString() !== managerId) {
-      throw new AppError('You are not authorized to start this event', HttpStatus.FORBIDDEN);
+    if (creatorId !== managerId) {
+      throw new AppError(
+        'Unauthorized: Only the event creator can start this event',
+        HttpStatus.FORBIDDEN,
+      );
     }
 
     if (event.status === EventStatus.LIVE) {
-      throw new AppError('Event is already LIVE', HttpStatus.BAD_REQUEST);
+      throw new AppError('Event is already live', HttpStatus.BAD_REQUEST);
     }
 
-    if (event.status !== EventStatus.ACTIVE) {
+    if (event.status === EventStatus.COMPLETED) {
       throw new AppError(
-        `Cannot start event with status ${event.status}. Only ACTIVE events can be started.`,
+        'Completed events cannot be started',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (event.status === EventStatus.CANCELED) {
+      throw new AppError(
+        'Canceled events cannot be started',
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -45,27 +60,37 @@ export class StartEventUseCase implements IStartEventUseCase {
     });
 
     if (!updatedEvent) {
-      throw new AppError('Failed to update event status', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new AppError(
+        'Failed to start event',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
 
-    // Send real-time Socket.IO notification to all users who booked this event
+    // Emit live notifications to booked users
     try {
-      const bookings = await this._bookingRepository.findConfirmedBookingsByEventId(eventId);
+      const bookings =
+        await this._bookingRepository.findConfirmedBookingsByEventId(eventId);
+
       const bookedUserIds = Array.from(
         new Set(
           bookings
             .map((b) => {
-              if (!b.userId) return '';
-              const u = b.userId as unknown as string | { _id?: { toString(): string } };
-              if (typeof u === 'string') return u;
-              if (u._id) return u._id.toString();
-              return u.toString();
+              if (!b.userId) {
+                return null;
+              }
+              if (typeof b.userId === 'string') {
+                return b.userId;
+              }
+              const uObj = b.userId as { id?: string; _id?: string };
+              return uObj.id || uObj._id?.toString() || String(b.userId);
             })
-            .filter(Boolean),
+            .filter(Boolean) as string[],
         ),
       );
 
-      console.log(`[StartEventUseCase] Found ${bookings.length} confirmed bookings for event ${eventId}. Notifying user IDs:`, bookedUserIds);
+      logger.info(
+        `[StartEventUseCase] Found ${bookings.length} confirmed bookings for event ${eventId}. Notifying user IDs: ${JSON.stringify(bookedUserIds)}`,
+      );
 
       const notificationPayload = {
         type: 'EVENT_LIVE',
@@ -81,7 +106,9 @@ export class StartEventUseCase implements IStartEventUseCase {
         socketService.notifyUser(userId, 'notification', notificationPayload);
       }
     } catch (notificationError) {
-      console.error('Failed to dispatch live event notifications:', notificationError);
+      logger.error(
+        `Failed to dispatch live event notifications: ${String(notificationError)}`,
+      );
     }
 
     return eventMapper.toResponse(updatedEvent);

@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+
 import type { ITransactionManager } from '../../domain/services/transaction-manager.interface';
 
 export class MongoTransactionManager implements ITransactionManager {

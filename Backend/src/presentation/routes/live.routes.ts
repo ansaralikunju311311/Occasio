@@ -1,4 +1,5 @@
 import { Router } from 'express';
+
 import { verifyAccessToken } from '../middlewares/verifyAccessToken.middleware';
 import { requireRole } from '../middlewares/requireRole.middleware';
 import { UserRole } from '../../common/enums/userrole-enum';

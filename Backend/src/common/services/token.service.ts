@@ -21,10 +21,16 @@ export class CreateToken implements ITokenService {
   }
 
   verifyAccessToken(token: string): AuthUser | JwtPayload | string {
-    return jwt.verify(token, process.env.JWT_ACCESS_SECRET as string) as AuthUser | JwtPayload | string;
+    return jwt.verify(token, process.env.JWT_ACCESS_SECRET as string) as
+      | AuthUser
+      | JwtPayload
+      | string;
   }
 
   verifyRefreshToken(token: string): AuthUser | JwtPayload | string {
-    return jwt.verify(token, process.env.JWT_REFRESH_SECRET as string) as AuthUser | JwtPayload | string;
+    return jwt.verify(token, process.env.JWT_REFRESH_SECRET as string) as
+      | AuthUser
+      | JwtPayload
+      | string;
   }
 }

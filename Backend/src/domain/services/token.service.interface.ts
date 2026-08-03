@@ -1,4 +1,5 @@
 import type { JwtPayload } from 'jsonwebtoken';
+
 import type { AuthUser } from '../../common/type/auth.type';
 
 export interface ITokenService {

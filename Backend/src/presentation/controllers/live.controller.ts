@@ -1,4 +1,5 @@
 import type { Request, Response } from 'express-serve-static-core';
+
 import { HttpStatus } from '../../common/constants/http-status';
 import { catchAsync } from '../../common/utils/catchAsync';
 import { sendSuccess } from '../../common/utils/response';
@@ -54,15 +55,23 @@ export class LiveController {
     }
 
     const result = await this._joinLiveUseCase.execute(eventId, userId);
-    sendSuccess(res, result, 'Joined live stream verification successful', HttpStatus.OK, {
-      liveSession: result,
-    });
+    sendSuccess(
+      res,
+      result,
+      'Joined live stream verification successful',
+      HttpStatus.OK,
+      {
+        liveSession: result,
+      },
+    );
   });
 
   sendChatMessage = catchAsync(async (req: Request, res: Response) => {
     const eventId = (req.params.eventId || req.params.id) as string;
     const userId = req.authUser?.userId;
-    const userName = req.authUser?.email?.split('@')[0] || (userId ? `User_${userId.substring(0, 5)}` : 'User');
+    const userName =
+      req.authUser?.email?.split('@')[0] ||
+      (userId ? `User_${userId.substring(0, 5)}` : 'User');
     const userRole = req.authUser?.role || 'USER';
 
     if (!userId) {
@@ -72,7 +81,9 @@ export class LiveController {
 
     const { message } = req.body;
     if (!message || typeof message !== 'string' || !message.trim()) {
-      res.status(HttpStatus.BAD_REQUEST).json({ message: 'Message content is required' });
+      res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ message: 'Message content is required' });
       return;
     }
 
@@ -98,8 +109,14 @@ export class LiveController {
     }
 
     const result = await this._getChatHistoryUseCase.execute(eventId, userId);
-    sendSuccess(res, result, 'Chat history retrieved successfully', HttpStatus.OK, {
-      messages: result,
-    });
+    sendSuccess(
+      res,
+      result,
+      'Chat history retrieved successfully',
+      HttpStatus.OK,
+      {
+        messages: result,
+      },
+    );
   });
 }

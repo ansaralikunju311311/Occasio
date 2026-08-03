@@ -18,7 +18,10 @@ export abstract class BaseRepository<T> {
     return this.model.findById(id).exec();
   }
 
-  async create(data: Partial<T>, options?: SaveOptions): Promise<HydratedDocument<T>> {
+  async create(
+    data: Partial<T>,
+    options?: SaveOptions,
+  ): Promise<HydratedDocument<T>> {
     const createdDocs = await this.model.create([data], options);
     return createdDocs[0];
   }

@@ -1,4 +1,5 @@
 import type mongoose from 'mongoose';
+
 import type { User } from '../../domain/entities/user.entity';
 
 export interface IUserRepository {

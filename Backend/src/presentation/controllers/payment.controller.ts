@@ -111,7 +111,9 @@ export class PaymentController {
         userId,
       );
 
-      sendSuccess(res, result, result.message as string, HttpStatus.OK, { ...result });
+      sendSuccess(res, result, result.message as string, HttpStatus.OK, {
+        ...result,
+      });
     },
   );
 
@@ -245,7 +247,9 @@ export class PaymentController {
 
       const result = await this._verifyPaymentUseCase.execute(dto, userId);
 
-      sendSuccess(res, result, result.message as string, HttpStatus.OK, { ...result });
+      sendSuccess(res, result, result.message as string, HttpStatus.OK, {
+        ...result,
+      });
     },
   );
 

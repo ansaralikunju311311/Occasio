@@ -12,7 +12,6 @@ import { CreateToken } from './common/services/token.service';
 import { seatLockCleanupService } from './infrastructure/services/seat-lock-cleanup.service';
 import { socketService } from './infrastructure/services/socket.service';
 import { logger } from './common/logger/logger';
-
 import { registerLiveSocketHandler } from './infrastructure/services/live-socket.handler';
 
 const tokenService = new CreateToken();
@@ -35,7 +34,9 @@ const startServer = async (): Promise<void> => {
 
     io.use((socket, next) => {
       try {
-        let token = socket.handshake.auth?.token || socket.handshake.headers?.authorization;
+        let token =
+          socket.handshake.auth?.token ||
+          socket.handshake.headers?.authorization;
 
         if (!token) {
           return next(new Error('Authentication required'));
@@ -48,11 +49,13 @@ const startServer = async (): Promise<void> => {
         const decode = tokenService.verifyAccessToken(token) as AuthUser;
 
         socket.data.user = decode;
-        console.log('⚡ Socket client authenticated successfully:', decode);
+        logger.info(
+          `⚡ Socket client authenticated successfully: ${JSON.stringify(decode)}`,
+        );
 
         next();
       } catch (error) {
-        console.log('❌ Socket authentication error:', error);
+        logger.error(`❌ Socket authentication error: ${String(error)}`);
         if (error instanceof jwt.TokenExpiredError) {
           return next(new Error('TOKEN_EXPIRED'));
         }
@@ -67,7 +70,9 @@ const startServer = async (): Promise<void> => {
         const uStr = user.toString();
         socket.join(`user${uStr}`);
         socket.join(uStr);
-        console.log(`Socket ${socket.id} joined rooms: user${uStr} and ${uStr}`);
+        logger.info(
+          `Socket ${socket.id} joined rooms: user${uStr} and ${uStr}`,
+        );
       }
 
       registerLiveSocketHandler(io, socket);

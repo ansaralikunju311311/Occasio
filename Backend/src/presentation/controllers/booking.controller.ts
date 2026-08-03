@@ -137,7 +137,10 @@ export class BookingController {
         return;
       }
 
-      const event = booking.eventId as unknown as { startTime: Date; publishedAt?: Date };
+      const event = booking.eventId as unknown as {
+        startTime: Date;
+        publishedAt?: Date;
+      };
       if (!event) {
         res
           .status(HttpStatus.NOT_FOUND)

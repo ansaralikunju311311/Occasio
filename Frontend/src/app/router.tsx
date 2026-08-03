@@ -56,7 +56,7 @@ import ProtectedRoute from '../components/common/ProtectedRoute.tsx';
 import PublicRoute from '../components/common/PublicRoute.tsx';
 import PreventAdminRoute from '../components/common/PreventAdminRoute.tsx';
 
-export const router = createBrowserRouter([
+const router = createBrowserRouter([
   {
     path: '/',
     element: (

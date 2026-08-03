@@ -1,7 +1,11 @@
-import mongoose from 'mongoose';
+import type mongoose from 'mongoose';
+
 import type { IManagerSubscriptionRepository } from '../../../domain/repositories/imanager-subscription.repository';
 import { ManagerSubscription } from '../../../domain/entities/manager-subscription.entity';
-import { ManagerSubscriptionModel, type IManagerSubscriptionDocument } from '../../database/model/manager-subscription.model';
+import {
+  ManagerSubscriptionModel,
+  type IManagerSubscriptionDocument,
+} from '../../database/model/manager-subscription.model';
 
 export class ManagerSubscriptionRepository implements IManagerSubscriptionRepository {
   async create(
@@ -41,7 +45,8 @@ export class ManagerSubscriptionRepository implements IManagerSubscriptionReposi
     updateData: Partial<ManagerSubscription>,
     session?: mongoose.ClientSession,
   ): Promise<ManagerSubscription | null> {
-    const mappedUpdateData: mongoose.UpdateQuery<IManagerSubscriptionDocument> = { ...updateData };
+    const mappedUpdateData: mongoose.UpdateQuery<IManagerSubscriptionDocument> =
+      { ...updateData };
     const doc = await ManagerSubscriptionModel.findByIdAndUpdate(
       id,
       mappedUpdateData,
@@ -50,11 +55,17 @@ export class ManagerSubscriptionRepository implements IManagerSubscriptionReposi
     return doc ? this._toEntity(doc) : null;
   }
 
-  private _toEntity(doc: IManagerSubscriptionDocument | mongoose.HydratedDocument<IManagerSubscriptionDocument> | Record<string, unknown>): ManagerSubscription {
+  private _toEntity(
+    doc:
+      | IManagerSubscriptionDocument
+      | mongoose.HydratedDocument<IManagerSubscriptionDocument>
+      | Record<string, unknown>,
+  ): ManagerSubscription {
     const d = doc as Record<string, unknown>;
     return new ManagerSubscription(
       (d._id as mongoose.Types.ObjectId)?.toString() || (d.id as string) || '',
-      (d.userId as mongoose.Types.ObjectId)?.toString() || String(d.userId || ''),
+      (d.userId as mongoose.Types.ObjectId)?.toString() ||
+        String(d.userId || ''),
       d.plan as ManagerSubscription['plan'],
       d.status as ManagerSubscription['status'],
       Number(d.eventLimit || 0),

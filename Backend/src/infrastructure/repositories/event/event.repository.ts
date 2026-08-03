@@ -28,7 +28,9 @@ export class EventRepository
     const events = await super.create({
       title: event.title,
       description: event.description,
-      createdBy: new mongoose.Types.ObjectId(event.createdBy) as unknown as mongoose.Schema.Types.ObjectId,
+      createdBy: new mongoose.Types.ObjectId(
+        event.createdBy,
+      ) as unknown as mongoose.Schema.Types.ObjectId,
       endTime: event.endTime,
       eventType: event.eventType,
       location: event.location,
@@ -47,7 +49,9 @@ export class EventRepository
     params: PaginationParams,
   ): Promise<PaginatedResponse<Events>> {
     const { page = 1, limit = 10, search, eventType, upcoming } = params;
-    const query: mongoose.FilterQuery<IEventDocument> = { isDeleted: { $ne: true } };
+    const query: mongoose.FilterQuery<IEventDocument> = {
+      isDeleted: { $ne: true },
+    };
 
     if (eventType) {
       query.eventType = eventType as IEventDocument['eventType'];
@@ -184,11 +188,17 @@ export class EventRepository
     }
   }
 
-  async createSeats(seats: Record<string, unknown>[], session?: mongoose.ClientSession) {
+  async createSeats(
+    seats: Record<string, unknown>[],
+    session?: mongoose.ClientSession,
+  ) {
     await SeatModel.insertMany(seats, { session });
   }
 
-  async createSeatLayout(data: Record<string, unknown>, session?: mongoose.ClientSession): Promise<{ _id: string | null; [key: string]: unknown }> {
+  async createSeatLayout(
+    data: Record<string, unknown>,
+    session?: mongoose.ClientSession,
+  ): Promise<{ _id: string | null; [key: string]: unknown }> {
     const [layout] = await SeatLayoutModel.create([data], { session });
     const obj = layout.toObject();
     return { ...obj, _id: obj._id?.toString() || null };
@@ -257,7 +267,8 @@ export class EventRepository
     }
 
     if (
-      (event.status === EventStatus.ACTIVE || event.status === EventStatus.LIVE) &&
+      (event.status === EventStatus.ACTIVE ||
+        event.status === EventStatus.LIVE) &&
       event.isPublished
     ) {
       return this.toEntity(event); // Already published
@@ -272,7 +283,12 @@ export class EventRepository
     return this.toEntity(updated);
   }
 
-  private toEntity(manager: IEventDocument | mongoose.HydratedDocument<IEventDocument> | Record<string, unknown>): Events {
+  private toEntity(
+    manager:
+      | IEventDocument
+      | mongoose.HydratedDocument<IEventDocument>
+      | Record<string, unknown>,
+  ): Events {
     const doc = manager as Record<string, unknown>;
     let createdById: string;
     let creatorDetails: User | undefined;
@@ -296,7 +312,9 @@ export class EventRepository
       seatLayoutDetails = s;
     } else {
       seatLayoutId = doc.seatLayoutId?.toString() || '';
-      seatLayoutDetails = doc.seatLayoutId as Record<string, unknown> | undefined;
+      seatLayoutDetails = doc.seatLayoutId as
+        | Record<string, unknown>
+        | undefined;
     }
 
     return new Events(
@@ -306,7 +324,9 @@ export class EventRepository
       doc.eventType as IEventDocument['eventType'],
       doc.startTime as Date,
       doc.endTime as Date,
-      doc.location && (doc.location as { type?: string }).type ? (doc.location as Events['location']) : undefined,
+      doc.location && (doc.location as { type?: string }).type
+        ? (doc.location as Events['location'])
+        : undefined,
       doc.maxOnlineUsers as number | undefined,
       Number(doc.price || 0),
       createdById,

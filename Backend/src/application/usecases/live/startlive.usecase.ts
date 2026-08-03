@@ -6,6 +6,7 @@ import { HttpStatus } from '../../../common/constants/http-status';
 import { socketService } from '../../../infrastructure/services/socket.service';
 import { eventMapper } from '../../../common/mappers/event.mapper';
 import type { EventResponseDto } from '../../dtos/responses/event-response.dto';
+import { logger } from '../../../common/logger/logger';
 
 export class StartLiveUseCase {
   constructor(
@@ -25,7 +26,10 @@ export class StartLiveUseCase {
     }
 
     if (event.createdBy.toString() !== managerId) {
-      throw new AppError('You are not authorized to start live for this event', HttpStatus.FORBIDDEN);
+      throw new AppError(
+        'You are not authorized to start live for this event',
+        HttpStatus.FORBIDDEN,
+      );
     }
 
     if (event.status === EventStatus.LIVE) {
@@ -38,20 +42,32 @@ export class StartLiveUseCase {
     });
 
     if (!updatedEvent) {
-      throw new AppError('Failed to update event status to LIVE', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new AppError(
+        'Failed to update event status to LIVE',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
 
     // Send realtime notification to all users with confirmed bookings
     try {
-      const bookings = await this._bookingRepository.findConfirmedBookingsByEventId(eventId);
+      const bookings =
+        await this._bookingRepository.findConfirmedBookingsByEventId(eventId);
       const bookedUserIds = Array.from(
         new Set(
           bookings
             .map((b) => {
-              if (!b.userId) return '';
-              const u = b.userId as unknown as string | { _id?: { toString(): string } };
-              if (typeof u === 'string') return u;
-              if (u._id) return u._id.toString();
+              if (!b.userId) {
+                return '';
+              }
+              const u = b.userId as unknown as
+                | string
+                | { _id?: { toString(): string } };
+              if (typeof u === 'string') {
+                return u;
+              }
+              if (u._id) {
+                return u._id.toString();
+              }
               return u.toString();
             })
             .filter(Boolean),
@@ -71,7 +87,9 @@ export class StartLiveUseCase {
         socketService.notifyUser(userId, 'notification', notificationPayload);
       }
     } catch (notificationError) {
-      console.error('[StartLiveUseCase] Failed to send live event notifications:', notificationError);
+      logger.error(
+        `[StartLiveUseCase] Failed to send live event notifications: ${String(notificationError)}`,
+      );
     }
 
     return eventMapper.toResponse(updatedEvent);

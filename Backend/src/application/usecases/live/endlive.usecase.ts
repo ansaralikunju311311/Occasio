@@ -5,6 +5,7 @@ import { HttpStatus } from '../../../common/constants/http-status';
 import { socketService } from '../../../infrastructure/services/socket.service';
 import { eventMapper } from '../../../common/mappers/event.mapper';
 import type { EventResponseDto } from '../../dtos/responses/event-response.dto';
+import { logger } from '../../../common/logger/logger';
 
 export class EndLiveUseCase {
   constructor(private _eventRepository: IEventRepository) {}
@@ -16,8 +17,22 @@ export class EndLiveUseCase {
       throw new AppError('Event not found', HttpStatus.NOT_FOUND);
     }
 
-    if (event.createdBy.toString() !== managerId) {
-      throw new AppError('You are not authorized to end live for this event', HttpStatus.FORBIDDEN);
+    const creatorId =
+      typeof event.createdBy === 'string'
+        ? event.createdBy
+        : (event.createdBy as { id?: string; _id?: string }).id ||
+          (event.createdBy as { _id?: string })._id?.toString() ||
+          String(event.createdBy);
+
+    if (creatorId !== managerId) {
+      throw new AppError(
+        'Unauthorized: Only the event creator can end this stream',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    if (event.status !== EventStatus.LIVE) {
+      throw new AppError('Event is not currently live', HttpStatus.BAD_REQUEST);
     }
 
     const updatedEvent = await this._eventRepository.updateEvent(eventId, {
@@ -25,7 +40,10 @@ export class EndLiveUseCase {
     });
 
     if (!updatedEvent) {
-      throw new AppError('Failed to update event status to COMPLETED', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new AppError(
+        'Failed to update event status',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
 
     // Broadcast stream ended to live room
@@ -38,7 +56,7 @@ export class EndLiveUseCase {
         });
       }
     } catch (err) {
-      console.error('[EndLiveUseCase] Socket broadcast error:', err);
+      logger.error(`[EndLiveUseCase] Socket broadcast error: ${String(err)}`);
     }
 
     return eventMapper.toResponse(updatedEvent);

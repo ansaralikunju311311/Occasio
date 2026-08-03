@@ -12,7 +12,10 @@ import { PaymentPurpose } from '../../../../common/enums/payment-purpose.enum';
 import { PaymentStatus } from '../../../../common/enums/payment-status.enum';
 import { PaymentMethod } from '../../../../common/enums/payment-method.enum';
 
-import type { IWalletPayUseCase, WalletPayResultDto } from './walletPay.usecase.interface';
+import type {
+  IWalletPayUseCase,
+  WalletPayResultDto,
+} from './walletPay.usecase.interface';
 
 export class WalletPayUseCase implements IWalletPayUseCase {
   constructor(

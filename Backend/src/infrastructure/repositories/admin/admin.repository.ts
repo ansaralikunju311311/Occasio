@@ -1,4 +1,5 @@
 import type mongoose from 'mongoose';
+
 import { User } from '../../../domain/entities/user.entity';
 import type { IAdminRepository } from '../../../domain/repositories/admin/admin.repository.interface';
 import { UserModel, type IUserDocument } from '../../database/model/user.model';
@@ -7,7 +8,10 @@ import type {
   PaginatedResponse,
 } from '../../../common/interfaces/pagination.interface';
 import { EventManager } from '../../../domain/entities/manager.entity';
-import { EventManagerModel, type IEventManagerDocument } from '../../database/model/manager.model';
+import {
+  EventManagerModel,
+  type IEventManagerDocument,
+} from '../../database/model/manager.model';
 
 export class AdminRepository implements IAdminRepository {
   async findAllUser(

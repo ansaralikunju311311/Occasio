@@ -1,4 +1,5 @@
 import type mongoose from 'mongoose';
+
 import type { ManagerSubscription } from '../entities/manager-subscription.entity';
 
 export interface IManagerSubscriptionRepository {
