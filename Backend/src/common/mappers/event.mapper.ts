@@ -1,9 +1,40 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { Events } from '../../domain/entities/event.entity';
 import type { EventResponseDto } from '../../application/dtos/responses/event-response.dto';
+import type { SeatResponseDto } from '../../application/dtos/responses/seat-response.dto';
+import type { SeatLayoutResponseDto } from '../../application/dtos/responses/seat-layout-response.dto';
+import type { SeatStatus } from '../../common/enums/searstatus-enum';
 
 import { userMapper } from './user.mapper';
 import { BaseMapper } from './base.mapper';
+
+export interface SeatData {
+  _id?: string;
+  id?: string;
+  block?: string;
+  row?: number;
+  column?: number;
+  seatNumber?: string;
+  categoryName?: string;
+  price?: number;
+  status?: SeatStatus | string;
+  holdExpiresAt?: Date;
+}
+
+export interface SeatLayoutData {
+  _id?: string;
+  id?: string;
+  blocks?: Array<{
+    blockName: string;
+    rows?: Array<{
+      rowNumber: number;
+      columns: number;
+    }>;
+    category?: {
+      name?: string;
+      price?: number;
+    };
+  }>;
+}
 
 export class EventMapper extends BaseMapper<Events, EventResponseDto> {
   toResponse(entity: Events): EventResponseDto {
@@ -32,10 +63,10 @@ export class EventMapper extends BaseMapper<Events, EventResponseDto> {
       bookedTickets: entity.bookedTickets,
       seatLayoutId: entity.seatLayoutId,
       SeatLayout: entity.SeatLayout
-        ? this.mapSeatLayout(entity.SeatLayout)
+        ? this.mapSeatLayout(entity.SeatLayout as SeatLayoutData)
         : undefined,
       seats: entity.seats
-        ? entity.seats.map((s) => this.mapSeat(s))
+        ? entity.seats.map((s) => this.mapSeat(s as SeatData))
         : undefined,
       isDeleted: entity.isDeleted,
       deletedAt: entity.deletedAt,
@@ -44,32 +75,32 @@ export class EventMapper extends BaseMapper<Events, EventResponseDto> {
     };
   }
 
-  private mapSeat(seat: any) {
+  private mapSeat(seat: SeatData): SeatResponseDto {
     return {
-      id: this.mapId(seat._id || seat.id),
-      block: seat.block,
-      row: seat.row,
-      column: seat.column,
-      seatNumber: seat.seatNumber,
-      categoryName: seat.categoryName,
-      price: seat.price,
-      status: seat.status,
+      id: this.mapId(seat._id || seat.id || null),
+      block: seat.block || '',
+      row: seat.row || 0,
+      column: seat.column || 0,
+      seatNumber: seat.seatNumber || '',
+      categoryName: seat.categoryName || '',
+      price: seat.price || 0,
+      status: (seat.status as SeatStatus) || 'AVAILABLE',
       holdExpiresAt: seat.holdExpiresAt,
     };
   }
 
-  private mapSeatLayout(layout: any) {
+  private mapSeatLayout(layout: SeatLayoutData): SeatLayoutResponseDto {
     return {
-      id: this.mapId(layout._id || layout.id),
-      blocks: layout.blocks?.map((block: any) => ({
-        blockName: block.blockName,
-        rows: block.rows?.map((row: any) => ({
-          rowNumber: row.rowNumber,
-          columns: row.columns,
+      id: this.mapId(layout._id || layout.id || null),
+      blocks: (layout.blocks || []).map((block) => ({
+        blockName: block.blockName || '',
+        rows: (block.rows || []).map((row) => ({
+          rowNumber: row.rowNumber || 0,
+          columns: row.columns || 0,
         })),
         category: {
-          name: block.category?.name,
-          price: block.category?.price,
+          name: block.category?.name || '',
+          price: block.category?.price || 0,
         },
       })),
     };

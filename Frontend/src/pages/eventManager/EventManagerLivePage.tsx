@@ -51,9 +51,10 @@ const EventManagerLivePage = () => {
       await liveService.startLive(eventId);
       setIsStreaming(true);
       toast.success('Live stream started successfully! Viewers have been notified.');
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to start live stream:', err);
-      toast.error(err?.response?.data?.message || 'Failed to start live stream');
+      const e = err as { response?: { data?: { message?: string } } };
+      toast.error(e?.response?.data?.message || 'Failed to start live stream');
     }
   };
 
@@ -65,9 +66,10 @@ const EventManagerLivePage = () => {
       setIsStreaming(false);
       toast.info('Live stream has ended.');
       navigate('/eventmanager/my-events');
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to end live stream:', err);
-      toast.error(err?.response?.data?.message || 'Failed to end live stream');
+      const e = err as { response?: { data?: { message?: string } } };
+      toast.error(e?.response?.data?.message || 'Failed to end live stream');
     }
   }, [eventId, cleanup, navigate]);
 
@@ -136,7 +138,7 @@ const EventManagerLivePage = () => {
               messages={messages}
               isLoading={isLoadingChat}
               onSendMessage={sendMessage}
-              currentUserId={authUser?.id || (authUser as any)?._id}
+              currentUserId={authUser?.id || ''}
             />
           </div>
         </div>

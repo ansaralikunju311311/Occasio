@@ -78,9 +78,10 @@ const AdminPendingManagers = () => {
 
       setSelectedManager(details);
       setIsModalOpen(true);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Failed to fetch manager details:', error);
-      toast.error(error.response?.data?.message || 'Failed to load manager details.');
+      const err = error as { response?: { data?: { message?: string } } };
+      toast.error(err.response?.data?.message || 'Failed to load manager details.');
     } finally {
     }
   };
@@ -91,7 +92,7 @@ const AdminPendingManagers = () => {
         toast.success('Manager application approved successfully!');
         setIsModalOpen(false);
       },
-      onError: (error: any) => {
+      onError: (error: unknown) => {
         console.error('Approval failed:', error);
         toast.error('Failed to approve manager application.');
       },
@@ -108,7 +109,7 @@ const AdminPendingManagers = () => {
           setIsRejectionModalOpen(false);
           setRejectionReason('');
         },
-        onError: (error: any) => {
+        onError: (error: unknown) => {
           console.error('Rejection failed:', error);
           toast.error('Failed to reject manager application.');
         },
@@ -195,7 +196,7 @@ const AdminPendingManagers = () => {
               </td>
             </tr>
           }
-          renderRow={(manager: any, index: number) => {
+          renderRow={(manager: { id?: string; name?: string; email?: string; status?: string; createdAt?: string }, index: number) => {
             const managerId = manager.id || index.toString();
             return (
               <tr key={managerId} className="hover:bg-gray-50 transition-colors duration-150">
@@ -203,7 +204,7 @@ const AdminPendingManagers = () => {
                   <div className="flex items-center">
                     <div className="flex-shrink-0 h-10 w-10">
                       <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-emerald-500 to-emerald-600 flex items-center justify-center text-white font-medium shadow-sm">
-                        {getInitials(manager.name)}
+                        {getInitials(manager.name || '')}
                       </div>
                     </div>
                     <div className="ml-4">

@@ -12,7 +12,7 @@ import { PaymentPurpose } from '../../../../common/enums/payment-purpose.enum';
 import { PaymentStatus } from '../../../../common/enums/payment-status.enum';
 import { PaymentMethod } from '../../../../common/enums/payment-method.enum';
 
-import type { IWalletPayUseCase } from './walletPay.usecase.interface';
+import type { IWalletPayUseCase, WalletPayResultDto } from './walletPay.usecase.interface';
 
 export class WalletPayUseCase implements IWalletPayUseCase {
   constructor(
@@ -30,7 +30,7 @@ export class WalletPayUseCase implements IWalletPayUseCase {
     amount: number,
     bookingType: 'physical' | 'online',
     seats?: string[],
-  ): Promise<any> {
+  ): Promise<WalletPayResultDto> {
     const event = await this._eventRepository.findByIdEvents(eventId);
     if (!event) {
       throw new Error('Event not found');

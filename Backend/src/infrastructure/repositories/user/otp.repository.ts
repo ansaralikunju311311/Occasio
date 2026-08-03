@@ -1,10 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import type mongoose from 'mongoose';
 import type { IOtp } from '../../../infrastructure/database/model/otp.model';
 import { OtpModel } from '../../../infrastructure/database/model/otp.model';
 import { BaseRepository } from '../base.repository';
 import type { IOtpRepository } from '../../../domain/repositories/otp.repository.interface';
 import { OTP } from '../../../domain/entities/otp.entity';
-// import { User } from "domain/entities/user.entity";
+
 export class OtpRepository
   extends BaseRepository<IOtp>
   implements IOtpRepository
@@ -55,15 +55,16 @@ export class OtpRepository
     return otpDetails ? this.toEntity(otpDetails) : null;
   }
 
-  private toEntity(doc: any): OTP {
+  private toEntity(doc: IOtp | mongoose.HydratedDocument<IOtp> | Record<string, unknown>): OTP {
+    const d = doc as Record<string, unknown>;
     return new OTP(
-      doc._id.toString(),
-      doc.email,
-      doc.otp,
-      doc.otpExpires,
-      doc.otpType,
-      doc.isUsed,
-      doc.otpSendAt,
+      (d._id as mongoose.Types.ObjectId)?.toString() || (d.id as string) || '',
+      d.email as string,
+      d.otp as string,
+      d.otpExpires as Date,
+      d.otpType as OTP['otpType'],
+      Boolean(d.isUsed),
+      d.otpSendAt as Date,
     );
   }
 }

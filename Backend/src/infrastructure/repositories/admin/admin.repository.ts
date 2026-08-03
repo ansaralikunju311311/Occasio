@@ -1,20 +1,20 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import type mongoose from 'mongoose';
 import { User } from '../../../domain/entities/user.entity';
 import type { IAdminRepository } from '../../../domain/repositories/admin/admin.repository.interface';
-import { UserModel } from '../../database/model/user.model';
+import { UserModel, type IUserDocument } from '../../database/model/user.model';
 import type {
   PaginationParams,
   PaginatedResponse,
 } from '../../../common/interfaces/pagination.interface';
 import { EventManager } from '../../../domain/entities/manager.entity';
-import { EventManagerModel } from '../../database/model/manager.model';
+import { EventManagerModel, type IEventManagerDocument } from '../../database/model/manager.model';
 
 export class AdminRepository implements IAdminRepository {
   async findAllUser(
     params: PaginationParams,
   ): Promise<PaginatedResponse<User> | null> {
     const { page = 1, limit = 10, search, role, applyingupgrade } = params;
-    const query: any = {
+    const query: mongoose.FilterQuery<IUserDocument> = {
       role: { $ne: 'ADMIN' }, // always exclude admin
     };
 
@@ -22,7 +22,7 @@ export class AdminRepository implements IAdminRepository {
       query.role = role;
     }
 
-    if (applyingupgrade) {
+    if (applyingupgrade !== undefined) {
       query.applyingupgrade = applyingupgrade;
     }
 
@@ -103,11 +103,11 @@ export class AdminRepository implements IAdminRepository {
     id: string,
     search?: string,
   ): Promise<EventManager | null> {
-    const query: any = {
-      userId: id, // always exclude admin
+    const query: mongoose.FilterQuery<IEventManagerDocument> = {
+      userId: id as unknown as mongoose.Types.ObjectId,
     };
     if (search) {
-      query.$or = [{ email: { $regex: search, $options: 'i' } }];
+      query.$or = [{ fullName: { $regex: search, $options: 'i' } }];
     }
     const manager = await EventManagerModel.findOne(query);
 

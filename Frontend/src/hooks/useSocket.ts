@@ -3,6 +3,13 @@ import { socket } from '../services/socket/socket';
 import { toast } from 'sonner';
 import { useNotifications } from '../context/NotificationContext';
 
+export interface EventLiveNotificationData {
+  eventId?: string;
+  eventTitle?: string;
+  message?: string;
+  timestamp?: string;
+}
+
 export const useSocket = () => {
   const { addNotification } = useNotifications();
 
@@ -18,7 +25,8 @@ export const useSocket = () => {
       }
 
       // Update auth token if socket auth is missing or changed
-      const currentToken = (socket.auth as any)?.token;
+      const currentAuth = socket.auth as { token?: string } | undefined;
+      const currentToken = currentAuth?.token;
       if (currentToken !== token) {
         socket.auth = { token };
         if (socket.connected) {
@@ -37,7 +45,7 @@ export const useSocket = () => {
       console.log('⚡ Socket connected successfully:', socket.id);
     };
 
-    const handleConnectError = (err: any) => {
+    const handleConnectError = (err: Error) => {
       console.error('❌ Socket connection error:', err.message);
     };
 
@@ -48,7 +56,7 @@ export const useSocket = () => {
     let lastHandledEventId: string | null = null;
     let lastHandledTime = 0;
 
-    const handleEventLive = (data: any) => {
+    const handleEventLive = (data: EventLiveNotificationData) => {
       const now = Date.now();
       if (data.eventId && data.eventId === lastHandledEventId && now - lastHandledTime < 5000) {
         return;

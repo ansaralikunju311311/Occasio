@@ -36,10 +36,11 @@ const UserLivePage = () => {
         setAccessError(null);
         const liveSessionData = await liveService.joinLive(eventId);
         setSession(liveSessionData);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('[UserLivePage] Join live error:', err);
+        const e = err as { response?: { data?: { message?: string } } };
         const msg =
-          err?.response?.data?.message ||
+          e?.response?.data?.message ||
           'You must have a confirmed booking for this event to watch the stream.';
         setAccessError(msg);
       } finally {
@@ -165,7 +166,7 @@ const UserLivePage = () => {
               messages={messages}
               isLoading={isLoadingChat}
               onSendMessage={sendMessage}
-              currentUserId={authUser?.id || (authUser as any)?._id}
+              currentUserId={authUser?.id || ''}
             />
           </div>
         </div>

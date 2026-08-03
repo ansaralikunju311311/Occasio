@@ -5,6 +5,7 @@ import { SearchBar } from '../../components/common/SearchBar';
 import { Pagination } from '../../components/common/Pagination';
 import EventDetailsModal from '../../components/admin/EventDetailsModal';
 import { useAllEventsAdmin } from '../../hooks/useEvents';
+import type { EventItem, SeatBlock } from '../../types/event.types';
 
 interface Event {
   id: string;
@@ -23,7 +24,7 @@ const AdminEvents = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [statusFilter, setStatusFilter] = useState('ALL');
-  const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
 
   const {
     data: responseData,
@@ -180,7 +181,7 @@ const AdminEvents = () => {
               </td>
             </tr>
           }
-          renderRow={(event: any) => (
+          renderRow={(event: EventItem) => (
             <tr key={event.id} className="hover:bg-slate-800/30 transition-colors group">
               <td className="px-6 py-4 flex flex-col justify-center">
                 <div className="text-white font-semibold text-sm truncate max-w-[200px] mb-1 group-hover:text-emerald-400 transition-colors">
@@ -260,10 +261,10 @@ const AdminEvents = () => {
               <td className="px-6 py-4">
                 {(() => {
                   const type = event.eventType?.toUpperCase();
+                  const layoutObj = typeof event.seatLayoutDetails === 'object' ? event.seatLayoutDetails : undefined;
                   const blocks =
                     event?.SeatLayout?.blocks ??
-                    event?.seatLayout?.blocks ??
-                    event?.seatLayoutDetails?.blocks ??
+                    layoutObj?.blocks ??
                     event?.layout?.blocks ??
                     [];
                   const onlinePrice = event.price ?? 0;
@@ -280,7 +281,7 @@ const AdminEvents = () => {
                     if (blocks.length > 0) {
                       return (
                         <div className="flex flex-col gap-1">
-                          {blocks.map((b: any, i: number) => {
+                          {blocks.map((b: SeatBlock, i: number) => {
                             const name =
                               b.category?.name || b.blockName || b.blocName || `Block ${i + 1}`;
                             const price = b.category?.price;
@@ -318,7 +319,7 @@ const AdminEvents = () => {
                         {/* Offline categories */}
                         {blocks.length > 0 && (
                           <div className="flex flex-col gap-1 pt-1 border-t border-slate-800/50">
-                            {blocks.map((b: any, i: number) => {
+                            {blocks.map((b: SeatBlock, i: number) => {
                               const name =
                                 b.category?.name || b.blockName || b.blocName || `Block ${i + 1}`;
                               const price = b.category?.price;
@@ -393,7 +394,9 @@ const AdminEvents = () => {
       </div>
 
       {/* Event Details Modal */}
-      <EventDetailsModal event={selectedEvent} onClose={() => setSelectedEvent(null)} />
+      {selectedEvent && (
+        <EventDetailsModal event={selectedEvent} onClose={() => setSelectedEvent(null)} />
+      )}
     </div>
   );
 };

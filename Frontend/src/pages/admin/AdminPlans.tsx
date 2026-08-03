@@ -97,8 +97,9 @@ const AdminPlans = () => {
             setEditingPlan(null);
             setErrors({});
           },
-          onError: (err: any) => {
-            toast.error(err.response?.data?.message || 'Failed to update plan');
+          onError: (err: unknown) => {
+            const e = err as { response?: { data?: { message?: string } } };
+            toast.error(e.response?.data?.message || 'Failed to update plan');
           },
         }
       );
@@ -110,8 +111,9 @@ const AdminPlans = () => {
           resetForm();
           setErrors({});
         },
-        onError: (err: any) => {
-          toast.error(err.response?.data?.message || 'Failed to create plan');
+        onError: (err: unknown) => {
+          const e = err as { response?: { data?: { message?: string } } };
+          toast.error(e.response?.data?.message || 'Failed to create plan');
         },
       });
     }

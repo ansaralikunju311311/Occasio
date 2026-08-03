@@ -37,7 +37,7 @@ const ResetPassword: React.FC = () => {
       navigate('/login');
     }
     if (resetMutation.isError) {
-      const error = resetMutation.error as any;
+      const error = resetMutation.error as { response?: { data?: { message?: string } } };
       toast.error(error.response?.data?.message || 'Something went wrong');
     }
   }, [resetMutation.isSuccess, resetMutation.isError, resetMutation.error, navigate]);
@@ -47,7 +47,7 @@ const ResetPassword: React.FC = () => {
       toast.success('New OTP sent to your email!');
     }
     if (resendMutation.isError) {
-      const error = resendMutation.error as any;
+      const error = resendMutation.error as { response?: { data?: { message?: string } } };
       toast.error(error.response?.data?.message || 'Something went wrong');
     }
   }, [resendMutation.isSuccess, resendMutation.isError, resendMutation.error]);

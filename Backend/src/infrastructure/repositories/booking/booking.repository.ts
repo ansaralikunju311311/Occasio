@@ -1,12 +1,14 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import mongoose from 'mongoose';
 import type { IBookingRepository } from '../../../domain/repositories/booking/booking.repository.interface';
 import { Booking } from '../../../domain/entities/booking.entity';
-import { BookingModel } from '../../database/model/booking.model';
+import { BookingModel, BookingStatus } from '../../database/model/booking.model';
 import type {
   PaginationParams,
   PaginatedResponse,
 } from '../../../common/interfaces/pagination.interface';
+
+import { EventModel } from '../../database/model/events/event.model';
+import type { IBookingDocument } from '../../database/model/booking.model';
 
 export class BookingRepository implements IBookingRepository {
   async saveBooking(booking: Booking): Promise<Booking> {
@@ -118,12 +120,10 @@ export class BookingRepository implements IBookingRepository {
     const skip = (page - 1) * limit;
 
     // Find all events created by this manager
-    const EventModel =
-      require('../../database/model/events/event.model').EventModel;
     const managerEvents = await EventModel.find({
       createdBy: managerId,
     }).select('_id');
-    const eventIds = managerEvents.map((e: any) => e._id);
+    const eventIds = managerEvents.map((e) => e._id);
 
     const query = { eventId: { $in: eventIds } };
 
@@ -151,21 +151,24 @@ export class BookingRepository implements IBookingRepository {
     };
   }
 
-  private toEntity(doc: any): Booking {
+  private toEntity(doc: IBookingDocument | mongoose.HydratedDocument<IBookingDocument> | Record<string, unknown>): Booking {
+    const d = doc as Record<string, unknown>;
+    const userIdStr = (d.userId as mongoose.Types.ObjectId)?.toString() || String(d.userId || '');
+    const eventIdStr = (d.eventId as mongoose.Types.ObjectId)?.toString() || String(d.eventId || '');
     return new Booking(
-      doc._id?.toString() || null,
-      doc.userId,
-      doc.eventId,
-      doc.seats,
-      doc.bookingType,
-      doc.totalAmount,
-      doc.commissionAmount,
-      doc.organizerRevenue,
-      doc.status,
-      doc.paymentId,
-      doc.qrCodeData,
-      doc.createdAt,
-      doc.updatedAt,
+      (d._id as mongoose.Types.ObjectId)?.toString() || (d.id as string) || null,
+      userIdStr,
+      eventIdStr,
+      (d.seats as string[]) || [],
+      d.bookingType as 'physical' | 'online',
+      Number(d.totalAmount || 0),
+      Number(d.commissionAmount || 0),
+      Number(d.organizerRevenue || 0),
+      d.status as BookingStatus,
+      d.paymentId as string | undefined,
+      d.qrCodeData as string | undefined,
+      (d.createdAt as Date) || new Date(),
+      (d.updatedAt as Date) || new Date(),
     );
   }
 
@@ -177,17 +180,17 @@ export class BookingRepository implements IBookingRepository {
     });
   }
   async findConfirmedBookingsByEventId(eventId: string): Promise<Booking[]> {
-    const filter: any = {
-      status: { $in: ['CONFIRMED', 'confirmed', 'SUCCESS', 'success', 'COMPLETED', 'completed'] },
+    const filter: mongoose.FilterQuery<IBookingDocument> = {
+      status: { $in: ['CONFIRMED', 'confirmed', 'SUCCESS', 'success', 'COMPLETED', 'completed'] as BookingStatus[] },
     };
 
     if (mongoose.Types.ObjectId.isValid(eventId)) {
       filter.$or = [
-        { eventId: eventId },
+        { eventId: eventId as unknown as mongoose.Types.ObjectId },
         { eventId: new mongoose.Types.ObjectId(eventId) },
       ];
     } else {
-      filter.eventId = eventId;
+      filter.eventId = eventId as unknown as mongoose.Types.ObjectId;
     }
 
     const docs = await BookingModel.find(filter);

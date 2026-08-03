@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useForm, type SubmitHandler } from 'react-hook-form';
+import { useForm, type SubmitHandler, type FieldErrors } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { api } from '../../services/api';
@@ -28,10 +28,14 @@ interface IEventFormInput {
   price: number;
   banner?: FileList;
   isSeatLayoutEnabled?: boolean;
-  layout?: any;
+  layout?: {
+    blocks: SeatBlock[];
+  };
 }
 
 import { useMutation } from '@tanstack/react-query';
+import type { SeatBlock, SeatRow } from '../../types/event.types';
+import type { CreateEventPayload } from '../../services/event.service';
 
 const CreateEvent = () => {
   const navigate = useNavigate();
@@ -63,17 +67,17 @@ const CreateEvent = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   // Layout Builder State
-  const [layoutBlocks, setLayoutBlocks] = useState<any[]>([
+  const [layoutBlocks, setLayoutBlocks] = useState<SeatBlock[]>([
     {
       blockName: '',
-      category: { name: '', price: '' },
-      rows: [{ rowNumber: 1, columns: '' }],
+      category: { name: '', price: 0 },
+      rows: [{ rowNumber: 1, columns: 0 }],
     },
   ]);
 
   const eventMutation = useMutation({
-    mutationFn: (payload: any) => api.post(API_ENDPOINTS.EVENT_CREATION, payload),
-    onSuccess: (response: any) => {
+    mutationFn: (payload: CreateEventPayload) => api.post(API_ENDPOINTS.EVENT_CREATION, payload),
+    onSuccess: (response: { data: { creation: { id: string; status: string } } }) => {
       const createdEvent = response.data.creation;
       if (createdEvent.status === 'LIVE' || createdEvent.status === 'ACTIVE') {
         toast.success('Event published directly successfully (Pro/Elite plan)!');
@@ -84,8 +88,9 @@ const CreateEvent = () => {
         setShowSuccessModal(true);
       }
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to create event.');
+    onError: (error: unknown) => {
+      const err = error as { response?: { data?: { message?: string } } };
+      toast.error(err.response?.data?.message || 'Failed to create event.');
     },
   });
 
@@ -94,8 +99,8 @@ const CreateEvent = () => {
       ...prev,
       {
         blockName: '',
-        category: { name: '', price: '' },
-        rows: [{ rowNumber: 1, columns: '' }],
+        category: { name: '', price: 0 },
+        rows: [{ rowNumber: 1, columns: 0 }],
       },
     ]);
   };
@@ -105,13 +110,13 @@ const CreateEvent = () => {
   };
 
   // ... (rest of helper functions same as before)
-  const updateBlock = (index: number, field: string, value: any) => {
+  const updateBlock = (index: number, field: string, value: string | number) => {
     setLayoutBlocks((prev) => {
       const newBlocks = [...prev];
       const blockCopy = { ...newBlocks[index], category: { ...newBlocks[index].category } };
-      if (field === 'blockName') blockCopy.blockName = value;
-      if (field === 'categoryName') blockCopy.category.name = value;
-      if (field === 'categoryPrice') blockCopy.category.price = value === '' ? '' : Number(value);
+      if (field === 'blockName') blockCopy.blockName = String(value);
+      if (field === 'categoryName') blockCopy.category.name = String(value);
+      if (field === 'categoryPrice') blockCopy.category.price = value === '' ? 0 : Number(value);
       newBlocks[index] = blockCopy;
       return newBlocks;
     });
@@ -121,9 +126,9 @@ const CreateEvent = () => {
     setLayoutBlocks((prev) => {
       const newBlocks = [...prev];
       const blockCopy = { ...newBlocks[blockIndex] };
-      const rowsCopy = [...blockCopy.rows];
+      const rowsCopy = [...(blockCopy.rows || [])];
       const nextRowNumber = rowsCopy.length > 0 ? rowsCopy[rowsCopy.length - 1].rowNumber + 1 : 1;
-      rowsCopy.push({ rowNumber: nextRowNumber, columns: '' });
+      rowsCopy.push({ rowNumber: nextRowNumber, columns: 0 });
       blockCopy.rows = rowsCopy;
       newBlocks[blockIndex] = blockCopy;
       return newBlocks;
@@ -134,9 +139,9 @@ const CreateEvent = () => {
     setLayoutBlocks((prev) => {
       const newBlocks = [...prev];
       const blockCopy = { ...newBlocks[blockIndex] };
-      let rowsCopy = blockCopy.rows
-        .filter((_: any, i: number) => i !== rowIndex)
-        .map((r: any, i: number) => ({ ...r, rowNumber: i + 1 }));
+      let rowsCopy = (blockCopy.rows || [])
+        .filter((_: SeatRow, i: number) => i !== rowIndex)
+        .map((r: SeatRow, i: number) => ({ ...r, rowNumber: i + 1 }));
       blockCopy.rows = rowsCopy;
       newBlocks[blockIndex] = blockCopy;
       return newBlocks;
@@ -147,10 +152,10 @@ const CreateEvent = () => {
     setLayoutBlocks((prev) => {
       const newBlocks = [...prev];
       const blockCopy = { ...newBlocks[blockIndex] };
-      const rowsCopy = [...blockCopy.rows];
+      const rowsCopy = [...(blockCopy.rows || [])];
       rowsCopy[rowIndex] = {
         ...rowsCopy[rowIndex],
-        columns: columns === '' ? '' : Number(columns),
+        columns: columns === '' ? 0 : Number(columns),
       };
       blockCopy.rows = rowsCopy;
       newBlocks[blockIndex] = blockCopy;
@@ -217,12 +222,11 @@ const CreateEvent = () => {
         setIsUploading(false);
         return;
       }
+      const start = new Date(data.startTime);
+      const end = new Date(data.endTime);
 
-      if (
-        (data.eventType === EventType.ONLINE || data.eventType === EventType.HYBRID) &&
-        (!data.maxOnlineUsers || data.maxOnlineUsers <= 0)
-      ) {
-        toast.error('Online capacity is required!');
+      if (start >= end) {
+        toast.error('End time must be after start time.');
         setIsUploading(false);
         return;
       }
@@ -233,9 +237,9 @@ const CreateEvent = () => {
         // Simple loop validation (preserving existing logic)
         for (const block of layoutBlocks) {
           if (
-            !block.blockName.trim() ||
-            !block.category.name ||
-            block.category.price === '' ||
+            !block.blockName?.trim() ||
+            !block.category?.name ||
+            block.category?.price === undefined ||
             Number(block.category.price) < 0
           ) {
             toast.error('Please complete all block details!');
@@ -252,7 +256,7 @@ const CreateEvent = () => {
             ? {
                 type: 'Point',
                 coordinates: [Number(data.longitude), Number(data.latitude)],
-                address: null,
+                address: data.address || undefined,
               }
             : null,
           startTime: new Date(data.startTime),
@@ -264,18 +268,19 @@ const CreateEvent = () => {
           onSettled: () => setIsUploading(false),
         }
       );
-    } catch (err) {
-      toast.error('Image upload failed');
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      toast.error(err.response?.data?.message || 'Failed to create event.');
       setIsUploading(false);
     }
   };
 
   const handlePayment = async () => {
     if (!createdEventId) return;
-
     setIsPaying(true);
     try {
       const orderResponse = await paymentService.createOrder(createdEventId);
+
       paymentService.openRazorpayCheckout(
         orderResponse.order,
         createdEventId,
@@ -284,20 +289,22 @@ const CreateEvent = () => {
           setShowSuccessModal(false);
           navigate('/eventmanager/my-events');
         },
-        (err: any) => {
-          toast.error(err.message || 'Payment failed or verification error');
+        (err: unknown) => {
+          const e = err as { message?: string };
+          toast.error(e.message || 'Payment failed or verification error');
           setIsPaying(false);
         }
       );
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to initiate payment');
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      toast.error(err.response?.data?.message || 'Failed to initiate payment');
       setIsPaying(false);
     }
   };
 
   const isSubmitting = eventMutation.isPending || isUploading;
 
-  const onFormError = (errors: any) => {
+  const onFormError = (errors: FieldErrors<IEventFormInput>) => {
     const errorMessages = Object.values(errors);
     if (errorMessages.length > 0) {
       toast.error('Please fill in all required fields correctly.');
@@ -646,9 +653,9 @@ const CreateEvent = () => {
                         Category Name
                       </label>
                       <select
-                        value={block.category.name}
+                        value={block.category?.name || ''}
                         onChange={(e) => updateBlock(blockIndex, 'categoryName', e.target.value)}
-                        className={`w-full bg-slate-900/50 border border-slate-700/80 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500 transition-colors ${!block.category.name ? 'text-slate-500' : 'text-white'}`}
+                        className={`w-full bg-slate-900/50 border border-slate-700/80 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500 transition-colors ${!block.category?.name ? 'text-slate-500' : 'text-white'}`}
                       >
                         <option value="" disabled>
                           Select Category
@@ -673,7 +680,7 @@ const CreateEvent = () => {
                       <input
                         type="number"
                         min="0"
-                        value={block.category.price}
+                        value={block.category?.price ?? ''}
                         onChange={(e) => updateBlock(blockIndex, 'categoryPrice', e.target.value)}
                         className="w-full bg-slate-900/50 border border-slate-700/80 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-teal-500 transition-colors"
                         placeholder="0"
@@ -709,7 +716,7 @@ const CreateEvent = () => {
                     </div>
 
                     <div className="space-y-2">
-                      {block.rows.map((row: any, rowIndex: number) => (
+                      {(block.rows || []).map((row: SeatRow, rowIndex: number) => (
                         <div
                           key={rowIndex}
                           className="flex items-center gap-3 bg-slate-800/50 px-3 py-2 rounded-lg border border-slate-700/50"
@@ -726,7 +733,7 @@ const CreateEvent = () => {
                               min="1"
                               value={row.columns}
                               onChange={(e) =>
-                                updateRowColumns(blockIndex, rowIndex, e.target.value as any)
+                                updateRowColumns(blockIndex, rowIndex, Number(e.target.value))
                               }
                               className="w-full bg-transparent border-none text-white text-sm px-2 py-1.5 focus:outline-none focus:ring-0"
                               placeholder="Columns"
@@ -737,7 +744,7 @@ const CreateEvent = () => {
                             onClick={() => removeRow(blockIndex, rowIndex)}
                             className="text-slate-600 hover:text-red-400 transition-colors p-1"
                             title="Delete Row"
-                            disabled={block.rows.length <= 1}
+                            disabled={(block.rows || []).length <= 1}
                           >
                             <svg
                               className="w-4 h-4"

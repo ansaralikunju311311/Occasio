@@ -38,9 +38,10 @@ const AdminLogin = () => {
 
       console.log(response);
       navigate('/admin/dashboard');
-    } catch (error: any) {
-      if (error.response) {
-        toast.error(error.response.data.message || 'Admin login failed');
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      if (err.response) {
+        toast.error(err.response.data?.message || 'Admin login failed');
       } else {
         toast.error('Something went wrong');
       }

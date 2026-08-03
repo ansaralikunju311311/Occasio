@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { useStartEvent } from '../../hooks/useEvents';
 import { toast } from 'sonner';
 
+import type { EventItem, SeatBlock, SeatRow } from '../../types/event.types';
+
 interface EventDetailsModalProps {
-  event: any;
+  event: EventItem;
   onClose: () => void;
 }
 
@@ -19,8 +21,9 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({ event, onClose })
       await startMutation.mutateAsync(event.id);
       toast.success('Event is now LIVE!');
       onClose();
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || err.message || 'Failed to start event.');
+    } catch (err: unknown) {
+      const e = err as { response?: { data?: { message?: string } }; message?: string };
+      toast.error(e.response?.data?.message || e.message || 'Failed to start event.');
     } finally {
       setIsStarting(false);
     }
@@ -54,10 +57,10 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({ event, onClose })
     }
   };
 
+  const layoutObj = typeof event.seatLayoutDetails === 'object' ? event.seatLayoutDetails : undefined;
   const blocks =
     event?.SeatLayout?.blocks ??
-    event?.seatLayout?.blocks ??
-    event?.seatLayoutDetails?.blocks ??
+    layoutObj?.blocks ??
     event?.layout?.blocks ??
     [];
 
@@ -170,7 +173,7 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({ event, onClose })
                     <p>
                       <span className="text-slate-500 mr-2">Base Ticket Price:</span>{' '}
                       <span className="text-emerald-400 font-semibold">
-                        {event.price > 0 ? `₹${event.price}` : 'Free'}
+                        {(event.price ?? 0) > 0 ? `₹${event.price}` : 'Free'}
                       </span>
                     </p>
                     {event.maxOnlineUsers && (
@@ -301,12 +304,12 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({ event, onClose })
                       Ticket Categories & Seats
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                      {blocks.map((b: any, i: number) => {
+                      {blocks.map((b: SeatBlock, i: number) => {
                         const name =
                           b.category?.name || b.blockName || b.blocName || `Block ${i + 1}`;
                         const price = b.category?.price;
                         const totalSeats = b.rows
-                          ? b.rows.reduce((sum: number, r: any) => sum + (r.seats?.length || 0), 0)
+                          ? b.rows.reduce((sum: number, r: SeatRow) => sum + (r.seats?.length || 0), 0)
                           : 0;
 
                         return (

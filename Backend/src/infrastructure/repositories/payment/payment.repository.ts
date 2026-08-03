@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import type mongoose from 'mongoose';
 import type { PaymentResponseDto } from '../../../application/dtos/responses/payment-response.dto';
 import type {
   PaginationParams,
@@ -33,17 +33,17 @@ export class PaymentRepository implements IPaymentRepository {
     params: PaginationParams,
   ): Promise<PaginatedResponse<PaymentResponseDto>> {
     const { page = 1, limit = 10, purpose } = params;
-    const query: any = {};
+    const query: mongoose.FilterQuery<IPaymentDocument> = {};
     if (purpose) {
-      query.purpose = purpose;
+      query.purpose = purpose as IPaymentDocument['purpose'];
     }
 
     const skip = (page - 1) * limit;
 
     const [payments, total] = await Promise.all([
       PaymentModel.find(query)
-        .populate('userId', 'name email picture') // Assuming user has these fields
-        .populate('eventId', 'title') // Assuming event has title
+        .populate('userId', 'name email picture')
+        .populate('eventId', 'title')
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
@@ -51,30 +51,35 @@ export class PaymentRepository implements IPaymentRepository {
       PaymentModel.countDocuments(query).exec(),
     ]);
 
-    const mappedData: PaymentResponseDto[] = payments.map((doc: any) => ({
-      id: doc._id.toString(),
-      userId: {
-        id: doc.userId?._id?.toString() ?? '',
-        name: doc.userId?.name ?? '',
-        email: doc.userId?.email ?? '',
-        picture: doc.userId?.picture,
-      },
-      purpose: doc.purpose,
-      amount: doc.amount,
-      currency: doc.currency,
-      paymentMethod: doc.paymentMethod,
-      paymentStatus: doc.paymentStatus,
-      transactionId: doc.transactionId,
-      eventId: doc.eventId
-        ? {
-            id: doc.eventId._id.toString(),
-            title: doc.eventId.title,
-          }
-        : undefined,
-      bookingId: doc.bookingId?.toString(),
-      paidAt: doc.paidAt,
-      createdAt: doc.createdAt,
-    }));
+    const mappedData: PaymentResponseDto[] = payments.map((rawDoc) => {
+      const doc = rawDoc as unknown as Record<string, unknown>;
+      const u = (doc.userId || {}) as Record<string, unknown>;
+      const e = doc.eventId as Record<string, unknown> | undefined;
+      return {
+        id: (doc._id as mongoose.Types.ObjectId)?.toString() || '',
+        userId: {
+          id: (u._id as mongoose.Types.ObjectId)?.toString() ?? '',
+          name: (u.name as string) ?? '',
+          email: (u.email as string) ?? '',
+          picture: u.picture as string | undefined,
+        },
+        purpose: doc.purpose as PaymentResponseDto['purpose'],
+        amount: Number(doc.amount || 0),
+        currency: (doc.currency as string) || 'INR',
+        paymentMethod: doc.paymentMethod as PaymentResponseDto['paymentMethod'],
+        paymentStatus: doc.paymentStatus as PaymentResponseDto['paymentStatus'],
+        transactionId: doc.transactionId as string,
+        eventId: e
+          ? {
+              id: (e._id as mongoose.Types.ObjectId)?.toString() || '',
+              title: (e.title as string) || '',
+            }
+          : undefined,
+        bookingId: (doc.bookingId as mongoose.Types.ObjectId)?.toString(),
+        paidAt: doc.paidAt as Date | undefined,
+        createdAt: doc.createdAt as Date,
+      };
+    });
 
     return {
       data: mappedData,
@@ -126,8 +131,8 @@ export class PaymentRepository implements IPaymentRepository {
     page: number,
     limit: number,
   ): Promise<PaginatedResponse<PaymentResponseDto>> {
-    const query: any = {
-      userId,
+    const query: mongoose.FilterQuery<IPaymentDocument> = {
+      userId: userId as unknown as mongoose.Types.ObjectId,
       $or: [{ paymentMethod: 'WALLET' }, { purpose: 'REFUND' }],
     };
 
@@ -144,30 +149,35 @@ export class PaymentRepository implements IPaymentRepository {
       PaymentModel.countDocuments(query).exec(),
     ]);
 
-    const mappedData: PaymentResponseDto[] = payments.map((doc: any) => ({
-      id: doc._id.toString(),
-      userId: {
-        id: doc.userId?._id?.toString() ?? '',
-        name: doc.userId?.name ?? '',
-        email: doc.userId?.email ?? '',
-        picture: doc.userId?.picture,
-      },
-      purpose: doc.purpose,
-      amount: doc.amount,
-      currency: doc.currency,
-      paymentMethod: doc.paymentMethod,
-      paymentStatus: doc.paymentStatus,
-      transactionId: doc.transactionId,
-      eventId: doc.eventId
-        ? {
-            id: doc.eventId._id.toString(),
-            title: doc.eventId.title,
-          }
-        : undefined,
-      bookingId: doc.bookingId?.toString(),
-      paidAt: doc.paidAt,
-      createdAt: doc.createdAt,
-    }));
+    const mappedData: PaymentResponseDto[] = payments.map((rawDoc) => {
+      const doc = rawDoc as unknown as Record<string, unknown>;
+      const u = (doc.userId || {}) as Record<string, unknown>;
+      const e = doc.eventId as Record<string, unknown> | undefined;
+      return {
+        id: (doc._id as mongoose.Types.ObjectId)?.toString() || '',
+        userId: {
+          id: (u._id as mongoose.Types.ObjectId)?.toString() ?? '',
+          name: (u.name as string) ?? '',
+          email: (u.email as string) ?? '',
+          picture: u.picture as string | undefined,
+        },
+        purpose: doc.purpose as PaymentResponseDto['purpose'],
+        amount: Number(doc.amount || 0),
+        currency: (doc.currency as string) || 'INR',
+        paymentMethod: doc.paymentMethod as PaymentResponseDto['paymentMethod'],
+        paymentStatus: doc.paymentStatus as PaymentResponseDto['paymentStatus'],
+        transactionId: doc.transactionId as string,
+        eventId: e
+          ? {
+              id: (e._id as mongoose.Types.ObjectId)?.toString() || '',
+              title: (e.title as string) || '',
+            }
+          : undefined,
+        bookingId: (doc.bookingId as mongoose.Types.ObjectId)?.toString(),
+        paidAt: doc.paidAt as Date | undefined,
+        createdAt: doc.createdAt as Date,
+      };
+    });
 
     return {
       data: mappedData,

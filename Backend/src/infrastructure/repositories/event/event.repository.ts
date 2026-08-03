@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import type mongoose from 'mongoose';
+import mongoose from 'mongoose';
 
 import { BaseRepository } from '../../repositories/base.repository';
 import { Events } from '../../../domain/entities/event.entity';
@@ -14,6 +13,7 @@ import type {
 } from '../../../common/interfaces/pagination.interface';
 import type { UpdateEventDTO } from '../../../application/dtos/updateevent.dto';
 import { EventStatus } from '../../../common/enums/eventstatus-enum';
+import type { User } from '../../../domain/entities/user.entity';
 
 export class EventRepository
   extends BaseRepository<IEventDocument>
@@ -28,7 +28,7 @@ export class EventRepository
     const events = await super.create({
       title: event.title,
       description: event.description,
-      createdBy: event.createdBy as any,
+      createdBy: new mongoose.Types.ObjectId(event.createdBy) as unknown as mongoose.Schema.Types.ObjectId,
       endTime: event.endTime,
       eventType: event.eventType,
       location: event.location,
@@ -47,10 +47,10 @@ export class EventRepository
     params: PaginationParams,
   ): Promise<PaginatedResponse<Events>> {
     const { page = 1, limit = 10, search, eventType, upcoming } = params;
-    const query: any = { isDeleted: { $ne: true } };
+    const query: mongoose.FilterQuery<IEventDocument> = { isDeleted: { $ne: true } };
 
     if (eventType) {
-      query.eventType = eventType;
+      query.eventType = eventType as IEventDocument['eventType'];
     }
 
     if (upcoming) {
@@ -126,7 +126,9 @@ export class EventRepository
     params: PaginationParams,
   ): Promise<PaginatedResponse<Events>> {
     const { page = 1, limit = 10, search } = params;
-    const query: any = { createdBy: userId as any };
+    const query: mongoose.FilterQuery<IEventDocument> = {
+      createdBy: userId as unknown as mongoose.Types.ObjectId,
+    };
 
     if (search) {
       query.$or = [
@@ -182,13 +184,14 @@ export class EventRepository
     }
   }
 
-  async createSeats(seats: any[], session?: mongoose.ClientSession) {
+  async createSeats(seats: Record<string, unknown>[], session?: mongoose.ClientSession) {
     await SeatModel.insertMany(seats, { session });
   }
 
-  async createSeatLayout(data: any, session?: mongoose.ClientSession) {
+  async createSeatLayout(data: Record<string, unknown>, session?: mongoose.ClientSession): Promise<{ _id: string | null; [key: string]: unknown }> {
     const [layout] = await SeatLayoutModel.create([data], { session });
-    return layout;
+    const obj = layout.toObject();
+    return { ...obj, _id: obj._id?.toString() || null };
   }
 
   async deleteSeatsByEventId(
@@ -209,9 +212,9 @@ export class EventRepository
     eventId: string,
     data: UpdateEventDTO,
     session?: mongoose.ClientSession,
-    unsetData?: any,
+    unsetData?: Record<string, unknown>,
   ): Promise<Events | null> {
-    const updateQuery: any = { $set: data };
+    const updateQuery: mongoose.UpdateQuery<IEventDocument> = { $set: data };
     if (unsetData) {
       updateQuery.$unset = unsetData;
     }
@@ -269,52 +272,55 @@ export class EventRepository
     return this.toEntity(updated);
   }
 
-  private toEntity(manager: any): Events {
+  private toEntity(manager: IEventDocument | mongoose.HydratedDocument<IEventDocument> | Record<string, unknown>): Events {
+    const doc = manager as Record<string, unknown>;
     let createdById: string;
-    let creatorDetails: any;
+    let creatorDetails: User | undefined;
 
-    if (manager.createdBy && typeof manager.createdBy === 'object') {
+    if (doc.createdBy && typeof doc.createdBy === 'object') {
+      const c = doc.createdBy as Record<string, unknown>;
       createdById =
-        manager.createdBy._id?.toString() || manager.createdBy.toString();
-      creatorDetails = manager.createdBy;
+        (c._id as mongoose.Types.ObjectId)?.toString() || c.toString();
+      creatorDetails = doc.createdBy as User;
     } else {
-      createdById = manager.createdBy?.toString() || '';
+      createdById = doc.createdBy?.toString() || '';
     }
 
     let seatLayoutId: string = '';
-    let seatLayoutDetails: any = null;
+    let seatLayoutDetails: Record<string, unknown> | undefined = undefined;
 
-    if (manager.seatLayoutId && typeof manager.seatLayoutId === 'object') {
+    if (doc.seatLayoutId && typeof doc.seatLayoutId === 'object') {
+      const s = doc.seatLayoutId as Record<string, unknown>;
       seatLayoutId =
-        manager.seatLayoutId._id?.toString() || manager.seatLayoutId.toString();
-      seatLayoutDetails = manager.seatLayoutId;
+        (s._id as mongoose.Types.ObjectId)?.toString() || s.toString();
+      seatLayoutDetails = s;
     } else {
-      seatLayoutId = manager.seatLayoutId?.toString() || '';
-      seatLayoutDetails = manager.seatLayoutId;
+      seatLayoutId = doc.seatLayoutId?.toString() || '';
+      seatLayoutDetails = doc.seatLayoutId as Record<string, unknown> | undefined;
     }
 
     return new Events(
-      manager._id?.toString() || null,
-      manager.title,
-      manager.description,
-      manager.eventType,
-      manager.startTime,
-      manager.endTime,
-      manager.location && manager.location.type ? manager.location : undefined,
-      manager.maxOnlineUsers,
-      manager.price,
+      (doc._id as mongoose.Types.ObjectId)?.toString() || null,
+      doc.title as string,
+      doc.description as string,
+      doc.eventType as IEventDocument['eventType'],
+      doc.startTime as Date,
+      doc.endTime as Date,
+      doc.location && (doc.location as { type?: string }).type ? (doc.location as Events['location']) : undefined,
+      doc.maxOnlineUsers as number | undefined,
+      Number(doc.price || 0),
       createdById,
-      manager.status,
-      manager.picture,
+      doc.status as EventStatus,
+      doc.picture as string,
       creatorDetails,
       seatLayoutId,
-      seatLayoutDetails,
-      manager.seats,
-      manager.isPublished,
-      manager.isDeleted,
-      manager.deletedAt,
-      manager.bookedTickets,
-      manager.publishedAt,
+      seatLayoutDetails as Events['SeatLayout'],
+      doc.seats as Record<string, unknown>[] | undefined,
+      Boolean(doc.isPublished),
+      Boolean(doc.isDeleted),
+      doc.deletedAt as Date | undefined,
+      doc.bookedTickets as number | undefined,
+      doc.publishedAt as Date | undefined,
     );
   }
 }

@@ -18,9 +18,9 @@ const SignupPage = () => {
       navigate('/otpverification');
     }
     if (signupMutation.isError) {
-      const error = signupMutation.error as any;
+      const error = signupMutation.error as { response?: { data?: { message?: string } } };
       if (error.response) {
-        toast.error(error.response.data.message || 'Signup failed');
+        toast.error(error.response.data?.message || 'Signup failed');
       } else {
         toast.error('Something went wrong');
       }

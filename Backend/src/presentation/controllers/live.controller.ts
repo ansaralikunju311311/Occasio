@@ -62,7 +62,7 @@ export class LiveController {
   sendChatMessage = catchAsync(async (req: Request, res: Response) => {
     const eventId = (req.params.eventId || req.params.id) as string;
     const userId = req.authUser?.userId;
-    const userName = (req.authUser as any)?.email?.split('@')[0] || (userId ? `User_${userId.substring(0, 5)}` : 'User');
+    const userName = req.authUser?.email?.split('@')[0] || (userId ? `User_${userId.substring(0, 5)}` : 'User');
     const userRole = req.authUser?.role || 'USER';
 
     if (!userId) {

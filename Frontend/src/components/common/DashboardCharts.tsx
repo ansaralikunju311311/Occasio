@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { jsPDF } from 'jspdf';
 
 // Helper to export CSV/Excel format
-const downloadCsv = (_title: string, headers: string[], rows: any[][], filename: string) => {
+const downloadCsv = (_title: string, headers: string[], rows: (string | number)[][], filename: string) => {
   const csvContent =
     'data:text/csv;charset=utf-8,' +
     [headers.join(','), ...rows.map((r) => r.map((val) => `"${String(val).replace(/"/g, '""')}"`).join(','))].join('\n');
@@ -19,7 +19,7 @@ const downloadCsv = (_title: string, headers: string[], rows: any[][], filename:
 const downloadPdfReport = (
   reportTitle: string,
   headers: string[],
-  rows: any[][],
+  rows: (string | number)[][],
   filename: string,
   summaryCards: { label: string; value: string }[],
 ) => {

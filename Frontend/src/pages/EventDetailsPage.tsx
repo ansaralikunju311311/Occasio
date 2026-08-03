@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEventDetails } from '../hooks/useEvents';
 import EventMap from '../components/eventManager/EventMap';
+import type { EventItem, SeatBlock } from '../types/event.types';
 
 const EventDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -60,17 +61,16 @@ const EventDetailsPage = () => {
     });
   };
 
-  const getMinSeatPrice = (evt: any): number | null => {
+  const getMinSeatPrice = (evt: EventItem): number | null => {
     const blocks =
       evt?.SeatLayout?.blocks ??
-      evt?.seatLayout?.blocks ??
       evt?.seatLayoutDetails?.blocks ??
       evt?.layout?.blocks ??
       [];
     if (!blocks.length) return null;
     const prices = blocks
-      .map((b: any) => {
-        const price = b.category?.price ?? b.price;
+      .map((b: SeatBlock) => {
+        const price = b.category?.price;
         return Number(price);
       })
       .filter((p: number) => !isNaN(p) && p > 0);

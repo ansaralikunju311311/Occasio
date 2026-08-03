@@ -42,9 +42,10 @@ const CancelBookingModal: React.FC<CancelBookingModalProps> = ({
         } else {
           setError(res.message || 'Failed to fetch refund details.');
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Failed to load refund info:', err);
-        setError(err.response?.data?.message || 'Error checking cancellation eligibility.');
+        const e = err as { response?: { data?: { message?: string } } };
+        setError(e.response?.data?.message || 'Error checking cancellation eligibility.');
       } finally {
         setLoading(false);
       }
@@ -64,9 +65,10 @@ const CancelBookingModal: React.FC<CancelBookingModalProps> = ({
       } else {
         toast.error(res.message || 'Failed to cancel booking.');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error cancelling booking:', err);
-      toast.error(err.response?.data?.message || 'An error occurred while cancelling the booking.');
+      const e = err as { response?: { data?: { message?: string } } };
+      toast.error(e.response?.data?.message || 'An error occurred while cancelling the booking.');
     } finally {
       setCancelling(false);
     }

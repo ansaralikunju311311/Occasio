@@ -19,7 +19,7 @@ const NotificationBell: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleNotificationClick = (notif: any) => {
+  const handleNotificationClick = (notif: { id: string; eventId?: string }) => {
     markAsRead(notif.id);
     if (notif.eventId) {
       navigate(`/event/${notif.eventId}`);

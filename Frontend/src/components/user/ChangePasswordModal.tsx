@@ -33,7 +33,7 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, onClo
       onClose();
     }
     if (updatePasswordMutation.isError) {
-      const error = updatePasswordMutation.error as any;
+      const error = updatePasswordMutation.error as { response?: { data?: { message?: string } } };
       const message = error.response?.data?.message || 'Something went wrong. Please try again.';
       toast.error(message);
     }

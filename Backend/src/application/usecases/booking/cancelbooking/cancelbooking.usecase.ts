@@ -4,6 +4,8 @@ import type { IEventRepository } from '../../../../domain/repositories/event/eve
 import { UserRepository } from '../../../../infrastructure/repositories/user/user.repository';
 import { PaymentRepository } from '../../../../infrastructure/repositories/payment/payment.repository';
 import { Payment } from '../../../../domain/entities/payment.entity';
+import { PaymentPurpose } from '../../../../common/enums/payment-purpose.enum';
+import { PaymentStatus } from '../../../../common/enums/payment-status.enum';
 import { calculateRefundPercentage } from '../../../../common/utils/refund';
 
 import type { ICancelBooking } from './cancelbooking.usecase.interface';
@@ -69,11 +71,11 @@ export class CancelBooking implements ICancelBooking {
         const refundPayment = new Payment(
           null,
           bookingDetails.userId,
-          'REFUND' as any,
+          PaymentPurpose.REFUND,
           refundAmount,
           'INR',
           'WALLET',
-          'SUCCESS' as any,
+          PaymentStatus.SUCCESS,
           `refund_${bookingDetails.id}_${Date.now()}`,
           bookingDetails.eventId,
           bookingDetails.id ?? undefined,

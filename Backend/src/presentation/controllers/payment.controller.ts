@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { Request, Response } from 'express';
 
 import type { ICreateOrderUseCase } from '../../application/usecases/payment/createOrder/createOrder.usecase.interface';
@@ -32,7 +31,7 @@ export class PaymentController {
 
   walletPay = catchAsync(async (req: Request, res: Response): Promise<void> => {
     const { eventId, amount, selectedSeats, bookingType } = req.body;
-    const userId = (req as any).user?.id || (req as any).authUser?.userId;
+    const userId = req.authUser?.userId;
 
     if (!userId) {
       throw new AppError('Unauthorized', HttpStatus.UNAUTHORIZED);
@@ -51,14 +50,14 @@ export class PaymentController {
       result,
       'Tickets booked successfully using wallet balance',
       HttpStatus.OK,
-      result,
+      { ...result },
     );
   });
 
   createSubscriptionOrder = catchAsync(
     async (req: Request, res: Response): Promise<void> => {
       const { planId } = req.body;
-      const userId = (req as any).user?.id || (req as any).authUser?.userId;
+      const userId = req.authUser?.userId;
 
       if (!userId) {
         throw new AppError('Unauthorized', HttpStatus.UNAUTHORIZED);
@@ -75,7 +74,7 @@ export class PaymentController {
 
   verifySubscriptionPayment = catchAsync(
     async (req: Request, res: Response): Promise<void> => {
-      const userId = (req as any).authUser?.userId;
+      const userId = req.authUser?.userId;
 
       if (!userId) {
         throw new AppError('Unauthorized', HttpStatus.UNAUTHORIZED);
@@ -112,14 +111,14 @@ export class PaymentController {
         userId,
       );
 
-      sendSuccess(res, result, result.message as string, HttpStatus.OK, result);
+      sendSuccess(res, result, result.message as string, HttpStatus.OK, { ...result });
     },
   );
 
   createOrder = catchAsync(
     async (req: Request, res: Response): Promise<void> => {
       const { eventId } = req.body;
-      const userId = (req as any).user?.id || (req as any).authUser?.userId;
+      const userId = req.authUser?.userId;
 
       if (!userId) {
         throw new AppError('Unauthorized', HttpStatus.UNAUTHORIZED);
@@ -134,7 +133,7 @@ export class PaymentController {
   createTicketOrder = catchAsync(
     async (req: Request, res: Response): Promise<void> => {
       const { eventId, amount, selectedSeats, bookingType } = req.body;
-      const userId = (req as any).user?.id || (req as any).authUser?.userId;
+      const userId = req.authUser?.userId;
 
       if (!userId) {
         throw new AppError('Unauthorized', HttpStatus.UNAUTHORIZED);
@@ -171,7 +170,7 @@ export class PaymentController {
 
   getMyBookings = catchAsync(
     async (req: Request, res: Response): Promise<void> => {
-      const userId = (req as any).user?.id || (req as any).authUser?.userId;
+      const userId = req.authUser?.userId;
       if (!userId) {
         throw new AppError('Unauthorized', HttpStatus.UNAUTHORIZED);
       }
@@ -192,7 +191,7 @@ export class PaymentController {
 
   getManagerBookings = catchAsync(
     async (req: Request, res: Response): Promise<void> => {
-      const managerId = (req as any).user?.id || (req as any).authUser?.userId;
+      const managerId = req.authUser?.userId;
       if (!managerId) {
         throw new AppError('Unauthorized', HttpStatus.UNAUTHORIZED);
       }
@@ -213,7 +212,7 @@ export class PaymentController {
 
   verifyPayment = catchAsync(
     async (req: Request, res: Response): Promise<void> => {
-      const userId = (req as any).authUser?.userId;
+      const userId = req.authUser?.userId;
 
       if (!userId) {
         throw new AppError('Unauthorized', HttpStatus.UNAUTHORIZED);
@@ -246,13 +245,13 @@ export class PaymentController {
 
       const result = await this._verifyPaymentUseCase.execute(dto, userId);
 
-      sendSuccess(res, result, result.message as string, HttpStatus.OK, result);
+      sendSuccess(res, result, result.message as string, HttpStatus.OK, { ...result });
     },
   );
 
   getWalletHistory = catchAsync(
     async (req: Request, res: Response): Promise<void> => {
-      const userId = (req as any).user?.id || (req as any).authUser?.userId;
+      const userId = req.authUser?.userId;
       if (!userId) {
         throw new AppError('Unauthorized', HttpStatus.UNAUTHORIZED);
       }

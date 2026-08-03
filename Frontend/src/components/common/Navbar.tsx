@@ -22,9 +22,10 @@ const Navbar = () => {
       dispatch(logout());
       toast.success('Logged out successfully');
       navigate('/');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.log(error);
-      toast.error(error.response?.data?.message || 'Logout failed');
+      const err = error as { response?: { data?: { message?: string } } };
+      toast.error(err.response?.data?.message || 'Logout failed');
     }
   };
 

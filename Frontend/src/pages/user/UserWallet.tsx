@@ -4,6 +4,16 @@ import { useWalletHistory } from '../../hooks/useUser';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { Pagination } from '../../components/common/Pagination';
 
+interface WalletTransaction {
+  id: string;
+  purpose: string;
+  amount: number;
+  createdAt: string;
+  transactionId?: string;
+  bookingId?: string;
+  eventId?: { title?: string };
+}
+
 const UserWallet = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
@@ -67,7 +77,7 @@ const UserWallet = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800/60">
-                  {transactions.map((tx: any) => {
+                  {transactions.map((tx: WalletTransaction) => {
                     const isRefund = tx.purpose === 'REFUND';
                     return (
                       <tr key={tx.id} className="hover:bg-slate-800/20 transition-colors">

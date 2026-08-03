@@ -1,9 +1,30 @@
 import { api } from './api';
 import { API_ENDPOINTS } from '../constants';
 
+export interface RazorpayOrderData {
+  id: string;
+  amount: number;
+  currency: string;
+}
+
+export interface RazorpayResponsePayload {
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  razorpay_signature: string;
+}
+
+export interface RazorpayErrorPayload {
+  message?: string;
+  code?: string;
+  description?: string;
+}
+
 declare global {
   interface Window {
-    Razorpay: any;
+    Razorpay: new (options: Record<string, unknown>) => {
+      open(): void;
+      on(event: string, handler: (resp: { error: RazorpayErrorPayload }) => void): void;
+    };
   }
 }
 
@@ -60,12 +81,7 @@ export const paymentService = {
     return response.data;
   },
 
-  verifyPayment: async (paymentData: {
-    razorpay_order_id: string;
-    razorpay_payment_id: string;
-    razorpay_signature: string;
-    eventId: string;
-  }) => {
+  verifyPayment: async (paymentData: RazorpayResponsePayload & { eventId: string }) => {
     const response = await api.post(API_ENDPOINTS.PAYMENTS_VERIFY, paymentData);
     return response.data;
   },
@@ -75,21 +91,16 @@ export const paymentService = {
     return response.data;
   },
 
-  verifySubscriptionPayment: async (paymentData: {
-    razorpay_order_id: string;
-    razorpay_payment_id: string;
-    razorpay_signature: string;
-    planId: string;
-  }) => {
+  verifySubscriptionPayment: async (paymentData: RazorpayResponsePayload & { planId: string }) => {
     const response = await api.post(API_ENDPOINTS.PAYMENTS_VERIFY_SUBSCRIPTION, paymentData);
     return response.data;
   },
 
   openRazorpayCheckout: (
-    orderData: any,
+    orderData: RazorpayOrderData,
     eventId: string,
     onSuccess: () => void,
-    onError: (err: any) => void
+    onError: (err: unknown) => void
   ) => {
     const options = {
       key: import.meta.env.VITE_RAZORPAY_KEY_ID,
@@ -98,7 +109,7 @@ export const paymentService = {
       name: 'Occasio',
       description: 'Event Scheduling Fee',
       order_id: orderData.id,
-      handler: async (response: any) => {
+      handler: async (response: RazorpayResponsePayload) => {
         try {
           await paymentService.verifyPayment({
             razorpay_order_id: response.razorpay_order_id,
@@ -126,17 +137,17 @@ export const paymentService = {
     };
 
     const rzp = new window.Razorpay(options);
-    rzp.on('payment.failed', function (response: any) {
+    rzp.on('payment.failed', function (response: { error: RazorpayErrorPayload }) {
       onError(response.error);
     });
     rzp.open();
   },
 
   openRazorpaySubscriptionCheckout: (
-    orderData: any,
+    orderData: RazorpayOrderData,
     planId: string,
     onSuccess: () => void,
-    onError: (err: any) => void
+    onError: (err: unknown) => void
   ) => {
     const options = {
       key: import.meta.env.VITE_RAZORPAY_KEY_ID,
@@ -145,7 +156,7 @@ export const paymentService = {
       name: 'Occasio',
       description: 'Subscription Plan Upgrade',
       order_id: orderData.id,
-      handler: async (response: any) => {
+      handler: async (response: RazorpayResponsePayload) => {
         try {
           await paymentService.verifySubscriptionPayment({
             razorpay_order_id: response.razorpay_order_id,
@@ -173,7 +184,7 @@ export const paymentService = {
     };
 
     const rzp = new window.Razorpay(options);
-    rzp.on('payment.failed', function (response: any) {
+    rzp.on('payment.failed', function (response: { error: RazorpayErrorPayload }) {
       onError(response.error);
     });
     rzp.open();

@@ -1,11 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import type mongoose from 'mongoose';
 import type { IUserRepository } from '../../../domain/repositories/user.repository.interface';
 import { User } from '../../../domain/entities/user.entity';
 import type { IUserDocument } from '../../database/model/user.model';
 import { UserModel } from '../../database/model/user.model';
 import { BaseRepository } from '../../../infrastructure/repositories/base.repository';
-// import { OTP } from "domain/entities/otp.entity";
-// import { IOtp } from "infrastructure/database/model/otp.model";
+
 export class UserRepository
   extends BaseRepository<IUserDocument>
   implements IUserRepository
@@ -32,20 +31,16 @@ export class UserRepository
       role: user.role,
       status: user.status,
       isVerified: user.isVerified,
-      //   otp: user.otp,
-      //   otpExpires: user.otpExpires,
-      //   otpType: user.otpType,
-      //   otpSendAt: user.otpSendAt,
       applyingupgrade: user.applyingupgrade,
-      rejectedAt: user.rejectedAt,
-      reapplyAt: user.reapplyAt,
+      rejectedAt: user.rejectedAt || undefined,
+      reapplyAt: user.reapplyAt || undefined,
       walletBalance: user.walletBalance,
     });
 
     return this.toEntity(doc);
   }
 
-  async updateUser(user: User, session?: any): Promise<User> {
+  async updateUser(user: User, session?: mongoose.ClientSession): Promise<User> {
     const doc = await super.updateOne(
       { email: user.email },
       {
@@ -55,10 +50,10 @@ export class UserRepository
         isVerified: user.isVerified,
         applyingupgrade: user.applyingupgrade,
         role: user.role,
-        rejectedAt: user.rejectedAt,
-        reapplyAt: user.reapplyAt,
+        rejectedAt: user.rejectedAt || undefined,
+        reapplyAt: user.reapplyAt || undefined,
         eventsCreated: user.eventsCreated,
-        activeSubscription: user.activeSubscription,
+        activeSubscription: user.activeSubscription as unknown as mongoose.Schema.Types.ObjectId,
         walletBalance: user.walletBalance,
       },
       { session },
@@ -71,26 +66,28 @@ export class UserRepository
     return this.toEntity(doc);
   }
 
-  private toEntity(doc: any): User {
+  private toEntity(doc: IUserDocument | mongoose.HydratedDocument<IUserDocument> | Record<string, unknown>): User {
+    const d = doc as Record<string, unknown>;
+    let activeSubStr: string | undefined = undefined;
+    if (d.activeSubscription) {
+      const sub = d.activeSubscription as Record<string, unknown>;
+      activeSubStr = (sub._id as mongoose.Types.ObjectId)?.toString() || sub.toString();
+    }
+
     return new User(
-      doc._id.toString(),
-      doc.name,
-      doc.email,
-      doc.password,
-      doc.role,
-      doc.status,
-      doc.isVerified,
-      doc.applyingupgrade,
-      doc.rejectedAt,
-      doc.reapplyAt,
-      doc.activeSubscription
-        ? doc._id
-          ? doc.activeSubscription._id?.toString() ||
-            doc.activeSubscription.toString()
-          : doc.activeSubscription
-        : undefined,
-      doc.eventsCreated || 0,
-      doc.walletBalance || 0,
+      (d._id as mongoose.Types.ObjectId)?.toString() || (d.id as string) || '',
+      d.name as string,
+      d.email as string,
+      d.password as string,
+      d.role as User['role'],
+      d.status as User['status'],
+      Boolean(d.isVerified),
+      d.applyingupgrade as User['applyingupgrade'],
+      d.rejectedAt ? (d.rejectedAt as Date) : null,
+      d.reapplyAt ? (d.reapplyAt as Date) : null,
+      activeSubStr,
+      Number(d.eventsCreated || 0),
+      Number(d.walletBalance || 0),
     );
   }
 }

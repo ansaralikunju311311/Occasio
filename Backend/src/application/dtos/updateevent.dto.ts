@@ -1,24 +1,3 @@
-// export interface UpdateEventDTO {
-//   title?: string;
-//   description?: string;
-//   bannerUrl?: string;
-//   eventType?: string;
-
-//   startTime?: Date;
-//   endTime?: Date;
-
-//   price?: number;
-//   maxOnlineUsers?: number;
-
-//   location?: {
-//     type: 'Point';
-//     coordinates: [number, number];
-//     address: string;
-//   } | null;
-
-//   layout?: any; // later restrict
-// }
-
 import type { EventType } from '../../common/enums/event-type';
 import type { EventStatus } from '../../common/enums/eventstatus-enum';
 

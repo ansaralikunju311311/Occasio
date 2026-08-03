@@ -13,7 +13,7 @@ interface LocalStorageUser {
   email?: string;
   otpSendAt?: string;
   role?: 'EVENT_MANAGER' | 'USER' | string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 const OtpVerification: React.FC = () => {
@@ -91,8 +91,9 @@ const OtpVerification: React.FC = () => {
           localStorage.setItem('user', JSON.stringify(updatedUser));
           setOtpSendAt(newSendTime);
         },
-        onError: (error: any) => {
-          toast.error(error.response?.data?.message || 'Something went wrong');
+        onError: (error: unknown) => {
+          const err = error as { response?: { data?: { message?: string } } };
+          toast.error(err.response?.data?.message || 'Something went wrong');
         },
       });
     } else {
@@ -121,8 +122,9 @@ const OtpVerification: React.FC = () => {
               navigate('/');
             }
           },
-          onError: (error: any) => {
-            toast.error(error.response?.data?.message || 'Something went wrong');
+          onError: (error: unknown) => {
+            const err = error as { response?: { data?: { message?: string } } };
+            toast.error(err.response?.data?.message || 'Something went wrong');
           },
         }
       );

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import type mongoose from 'mongoose';
 
 import type { Events } from '../../../domain/entities/event.entity';
@@ -10,9 +9,9 @@ import type { UpdateEventDTO } from '../../../application/dtos/updateevent.dto';
 
 export interface IEventRepository {
   createEvent(event: Events, session?: mongoose.ClientSession): Promise<Events>;
-  createSeatLayout(data: any, session?: mongoose.ClientSession): Promise<any>;
+  createSeatLayout(data: Record<string, unknown>, session?: mongoose.ClientSession): Promise<{ _id: string | null; [key: string]: unknown }>;
 
-  createSeats(seats: any[], session?: mongoose.ClientSession): Promise<void>;
+  createSeats(seats: Record<string, unknown>[], session?: mongoose.ClientSession): Promise<void>;
 
   updateEventLayout(
     eventId: string,
@@ -39,7 +38,7 @@ export interface IEventRepository {
     eventId: string,
     data: UpdateEventDTO,
     session?: mongoose.ClientSession,
-    unsetData?: any,
+    unsetData?: Record<string, unknown>,
   ): Promise<Events | null>;
   deleteEvent(id: string): Promise<boolean>;
   deleteSeatsByEventId(

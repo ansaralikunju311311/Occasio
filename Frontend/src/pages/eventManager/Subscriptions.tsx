@@ -10,15 +10,33 @@ import { API_ENDPOINTS } from '../../constants';
 import { paymentService } from '../../services/payment.service';
 import { Pagination } from '../../components/common/Pagination';
 
-const Subscriptions = () => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 3;
-  const { data: plansData, isLoading, error } = usePlans({ page: currentPage, limit: itemsPerPage });
-  const { user } = useAppSelector((state) => state.auth);
+interface ManagerSubscription {
+  plan?: string;
+  status?: string;
+  endDate?: string;
+  eventsUsed?: number;
+  eventLimit?: number;
+}
+
+interface PlanItem {
+  id?: string;
+  _id?: string;
+  name?: string;
+  price?: number;
+  commissionPercentage?: number;
+  eventLimit?: number;
+  features?: string[];
+}
+
+const Subscriptions: React.FC = () => {
+  const user = useAppSelector((state) => state.auth.user);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
+  const { data: plansData, isLoading, error } = usePlans({ page: currentPage, limit: itemsPerPage });
   const [isProcessing, setIsProcessing] = useState(false);
-  const [mySubscription, setMySubscription] = useState<any>(null);
+  const [mySubscription, setMySubscription] = useState<ManagerSubscription | null>(null);
   const [isLoadingSubscription, setIsLoadingSubscription] = useState(false);
 
   useEffect(() => {
@@ -80,19 +98,21 @@ const Subscriptions = () => {
               dispatch(setAuth({ user: res.data.user }));
             }
           },
-          (err: any) => {
-            toast.error(err.message || 'Payment failed or verification error');
+          (err: unknown) => {
+            const e = err as { message?: string };
+            toast.error(e.message || 'Payment failed or verification error');
           }
         );
       }
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to subscribe to plan');
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      toast.error(err.response?.data?.message || 'Failed to subscribe to plan');
     } finally {
       setIsProcessing(false);
     }
   };
 
-  const plans = apiPlans.map((plan: any) => {
+  const plans = apiPlans.map((plan: PlanItem) => {
     // Basic logic to determine if current plan
     const planId = plan.id || plan._id;
     const isCurrent =
@@ -168,8 +188,8 @@ const Subscriptions = () => {
                       Events Used
                     </span>
                     <span className="text-sm font-bold">
-                      {mySubscription.eventsUsed} /{' '}
-                      {mySubscription.eventLimit === 0 ? 'Unlimited' : mySubscription.eventLimit}
+                      {mySubscription.eventsUsed ?? 0} /{' '}
+                      {mySubscription.eventLimit === 0 ? 'Unlimited' : (mySubscription.eventLimit ?? 0)}
                     </span>
                   </div>
                   <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
@@ -177,9 +197,9 @@ const Subscriptions = () => {
                       className="h-full bg-teal-500 rounded-full"
                       style={{
                         width:
-                          mySubscription.eventLimit === 0
+                          !mySubscription.eventLimit || mySubscription.eventLimit === 0
                             ? '10%'
-                            : `${Math.min((mySubscription.eventsUsed / mySubscription.eventLimit) * 100, 100)}%`,
+                            : `${Math.min(((mySubscription.eventsUsed || 0) / mySubscription.eventLimit) * 100, 100)}%`,
                       }}
                     ></div>
                   </div>
@@ -213,7 +233,7 @@ const Subscriptions = () => {
 
       {/* Plans grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto px-2 sm:px-4">
-        {plans.map((plan: any, index: number) => (
+        {plans.map((plan: { name?: string; popular?: boolean; isCurrent?: boolean; price?: string; period?: string; limit?: string; description?: string; features?: string[]; color?: string; buttonText?: string; id?: string; commission?: string }, index: number) => (
           <div
             key={plan.name}
             className={`relative group bg-[#0a0f16] border rounded-3xl lg:rounded-[2.5rem] p-6 sm:p-8 transition-all duration-500 flex flex-col h-full hover:-translate-y-2
@@ -288,7 +308,7 @@ const Subscriptions = () => {
 
               {/* Features List */}
               <ul className="space-y-4">
-                {plan.features.map((feature: string) => (
+                {(plan.features || []).map((feature: string) => (
                   <li key={feature} className="flex items-center gap-3 text-sm text-slate-300">
                     <div
                       className={`shrink-0 w-5 h-5 rounded-full flex items-center justify-center border ${
@@ -320,7 +340,7 @@ const Subscriptions = () => {
             </div>
 
             <button
-              onClick={() => handleSubscribe(plan.id, plan.price)}
+              onClick={() => handleSubscribe(plan.id || '', plan.price || '')}
               disabled={plan.isCurrent || isProcessing}
               className={`w-full py-4 rounded-2xl text-sm font-bold transition-all duration-300 active:scale-95
                 ${

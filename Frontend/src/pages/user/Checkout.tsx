@@ -175,14 +175,16 @@ const Checkout = () => {
             }
             navigate('/eventmanager/user-bookings');
           },
-          (err: any) => {
-            toast.error(err.message || 'Payment failed or verification error');
+          (err: unknown) => {
+            const e = err as { message?: string };
+            toast.error(e.message || 'Payment failed or verification error');
             setIsPaying(false);
           }
         );
       }
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to initiate payment');
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      toast.error(err.response?.data?.message || 'Failed to initiate payment');
       setIsPaying(false);
     }
   };

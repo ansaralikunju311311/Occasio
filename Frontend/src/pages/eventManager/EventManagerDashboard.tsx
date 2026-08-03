@@ -6,9 +6,18 @@ import HomeButton from '../../components/common/HomeButton';
 import { useManagerStats } from '../../hooks/useEvents';
 import { ManagerDashboardCharts } from '../../components/common/DashboardCharts';
 
+interface ManagerSubscription {
+  plan?: string;
+  status?: string;
+  endDate?: string;
+  eventsUsed?: number;
+  eventLimit?: number;
+  maxEvents?: number;
+}
+
 const EventManagerDashboard = () => {
   const user = useAppSelector((state) => state.auth.user);
-  const [mySubscription, setMySubscription] = useState<any>(null);
+  const [mySubscription, setMySubscription] = useState<ManagerSubscription | null>(null);
   const { data, isLoading } = useManagerStats();
 
   useEffect(() => {

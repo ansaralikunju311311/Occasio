@@ -1,8 +1,17 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from 'axios';
+
+interface OpenCageResult {
+  confidence: number;
+  geometry: {
+    lat: number;
+    lng: number;
+  };
+  formatted: string;
+}
+
 export const getLocationName = async (address: string) => {
   try {
-    const res = await axios.get(
+    const res = await axios.get<{ results: OpenCageResult[] }>(
       `https://api.opencagedata.com/geocode/v1/json?q=${address}&key=${process.env.API_KEY}`,
     );
 
@@ -12,9 +21,8 @@ export const getLocationName = async (address: string) => {
       return null;
     }
 
-    //  Prefer high confidence result
     const bestResult =
-      results.find((r: any) => r.confidence >= 8) || results[0];
+      results.find((r: OpenCageResult) => r.confidence >= 8) || results[0];
     return {
       latitude: bestResult.geometry.lat,
       longitude: bestResult.geometry.lng,

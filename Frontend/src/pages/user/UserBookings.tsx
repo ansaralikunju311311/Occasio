@@ -33,7 +33,7 @@ const UserBookings = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [metadata, setMetadata] = useState<any>(null);
+  const [metadata, setMetadata] = useState<{ total: number; totalPages: number } | null>(null);
   const itemsPerPage = 10;
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -55,7 +55,7 @@ const UserBookings = () => {
           setBookings(res.data || []);
           setMetadata(res.metadata);
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Failed to fetch bookings:', err);
         toast.error(APP_MESSAGES.LOAD_BOOKINGS_FAILED);
       } finally {

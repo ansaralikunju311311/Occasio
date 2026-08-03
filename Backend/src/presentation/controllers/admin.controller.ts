@@ -218,7 +218,7 @@ export class AdminController {
     }
 
     for (const user of users) {
-      const uDate = new Date((user as any).createdAt);
+      const uDate = new Date((user as unknown as { createdAt: Date }).createdAt || Date.now());
       const m = trend.find(
         (x) => x.year === uDate.getFullYear() && x.month === uDate.getMonth(),
       );

@@ -36,7 +36,7 @@ interface Booking {
 const EventManagerBookings = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
-  const [metadata, setMetadata] = useState<any>(null);
+  const [metadata, setMetadata] = useState<{ total: number; totalPages: number } | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -53,8 +53,9 @@ const EventManagerBookings = () => {
       } else {
         setError(res.message || APP_MESSAGES.LOAD_BOOKINGS_FAILED);
       }
-    } catch (err: any) {
-      setError(err.response?.data?.message || err.message || APP_MESSAGES.LOAD_BOOKINGS_FAILED);
+    } catch (err: unknown) {
+      const e = err as { response?: { data?: { message?: string } }; message?: string };
+      setError(e.response?.data?.message || e.message || APP_MESSAGES.LOAD_BOOKINGS_FAILED);
     } finally {
       setIsLoading(false);
     }

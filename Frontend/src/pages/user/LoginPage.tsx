@@ -23,9 +23,9 @@ const LoginPage = () => {
       navigate('/');
     }
     if (loginMutation.isError) {
-      const error = loginMutation.error as any;
+      const error = loginMutation.error as { response?: { data?: { message?: string } } };
       if (error.response) {
-        toast.error(error.response.data.message || 'Login failed');
+        toast.error(error.response.data?.message || 'Login failed');
       } else {
         toast.error('Something went wrong');
       }

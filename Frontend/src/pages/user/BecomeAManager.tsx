@@ -15,7 +15,7 @@ interface ManagerFormData {
   aboutEvents: string;
   socialLinks: string;
   documentReference: string;
-  certificate: any;
+  certificate: FileList;
 }
 
 const RocketIcon = () => (
@@ -101,7 +101,7 @@ const BecomeAManager: React.FC = () => {
       setView('success');
     }
     if (upgradeMutation.isError) {
-      const error = upgradeMutation.error as any;
+      const error = upgradeMutation.error as { response?: { data?: { message?: string } } };
       toast.error(error.response?.data?.message || 'Failed to submit application.');
     }
   }, [
@@ -122,7 +122,7 @@ const BecomeAManager: React.FC = () => {
       navigate('/applyasmanager');
     }
     if (reapplyMutation.isError) {
-      const error = reapplyMutation.error as any;
+      const error = reapplyMutation.error as { response?: { data?: { message?: string } } };
       toast.error(error.response?.data?.message || 'Failed to re-apply.');
     }
   }, [

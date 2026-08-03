@@ -58,8 +58,9 @@ const AdminUsers = () => {
         onSuccess: () => {
           toast.success('User status updated successfully.');
         },
-        onError: (error: any) => {
-          toast.error(error.response?.data?.message || 'Failed to update user status.');
+        onError: (error: unknown) => {
+          const err = error as { response?: { data?: { message?: string } } };
+          toast.error(err.response?.data?.message || 'Failed to update user status.');
         },
       }
     );
@@ -71,8 +72,9 @@ const AdminUsers = () => {
       const userData = response.data?.user || response.data?.data || response.data;
       setSelectedUser(userData);
       setIsDetailsModalOpen(true);
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to load user details.');
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      toast.error(err.response?.data?.message || 'Failed to load user details.');
     }
   };
 

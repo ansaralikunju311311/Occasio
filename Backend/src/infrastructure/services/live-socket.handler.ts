@@ -58,7 +58,7 @@ export const registerLiveSocketHandler = (io: Server, socket: Socket): void => {
   });
 
   // WebRTC Offer Relay
-  socket.on('webrtc_offer', ({ targetSocketId, offer, eventId }: { targetSocketId: string; offer: any; eventId: string }) => {
+  socket.on('webrtc_offer', ({ targetSocketId, offer, eventId }: { targetSocketId: string; offer: Record<string, unknown>; eventId: string }) => {
     if (!targetSocketId || !offer) return;
     io.to(targetSocketId).emit('webrtc_offer', {
       senderSocketId: socket.id,
@@ -68,7 +68,7 @@ export const registerLiveSocketHandler = (io: Server, socket: Socket): void => {
   });
 
   // WebRTC Answer Relay
-  socket.on('webrtc_answer', ({ targetSocketId, answer, eventId }: { targetSocketId: string; answer: any; eventId: string }) => {
+  socket.on('webrtc_answer', ({ targetSocketId, answer, eventId }: { targetSocketId: string; answer: Record<string, unknown>; eventId: string }) => {
     if (!targetSocketId || !answer) return;
     io.to(targetSocketId).emit('webrtc_answer', {
       senderSocketId: socket.id,
@@ -78,7 +78,7 @@ export const registerLiveSocketHandler = (io: Server, socket: Socket): void => {
   });
 
   // WebRTC ICE Candidate Relay
-  socket.on('webrtc_ice_candidate', ({ targetSocketId, candidate, eventId }: { targetSocketId: string; candidate: any; eventId: string }) => {
+  socket.on('webrtc_ice_candidate', ({ targetSocketId, candidate, eventId }: { targetSocketId: string; candidate: Record<string, unknown>; eventId: string }) => {
     if (!targetSocketId || !candidate) return;
     io.to(targetSocketId).emit('webrtc_ice_candidate', {
       senderSocketId: socket.id,
@@ -88,7 +88,7 @@ export const registerLiveSocketHandler = (io: Server, socket: Socket): void => {
   });
 
   // Realtime Chat Broadcast
-  socket.on('chat_message_broadcast', ({ eventId, message }: { eventId: string; message: any }) => {
+  socket.on('chat_message_broadcast', ({ eventId, message }: { eventId: string; message: Record<string, unknown> }) => {
     if (!eventId || !message) return;
     const roomName = `live_event_${eventId}`;
     io.to(roomName).emit('receive_chat_message', message);

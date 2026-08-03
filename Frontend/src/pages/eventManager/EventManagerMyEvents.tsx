@@ -8,20 +8,21 @@ import { SearchBar } from '../../components/common/SearchBar';
 import { Pagination } from '../../components/common/Pagination';
 import EventDetailsModal from '../../components/admin/EventDetailsModal';
 import { useMyEvents, useDeleteEvent, useStartEvent } from '../../hooks/useEvents';
+import type { EventItem, SeatBlock } from '../../types/event.types';
 
 const EventManagerMyEvents = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [statusFilter, setStatusFilter] = useState('ALL');
-  const [selectedEvent, setSelectedEvent] = useState<any>(null);
+  const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
   const navigate = useNavigate();
   const deleteMutation = useDeleteEvent();
   const startMutation = useStartEvent();
   const [isDeletingId, setIsDeletingId] = useState<string | null>(null);
   const [isSchedulingId, setIsSchedulingId] = useState<string | null>(null);
   const [isStartingId, setIsStartingId] = useState<string | null>(null);
-  const [eventToCancel, setEventToCancel] = useState<any>(null);
+  const [eventToCancel, setEventToCancel] = useState<EventItem | null>(null);
 
   const handleStartEvent = async (id: string) => {
     setIsStartingId(id);
@@ -29,8 +30,9 @@ const EventManagerMyEvents = () => {
       await startMutation.mutateAsync(id);
       toast.success('Event is now LIVE! Redirecting to studio...');
       navigate(`/eventmanager/live/${id}`);
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || err.message || 'Failed to start event.');
+    } catch (err: unknown) {
+      const e = err as { response?: { data?: { message?: string } }; message?: string };
+      toast.error(e.response?.data?.message || e.message || 'Failed to start event.');
     } finally {
       setIsStartingId(null);
     }
@@ -78,7 +80,7 @@ const EventManagerMyEvents = () => {
     }
   };
 
-  const handleScheduleClick = async (event: any) => {
+  const handleScheduleClick = async (event: EventItem) => {
     setIsSchedulingId(event.id);
     try {
       const orderResponse = await paymentService.createOrder(event.id);
@@ -90,13 +92,15 @@ const EventManagerMyEvents = () => {
           setIsSchedulingId(null);
           window.location.reload();
         },
-        (err: any) => {
-          toast.error(err.message || 'Payment failed');
+        (err: unknown) => {
+          const e = err as { message?: string };
+          toast.error(e.message || 'Payment failed');
           setIsSchedulingId(null);
         }
       );
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to initiate payment');
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      toast.error(err.response?.data?.message || 'Failed to initiate payment');
       setIsSchedulingId(null);
     }
   };
@@ -113,7 +117,7 @@ const EventManagerMyEvents = () => {
     );
   }
 
-  const filteredEvents = events.filter((event: any) => {
+  const filteredEvents = events.filter((event: EventItem) => {
     const matchesStatus = statusFilter === 'ALL' || event.status === statusFilter;
     return matchesStatus;
   });
@@ -278,7 +282,7 @@ const EventManagerMyEvents = () => {
                 </td>
               </tr>
             }
-            renderRow={(event: any) => {
+            renderRow={(event: EventItem) => {
               const isStarted = new Date(event.startTime) <= new Date();
               const isCancelled = event.isDeleted;
               return (
@@ -351,11 +355,10 @@ const EventManagerMyEvents = () => {
                   <td className="px-6 py-4">
                     {(() => {
                       const type = event.eventType?.toUpperCase();
+                      const layoutObj = typeof event.seatLayoutDetails === 'object' ? event.seatLayoutDetails : undefined;
                       const blocks =
                         event?.SeatLayout?.blocks ??
-                        event?.seatLayout?.blocks ??
-                        event?.seatLayoutId?.blocks ??
-                        event?.seatLayoutDetails?.blocks ??
+                        layoutObj?.blocks ??
                         event?.layout?.blocks ??
                         [];
                       const onlinePrice = event.price ?? 0;
@@ -372,7 +375,7 @@ const EventManagerMyEvents = () => {
                         if (blocks.length > 0) {
                           return (
                             <div className="flex flex-col gap-1">
-                              {blocks.map((b: any, i: number) => {
+                              {blocks.map((b: SeatBlock, i: number) => {
                                 const name =
                                   b.category?.name || b.blockName || b.blocName || `Block ${i + 1}`;
                                 const price = b.category?.price;
@@ -410,7 +413,7 @@ const EventManagerMyEvents = () => {
                             {/* Offline categories */}
                             {blocks.length > 0 && (
                               <div className="flex flex-col gap-1 pt-1 border-t border-slate-800/50">
-                                {blocks.map((b: any, i: number) => {
+                                {blocks.map((b: SeatBlock, i: number) => {
                                   const name =
                                     b.category?.name ||
                                     b.blockName ||
@@ -609,7 +612,9 @@ const EventManagerMyEvents = () => {
       </div>
 
       {/* Event Details Modal */}
-      <EventDetailsModal event={selectedEvent} onClose={() => setSelectedEvent(null)} />
+      {selectedEvent && (
+        <EventDetailsModal event={selectedEvent} onClose={() => setSelectedEvent(null)} />
+      )}
 
       {/* Cancel Event Confirmation Modal */}
       {eventToCancel && (

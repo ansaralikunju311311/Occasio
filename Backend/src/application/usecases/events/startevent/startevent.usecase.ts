@@ -56,7 +56,7 @@ export class StartEventUseCase implements IStartEventUseCase {
           bookings
             .map((b) => {
               if (!b.userId) return '';
-              const u = b.userId as any;
+              const u = b.userId as unknown as string | { _id?: { toString(): string } };
               if (typeof u === 'string') return u;
               if (u._id) return u._id.toString();
               return u.toString();

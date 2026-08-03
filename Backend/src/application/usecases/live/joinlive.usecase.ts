@@ -42,7 +42,7 @@ export class JoinLiveUseCase {
     const confirmedBookings = await this._bookingRepository.findConfirmedBookingsByEventId(eventId);
     const hasBooking = confirmedBookings.some((b) => {
       if (!b.userId) return false;
-      const u = b.userId as any;
+      const u = b.userId as unknown as string | { _id?: { toString(): string } };
       const bUserId = typeof u === 'string' ? u : u._id ? u._id.toString() : u.toString();
       return bUserId === userId;
     });

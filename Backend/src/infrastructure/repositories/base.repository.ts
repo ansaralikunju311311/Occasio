@@ -1,9 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import type {
   Model,
   FilterQuery,
   UpdateQuery,
   HydratedDocument,
+  SaveOptions,
+  QueryOptions,
 } from 'mongoose';
 
 export abstract class BaseRepository<T> {
@@ -17,7 +18,7 @@ export abstract class BaseRepository<T> {
     return this.model.findById(id).exec();
   }
 
-  async create(data: Partial<T>, options?: any): Promise<HydratedDocument<T>> {
+  async create(data: Partial<T>, options?: SaveOptions): Promise<HydratedDocument<T>> {
     const createdDocs = await this.model.create([data], options);
     return createdDocs[0];
   }
@@ -25,11 +26,11 @@ export abstract class BaseRepository<T> {
   async updateById(
     id: string,
     data: UpdateQuery<T>,
-    options?: any,
+    options?: QueryOptions<T>,
   ): Promise<HydratedDocument<T> | null> {
     return this.model
       .findByIdAndUpdate(id, data, { new: true, ...options })
-      .exec() as any;
+      .exec();
   }
 
   async findAll(filter: FilterQuery<T> = {}): Promise<HydratedDocument<T>[]> {
@@ -53,10 +54,10 @@ export abstract class BaseRepository<T> {
   async updateOne(
     filter: FilterQuery<T>,
     data: UpdateQuery<T>,
-    options?: any,
+    options?: QueryOptions<T>,
   ): Promise<HydratedDocument<T> | null> {
     return this.model
       .findOneAndUpdate(filter, data, { new: true, ...options })
-      .exec() as any;
+      .exec();
   }
 }

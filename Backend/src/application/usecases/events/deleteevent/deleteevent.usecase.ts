@@ -5,6 +5,8 @@ import type { IUserRepository } from '../../../../domain/repositories/user.repos
 import { razorpayInstance } from '../../../../infrastructure/config/razorpay';
 import { logger } from '../../../../common/logger/logger';
 import { Payment } from '../../../../domain/entities/payment.entity';
+import { PaymentPurpose } from '../../../../common/enums/payment-purpose.enum';
+import { PaymentStatus } from '../../../../common/enums/payment-status.enum';
 
 import type { IDeleteEventUseCase } from './deleteevent.usecase.interface';
 
@@ -46,7 +48,7 @@ export class DeleteEventUseCase implements IDeleteEventUseCase {
               logger.info(
                 `Successfully refunded booking ${booking.id} via Razorpay (transaction: ${payment.transactionId})`,
               );
-            } catch (rzErr: any) {
+            } catch (rzErr: unknown) {
               logger.error(
                 `Razorpay refund API call failed for payment ID ${payment.transactionId}:`,
                 rzErr,
@@ -58,7 +60,7 @@ export class DeleteEventUseCase implements IDeleteEventUseCase {
             );
           }
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         logger.error(`Error processing refund for booking ${booking.id}:`, err);
       }
 
@@ -67,7 +69,7 @@ export class DeleteEventUseCase implements IDeleteEventUseCase {
           booking.id ?? '',
           'CANCELLED',
         );
-      } catch (err: any) {
+      } catch (err: unknown) {
         logger.error(
           `Failed to update booking status for ${booking.id} to CANCELLED:`,
           err,
@@ -82,11 +84,11 @@ export class DeleteEventUseCase implements IDeleteEventUseCase {
           const refundPayment = new Payment(
             null,
             booking.userId,
-            'REFUND' as any,
+            PaymentPurpose.REFUND,
             booking.totalAmount,
             'INR',
             'WALLET',
-            'SUCCESS' as any,
+            PaymentStatus.SUCCESS,
             `refund_${booking.id}_${Date.now()}`,
             id,
             booking.id ?? undefined,
@@ -101,7 +103,7 @@ export class DeleteEventUseCase implements IDeleteEventUseCase {
             `Could not find user ${booking.userId} to credit refund wallet balance.`,
           );
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         logger.error(
           `Failed to credit user ${booking.userId} wallet balance:`,
           err,

@@ -1,3 +1,9 @@
+export interface WalletPayResultDto {
+  success: boolean;
+  message: string;
+  bookingId: string | null;
+}
+
 export interface IWalletPayUseCase {
   execute(
     eventId: string,
@@ -5,5 +11,5 @@ export interface IWalletPayUseCase {
     amount: number,
     bookingType: 'physical' | 'online',
     seats?: string[],
-  ): Promise<any>;
+  ): Promise<WalletPayResultDto>;
 }

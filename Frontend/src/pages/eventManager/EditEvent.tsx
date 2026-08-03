@@ -26,8 +26,12 @@ interface IEventFormInput {
   price: number;
   banner?: FileList;
   isSeatLayoutEnabled?: boolean;
-  layout?: any;
+  layout?: {
+    blocks: SeatBlock[];
+  };
 }
+
+import type { SeatBlock, SeatRow } from '../../types/event.types';
 
 const EditEvent = () => {
   const { id } = useParams<{ id: string }>();
@@ -54,7 +58,7 @@ const EditEvent = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   // Layout Builder State
-  const [layoutBlocks, setLayoutBlocks] = useState<any[]>([]);
+  const [layoutBlocks, setLayoutBlocks] = useState<SeatBlock[]>([]);
 
   useEffect(() => {
     if (event && !initialDataLoaded) {
@@ -89,8 +93,8 @@ const EditEvent = () => {
         setLayoutBlocks([
           {
             blockName: '',
-            category: { name: '', price: '' },
-            rows: [{ rowNumber: 1, columns: '' }],
+            category: { name: '', price: 0 },
+            rows: [{ rowNumber: 1, columns: 0 }],
           },
         ]);
       }
@@ -103,8 +107,8 @@ const EditEvent = () => {
       ...prev,
       {
         blockName: '',
-        category: { name: '', price: '' },
-        rows: [{ rowNumber: 1, columns: '' }],
+        category: { name: '', price: 0 },
+        rows: [{ rowNumber: 1, columns: 0 }],
       },
     ]);
   };
@@ -113,13 +117,13 @@ const EditEvent = () => {
     setLayoutBlocks((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const updateBlock = (index: number, field: string, value: any) => {
+  const updateBlock = (index: number, field: string, value: string | number) => {
     setLayoutBlocks((prev) => {
       const newBlocks = [...prev];
       const blockCopy = { ...newBlocks[index], category: { ...newBlocks[index].category } };
-      if (field === 'blockName') blockCopy.blockName = value;
-      if (field === 'categoryName') blockCopy.category.name = value;
-      if (field === 'categoryPrice') blockCopy.category.price = value === '' ? '' : Number(value);
+      if (field === 'blockName') blockCopy.blockName = String(value);
+      if (field === 'categoryName') blockCopy.category.name = String(value);
+      if (field === 'categoryPrice') blockCopy.category.price = value === '' ? 0 : Number(value);
       newBlocks[index] = blockCopy;
       return newBlocks;
     });
@@ -129,9 +133,9 @@ const EditEvent = () => {
     setLayoutBlocks((prev) => {
       const newBlocks = [...prev];
       const blockCopy = { ...newBlocks[blockIndex] };
-      const rowsCopy = [...blockCopy.rows];
+      const rowsCopy = [...(blockCopy.rows || [])];
       const nextRowNumber = rowsCopy.length > 0 ? rowsCopy[rowsCopy.length - 1].rowNumber + 1 : 1;
-      rowsCopy.push({ rowNumber: nextRowNumber, columns: '' });
+      rowsCopy.push({ rowNumber: nextRowNumber, columns: 0 });
       blockCopy.rows = rowsCopy;
       newBlocks[blockIndex] = blockCopy;
       return newBlocks;
@@ -142,32 +146,20 @@ const EditEvent = () => {
     setLayoutBlocks((prev) => {
       const newBlocks = [...prev];
       const blockCopy = { ...newBlocks[blockIndex] };
-      let rowsCopy = blockCopy.rows
-        .filter((_: any, i: number) => i !== rowIndex)
-        .map((r: any, i: number) => ({ ...r, rowNumber: i + 1 }));
+      let rowsCopy = (blockCopy.rows || [])
+        .filter((_: SeatRow, i: number) => i !== rowIndex)
+        .map((r: SeatRow, i: number) => ({ ...r, rowNumber: i + 1 }));
       blockCopy.rows = rowsCopy;
       newBlocks[blockIndex] = blockCopy;
       return newBlocks;
     });
   };
 
-  // const updateRowColumns = (blockIndex: number, rowIndex: number, columns: number | string) => {
-  //   setLayoutBlocks((prev) => {
-  //     const newBlocks = [...prev];
-  //     const blockCopy = { ...newBlocks[blockIndex] };
-  //     const rowsCopy = [...blockCopy.rows];
-  //     rowsCopy[rowIndex] = { ...rowsCopy[rowIndex], columns: columns === '' ? '' : Number(columns) };
-  //     blockCopy.rows = rowsCopy;
-  //     newBlocks[blockIndex] = blockCopy;
-  //     return newBlocks;
-  //   });
-  // };
-
   const updateRowColumns = (blockIndex: number, rowIndex: number, columns: number | string) => {
     setLayoutBlocks((prev) => {
       const newBlocks = [...prev];
       const blockCopy = { ...newBlocks[blockIndex] };
-      const rowsCopy = [...blockCopy.rows];
+      const rowsCopy = [...(blockCopy.rows || [])];
 
       const value = Number(columns);
 
@@ -222,7 +214,7 @@ const EditEvent = () => {
     }
 
     for (const block of layoutBlocks) {
-      for (const row of block.rows) {
+      for (const row of (block.rows || [])) {
         if (!row.columns || Number(row.columns) <= 0) {
           toast.error('Each row must have at least 1 seat');
           return;
@@ -246,9 +238,9 @@ const EditEvent = () => {
       if (isOfflineOrHybrid) {
         for (const block of layoutBlocks) {
           if (
-            !block.blockName.trim() ||
-            !block.category.name ||
-            block.category.price === '' ||
+            !block.blockName?.trim() ||
+            !block.category?.name ||
+            block.category?.price === undefined ||
             Number(block.category.price) < 0
           ) {
             toast.error('Please complete all block details!');
@@ -282,8 +274,9 @@ const EditEvent = () => {
             toast.success('Event updated successfully!');
             setShowSuccessModal(true);
           },
-          onError: (error: any) => {
-            toast.error(error.response?.data?.message || 'Failed to update event.');
+          onError: (error: unknown) => {
+            const err = error as { response?: { data?: { message?: string } } };
+            toast.error(err.response?.data?.message || 'Failed to update event.');
           },
         }
       );
@@ -367,8 +360,8 @@ const EditEvent = () => {
                         setLayoutBlocks([
                           {
                             blockName: '',
-                            category: { name: '', price: '' },
-                            rows: [{ rowNumber: 1, columns: '' }],
+                            category: { name: '', price: 0 },
+                            rows: [{ rowNumber: 1, columns: 0 }],
                           },
                         ]);
                       }
@@ -475,7 +468,7 @@ const EditEvent = () => {
                     className="bg-slate-900/50 border border-slate-700 rounded-lg px-3 py-2 text-white"
                   />
                   <select
-                    value={block.category.name}
+                    value={block.category?.name || ''}
                     onChange={(e) => updateBlock(blockIndex, 'categoryName', e.target.value)}
                     className="bg-slate-900/50 border border-slate-700 rounded-lg px-3 py-2 text-white"
                   >
@@ -488,24 +481,24 @@ const EditEvent = () => {
                   </select>
                   <input
                     type="number"
-                    value={block.category.price}
+                    value={block.category?.price ?? ''}
                     onChange={(e) => updateBlock(blockIndex, 'categoryPrice', e.target.value)}
                     placeholder="Price"
                     className="bg-slate-900/50 border border-slate-700 rounded-lg px-3 py-2 text-white"
                   />
                 </div>
                 <div className="space-y-2">
-                  {block.rows.map((row: any, rowIndex: number) => (
+                  {(block.rows || []).map((row: SeatRow, rowIndex: number) => (
                     <div key={rowIndex} className="flex gap-2">
                       <span className="text-slate-400 py-2">Row {row.rowNumber}</span>
                       <input
                         type="number"
                         value={row.columns}
-                        onChange={(e) => updateRowColumns(blockIndex, rowIndex, e.target.value)}
+                        onChange={(e) => updateRowColumns(blockIndex, rowIndex, Number(e.target.value))}
                         placeholder="Seats"
                         className="bg-slate-900/50 border border-slate-700 rounded-lg px-3 py-2 text-white w-24"
                       />
-                      {block.rows.length > 1 && (
+                      {(block.rows || []).length > 1 && (
                         <button
                           type="button"
                           onClick={() => removeRow(blockIndex, rowIndex)}

@@ -14,6 +14,8 @@ interface Seat {
   status: 'AVAILABLE' | 'HELD' | 'BOOKED';
 }
 
+import type { SeatBlock, SeatRow } from '../../types/event.types';
+
 interface GroupedBlock {
   blockName: string;
   categoryName: string;
@@ -21,7 +23,7 @@ interface GroupedBlock {
   rows: { rowNumber: number; seats: Seat[] }[];
 }
 
-const groupSeats = (existingSeats: Seat[], layoutBlocks: any[] = []): GroupedBlock[] => {
+const groupSeats = (existingSeats: Seat[], layoutBlocks: SeatBlock[] = []): GroupedBlock[] => {
   const busySeatMap = new Map<string, Seat>();
   for (const s of existingSeats) {
     const key = `${s.block}-${s.row}-${s.column}`.toUpperCase();
@@ -36,7 +38,7 @@ const groupSeats = (existingSeats: Seat[], layoutBlocks: any[] = []): GroupedBlo
       blockName: trimmedBlockName,
       categoryName: lb.category?.name ?? '',
       categoryPrice: lb.category?.price ?? null,
-      rows: (lb.rows || []).map((lr: any) => {
+      rows: (lb.rows || []).map((lr: SeatRow) => {
         const rowNumber = Number(lr.rowNumber);
         const totalColumns = Number(lr.columns);
         const seats: Seat[] = [];
@@ -343,9 +345,8 @@ const SeatSelection = () => {
 
   const groupedBlocks = useMemo<GroupedBlock[]>(() => {
     const seats: Seat[] = event?.seats ?? [];
-    const layoutBlocks: any[] =
+    const layoutBlocks: SeatBlock[] =
       event?.SeatLayout?.blocks ??
-      event?.seatLayout?.blocks ??
       event?.seatLayoutDetails?.blocks ??
       event?.layout?.blocks ??
       [];
@@ -400,9 +401,10 @@ const SeatSelection = () => {
       navigate(`/checkout/${event.id}`, {
         state: { selectedSeats, bookingType: 'physical', totalPrice, lockExpiresAt },
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
       toast.error(
-        error.response?.data?.message || 'Failed to lock seats. Some seats may have been taken.'
+        err.response?.data?.message || 'Failed to lock seats. Some seats may have been taken.'
       );
     } finally {
       setIsLocking(false);

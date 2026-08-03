@@ -1,17 +1,17 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import mongoose from 'mongoose';
 import type { IManagerSubscriptionRepository } from '../../../domain/repositories/imanager-subscription.repository';
 import { ManagerSubscription } from '../../../domain/entities/manager-subscription.entity';
-import { ManagerSubscriptionModel } from '../../database/model/manager-subscription.model';
+import { ManagerSubscriptionModel, type IManagerSubscriptionDocument } from '../../database/model/manager-subscription.model';
 
 export class ManagerSubscriptionRepository implements IManagerSubscriptionRepository {
   async create(
     subscription: ManagerSubscription,
-    session?: any,
+    session?: mongoose.ClientSession,
   ): Promise<ManagerSubscription> {
     const createdDocs = await ManagerSubscriptionModel.create(
       [
         {
-          userId: subscription.userId as any,
+          userId: subscription.userId as unknown as mongoose.Types.ObjectId,
           plan: subscription.plan,
           status: subscription.status,
           eventLimit: subscription.eventLimit,
@@ -39,9 +39,9 @@ export class ManagerSubscriptionRepository implements IManagerSubscriptionReposi
   async update(
     id: string,
     updateData: Partial<ManagerSubscription>,
-    session?: any,
+    session?: mongoose.ClientSession,
   ): Promise<ManagerSubscription | null> {
-    const mappedUpdateData: any = { ...updateData };
+    const mappedUpdateData: mongoose.UpdateQuery<IManagerSubscriptionDocument> = { ...updateData };
     const doc = await ManagerSubscriptionModel.findByIdAndUpdate(
       id,
       mappedUpdateData,
@@ -50,18 +50,19 @@ export class ManagerSubscriptionRepository implements IManagerSubscriptionReposi
     return doc ? this._toEntity(doc) : null;
   }
 
-  private _toEntity(doc: any): ManagerSubscription {
+  private _toEntity(doc: IManagerSubscriptionDocument | mongoose.HydratedDocument<IManagerSubscriptionDocument> | Record<string, unknown>): ManagerSubscription {
+    const d = doc as Record<string, unknown>;
     return new ManagerSubscription(
-      doc._id.toString(),
-      doc.userId.toString(),
-      doc.plan,
-      doc.status,
-      doc.eventLimit,
-      doc.eventsUsed,
-      doc.startDate,
-      doc.endDate,
-      doc.createdAt,
-      doc.updatedAt,
+      (d._id as mongoose.Types.ObjectId)?.toString() || (d.id as string) || '',
+      (d.userId as mongoose.Types.ObjectId)?.toString() || String(d.userId || ''),
+      d.plan as ManagerSubscription['plan'],
+      d.status as ManagerSubscription['status'],
+      Number(d.eventLimit || 0),
+      Number(d.eventsUsed || 0),
+      d.startDate as Date,
+      d.endDate as Date,
+      d.createdAt as Date,
+      d.updatedAt as Date,
     );
   }
 }

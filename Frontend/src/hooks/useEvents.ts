@@ -1,7 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { eventService } from '../services/event.service';
+import { eventService, type CreateEventPayload } from '../services/event.service';
+import type { EventFilterParams, EventItem } from '../types/event.types';
 
-export const useEvents = (params?: any) => {
+export const useEvents = (params?: EventFilterParams) => {
   return useQuery({
     queryKey: ['events', params],
     queryFn: () => eventService.getEvents(params).then((res) => res.data),
@@ -27,7 +28,7 @@ export const useEventSeats = (id: string | undefined) => {
 export const useCreateEvent = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: any) => eventService.createEvent(payload),
+    mutationFn: (payload: CreateEventPayload) => eventService.createEvent(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['events'] });
       queryClient.invalidateQueries({ queryKey: ['myEvents'] });
@@ -35,14 +36,14 @@ export const useCreateEvent = () => {
   });
 };
 
-export const useAllEventsAdmin = (params?: any) => {
+export const useAllEventsAdmin = (params?: EventFilterParams) => {
   return useQuery({
     queryKey: ['allEventsAdmin', params],
     queryFn: () => eventService.getAllEvents(params).then((res) => res.data),
   });
 };
 
-export const useMyEvents = (params?: any) => {
+export const useMyEvents = (params?: EventFilterParams) => {
   return useQuery({
     queryKey: ['myEvents', params],
     queryFn: () => eventService.getMyEvents(params).then((res) => res.data),
@@ -52,7 +53,7 @@ export const useMyEvents = (params?: any) => {
 export const useUpdateEvent = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, payload }: { id: string; payload: any }) =>
+    mutationFn: ({ id, payload }: { id: string; payload: Partial<CreateEventPayload> | Partial<EventItem> }) =>
       eventService.updateEvent(id, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['events'] });
@@ -91,4 +92,3 @@ export const useManagerStats = () => {
     queryFn: () => eventService.getManagerStats().then((res) => res.data),
   });
 };
-

@@ -14,7 +14,7 @@ export const useLiveChat = (eventId: string) => {
       setIsLoading(true);
       const history = await liveService.getChatHistory(eventId);
       setMessages(history);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('[LiveChat] Failed to load chat history:', err);
     } finally {
       setIsLoading(false);
@@ -50,9 +50,10 @@ export const useLiveChat = (eventId: string) => {
           eventId,
           message: savedMessage,
         });
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('[LiveChat] Error sending message:', err);
-        toast.error(err?.response?.data?.message || 'Failed to send chat message');
+        const e = err as { response?: { data?: { message?: string } } };
+        toast.error(e?.response?.data?.message || 'Failed to send chat message');
       }
     },
     [eventId],

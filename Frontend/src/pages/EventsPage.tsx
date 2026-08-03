@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useEvents } from '../hooks/useEvents';
 import { EventType } from './eventManager/CreateEvent';
+import type { EventItem, SeatBlock } from '../types/event.types';
 import { Pagination } from '../components/common/Pagination';
 import { SearchBar } from '../components/common/SearchBar';
 import { toast } from 'sonner';
@@ -120,17 +121,16 @@ const EventsPage = () => {
     });
   };
 
-  const getMinSeatPrice = (event: any): number | null => {
+  const getMinSeatPrice = (event: EventItem): number | null => {
     const blocks =
       event?.SeatLayout?.blocks ??
-      event?.seatLayout?.blocks ??
       event?.seatLayoutDetails?.blocks ??
       event?.layout?.blocks ??
       [];
     if (!blocks.length) return null;
     const prices = blocks
-      .map((b: any) => {
-        const price = b.category?.price ?? b.price;
+      .map((b: SeatBlock) => {
+        const price = b.category?.price;
         return Number(price);
       })
       .filter((p: number) => !isNaN(p) && p > 0);
@@ -138,7 +138,7 @@ const EventsPage = () => {
   };
 
   // Map events to include calculated distance if coordinates exist
-  const processedEvents = events.map((event: any) => {
+  const processedEvents = events.map((event: EventItem) => {
     let distance: number | null = null;
     if (
       userCoords &&
@@ -154,7 +154,7 @@ const EventsPage = () => {
   });
 
   // Filter based on "Nearby Only"
-  const filteredEvents = processedEvents.filter((event: any) => {
+  const filteredEvents = processedEvents.filter((event: EventItem & { distance: number | null }) => {
     // Hide own events
     if (user && event.createdBy === user.id) return false;
 
@@ -167,7 +167,7 @@ const EventsPage = () => {
   });
 
   // Sort events list
-  const sortedEvents = [...filteredEvents].sort((a: any, b: any) => {
+  const sortedEvents = [...filteredEvents].sort((a: EventItem & { distance: number | null }, b: EventItem & { distance: number | null }) => {
     if (sortBy === 'DATE_ASC') {
       return new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
     }
@@ -369,7 +369,7 @@ const EventsPage = () => {
           <>
             {/* Events Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {sortedEvents.map((event: any) => (
+              {sortedEvents.map((event: EventItem & { distance: number | null }) => (
                 <div
                   key={event.id}
                   onClick={() => navigate(`/event/${event.id}`)}
@@ -443,8 +443,8 @@ const EventsPage = () => {
                         />
                       </svg>
                       <span>
-                        {formatDate(event.startTime)}{' '}
-                        {event.endTime && ` - ${formatDate(event.endTime)}`}
+                        {formatDate(String(event.startTime))}{' '}
+                        {event.endTime && ` - ${formatDate(String(event.endTime))}`}
                       </span>
                     </div>
                     <h3 className="text-2xl font-bold text-white mb-3 line-clamp-1 group-hover:text-indigo-400 transition-colors tracking-tight">
@@ -459,7 +459,7 @@ const EventsPage = () => {
                         {(() => {
                           const type = event.eventType?.toUpperCase();
                           const minSeatPrice = getMinSeatPrice(event);
-                          const onlinePrice = event.price;
+                          const onlinePrice = event.price ?? 0;
 
                           if (type === 'ONLINE') {
                             return onlinePrice > 0 ? (

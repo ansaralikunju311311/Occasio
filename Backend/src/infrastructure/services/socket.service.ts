@@ -22,7 +22,7 @@ export class SocketService {
     return this.io;
   }
 
-  public notifyUser(userId: string, eventName: string, data: any): void {
+  public notifyUser(userId: string, eventName: string, data: unknown): void {
     if (!this.io) {
       logger.warn(`SocketService: Cannot notify user ${userId}, IO server not set.`);
       return;
@@ -32,7 +32,7 @@ export class SocketService {
     this.io.to(userId).emit(eventName, data);
   }
 
-  public broadcast(eventName: string, data: any): void {
+  public broadcast(eventName: string, data: unknown): void {
     if (!this.io) {
       logger.warn(`SocketService: Cannot broadcast ${eventName}, IO server not set.`);
       return;

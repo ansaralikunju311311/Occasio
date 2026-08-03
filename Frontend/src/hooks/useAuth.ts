@@ -1,21 +1,28 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { authService } from '../services/auth.service';
+import {
+  authService,
+  type LoginDto,
+  type SignupDto,
+  type ResetPasswordDto,
+  type VerifyOtpDto,
+  type UpdatePasswordDto,
+} from '../services/auth.service';
 
 export const useLogin = () => {
   return useMutation({
-    mutationFn: (data: any) => authService.login(data),
+    mutationFn: (data: LoginDto) => authService.login(data),
   });
 };
 
 export const useSignup = () => {
   return useMutation({
-    mutationFn: (data: any) => authService.signup(data),
+    mutationFn: (data: SignupDto) => authService.signup(data),
   });
 };
 
 export const useAdminLogin = () => {
   return useMutation({
-    mutationFn: (data: any) => authService.adminLogin(data),
+    mutationFn: (data: LoginDto) => authService.adminLogin(data),
   });
 };
 
@@ -37,7 +44,7 @@ export const useForgotPassword = () => {
 
 export const useResetPassword = () => {
   return useMutation({
-    mutationFn: (data: any) => authService.resetPassword(data),
+    mutationFn: (data: ResetPasswordDto) => authService.resetPassword(data),
   });
 };
 
@@ -49,13 +56,13 @@ export const useResendOtp = () => {
 
 export const useVerifyOtp = () => {
   return useMutation({
-    mutationFn: (data: any) => authService.verifyOtp(data),
+    mutationFn: (data: VerifyOtpDto) => authService.verifyOtp(data),
   });
 };
 
 export const useUpdatePassword = () => {
   return useMutation({
-    mutationFn: (data: any) => authService.updatePassword(data),
+    mutationFn: (data: UpdatePasswordDto) => authService.updatePassword(data),
   });
 };
 

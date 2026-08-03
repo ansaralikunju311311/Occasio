@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
-import { userService } from '../services/user.service';
+import { userService, type UpgradeRolePayload } from '../services/user.service';
 import { paymentService } from '../services/payment.service';
 
 export const useUpdateProfile = () => {
@@ -15,7 +15,7 @@ export const useUpdateProfile = () => {
 export const useUpgradeRole = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: any) => userService.upgradeRole(payload),
+    mutationFn: (payload: UpgradeRolePayload) => userService.upgradeRole(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['me'] });
     },

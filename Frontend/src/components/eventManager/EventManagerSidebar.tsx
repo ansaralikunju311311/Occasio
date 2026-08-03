@@ -21,10 +21,11 @@ const EventManagerSidebar = () => {
       dispatch(logout());
       navigate('/');
       console.log(response);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.log('error', error);
-      if (error.response) {
-        toast.error(error.response.data.message || 'Logout failed');
+      const err = error as { response?: { data?: { message?: string } } };
+      if (err.response) {
+        toast.error(err.response.data?.message || 'Logout failed');
       } else {
         toast.error('Something went wrong');
       }

@@ -42,7 +42,7 @@ const BookingDetailsPage = () => {
         setLoading(true);
         const res = await paymentService.getMyBookings();
         if (res.success) {
-          const match = (res.data || []).find((b: any) => b.id === id);
+          const match = (res.data || []).find((b: { id: string }) => b.id === id);
           if (match) {
             setBooking(match);
           } else {

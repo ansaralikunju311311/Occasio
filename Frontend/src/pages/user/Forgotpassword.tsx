@@ -21,7 +21,7 @@ const Forgotpassword = () => {
       navigate('/resetpassword');
     }
     if (forgotMutation.isError) {
-      const error = forgotMutation.error as any;
+      const error = forgotMutation.error as { response?: { data?: { message?: string } } };
       toast.error(error.response?.data?.message || 'Failed to send OTP');
     }
   }, [

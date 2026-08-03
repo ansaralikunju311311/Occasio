@@ -15,11 +15,20 @@ interface EventManager {
   role: string;
   status: string;
   isVerified: boolean;
-  isEventManger: boolean;
+  isEventManger?: boolean;
+  fullName?: string;
+  organizationName?: string;
+  authEmail?: string;
+  organizationType?: string;
+  experienceLevel?: string;
+  documentReference?: string;
+  socialLinks?: string;
+  certificate?: string;
+  aboutEvents?: string;
 }
 
 const AdminEventManagers = () => {
-  const [selectedManager, setSelectedManager] = useState<any | null>(null);
+  const [selectedManager, setSelectedManager] = useState<EventManager | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -54,8 +63,9 @@ const AdminEventManagers = () => {
         onSuccess: () => {
           toast.success('Manager status updated successfully.');
         },
-        onError: (error: any) => {
-          toast.error(error.response?.data?.message || 'Failed to update manager status.');
+        onError: (error: unknown) => {
+          const err = error as { response?: { data?: { message?: string } } };
+          toast.error(err.response?.data?.message || 'Failed to update manager status.');
         },
       }
     );
@@ -70,8 +80,9 @@ const AdminEventManagers = () => {
         setSelectedManager({ ...managerData, authEmail: email });
         setIsDetailsModalOpen(true);
       }
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to load manager details.');
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      toast.error(err.response?.data?.message || 'Failed to load manager details.');
     }
   };
 
