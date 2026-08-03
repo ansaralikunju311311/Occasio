@@ -14,6 +14,10 @@ import type {
 } from '../../../common/interfaces/pagination.interface';
 import { EventStatus } from '../../../common/enums/eventstatus-enum';
 import type { User } from '../../../domain/entities/user.entity';
+import { eventMapper } from '../../../common/mappers/event.mapper';
+
+import { BookingModel } from '../../../infrastructure/database/model/booking.model';
+import type { ManagerStatsResult } from '../../../domain/repositories/event/event.repository.interface';
 
 export class EventRepository
   extends BaseRepository<IEventDocument>
@@ -23,27 +27,131 @@ export class EventRepository
     super(EventModel);
   }
 
+  async getManagerStats(managerId: string): Promise<ManagerStatsResult> {
+    const managerObjId = new mongoose.Types.ObjectId(managerId);
+
+    const totalEvents = await EventModel.countDocuments({
+      createdBy: managerObjId,
+    });
+    const activeEvents = await EventModel.countDocuments({
+      createdBy: managerObjId,
+      status: 'LIVE',
+    });
+
+    const managerEvents = await EventModel.find(
+      { createdBy: managerObjId },
+      '_id title',
+    );
+    const eventIds = managerEvents.map((e) => e._id);
+
+    const totalBookings = await BookingModel.countDocuments({
+      eventId: { $in: eventIds },
+      status: 'CONFIRMED',
+    });
+
+    const revenueResult = await BookingModel.aggregate([
+      { $match: { eventId: { $in: eventIds }, status: 'CONFIRMED' } },
+      { $group: { _id: null, totalRevenue: { $sum: '$organizerRevenue' } } },
+    ]);
+
+    const refundedResult = await BookingModel.aggregate([
+      { $match: { eventId: { $in: eventIds }, status: 'CANCELLED' } },
+      { $group: { _id: null, totalRefunded: { $sum: '$organizerRevenue' } } },
+    ]);
+
+    const totalRevenue = revenueResult[0]?.totalRevenue || 0;
+    const totalRefunded = refundedResult[0]?.totalRefunded || 0;
+
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5);
+    sixMonthsAgo.setDate(1);
+    sixMonthsAgo.setHours(0, 0, 0, 0);
+
+    const bookings = await BookingModel.find({
+      eventId: { $in: eventIds },
+      status: 'CONFIRMED',
+      createdAt: { $gte: sixMonthsAgo },
+    });
+
+    const trend: ManagerStatsResult['trend'] = [];
+    const now = new Date();
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      trend.push({
+        year: d.getFullYear(),
+        month: d.getMonth(),
+        label: d.toLocaleString('default', { month: 'short' }),
+        revenue: 0,
+        bookingsCount: 0,
+      });
+    }
+
+    for (const booking of bookings) {
+      const bDate = new Date(booking.createdAt);
+      const m = trend.find(
+        (x) => x.year === bDate.getFullYear() && x.month === bDate.getMonth(),
+      );
+      if (m) {
+        m.revenue += booking.organizerRevenue;
+        m.bookingsCount += 1;
+      }
+    }
+
+    for (const m of trend) {
+      m.revenue = Math.round(m.revenue);
+    }
+
+    const allBookings = await BookingModel.find({
+      eventId: { $in: eventIds },
+      status: 'CONFIRMED',
+    });
+
+    const eventDistribution = managerEvents
+      .map((event) => {
+        const eventBookings = allBookings.filter(
+          (b) => b.eventId.toString() === event._id.toString(),
+        );
+        const totalAmount = eventBookings.reduce(
+          (sum, b) => sum + b.organizerRevenue,
+          0,
+        );
+        const ticketsSold = eventBookings.reduce(
+          (sum, b) => sum + b.seats.length,
+          0,
+        );
+        return {
+          eventId: event._id.toString(),
+          title: event.title,
+          revenue: Math.round(totalAmount),
+          ticketsSold,
+        };
+      })
+      .sort((a, b) => b.revenue - a.revenue);
+
+    return {
+      totalEvents,
+      activeEvents,
+      totalBookings,
+      totalRevenue: Math.round(totalRevenue),
+      totalRefunded: Math.round(totalRefunded),
+      trend,
+      eventDistribution,
+    };
+  }
+
   async createEvent(event: Events, session?: IDbSession): Promise<Events> {
-    const isLive = event.status === EventStatus.LIVE;
     const mongoSession = session as unknown as mongoose.ClientSession;
-    const events = await super.create({
-      title: event.title,
-      description: event.description,
-      createdBy: new mongoose.Types.ObjectId(
-        event.createdBy,
-      ) as unknown as mongoose.Schema.Types.ObjectId,
-      endTime: event.endTime,
-      eventType: event.eventType,
-      location: event.location,
-      maxOnlineUsers: event.maxOnlineUsers,
-      picture: event.picture,
-      price: event.price,
-      startTime: event.startTime,
-      status: event.status,
-      isPublished: isLive,
-      publishedAt: isLive ? new Date() : undefined,
-    }, { session: mongoSession });
-    return this.toEntity(events);
+    
+    // Use the mapper to convert the domain entity to persistence format
+    const persistenceData = eventMapper.toPersistence(event);
+    
+    // Explicitly cast createdBy to ObjectId as was done previously
+    persistenceData.createdBy = new mongoose.Types.ObjectId(
+      event.createdBy
+    ) as unknown as mongoose.Schema.Types.ObjectId;
+
+    const events = await super.create(persistenceData, { session: mongoSession });
+    return eventMapper.toDomain(events as unknown as Record<string, unknown>);
   }
 
   async findAllEvents(
@@ -85,7 +193,7 @@ export class EventRepository
       this.model.countDocuments(query).exec(),
     ]);
 
-    const data = events.map((event) => this.toEntity(event));
+    const data = events.map((event) => eventMapper.toDomain(event as unknown as Record<string, unknown>));
 
     return {
       data,
@@ -104,7 +212,7 @@ export class EventRepository
       .populate('createdBy')
       .populate('seatLayoutId')
       .populate('seats');
-    return event ? this.toEntity(event) : null;
+    return event ? eventMapper.toDomain(event as unknown as Record<string, unknown>) : null;
   }
 
   async findExactConflict(
@@ -123,7 +231,7 @@ export class EventRepository
       .populate('createdBy')
       .populate('seatLayoutId')
       .populate('seats');
-    return events ? this.toEntity(events) : null;
+    return events ? eventMapper.toDomain(events as unknown as Record<string, unknown>) : null;
   }
 
   async findEvents(
@@ -156,7 +264,7 @@ export class EventRepository
       this.model.countDocuments(query).exec(),
     ]);
 
-    const data = events.map((event) => this.toEntity(event));
+    const data = events.map((event) => eventMapper.toDomain(event as unknown as Record<string, unknown>));
 
     return {
       data,
@@ -239,7 +347,7 @@ export class EventRepository
       new: true,
       session: mongoSession,
     });
-    return updated ? this.toEntity(updated) : null;
+    return updated ? eventMapper.toDomain(updated as unknown as Record<string, unknown>) : null;
   }
   async deleteEvent(id: string): Promise<boolean> {
     const result = await this.model.findByIdAndUpdate(id, {
@@ -264,7 +372,7 @@ export class EventRepository
       throw new Error('Event not found or not eligible for payment');
     }
 
-    return this.toEntity(event);
+    return eventMapper.toDomain(event as unknown as Record<string, unknown>);
   }
 
   async publishEvent(eventId: string): Promise<Events> {
@@ -278,7 +386,7 @@ export class EventRepository
         event.status === EventStatus.LIVE) &&
       event.isPublished
     ) {
-      return this.toEntity(event); // Already published
+      return eventMapper.toDomain(event as unknown as Record<string, unknown>); // Already published
     }
 
     event.status = EventStatus.ACTIVE;
@@ -287,67 +395,8 @@ export class EventRepository
       event.publishedAt = new Date();
     }
     const updated = await event.save();
-    return this.toEntity(updated);
+    return eventMapper.toDomain(updated as unknown as Record<string, unknown>);
   }
 
-  private toEntity(
-    manager:
-      | IEventDocument
-      | mongoose.HydratedDocument<IEventDocument>
-      | Record<string, unknown>,
-  ): Events {
-    const doc = manager as Record<string, unknown>;
-    let createdById: string;
-    let creatorDetails: User | undefined;
 
-    if (doc.createdBy && typeof doc.createdBy === 'object') {
-      const c = doc.createdBy as Record<string, unknown>;
-      createdById =
-        (c._id as mongoose.Types.ObjectId)?.toString() || c.toString();
-      creatorDetails = doc.createdBy as User;
-    } else {
-      createdById = doc.createdBy?.toString() || '';
-    }
-
-    let seatLayoutId: string = '';
-    let seatLayoutDetails: Record<string, unknown> | undefined = undefined;
-
-    if (doc.seatLayoutId && typeof doc.seatLayoutId === 'object') {
-      const s = doc.seatLayoutId as Record<string, unknown>;
-      seatLayoutId =
-        (s._id as mongoose.Types.ObjectId)?.toString() || s.toString();
-      seatLayoutDetails = s;
-    } else {
-      seatLayoutId = doc.seatLayoutId?.toString() || '';
-      seatLayoutDetails = doc.seatLayoutId as
-        | Record<string, unknown>
-        | undefined;
-    }
-
-    return new Events(
-      (doc._id as mongoose.Types.ObjectId)?.toString() || null,
-      doc.title as string,
-      doc.description as string,
-      doc.eventType as IEventDocument['eventType'],
-      doc.startTime as Date,
-      doc.endTime as Date,
-      doc.location && (doc.location as { type?: string }).type
-        ? (doc.location as Events['location'])
-        : undefined,
-      doc.maxOnlineUsers as number | undefined,
-      Number(doc.price || 0),
-      createdById,
-      doc.status as EventStatus,
-      doc.picture as string,
-      creatorDetails,
-      seatLayoutId,
-      seatLayoutDetails as Events['SeatLayout'],
-      doc.seats as Record<string, unknown>[] | undefined,
-      Boolean(doc.isPublished),
-      Boolean(doc.isDeleted),
-      doc.deletedAt as Date | undefined,
-      doc.bookedTickets as number | undefined,
-      doc.publishedAt as Date | undefined,
-    );
-  }
 }

@@ -19,6 +19,8 @@ import { GetAllPaymentsUseCase } from '../application/usecases/payment/getAllPay
 
 import { MongoTransactionManager } from '../infrastructure/services/mongotransation.service';
 
+import { GetDashboardStatsUseCase } from '../application/usecases/admin/dashboardStats/dashboardstats.usecase';
+
 export const makeAdminController = () => {
   const adminRepository = new AdminRepository();
   const userRepository = new UserRepository();
@@ -48,6 +50,7 @@ export const makeAdminController = () => {
   );
   const managerDetailsUseCase = new ManagerDetailsUseCase(managerRepository);
   const getAllPaymentsUseCase = new GetAllPaymentsUseCase(paymentRepository);
+  const getDashboardStatsUseCase = new GetDashboardStatsUseCase(adminRepository);
 
   return new AdminController(
     findAllUseCase,
@@ -58,5 +61,6 @@ export const makeAdminController = () => {
     managerRejectionUseCase,
     managerDetailsUseCase,
     getAllPaymentsUseCase,
+    getDashboardStatsUseCase,
   );
 };

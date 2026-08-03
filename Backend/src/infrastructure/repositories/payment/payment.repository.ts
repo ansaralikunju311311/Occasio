@@ -9,24 +9,14 @@ import type { IPaymentDocument } from '../../database/model/payment/payment.mode
 import { Payment } from '../../../domain/entities/payment.entity';
 import { PaymentModel } from '../../database/model/payment/payment.model';
 import { BookingModel } from '../../database/model/booking.model';
+import { paymentMapper } from '../../../common/mappers/payment.mapper';
 
 export class PaymentRepository implements IPaymentRepository {
   async savePayment(payment: Payment): Promise<Payment> {
-    const paymentDoc = new PaymentModel({
-      userId: payment.userId,
-      purpose: payment.purpose,
-      eventId: payment.eventId,
-      bookingId: payment.bookingId,
-      amount: payment.amount,
-      currency: payment.currency,
-      paymentMethod: payment.paymentMethod,
-      paymentStatus: payment.paymentStatus,
-      transactionId: payment.transactionId,
-      paidAt: payment.paidAt,
-    });
+    const paymentDoc = new PaymentModel(paymentMapper.toPersistence(payment));
 
     const saved = await paymentDoc.save();
-    return this.toEntity(saved);
+    return paymentMapper.toDomain(saved.toObject() as unknown as Record<string, unknown>);
   }
 
   async getAllPayments(
@@ -51,7 +41,7 @@ export class PaymentRepository implements IPaymentRepository {
       PaymentModel.countDocuments(query).exec(),
     ]);
 
-    const mappedData = payments.map((rawDoc) => this.toEntity(rawDoc));
+    const mappedData = payments.map((rawDoc) => paymentMapper.toDomain(rawDoc.toObject() as unknown as Record<string, unknown>));
 
     return {
       data: mappedData,
@@ -64,55 +54,7 @@ export class PaymentRepository implements IPaymentRepository {
     };
   }
 
-  private toEntity(doc: IPaymentDocument): Payment {
-    const raw = doc as any;
-    
-    let userId = '';
-    let userDetails: any = undefined;
-    if (raw.userId) {
-      if (typeof raw.userId === 'object' && raw.userId._id) {
-        userId = raw.userId._id.toString();
-        userDetails = {
-          name: raw.userId.name || '',
-          email: raw.userId.email || '',
-          picture: raw.userId.picture,
-        };
-      } else {
-        userId = raw.userId.toString();
-      }
-    }
 
-    let eventId: string | undefined = undefined;
-    let eventDetails: any = undefined;
-    if (raw.eventId) {
-      if (typeof raw.eventId === 'object' && raw.eventId._id) {
-        eventId = raw.eventId._id.toString();
-        eventDetails = {
-          title: raw.eventId.title || '',
-        };
-      } else {
-        eventId = raw.eventId.toString();
-      }
-    }
-
-    return new Payment(
-      raw._id?.toString() || null,
-      userId,
-      raw.purpose,
-      raw.amount,
-      raw.currency,
-      raw.paymentMethod,
-      raw.paymentStatus,
-      raw.transactionId,
-      eventId,
-      raw.bookingId?.toString(),
-      raw.paidAt,
-      raw.createdAt,
-      raw.updatedAt,
-      userDetails,
-      eventDetails,
-    );
-  }
 
   async getOnlineBookedCount(eventId: string): Promise<number> {
     return await BookingModel.countDocuments({
@@ -127,7 +69,7 @@ export class PaymentRepository implements IPaymentRepository {
       bookingId,
       paymentStatus: 'SUCCESS',
     });
-    return doc ? this.toEntity(doc) : null;
+    return doc ? paymentMapper.toDomain(doc.toObject() as unknown as Record<string, unknown>) : null;
   }
 
   async getWalletHistory(
@@ -153,7 +95,7 @@ export class PaymentRepository implements IPaymentRepository {
       PaymentModel.countDocuments(query).exec(),
     ]);
 
-    const mappedData = payments.map((rawDoc) => this.toEntity(rawDoc));
+    const mappedData = payments.map((rawDoc) => paymentMapper.toDomain(rawDoc.toObject() as unknown as Record<string, unknown>));
 
     return {
       data: mappedData,

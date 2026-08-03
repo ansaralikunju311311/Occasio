@@ -8,6 +8,7 @@ import { EventType } from '../../../../common/enums/event-type';
 import { getLocationName } from '../../../../common/services/location.service';
 import { normalizeCoordinates } from '../../../../common/utils/geo.utils';
 
+import type { Events } from '../../../../domain/entities/event.entity';
 import type { IUpdateEventUseCase } from './updatevent.usecase.interface';
 
 export class UpdateEventUseCase implements IUpdateEventUseCase {
@@ -87,7 +88,7 @@ export class UpdateEventUseCase implements IUpdateEventUseCase {
 
       await this._eventRepository.updateEvent(
         eventId,
-        data as any,
+        data as Partial<Events> & { layout?: unknown },
         session,
         unsetData,
       );

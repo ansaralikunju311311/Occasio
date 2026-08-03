@@ -16,6 +16,8 @@ import { MongoTransactionManager } from '../infrastructure/services/mongotransat
 import { socketService } from '../infrastructure/services/socket.service';
 import { RazorpayGateway } from '../infrastructure/services/payment/razorpay.gateway';
 
+import { GetManagerStatsUseCase } from '../application/usecases/events/managerstats/managerstats.usecase';
+
 export const MakeEventController = () => {
   const eventRepository = new EventRepository();
   const bookingRepository = new BookingRepository();
@@ -57,6 +59,7 @@ export const MakeEventController = () => {
     bookingRepository,
     socketService,
   );
+  const getManagerStatsUseCase = new GetManagerStatsUseCase(eventRepository);
 
   return new EventController(
     eventCretionUseCase,
@@ -66,5 +69,6 @@ export const MakeEventController = () => {
     updateEventsUseCase,
     deleteEventUseCase,
     startEventUseCase,
+    getManagerStatsUseCase,
   );
 };

@@ -5,6 +5,27 @@ import type {
   PaginatedResponse,
 } from '../../../common/interfaces/pagination.interface';
 
+export interface ManagerStatsResult {
+  totalEvents: number;
+  activeEvents: number;
+  totalBookings: number;
+  totalRevenue: number;
+  totalRefunded: number;
+  trend: Array<{
+    year: number;
+    month: number;
+    label: string;
+    revenue: number;
+    bookingsCount: number;
+  }>;
+  eventDistribution: Array<{
+    eventId: string;
+    title: string;
+    revenue: number;
+    ticketsSold: number;
+  }>;
+}
+
 export interface IEventRepository {
   createEvent(event: Events, session?: IDbSession): Promise<Events>;
   createSeatLayout(
@@ -56,4 +77,5 @@ export interface IEventRepository {
 
   validateOwnershipAndDraft(eventId: string, userId: string): Promise<Events>;
   publishEvent(eventId: string): Promise<Events>;
+  getManagerStats(managerId: string): Promise<ManagerStatsResult>;
 }

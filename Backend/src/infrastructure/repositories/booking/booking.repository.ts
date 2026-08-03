@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-import type { IBookingRepository } from '../../../domain/repositories/booking/booking.repository.interface';
+import type { IBookingRepository, RefundInfoResult } from '../../../domain/repositories/booking/booking.repository.interface';
 import { Booking } from '../../../domain/entities/booking.entity';
 import { BookingModel } from '../../database/model/booking.model';
 import type {
@@ -12,33 +12,25 @@ import type {
   IBookingDocument,
   BookingStatus,
 } from '../../database/model/booking.model';
+import { bookingMapper } from '../../../common/mappers/booking.mapper';
+import { calculateRefundPercentage } from '../../../common/utils/refund';
 
 export class BookingRepository implements IBookingRepository {
   async saveBooking(booking: Booking): Promise<Booking> {
-    const bookingDoc = new BookingModel({
-      userId: booking.userId,
-      eventId: booking.eventId,
-      seats: booking.seats,
-      bookingType: booking.bookingType,
-      totalAmount: booking.totalAmount,
-      commissionAmount: booking.commissionAmount,
-      organizerRevenue: booking.organizerRevenue,
-      status: booking.status,
-      paymentId: booking.paymentId,
-    });
+    const bookingDoc = new BookingModel(bookingMapper.toPersistence(booking));
 
     const saved = await bookingDoc.save();
-    return this.toEntity(saved);
+    return bookingMapper.toDomain(saved as unknown as Record<string, unknown>);
   }
 
   async findBookingById(id: string): Promise<Booking | null> {
     const doc = await BookingModel.findById(id).populate('eventId');
-    return doc ? this.toEntity(doc) : null;
+    return doc ? bookingMapper.toDomain(doc as unknown as Record<string, unknown>) : null;
   }
 
   async findBookingByPaymentId(paymentId: string): Promise<Booking | null> {
     const doc = await BookingModel.findOne({ paymentId }).populate('eventId');
-    return doc ? this.toEntity(doc) : null;
+    return doc ? bookingMapper.toDomain(doc as unknown as Record<string, unknown>) : null;
   }
 
   async updateBookingStatus(
@@ -50,7 +42,7 @@ export class BookingRepository implements IBookingRepository {
       { status },
       { new: true },
     );
-    return updated ? this.toEntity(updated) : null;
+    return updated ? bookingMapper.toDomain(updated as unknown as Record<string, unknown>) : null;
   }
 
   async getBookingsByUser(
@@ -71,7 +63,7 @@ export class BookingRepository implements IBookingRepository {
       BookingModel.countDocuments(query).exec(),
     ]);
 
-    const data = bookings.map((b) => this.toEntity(b));
+    const data = bookings.map((b) => bookingMapper.toDomain(b as unknown as Record<string, unknown>));
 
     return {
       data,
@@ -102,7 +94,7 @@ export class BookingRepository implements IBookingRepository {
       BookingModel.countDocuments(query).exec(),
     ]);
 
-    const data = bookings.map((b) => this.toEntity(b));
+    const data = bookings.map((b) => bookingMapper.toDomain(b as unknown as Record<string, unknown>));
 
     return {
       data,
@@ -141,7 +133,7 @@ export class BookingRepository implements IBookingRepository {
       BookingModel.countDocuments(query).exec(),
     ]);
 
-    const data = bookings.map((b) => this.toEntity(b));
+    const data = bookings.map((b) => bookingMapper.toDomain(b as unknown as Record<string, unknown>));
 
     return {
       data,
@@ -154,37 +146,6 @@ export class BookingRepository implements IBookingRepository {
     };
   }
 
-  private toEntity(
-    doc:
-      | IBookingDocument
-      | mongoose.HydratedDocument<IBookingDocument>
-      | Record<string, unknown>,
-  ): Booking {
-    const d = doc as Record<string, unknown>;
-    const userIdStr =
-      (d.userId as mongoose.Types.ObjectId)?.toString() ||
-      String(d.userId || '');
-    const eventIdStr =
-      (d.eventId as mongoose.Types.ObjectId)?.toString() ||
-      String(d.eventId || '');
-    return new Booking(
-      (d._id as mongoose.Types.ObjectId)?.toString() ||
-        (d.id as string) ||
-        null,
-      userIdStr,
-      eventIdStr,
-      (d.seats as string[]) || [],
-      d.bookingType as 'physical' | 'online',
-      Number(d.totalAmount || 0),
-      Number(d.commissionAmount || 0),
-      Number(d.organizerRevenue || 0),
-      d.status as BookingStatus,
-      d.paymentId as string | undefined,
-      d.qrCodeData as string | undefined,
-      (d.createdAt as Date) || new Date(),
-      (d.updatedAt as Date) || new Date(),
-    );
-  }
 
   async getOnlineBookedCount(eventId: string): Promise<number> {
     return await BookingModel.countDocuments({
@@ -217,7 +178,7 @@ export class BookingRepository implements IBookingRepository {
     }
 
     const docs = await BookingModel.find(filter);
-    return docs.map((doc) => this.toEntity(doc));
+    return docs.map((doc) => bookingMapper.toDomain(doc as unknown as Record<string, unknown>));
   }
   async hasBookings(eventId: string): Promise<boolean> {
     const count = await BookingModel.countDocuments({
@@ -225,5 +186,66 @@ export class BookingRepository implements IBookingRepository {
       status: { $in: ['CONFIRMED', 'PENDING'] },
     });
     return count > 0;
+  }
+
+  async getRefundInfo(
+    bookingId: string,
+    userId: string,
+  ): Promise<RefundInfoResult> {
+    const booking = await BookingModel.findById(bookingId).populate('eventId');
+    if (!booking) {
+      throw new Error('Booking not found');
+    }
+
+    if (String(booking.userId) !== String(userId)) {
+      throw new Error('Booking does not belong to this user');
+    }
+
+    const event = booking.eventId as unknown as {
+      startTime: Date;
+      publishedAt?: Date;
+    };
+    if (!event) {
+      throw new Error('Associated event not found');
+    }
+
+    const today = new Date();
+    const startTime = new Date(event.startTime);
+    const isStarted = today > startTime;
+
+    let refundPercentage = 0;
+    let eligible = false;
+    let message = '';
+
+    if (isStarted) {
+      eligible = false;
+      message = 'Cannot cancel booking after the event has started.';
+    } else {
+      refundPercentage = calculateRefundPercentage(
+        event.publishedAt,
+        event.startTime,
+        today,
+      );
+      if (refundPercentage === 0) {
+        eligible = false;
+        message =
+          'Cancellation is not available less than 24 hours before the event starts.';
+      } else {
+        eligible = true;
+        message = 'Eligible for cancellation.';
+      }
+    }
+
+    const refundAmount = Math.round(
+      (booking.totalAmount * refundPercentage) / 100,
+    );
+
+    return {
+      eligible,
+      refundPercentage,
+      refundAmount,
+      totalAmount: booking.totalAmount,
+      message,
+    };
   }
 }

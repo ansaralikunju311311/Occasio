@@ -4,6 +4,14 @@ import type {
   PaginatedResponse,
 } from '../../../common/interfaces/pagination.interface';
 
+export interface RefundInfoResult {
+  eligible: boolean;
+  refundPercentage: number;
+  refundAmount: number;
+  totalAmount: number;
+  message: string;
+}
+
 export interface IBookingRepository {
   saveBooking(booking: Booking): Promise<Booking>;
   findBookingById(id: string): Promise<Booking | null>;
@@ -24,4 +32,5 @@ export interface IBookingRepository {
   getOnlineBookedCount(eventId: string): Promise<number>;
   findConfirmedBookingsByEventId(eventId: string): Promise<Booking[]>;
   hasBookings(eventId: string): Promise<boolean>;
+  getRefundInfo(bookingId: string, userId: string): Promise<RefundInfoResult>;
 }

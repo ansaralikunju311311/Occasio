@@ -7,6 +7,7 @@ import {
   ManagerSubscriptionModel,
   type IManagerSubscriptionDocument,
 } from '../../database/model/manager-subscription.model';
+import { managerSubscriptionMapper } from '../../../common/mappers/manager-subscription.mapper';
 
 export class ManagerSubscriptionRepository implements IManagerSubscriptionRepository {
   async create(
@@ -16,30 +17,22 @@ export class ManagerSubscriptionRepository implements IManagerSubscriptionReposi
     const mongoSession = session as unknown as mongoose.ClientSession;
     const createdDocs = await ManagerSubscriptionModel.create(
       [
-        {
-          userId: subscription.userId as unknown as mongoose.Types.ObjectId,
-          plan: subscription.plan,
-          status: subscription.status,
-          eventLimit: subscription.eventLimit,
-          eventsUsed: subscription.eventsUsed,
-          startDate: subscription.startDate,
-          endDate: subscription.endDate,
-        },
+        managerSubscriptionMapper.toPersistence(subscription),
       ],
       { session: mongoSession },
     );
 
-    return this._toEntity(createdDocs[0]);
+    return managerSubscriptionMapper.toDomain(createdDocs[0].toObject() as unknown as Record<string, unknown>);
   }
 
   async findById(id: string): Promise<ManagerSubscription | null> {
     const doc = await ManagerSubscriptionModel.findById(id).exec();
-    return doc ? this._toEntity(doc) : null;
+    return doc ? managerSubscriptionMapper.toDomain(doc.toObject() as unknown as Record<string, unknown>) : null;
   }
 
   async findByUserId(userId: string): Promise<ManagerSubscription[]> {
     const docs = await ManagerSubscriptionModel.find({ userId }).exec();
-    return docs.map((doc) => this._toEntity(doc));
+    return docs.map((doc) => managerSubscriptionMapper.toDomain(doc.toObject() as unknown as Record<string, unknown>));
   }
 
   async update(
@@ -55,28 +48,8 @@ export class ManagerSubscriptionRepository implements IManagerSubscriptionReposi
       mappedUpdateData,
       { new: true, session: mongoSession },
     ).exec();
-    return doc ? this._toEntity(doc) : null;
+    return doc ? managerSubscriptionMapper.toDomain(doc.toObject() as unknown as Record<string, unknown>) : null;
   }
 
-  private _toEntity(
-    doc:
-      | IManagerSubscriptionDocument
-      | mongoose.HydratedDocument<IManagerSubscriptionDocument>
-      | Record<string, unknown>,
-  ): ManagerSubscription {
-    const d = doc as Record<string, unknown>;
-    return new ManagerSubscription(
-      (d._id as mongoose.Types.ObjectId)?.toString() || (d.id as string) || '',
-      (d.userId as mongoose.Types.ObjectId)?.toString() ||
-        String(d.userId || ''),
-      d.plan as ManagerSubscription['plan'],
-      d.status as ManagerSubscription['status'],
-      Number(d.eventLimit || 0),
-      Number(d.eventsUsed || 0),
-      d.startDate as Date,
-      d.endDate as Date,
-      d.createdAt as Date,
-      d.updatedAt as Date,
-    );
-  }
+
 }

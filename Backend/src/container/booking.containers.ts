@@ -11,6 +11,8 @@ import { QrCode } from '../common/services/qrcode.service';
 import { BookingController } from '../presentation/controllers/booking.controller';
 import { MongoTransactionManager } from '../infrastructure/services/mongotransation.service';
 import { CancelBooking } from '../application/usecases/booking/cancelbooking/cancelbooking.usecase';
+import { GetRefundInfoUseCase } from '../application/usecases/booking/getrefundinfo/getrefundinfo.usecase';
+
 export const makebookingController = () => {
   const eventRepository = new EventRepository();
   const seatRepository = new SeatRepository();
@@ -40,6 +42,7 @@ export const makebookingController = () => {
     userRepository,
     paymentRepository,
   );
+  const getRefundInfoUseCase = new GetRefundInfoUseCase(bookingRepository);
 
   return new BookingController(
     lockSeatsUseCase,
@@ -47,5 +50,6 @@ export const makebookingController = () => {
     confirmBookingUseCase,
     failBookingUseCase,
     cancelBookingUseCase,
+    getRefundInfoUseCase,
   );
 };

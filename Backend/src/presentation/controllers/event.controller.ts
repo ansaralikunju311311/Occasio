@@ -1,11 +1,7 @@
 import type { Request, Response } from 'express-serve-static-core';
-import mongoose from 'mongoose';
 
 import { HttpStatus } from '../../common/constants/http-status';
 import { UserRole } from '../../common/enums/userrole-enum';
-import type { EventType } from '../../common/enums/event-type';
-import type { EventDto } from '../../application/dtos/event.dto';
-import type { UpdateEventDTO } from '../../application/dtos/updateevent.dto';
 import type { IEventCreationUseCase } from '../../application/usecases/events/eventcreation/eventcreation.usecase.interface';
 import type { IGetEventsUseCase } from '../../application/usecases/events/getEvents/getEvents.usecase.interface';
 import type { IEventDetailsUseCase } from '../../application/usecases/events/eventdetails/eventdetails.usecase.interface';
@@ -15,8 +11,8 @@ import type { IDeleteEventUseCase } from '../../application/usecases/events/dele
 import type { IUpdateEventUseCase } from '../../application/usecases/events/updatevent/updatevent.usecase.interface';
 import type { IStartEventUseCase } from '../../application/usecases/events/startevent/startevent.usecase.interface';
 import { sendSuccess } from '../../common/utils/response';
-import { EventModel } from '../../infrastructure/database/model/events/event.model';
-import { BookingModel } from '../../infrastructure/database/model/booking.model';
+import type { IGetManagerStatsUseCase } from '../../application/usecases/events/managerstats/managerstats.usecase.interface';
+import { EventDtoMapper } from '../../common/mappers/event-dto.mapper';
 
 export class EventController {
   constructor(
@@ -27,6 +23,7 @@ export class EventController {
     private _updateEventsUseCase: IUpdateEventUseCase,
     private _deleteEventUseCase: IDeleteEventUseCase,
     private _startEventUseCase: IStartEventUseCase,
+    private _getManagerStatsUseCase: IGetManagerStatsUseCase,
   ) {}
 
   eventCreation = catchAsync(async (req: Request, res: Response) => {
@@ -36,24 +33,7 @@ export class EventController {
       return;
     }
 
-    const dto: EventDto = {
-      title: req.body.title as string,
-      description: req.body.description as string,
-      picture: req.body.picture as string,
-      eventType: req.body.eventType as EventType,
-      startTime: new Date(req.body.startTime as string),
-      endTime: new Date(req.body.endTime as string),
-      price: Number(req.body.price),
-      isSeatLayoutEnabled: Boolean(req.body.isSeatLayoutEnabled),
-      maxOnlineUsers:
-        req.body.maxOnlineUsers !== undefined &&
-        req.body.maxOnlineUsers !== null
-          ? Number(req.body.maxOnlineUsers)
-          : undefined,
-      address: req.body.address as string | undefined,
-      layout: req.body.layout,
-    };
-
+    const dto = EventDtoMapper.fromRequest(req.body);
     const creation = await this._eventCreationUseCase.execute(dto, userId);
 
     sendSuccess(res, creation, undefined, HttpStatus.CREATED, { creation });
@@ -125,38 +105,7 @@ export class EventController {
       return;
     }
 
-    const dto: UpdateEventDTO = {};
-    if (req.body.title !== undefined) {
-      dto.title = req.body.title as string;
-    }
-    if (req.body.description !== undefined) {
-      dto.description = req.body.description as string;
-    }
-    if (req.body.picture !== undefined) {
-      dto.picture = req.body.picture as string;
-    }
-    if (req.body.eventType !== undefined) {
-      dto.eventType = req.body.eventType as EventType;
-    }
-    if (req.body.startTime !== undefined) {
-      dto.startTime = new Date(req.body.startTime as string);
-    }
-    if (req.body.endTime !== undefined) {
-      dto.endTime = new Date(req.body.endTime as string);
-    }
-    if (req.body.price !== undefined) {
-      dto.price = Number(req.body.price);
-    }
-    if (req.body.maxOnlineUsers !== undefined) {
-      dto.maxOnlineUsers = Number(req.body.maxOnlineUsers);
-    }
-    if (req.body.location !== undefined) {
-      dto.location = req.body.location;
-    }
-    if (req.body.layout !== undefined) {
-      dto.layout = req.body.layout;
-    }
-
+    const dto = EventDtoMapper.toUpdateDto(req.body);
     const result = await this._updateEventsUseCase.execute(id, managerId, dto);
     sendSuccess(res, result, undefined, HttpStatus.OK, { data: result });
   });
@@ -174,127 +123,8 @@ export class EventController {
       return;
     }
 
-    const managerObjId = new mongoose.Types.ObjectId(managerId);
-
-    // Get manager events
-    const totalEvents = await EventModel.countDocuments({
-      createdBy: managerObjId,
-    });
-    const activeEvents = await EventModel.countDocuments({
-      createdBy: managerObjId,
-      status: 'LIVE',
-    });
-
-    // Aggregate booking counts & organizer revenue for manager's events
-    const managerEvents = await EventModel.find(
-      { createdBy: managerObjId },
-      '_id title',
-    );
-    const eventIds = managerEvents.map((e) => e._id);
-
-    const totalBookings = await BookingModel.countDocuments({
-      eventId: { $in: eventIds },
-      status: 'CONFIRMED',
-    });
-
-    const revenueResult = await BookingModel.aggregate([
-      { $match: { eventId: { $in: eventIds }, status: 'CONFIRMED' } },
-      { $group: { _id: null, totalRevenue: { $sum: '$organizerRevenue' } } },
-    ]);
-
-    const refundedResult = await BookingModel.aggregate([
-      { $match: { eventId: { $in: eventIds }, status: 'CANCELLED' } },
-      { $group: { _id: null, totalRefunded: { $sum: '$organizerRevenue' } } },
-    ]);
-
-    const totalRevenue = revenueResult[0]?.totalRevenue || 0;
-    const totalRefunded = refundedResult[0]?.totalRefunded || 0;
-
-    // Aggregate monthly trends for the last 6 months
-    const sixMonthsAgo = new Date();
-    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5);
-    sixMonthsAgo.setDate(1);
-    sixMonthsAgo.setHours(0, 0, 0, 0);
-
-    const bookings = await BookingModel.find({
-      eventId: { $in: eventIds },
-      status: 'CONFIRMED',
-      createdAt: { $gte: sixMonthsAgo },
-    });
-
-    const trend: {
-      year: number;
-      month: number;
-      label: string;
-      revenue: number;
-      bookingsCount: number;
-    }[] = [];
-    const now = new Date();
-    for (let i = 5; i >= 0; i--) {
-      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      trend.push({
-        year: d.getFullYear(),
-        month: d.getMonth(),
-        label: d.toLocaleString('default', { month: 'short' }),
-        revenue: 0,
-        bookingsCount: 0,
-      });
-    }
-
-    for (const booking of bookings) {
-      const bDate = new Date(booking.createdAt);
-      const m = trend.find(
-        (x) => x.year === bDate.getFullYear() && x.month === bDate.getMonth(),
-      );
-      if (m) {
-        m.revenue += booking.organizerRevenue;
-        m.bookingsCount += 1;
-      }
-    }
-
-    for (const m of trend) {
-      m.revenue = Math.round(m.revenue);
-    }
-
-    // Calculate event distribution (all-time confirmed bookings performance)
-    const allBookings = await BookingModel.find({
-      eventId: { $in: eventIds },
-      status: 'CONFIRMED',
-    });
-
-    const eventDistribution = managerEvents
-      .map((event) => {
-        const eventBookings = allBookings.filter(
-          (b) => b.eventId.toString() === event._id.toString(),
-        );
-        const totalAmount = eventBookings.reduce(
-          (sum, b) => sum + b.organizerRevenue,
-          0,
-        );
-        const ticketsSold = eventBookings.reduce(
-          (sum, b) => sum + b.seats.length,
-          0,
-        );
-        return {
-          eventId: event._id,
-          title: event.title,
-          revenue: Math.round(totalAmount),
-          ticketsSold,
-        };
-      })
-      .sort((a, b) => b.revenue - a.revenue);
-
-    sendSuccess(res, undefined, undefined, HttpStatus.OK, {
-      stats: {
-        totalEvents,
-        activeEvents,
-        totalBookings,
-        totalRevenue: Math.round(totalRevenue),
-        totalRefunded: Math.round(totalRefunded),
-        trend,
-        eventDistribution,
-      },
-    });
+    const stats = await this._getManagerStatsUseCase.execute(managerId);
+    sendSuccess(res, undefined, undefined, HttpStatus.OK, { stats });
   });
 
   startEvent = catchAsync(async (req: Request, res: Response) => {

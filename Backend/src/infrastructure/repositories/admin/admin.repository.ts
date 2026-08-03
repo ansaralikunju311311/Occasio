@@ -1,17 +1,22 @@
 import type mongoose from 'mongoose';
 
-import { User } from '../../../domain/entities/user.entity';
-import type { IAdminRepository } from '../../../domain/repositories/admin/admin.repository.interface';
+import type { User } from '../../../domain/entities/user.entity';
+import type { DashboardStatsResult, IAdminRepository } from '../../../domain/repositories/admin/admin.repository.interface';
 import { UserModel, type IUserDocument } from '../../database/model/user.model';
 import type {
   PaginationParams,
   PaginatedResponse,
 } from '../../../common/interfaces/pagination.interface';
-import { EventManager } from '../../../domain/entities/manager.entity';
+import type { EventManager } from '../../../domain/entities/manager.entity';
 import {
   EventManagerModel,
   type IEventManagerDocument,
 } from '../../database/model/manager.model';
+import { userMapper } from '../../../common/mappers/user.mapper';
+import { managerMapper } from '../../../common/mappers/manager.mapper';
+import { EventModel } from '../../database/model/events/event.model';
+import { BookingModel } from '../../database/model/booking.model';
+import { PaymentModel } from '../../database/model/payment/payment.model';
 
 export class AdminRepository implements IAdminRepository {
   async findAllUser(
@@ -57,19 +62,7 @@ export class AdminRepository implements IAdminRepository {
     }
 
     const data = users.map(
-      (user) =>
-        new User(
-          user._id.toString(),
-          user.name,
-          user.email,
-          user.password,
-          user.role,
-          user.status,
-          user.isVerified,
-          user.applyingupgrade,
-          user.rejectedAt,
-          user.reapplyAt,
-        ),
+      (user) => userMapper.toDomain(user as unknown as Record<string, unknown>)
     );
 
     return {
@@ -88,19 +81,7 @@ export class AdminRepository implements IAdminRepository {
     if (!user) {
       return null;
     }
-    return new User(
-      user._id.toString(),
-      user.name,
-      user.email,
-      user.password,
-      user.role,
-      user.status,
-      user.isVerified,
-
-      user.applyingupgrade,
-      user.rejectedAt,
-      user.reapplyAt,
-    );
+    return userMapper.toDomain(user as unknown as Record<string, unknown>);
   }
 
   async findByuserId(
@@ -119,17 +100,130 @@ export class AdminRepository implements IAdminRepository {
       return null;
     }
 
-    return new EventManager(
-      manager._id.toString(),
-      manager.userId.toString(),
-      manager.fullName,
-      manager.organizationName,
-      manager.aboutEvents,
-      manager.certificate,
-      manager.documentReference,
-      manager.experienceLevel,
-      manager.socialLinks,
-      manager.organizationType,
+    return managerMapper.toDomain(manager as unknown as Record<string, unknown>);
+  }
+
+  async getDashboardStats(): Promise<DashboardStatsResult> {
+    const totalUsers = await UserModel.countDocuments();
+    const eventManagers = await UserModel.countDocuments({
+      role: 'EVENT_MANAGER',
+    });
+    const activeEvents = await EventModel.countDocuments({ status: 'LIVE' });
+
+    const bookingCommissions = await BookingModel.aggregate([
+      { $match: { status: 'CONFIRMED' } },
+      { $group: { _id: null, total: { $sum: '$commissionAmount' } } },
+    ]);
+
+    const subscriptionFees = await PaymentModel.aggregate([
+      { $match: { purpose: 'SUBSCRIPTION', paymentStatus: 'SUCCESS' } },
+      { $group: { _id: null, total: { $sum: '$amount' } } },
+    ]);
+
+    const publishingFees = await PaymentModel.aggregate([
+      { $match: { purpose: 'EVENT_PUBLISH', paymentStatus: 'SUCCESS' } },
+      { $group: { _id: null, total: { $sum: '$amount' } } },
+    ]);
+
+    const commissionRevenue = bookingCommissions[0]?.total || 0;
+    const subscriptionRevenue = subscriptionFees[0]?.total || 0;
+    const publishingRevenue = publishingFees[0]?.total || 0;
+    const totalRevenue =
+      commissionRevenue + subscriptionRevenue + publishingRevenue;
+
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5);
+    sixMonthsAgo.setDate(1);
+    sixMonthsAgo.setHours(0, 0, 0, 0);
+
+    const payments = await PaymentModel.find({
+      paymentStatus: 'SUCCESS',
+      createdAt: { $gte: sixMonthsAgo },
+    });
+
+    const bookings = await BookingModel.find({
+      status: 'CONFIRMED',
+      createdAt: { $gte: sixMonthsAgo },
+    });
+
+    const users = await UserModel.find(
+      { createdAt: { $gte: sixMonthsAgo } },
+      'createdAt role',
     );
+
+    const trend: DashboardStatsResult['trend'] = [];
+    const now = new Date();
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      trend.push({
+        year: d.getFullYear(),
+        month: d.getMonth(),
+        label: d.toLocaleString('default', { month: 'short' }),
+        subscription: 0,
+        publishing: 0,
+        commission: 0,
+        total: 0,
+        users: 0,
+        managers: 0,
+      });
+    }
+
+    for (const payment of payments) {
+      const pDate = new Date(payment.createdAt);
+      const m = trend.find(
+        (x) => x.year === pDate.getFullYear() && x.month === pDate.getMonth(),
+      );
+      if (m) {
+        if (payment.purpose === 'SUBSCRIPTION') {
+          m.subscription += payment.amount;
+        } else if (payment.purpose === 'EVENT_PUBLISH') {
+          m.publishing += payment.amount;
+        }
+      }
+    }
+
+    for (const booking of bookings) {
+      const bDate = new Date(booking.createdAt);
+      const m = trend.find(
+        (x) => x.year === bDate.getFullYear() && x.month === bDate.getMonth(),
+      );
+      if (m) {
+        m.commission += booking.commissionAmount;
+      }
+    }
+
+    for (const user of users) {
+      const uDate = new Date(
+        (user as unknown as { createdAt: Date }).createdAt || Date.now(),
+      );
+      const m = trend.find(
+        (x) => x.year === uDate.getFullYear() && x.month === uDate.getMonth(),
+      );
+      if (m) {
+        if (user.role === 'EVENT_MANAGER') {
+          m.managers += 1;
+        } else {
+          m.users += 1;
+        }
+      }
+    }
+
+    for (const m of trend) {
+      m.subscription = Math.round(m.subscription);
+      m.publishing = Math.round(m.publishing);
+      m.commission = Math.round(m.commission);
+      m.total = m.subscription + m.publishing + m.commission;
+    }
+
+    return {
+      totalUsers,
+      eventManagers,
+      activeEvents,
+      commissionRevenue: Math.round(commissionRevenue),
+      subscriptionRevenue: Math.round(subscriptionRevenue),
+      publishingRevenue: Math.round(publishingRevenue),
+      totalRevenue: Math.round(totalRevenue),
+      trend,
+    };
   }
 }
