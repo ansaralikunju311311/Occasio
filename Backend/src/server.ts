@@ -1,5 +1,6 @@
 // import "../shared/config/env"
-import '../src/shared/loader/env';
+// import '../src/shared/loader/env';
+import './shared/loader/env';
 import { createServer } from 'http';
 
 import { Server } from 'socket.io';
