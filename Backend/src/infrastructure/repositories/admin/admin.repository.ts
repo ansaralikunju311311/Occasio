@@ -1,7 +1,10 @@
 import type mongoose from 'mongoose';
 
 import type { User } from '../../../domain/entities/user.entity';
-import type { DashboardStatsResult, IAdminRepository } from '../../../domain/repositories/admin/admin.repository.interface';
+import type {
+  DashboardStatsResult,
+  IAdminRepository,
+} from '../../../domain/repositories/admin/admin.repository.interface';
 import { UserModel, type IUserDocument } from '../../database/model/user.model';
 import type {
   PaginationParams,
@@ -61,8 +64,8 @@ export class AdminRepository implements IAdminRepository {
       };
     }
 
-    const data = users.map(
-      (user) => userMapper.toDomain(user as unknown as Record<string, unknown>)
+    const data = users.map((user) =>
+      userMapper.toDomain(user as unknown as Record<string, unknown>),
     );
 
     return {
@@ -100,7 +103,9 @@ export class AdminRepository implements IAdminRepository {
       return null;
     }
 
-    return managerMapper.toDomain(manager as unknown as Record<string, unknown>);
+    return managerMapper.toDomain(
+      manager as unknown as Record<string, unknown>,
+    );
   }
 
   async getDashboardStats(): Promise<DashboardStatsResult> {

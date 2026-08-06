@@ -2,7 +2,7 @@ import { BaseRepository } from '../base.repository';
 import type { IPlanDocument } from '../../database/model/subscription/plan.model';
 import { SubscriptionModel } from '../../database/model/subscription/plan.model';
 import type { ISubscriptionRepository } from '../../../domain/repositories/subscription/subscription.repository.interface';
-import { Subscription } from '../../../domain/entities/subscription.entity';
+import type { Subscription } from '../../../domain/entities/subscription.entity';
 import { subscriptionMapper } from '../../../common/mappers/plan.mapper';
 export class SubscriptionRepository
   extends BaseRepository<IPlanDocument>
@@ -14,7 +14,9 @@ export class SubscriptionRepository
 
   async createPlan(data: Subscription): Promise<Subscription> {
     const newPlan = await this.model.create(data);
-    return subscriptionMapper.toDomain(newPlan.toObject() as unknown as Record<string, unknown>);
+    return subscriptionMapper.toDomain(
+      newPlan.toObject() as unknown as Record<string, unknown>,
+    );
   }
 
   async findAllPlans(params?: {
@@ -37,7 +39,9 @@ export class SubscriptionRepository
 
     return {
       plans: plans.map((plan) =>
-        subscriptionMapper.toDomain(plan.toObject() as unknown as Record<string, unknown>),
+        subscriptionMapper.toDomain(
+          plan.toObject() as unknown as Record<string, unknown>,
+        ),
       ),
       total,
     };
@@ -50,7 +54,9 @@ export class SubscriptionRepository
     if (!plan) {
       return null;
     }
-    return subscriptionMapper.toDomain(plan.toObject() as unknown as Record<string, unknown>);
+    return subscriptionMapper.toDomain(
+      plan.toObject() as unknown as Record<string, unknown>,
+    );
   }
 
   async findPlanById(id: string): Promise<Subscription | null> {
@@ -58,7 +64,9 @@ export class SubscriptionRepository
     if (!plan) {
       return null;
     }
-    return subscriptionMapper.toDomain(plan.toObject() as unknown as Record<string, unknown>);
+    return subscriptionMapper.toDomain(
+      plan.toObject() as unknown as Record<string, unknown>,
+    );
   }
 
   async update(
@@ -71,6 +79,8 @@ export class SubscriptionRepository
     if (!updatedPlan) {
       return null;
     }
-    return subscriptionMapper.toDomain(updatedPlan.toObject() as unknown as Record<string, unknown>);
+    return subscriptionMapper.toDomain(
+      updatedPlan.toObject() as unknown as Record<string, unknown>,
+    );
   }
 }

@@ -1,6 +1,9 @@
 import mongoose from 'mongoose';
 
-import type { ITransactionManager, IDbSession } from '../../domain/services/transaction-manager.interface';
+import type {
+  ITransactionManager,
+  IDbSession,
+} from '../../domain/services/transaction-manager.interface';
 
 export class MongoTransactionManager implements ITransactionManager {
   async start(): Promise<IDbSession> {

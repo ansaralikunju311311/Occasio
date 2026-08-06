@@ -61,19 +61,13 @@ export interface IEventRepository {
 
   updateEvent(
     eventId: string,
-    data: Partial<Events> & { layout?: any },
+    data: Partial<Events> & { layout?: unknown },
     session?: IDbSession,
     unsetData?: Record<string, unknown>,
   ): Promise<Events | null>;
   deleteEvent(id: string): Promise<boolean>;
-  deleteSeatsByEventId(
-    eventId: string,
-    session?: IDbSession,
-  ): Promise<void>;
-  deleteLayoutByEventId(
-    eventId: string,
-    session?: IDbSession,
-  ): Promise<void>;
+  deleteSeatsByEventId(eventId: string, session?: IDbSession): Promise<void>;
+  deleteLayoutByEventId(eventId: string, session?: IDbSession): Promise<void>;
 
   validateOwnershipAndDraft(eventId: string, userId: string): Promise<Events>;
   publishEvent(eventId: string): Promise<Events>;

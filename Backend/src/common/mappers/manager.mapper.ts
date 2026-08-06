@@ -24,8 +24,11 @@ export class ManagerMapper extends BaseMapper<
 
   toDomain(doc: Record<string, unknown>): EventManager {
     return new EventManager(
-      (doc._id as { toString(): string })?.toString() || (doc.id as string) || '',
-      (doc.userId as { toString(): string })?.toString() || String(doc.userId || ''),
+      (doc._id as { toString(): string })?.toString() ||
+        (doc.id as string) ||
+        '',
+      (doc.userId as { toString(): string })?.toString() ||
+        String(doc.userId || ''),
       (doc.fullName as string) || '',
       (doc.organizationName as string) || '',
       (doc.aboutEvents as string) || '',

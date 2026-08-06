@@ -1,4 +1,8 @@
-import type { IEventRepository, ManagerStatsResult } from '../../../../domain/repositories/event/event.repository.interface';
+import type {
+  IEventRepository,
+  ManagerStatsResult,
+} from '../../../../domain/repositories/event/event.repository.interface';
+
 import type { IGetManagerStatsUseCase } from './managerstats.usecase.interface';
 
 export class GetManagerStatsUseCase implements IGetManagerStatsUseCase {

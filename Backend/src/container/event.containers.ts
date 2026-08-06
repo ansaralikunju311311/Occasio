@@ -15,7 +15,6 @@ import { PaymentRepository } from '../infrastructure/repositories/payment/paymen
 import { MongoTransactionManager } from '../infrastructure/services/mongotransation.service';
 import { socketService } from '../infrastructure/services/socket.service';
 import { RazorpayGateway } from '../infrastructure/services/payment/razorpay.gateway';
-
 import { GetManagerStatsUseCase } from '../application/usecases/events/managerstats/managerstats.usecase';
 
 export const MakeEventController = () => {

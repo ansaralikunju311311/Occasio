@@ -13,7 +13,11 @@ export class GetWalletHistoryUseCase implements IGetWalletHistoryUseCase {
     page: number,
     limit: number,
   ): Promise<PaginatedResponse<PaymentResponseDto>> {
-    const result = await this._paymentRepository.getWalletHistory(userId, page, limit);
+    const result = await this._paymentRepository.getWalletHistory(
+      userId,
+      page,
+      limit,
+    );
     return {
       data: paymentMapper.toResponseArray(result.data),
       metadata: result.metadata,

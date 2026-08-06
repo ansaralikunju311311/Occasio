@@ -38,7 +38,9 @@ export class UserMapper extends BaseMapper<User, UserResponseDto> {
     }
 
     return new User(
-      (doc._id as { toString(): string })?.toString() || (doc.id as string) || '',
+      (doc._id as { toString(): string })?.toString() ||
+        (doc.id as string) ||
+        '',
       doc.name as string,
       doc.email as string,
       doc.password as string,

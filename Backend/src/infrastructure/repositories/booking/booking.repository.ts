@@ -1,7 +1,10 @@
 import mongoose from 'mongoose';
 
-import type { IBookingRepository, RefundInfoResult } from '../../../domain/repositories/booking/booking.repository.interface';
-import { Booking } from '../../../domain/entities/booking.entity';
+import type {
+  IBookingRepository,
+  RefundInfoResult,
+} from '../../../domain/repositories/booking/booking.repository.interface';
+import type { Booking } from '../../../domain/entities/booking.entity';
 import { BookingModel } from '../../database/model/booking.model';
 import type {
   PaginationParams,
@@ -25,12 +28,16 @@ export class BookingRepository implements IBookingRepository {
 
   async findBookingById(id: string): Promise<Booking | null> {
     const doc = await BookingModel.findById(id).populate('eventId');
-    return doc ? bookingMapper.toDomain(doc as unknown as Record<string, unknown>) : null;
+    return doc
+      ? bookingMapper.toDomain(doc as unknown as Record<string, unknown>)
+      : null;
   }
 
   async findBookingByPaymentId(paymentId: string): Promise<Booking | null> {
     const doc = await BookingModel.findOne({ paymentId }).populate('eventId');
-    return doc ? bookingMapper.toDomain(doc as unknown as Record<string, unknown>) : null;
+    return doc
+      ? bookingMapper.toDomain(doc as unknown as Record<string, unknown>)
+      : null;
   }
 
   async updateBookingStatus(
@@ -42,7 +49,9 @@ export class BookingRepository implements IBookingRepository {
       { status },
       { new: true },
     );
-    return updated ? bookingMapper.toDomain(updated as unknown as Record<string, unknown>) : null;
+    return updated
+      ? bookingMapper.toDomain(updated as unknown as Record<string, unknown>)
+      : null;
   }
 
   async getBookingsByUser(
@@ -63,7 +72,9 @@ export class BookingRepository implements IBookingRepository {
       BookingModel.countDocuments(query).exec(),
     ]);
 
-    const data = bookings.map((b) => bookingMapper.toDomain(b as unknown as Record<string, unknown>));
+    const data = bookings.map((b) =>
+      bookingMapper.toDomain(b as unknown as Record<string, unknown>),
+    );
 
     return {
       data,
@@ -94,7 +105,9 @@ export class BookingRepository implements IBookingRepository {
       BookingModel.countDocuments(query).exec(),
     ]);
 
-    const data = bookings.map((b) => bookingMapper.toDomain(b as unknown as Record<string, unknown>));
+    const data = bookings.map((b) =>
+      bookingMapper.toDomain(b as unknown as Record<string, unknown>),
+    );
 
     return {
       data,
@@ -133,7 +146,9 @@ export class BookingRepository implements IBookingRepository {
       BookingModel.countDocuments(query).exec(),
     ]);
 
-    const data = bookings.map((b) => bookingMapper.toDomain(b as unknown as Record<string, unknown>));
+    const data = bookings.map((b) =>
+      bookingMapper.toDomain(b as unknown as Record<string, unknown>),
+    );
 
     return {
       data,
@@ -145,7 +160,6 @@ export class BookingRepository implements IBookingRepository {
       },
     };
   }
-
 
   async getOnlineBookedCount(eventId: string): Promise<number> {
     return await BookingModel.countDocuments({
@@ -178,7 +192,9 @@ export class BookingRepository implements IBookingRepository {
     }
 
     const docs = await BookingModel.find(filter);
-    return docs.map((doc) => bookingMapper.toDomain(doc as unknown as Record<string, unknown>));
+    return docs.map((doc) =>
+      bookingMapper.toDomain(doc as unknown as Record<string, unknown>),
+    );
   }
   async hasBookings(eventId: string): Promise<boolean> {
     const count = await BookingModel.countDocuments({

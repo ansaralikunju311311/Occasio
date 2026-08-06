@@ -1,5 +1,3 @@
-import type mongoose from 'mongoose';
-
 import type { EventManager } from '../../../domain/entities/manager.entity';
 import type { IEventManagerRepository } from '../../../domain/repositories/manger.repository.interface';
 import { EventManagerModel } from '../../database/model/manager.model';
@@ -16,9 +14,12 @@ export class ManagerRepository
   }
   async createManager(user: EventManager): Promise<EventManager> {
     const persistenceData = managerMapper.toPersistence(user);
-    persistenceData.userId = persistenceData.userId as unknown as IEventManagerDocument['userId'];
+    persistenceData.userId =
+      persistenceData.userId as unknown as IEventManagerDocument['userId'];
 
-    const doc = await super.create(persistenceData as Partial<IEventManagerDocument>);
+    const doc = await super.create(
+      persistenceData as Partial<IEventManagerDocument>,
+    );
 
     return managerMapper.toDomain(doc as unknown as Record<string, unknown>);
   }
@@ -29,6 +30,8 @@ export class ManagerRepository
     if (!manager) {
       return null;
     }
-    return managerMapper.toDomain(manager as unknown as Record<string, unknown>);
+    return managerMapper.toDomain(
+      manager as unknown as Record<string, unknown>,
+    );
   }
 }

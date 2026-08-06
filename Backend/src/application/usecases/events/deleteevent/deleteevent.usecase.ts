@@ -43,7 +43,10 @@ export class DeleteEventUseCase implements IDeleteEventUseCase {
             payment.transactionId.startsWith('pay_mock');
           if (!isMock) {
             try {
-              await this._paymentGateway.refund(payment.transactionId, booking.totalAmount);
+              await this._paymentGateway.refund(
+                payment.transactionId,
+                booking.totalAmount,
+              );
               logger.info(
                 `Successfully refunded booking ${booking.id} via Gateway (transaction: ${payment.transactionId})`,
               );

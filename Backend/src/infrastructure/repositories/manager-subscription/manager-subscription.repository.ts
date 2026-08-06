@@ -1,8 +1,8 @@
-import type { IDbSession } from '../../../domain/services/transaction-manager.interface';
 import type mongoose from 'mongoose';
 
+import type { IDbSession } from '../../../domain/services/transaction-manager.interface';
 import type { IManagerSubscriptionRepository } from '../../../domain/repositories/imanager-subscription.repository';
-import { ManagerSubscription } from '../../../domain/entities/manager-subscription.entity';
+import type { ManagerSubscription } from '../../../domain/entities/manager-subscription.entity';
 import {
   ManagerSubscriptionModel,
   type IManagerSubscriptionDocument,
@@ -16,23 +16,31 @@ export class ManagerSubscriptionRepository implements IManagerSubscriptionReposi
   ): Promise<ManagerSubscription> {
     const mongoSession = session as unknown as mongoose.ClientSession;
     const createdDocs = await ManagerSubscriptionModel.create(
-      [
-        managerSubscriptionMapper.toPersistence(subscription),
-      ],
+      [managerSubscriptionMapper.toPersistence(subscription)],
       { session: mongoSession },
     );
 
-    return managerSubscriptionMapper.toDomain(createdDocs[0].toObject() as unknown as Record<string, unknown>);
+    return managerSubscriptionMapper.toDomain(
+      createdDocs[0].toObject() as unknown as Record<string, unknown>,
+    );
   }
 
   async findById(id: string): Promise<ManagerSubscription | null> {
     const doc = await ManagerSubscriptionModel.findById(id).exec();
-    return doc ? managerSubscriptionMapper.toDomain(doc.toObject() as unknown as Record<string, unknown>) : null;
+    return doc
+      ? managerSubscriptionMapper.toDomain(
+          doc.toObject() as unknown as Record<string, unknown>,
+        )
+      : null;
   }
 
   async findByUserId(userId: string): Promise<ManagerSubscription[]> {
     const docs = await ManagerSubscriptionModel.find({ userId }).exec();
-    return docs.map((doc) => managerSubscriptionMapper.toDomain(doc.toObject() as unknown as Record<string, unknown>));
+    return docs.map((doc) =>
+      managerSubscriptionMapper.toDomain(
+        doc.toObject() as unknown as Record<string, unknown>,
+      ),
+    );
   }
 
   async update(
@@ -48,8 +56,10 @@ export class ManagerSubscriptionRepository implements IManagerSubscriptionReposi
       mappedUpdateData,
       { new: true, session: mongoSession },
     ).exec();
-    return doc ? managerSubscriptionMapper.toDomain(doc.toObject() as unknown as Record<string, unknown>) : null;
+    return doc
+      ? managerSubscriptionMapper.toDomain(
+          doc.toObject() as unknown as Record<string, unknown>,
+        )
+      : null;
   }
-
-
 }

@@ -1,5 +1,4 @@
 import type { ITransactionManager } from '../../../../domain/services/transaction-manager.interface';
-
 import { EventStatus } from '../../../../common/enums/eventstatus-enum';
 import { Events } from '../../../../domain/entities/event.entity';
 import type { IEventRepository } from '../../../../domain/repositories/event/event.repository.interface';

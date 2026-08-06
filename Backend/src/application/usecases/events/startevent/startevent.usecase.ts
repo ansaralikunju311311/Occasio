@@ -103,8 +103,16 @@ export class StartEventUseCase implements IStartEventUseCase {
 
       // Notify only the users who booked this event
       for (const userId of bookedUserIds) {
-        this._notificationService.notifyUser(userId, 'event_live', notificationPayload);
-        this._notificationService.notifyUser(userId, 'notification', notificationPayload);
+        this._notificationService.notifyUser(
+          userId,
+          'event_live',
+          notificationPayload,
+        );
+        this._notificationService.notifyUser(
+          userId,
+          'notification',
+          notificationPayload,
+        );
       }
     } catch (notificationError) {
       logger.error(

@@ -1,6 +1,6 @@
-import type { IDbSession } from '../../../domain/services/transaction-manager.interface';
 import type mongoose from 'mongoose';
 
+import type { IDbSession } from '../../../domain/services/transaction-manager.interface';
 import type {
   ISeatRepository,
   ISeatData,

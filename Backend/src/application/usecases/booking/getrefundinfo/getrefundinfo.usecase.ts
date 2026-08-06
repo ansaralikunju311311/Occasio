@@ -1,4 +1,8 @@
-import type { IBookingRepository, RefundInfoResult } from '../../../../domain/repositories/booking/booking.repository.interface';
+import type {
+  IBookingRepository,
+  RefundInfoResult,
+} from '../../../../domain/repositories/booking/booking.repository.interface';
+
 import type { IGetRefundInfoUseCase } from './getrefundinfo.usecase.interface';
 
 export class GetRefundInfoUseCase implements IGetRefundInfoUseCase {

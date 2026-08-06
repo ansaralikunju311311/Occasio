@@ -6,8 +6,10 @@ export class ChatMapper {
       (doc._id as { toString(): string })?.toString() ||
         (doc.id as string) ||
         null,
-      (doc.eventId as { toString(): string })?.toString() || String(doc.eventId || ''),
-      (doc.senderId as { toString(): string })?.toString() || String(doc.senderId || ''),
+      (doc.eventId as { toString(): string })?.toString() ||
+        String(doc.eventId || ''),
+      (doc.senderId as { toString(): string })?.toString() ||
+        String(doc.senderId || ''),
       doc.senderName as string,
       doc.senderRole as string,
       doc.message as string,

@@ -51,10 +51,14 @@ export class EndLiveUseCase {
 
     // Broadcast stream ended to live room
     try {
-      this._notificationService.toRoomEmit(`live_event_${eventId}`, 'event_ended', {
-        eventId,
-        message: 'The live stream has ended.',
-      });
+      this._notificationService.toRoomEmit(
+        `live_event_${eventId}`,
+        'event_ended',
+        {
+          eventId,
+          message: 'The live stream has ended.',
+        },
+      );
     } catch (err) {
       logger.error(`[EndLiveUseCase] Socket broadcast error: ${String(err)}`);
     }

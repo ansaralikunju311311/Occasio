@@ -2,7 +2,10 @@ import type { SignOptions } from 'jsonwebtoken';
 import jwt from 'jsonwebtoken';
 import type { StringValue } from 'ms';
 
-import type { ITokenService, IDomainJwtPayload } from '../../domain/services/token.service.interface';
+import type {
+  ITokenService,
+  IDomainJwtPayload,
+} from '../../domain/services/token.service.interface';
 import type { AuthUser } from '../type/auth.type';
 
 export class CreateToken implements ITokenService {

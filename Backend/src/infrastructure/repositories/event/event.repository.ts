@@ -1,8 +1,8 @@
-import type { IDbSession } from '../../../domain/services/transaction-manager.interface';
 import mongoose from 'mongoose';
 
+import type { IDbSession } from '../../../domain/services/transaction-manager.interface';
 import { BaseRepository } from '../../repositories/base.repository';
-import { Events } from '../../../domain/entities/event.entity';
+import type { Events } from '../../../domain/entities/event.entity';
 import type { IEventRepository } from '../../../domain/repositories/event/event.repository.interface';
 import type { IEventDocument } from '../../../infrastructure/database/model/events/event.model';
 import { EventModel } from '../../../infrastructure/database/model/events/event.model';
@@ -13,9 +13,7 @@ import type {
   PaginatedResponse,
 } from '../../../common/interfaces/pagination.interface';
 import { EventStatus } from '../../../common/enums/eventstatus-enum';
-import type { User } from '../../../domain/entities/user.entity';
 import { eventMapper } from '../../../common/mappers/event.mapper';
-
 import { BookingModel } from '../../../infrastructure/database/model/booking.model';
 import type { ManagerStatsResult } from '../../../domain/repositories/event/event.repository.interface';
 
@@ -141,16 +139,18 @@ export class EventRepository
 
   async createEvent(event: Events, session?: IDbSession): Promise<Events> {
     const mongoSession = session as unknown as mongoose.ClientSession;
-    
+
     // Use the mapper to convert the domain entity to persistence format
     const persistenceData = eventMapper.toPersistence(event);
-    
+
     // Explicitly cast createdBy to ObjectId as was done previously
     persistenceData.createdBy = new mongoose.Types.ObjectId(
-      event.createdBy
+      event.createdBy,
     ) as unknown as mongoose.Schema.Types.ObjectId;
 
-    const events = await super.create(persistenceData, { session: mongoSession });
+    const events = await super.create(persistenceData, {
+      session: mongoSession,
+    });
     return eventMapper.toDomain(events as unknown as Record<string, unknown>);
   }
 
@@ -193,7 +193,9 @@ export class EventRepository
       this.model.countDocuments(query).exec(),
     ]);
 
-    const data = events.map((event) => eventMapper.toDomain(event as unknown as Record<string, unknown>));
+    const data = events.map((event) =>
+      eventMapper.toDomain(event as unknown as Record<string, unknown>),
+    );
 
     return {
       data,
@@ -212,7 +214,9 @@ export class EventRepository
       .populate('createdBy')
       .populate('seatLayoutId')
       .populate('seats');
-    return event ? eventMapper.toDomain(event as unknown as Record<string, unknown>) : null;
+    return event
+      ? eventMapper.toDomain(event as unknown as Record<string, unknown>)
+      : null;
   }
 
   async findExactConflict(
@@ -231,7 +235,9 @@ export class EventRepository
       .populate('createdBy')
       .populate('seatLayoutId')
       .populate('seats');
-    return events ? eventMapper.toDomain(events as unknown as Record<string, unknown>) : null;
+    return events
+      ? eventMapper.toDomain(events as unknown as Record<string, unknown>)
+      : null;
   }
 
   async findEvents(
@@ -264,7 +270,9 @@ export class EventRepository
       this.model.countDocuments(query).exec(),
     ]);
 
-    const data = events.map((event) => eventMapper.toDomain(event as unknown as Record<string, unknown>));
+    const data = events.map((event) =>
+      eventMapper.toDomain(event as unknown as Record<string, unknown>),
+    );
 
     return {
       data,
@@ -298,10 +306,7 @@ export class EventRepository
     }
   }
 
-  async createSeats(
-    seats: Record<string, unknown>[],
-    session?: IDbSession,
-  ) {
+  async createSeats(seats: Record<string, unknown>[], session?: IDbSession) {
     const mongoSession = session as unknown as mongoose.ClientSession;
     await SeatModel.insertMany(seats, { session: mongoSession });
   }
@@ -311,30 +316,26 @@ export class EventRepository
     session?: IDbSession,
   ): Promise<{ _id: string | null; [key: string]: unknown }> {
     const mongoSession = session as unknown as mongoose.ClientSession;
-    const [layout] = await SeatLayoutModel.create([data], { session: mongoSession });
+    const [layout] = await SeatLayoutModel.create([data], {
+      session: mongoSession,
+    });
     const obj = layout.toObject();
     return { ...obj, _id: obj._id?.toString() || null };
   }
 
-  async deleteSeatsByEventId(
-    eventId: string,
-    session?: IDbSession,
-  ) {
+  async deleteSeatsByEventId(eventId: string, session?: IDbSession) {
     const mongoSession = session as unknown as mongoose.ClientSession;
     await SeatModel.deleteMany({ eventId }, { session: mongoSession });
   }
 
-  async deleteLayoutByEventId(
-    eventId: string,
-    session?: IDbSession,
-  ) {
+  async deleteLayoutByEventId(eventId: string, session?: IDbSession) {
     const mongoSession = session as unknown as mongoose.ClientSession;
     await SeatLayoutModel.deleteMany({ eventId }, { session: mongoSession });
   }
 
   async updateEvent(
     eventId: string,
-    data: Partial<Events> & { layout?: any },
+    data: Partial<Events> & { layout?: unknown },
     session?: IDbSession,
     unsetData?: Record<string, unknown>,
   ): Promise<Events | null> {
@@ -347,7 +348,9 @@ export class EventRepository
       new: true,
       session: mongoSession,
     });
-    return updated ? eventMapper.toDomain(updated as unknown as Record<string, unknown>) : null;
+    return updated
+      ? eventMapper.toDomain(updated as unknown as Record<string, unknown>)
+      : null;
   }
   async deleteEvent(id: string): Promise<boolean> {
     const result = await this.model.findByIdAndUpdate(id, {
@@ -397,6 +400,4 @@ export class EventRepository
     const updated = await event.save();
     return eventMapper.toDomain(updated as unknown as Record<string, unknown>);
   }
-
-
 }

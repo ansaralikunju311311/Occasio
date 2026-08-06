@@ -1,4 +1,5 @@
 import type mongoose from 'mongoose';
+
 import { Events } from '../../domain/entities/event.entity';
 import type { EventResponseDto } from '../../application/dtos/responses/event-response.dto';
 import type { SeatResponseDto } from '../../application/dtos/responses/seat-response.dto';

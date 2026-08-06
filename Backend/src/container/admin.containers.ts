@@ -16,9 +16,7 @@ import { ManagerSubscriptionRepository } from '../infrastructure/repositories/ma
 import { PaymentRepository } from '../infrastructure/repositories/payment/payment.repository';
 import { SubscriptionRepository } from '../infrastructure/repositories/subscription/subscription.repository';
 import { GetAllPaymentsUseCase } from '../application/usecases/payment/getAllPayments/getAllPayments.usecase';
-
 import { MongoTransactionManager } from '../infrastructure/services/mongotransation.service';
-
 import { GetDashboardStatsUseCase } from '../application/usecases/admin/dashboardStats/dashboardstats.usecase';
 
 export const makeAdminController = () => {
@@ -50,7 +48,9 @@ export const makeAdminController = () => {
   );
   const managerDetailsUseCase = new ManagerDetailsUseCase(managerRepository);
   const getAllPaymentsUseCase = new GetAllPaymentsUseCase(paymentRepository);
-  const getDashboardStatsUseCase = new GetDashboardStatsUseCase(adminRepository);
+  const getDashboardStatsUseCase = new GetDashboardStatsUseCase(
+    adminRepository,
+  );
 
   return new AdminController(
     findAllUseCase,

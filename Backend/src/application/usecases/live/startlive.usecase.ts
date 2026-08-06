@@ -84,8 +84,16 @@ export class StartLiveUseCase {
       };
 
       for (const userId of bookedUserIds) {
-        this._notificationService.notifyUser(userId, 'event_live', notificationPayload);
-        this._notificationService.notifyUser(userId, 'notification', notificationPayload);
+        this._notificationService.notifyUser(
+          userId,
+          'event_live',
+          notificationPayload,
+        );
+        this._notificationService.notifyUser(
+          userId,
+          'notification',
+          notificationPayload,
+        );
       }
     } catch (notificationError) {
       logger.error(

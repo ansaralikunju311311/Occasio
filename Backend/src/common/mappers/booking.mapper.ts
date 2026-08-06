@@ -1,4 +1,5 @@
 import type mongoose from 'mongoose';
+
 import { Booking } from '../../domain/entities/booking.entity';
 import type { BookingStatus } from '../../infrastructure/database/model/booking.model';
 

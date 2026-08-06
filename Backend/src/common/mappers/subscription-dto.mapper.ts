@@ -7,9 +7,7 @@ export class SubscriptionDtoMapper {
       price: Number(body.price),
       eventLimit: Number(body.eventLimit),
       commissionPercentage: Number(body.commissionPercentage),
-      features: Array.isArray(body.features)
-        ? (body.features as string[])
-        : [],
+      features: Array.isArray(body.features) ? (body.features as string[]) : [],
     };
   }
 

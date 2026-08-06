@@ -48,9 +48,14 @@ export class RazorpayGateway implements IPaymentGateway {
       await razorpayInstance.payments.refund(transactionId, {
         amount: amount * 100,
       });
-      logger.info(`Successfully refunded transaction ${transactionId} via Razorpay`);
+      logger.info(
+        `Successfully refunded transaction ${transactionId} via Razorpay`,
+      );
     } catch (error) {
-      logger.error(`Razorpay refund API call failed for transaction ${transactionId}:`, error);
+      logger.error(
+        `Razorpay refund API call failed for transaction ${transactionId}:`,
+        error,
+      );
       throw error;
     }
   }

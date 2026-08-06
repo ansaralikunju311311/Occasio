@@ -1,4 +1,8 @@
-import type { IAdminRepository, DashboardStatsResult } from '../../../../domain/repositories/admin/admin.repository.interface';
+import type {
+  IAdminRepository,
+  DashboardStatsResult,
+} from '../../../../domain/repositories/admin/admin.repository.interface';
+
 import type { IGetDashboardStatsUseCase } from './dashboardstats.usecase.interface';
 
 export class GetDashboardStatsUseCase implements IGetDashboardStatsUseCase {

@@ -1,5 +1,5 @@
 import type { IChatRepository } from '../../../domain/repositories/chat/chat.repository.interface';
-import { ChatMessage } from '../../../domain/entities/chat.entity';
+import type { ChatMessage } from '../../../domain/entities/chat.entity';
 import { ChatModel } from '../../database/model/chat.model';
 import { chatMapper } from '../../../common/mappers/chat.mapper';
 
@@ -7,7 +7,9 @@ export class ChatRepository implements IChatRepository {
   async saveMessage(chatMessage: ChatMessage): Promise<ChatMessage> {
     const doc = await ChatModel.create(chatMapper.toPersistence(chatMessage));
 
-    return chatMapper.toDomain(doc.toObject() as unknown as Record<string, unknown>);
+    return chatMapper.toDomain(
+      doc.toObject() as unknown as Record<string, unknown>,
+    );
   }
 
   async getMessagesByEventId(
@@ -19,8 +21,8 @@ export class ChatRepository implements IChatRepository {
       .limit(limit)
       .exec();
 
-    return docs.map(
-      (doc) => chatMapper.toDomain(doc.toObject() as unknown as Record<string, unknown>)
+    return docs.map((doc) =>
+      chatMapper.toDomain(doc.toObject() as unknown as Record<string, unknown>),
     );
   }
 }

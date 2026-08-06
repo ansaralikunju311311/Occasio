@@ -3,6 +3,7 @@ import type { PaymentStatus } from '../enums/payment-status.enum';
 import type { PaymentMethod } from '../enums/payment-method.enum';
 import { Payment } from '../../domain/entities/payment.entity';
 import type { PaymentResponseDto } from '../../application/dtos/responses/payment-response.dto';
+
 import { BaseMapper } from './base.mapper';
 
 interface PopulatedUser {
@@ -30,15 +31,18 @@ export class PaymentMapper extends BaseMapper<Payment, PaymentResponseDto> {
       purpose: entity.purpose as PaymentResponseDto['purpose'],
       amount: entity.amount,
       currency: entity.currency,
-      paymentMethod: entity.paymentMethod as PaymentResponseDto['paymentMethod'],
-      paymentStatus: entity.paymentStatus as PaymentResponseDto['paymentStatus'],
+      paymentMethod:
+        entity.paymentMethod as PaymentResponseDto['paymentMethod'],
+      paymentStatus:
+        entity.paymentStatus as PaymentResponseDto['paymentStatus'],
       transactionId: entity.transactionId,
-      eventId: entity.eventId && entity.eventDetails
-        ? {
-            id: entity.eventId,
-            title: entity.eventDetails.title,
-          }
-        : undefined,
+      eventId:
+        entity.eventId && entity.eventDetails
+          ? {
+              id: entity.eventId,
+              title: entity.eventDetails.title,
+            }
+          : undefined,
       bookingId: entity.bookingId,
       paidAt: entity.paidAt,
       createdAt: entity.createdAt,
@@ -47,8 +51,10 @@ export class PaymentMapper extends BaseMapper<Payment, PaymentResponseDto> {
 
   toDomain(doc: Record<string, unknown>): Payment {
     let userId = '';
-    let userDetails: { name: string; email: string; picture?: string } | undefined = undefined;
-    
+    let userDetails:
+      | { name: string; email: string; picture?: string }
+      | undefined = undefined;
+
     if (doc.userId) {
       const rawUser = doc.userId as PopulatedUser;
       if (typeof rawUser === 'object' && rawUser._id) {
@@ -65,7 +71,7 @@ export class PaymentMapper extends BaseMapper<Payment, PaymentResponseDto> {
 
     let eventId: string | undefined = undefined;
     let eventDetails: { title: string } | undefined = undefined;
-    
+
     if (doc.eventId) {
       const rawEvent = doc.eventId as PopulatedEvent;
       if (typeof rawEvent === 'object' && rawEvent._id) {

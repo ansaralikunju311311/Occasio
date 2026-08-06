@@ -1,8 +1,12 @@
 import type { ResponsePlanDto } from '../../application/dtos/responses/responseplan.dto';
 import { Subscription } from '../../domain/entities/subscription.entity';
+
 import { BaseMapper } from './base.mapper';
 
-export class SubscriptionMapper extends BaseMapper<Subscription, ResponsePlanDto> {
+export class SubscriptionMapper extends BaseMapper<
+  Subscription,
+  ResponsePlanDto
+> {
   toResponse(entity: Subscription): ResponsePlanDto {
     return {
       id: entity.id ?? '',
@@ -19,7 +23,9 @@ export class SubscriptionMapper extends BaseMapper<Subscription, ResponsePlanDto
 
   toDomain(doc: Record<string, unknown>): Subscription {
     return new Subscription(
-      (doc._id as { toString(): string })?.toString() || (doc.id as string) || null,
+      (doc._id as { toString(): string })?.toString() ||
+        (doc.id as string) ||
+        null,
       doc.name as string,
       doc.price as number,
       doc.eventLimit as number,
@@ -34,6 +40,5 @@ export class SubscriptionMapper extends BaseMapper<Subscription, ResponsePlanDto
 
 export const subscriptionMapper = new SubscriptionMapper();
 
-export const mapToResponsePlanDto = (
-  plan: Subscription,
-): ResponsePlanDto => subscriptionMapper.toResponse(plan);
+export const mapToResponsePlanDto = (plan: Subscription): ResponsePlanDto =>
+  subscriptionMapper.toResponse(plan);

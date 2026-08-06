@@ -6,7 +6,7 @@ import type {
 } from '../../../common/interfaces/pagination.interface';
 import type { IPaymentRepository } from '../../../domain/repositories/payment/payment.repository.interface';
 import type { IPaymentDocument } from '../../database/model/payment/payment.model';
-import { Payment } from '../../../domain/entities/payment.entity';
+import type { Payment } from '../../../domain/entities/payment.entity';
 import { PaymentModel } from '../../database/model/payment/payment.model';
 import { BookingModel } from '../../database/model/booking.model';
 import { paymentMapper } from '../../../common/mappers/payment.mapper';
@@ -16,7 +16,9 @@ export class PaymentRepository implements IPaymentRepository {
     const paymentDoc = new PaymentModel(paymentMapper.toPersistence(payment));
 
     const saved = await paymentDoc.save();
-    return paymentMapper.toDomain(saved.toObject() as unknown as Record<string, unknown>);
+    return paymentMapper.toDomain(
+      saved.toObject() as unknown as Record<string, unknown>,
+    );
   }
 
   async getAllPayments(
@@ -41,7 +43,11 @@ export class PaymentRepository implements IPaymentRepository {
       PaymentModel.countDocuments(query).exec(),
     ]);
 
-    const mappedData = payments.map((rawDoc) => paymentMapper.toDomain(rawDoc.toObject() as unknown as Record<string, unknown>));
+    const mappedData = payments.map((rawDoc) =>
+      paymentMapper.toDomain(
+        rawDoc.toObject() as unknown as Record<string, unknown>,
+      ),
+    );
 
     return {
       data: mappedData,
@@ -53,8 +59,6 @@ export class PaymentRepository implements IPaymentRepository {
       },
     };
   }
-
-
 
   async getOnlineBookedCount(eventId: string): Promise<number> {
     return await BookingModel.countDocuments({
@@ -69,7 +73,11 @@ export class PaymentRepository implements IPaymentRepository {
       bookingId,
       paymentStatus: 'SUCCESS',
     });
-    return doc ? paymentMapper.toDomain(doc.toObject() as unknown as Record<string, unknown>) : null;
+    return doc
+      ? paymentMapper.toDomain(
+          doc.toObject() as unknown as Record<string, unknown>,
+        )
+      : null;
   }
 
   async getWalletHistory(
@@ -95,7 +103,11 @@ export class PaymentRepository implements IPaymentRepository {
       PaymentModel.countDocuments(query).exec(),
     ]);
 
-    const mappedData = payments.map((rawDoc) => paymentMapper.toDomain(rawDoc.toObject() as unknown as Record<string, unknown>));
+    const mappedData = payments.map((rawDoc) =>
+      paymentMapper.toDomain(
+        rawDoc.toObject() as unknown as Record<string, unknown>,
+      ),
+    );
 
     return {
       data: mappedData,

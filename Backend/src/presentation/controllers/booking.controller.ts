@@ -123,7 +123,10 @@ export class BookingController {
         return;
       }
 
-      const result = await this._getRefundInfoUseCase.execute(bookingId, userId);
+      const result = await this._getRefundInfoUseCase.execute(
+        bookingId,
+        userId,
+      );
       sendSuccess(res, result);
     },
   );

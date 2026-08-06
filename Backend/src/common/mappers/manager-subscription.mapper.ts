@@ -4,8 +4,11 @@ import type { ManagerSubscriptionStatus } from '../enums/manager-subscription-st
 export class ManagerSubscriptionMapper {
   toDomain(doc: Record<string, unknown>): ManagerSubscription {
     return new ManagerSubscription(
-      (doc._id as { toString(): string })?.toString() || (doc.id as string) || '',
-      (doc.userId as { toString(): string })?.toString() || String(doc.userId || ''),
+      (doc._id as { toString(): string })?.toString() ||
+        (doc.id as string) ||
+        '',
+      (doc.userId as { toString(): string })?.toString() ||
+        String(doc.userId || ''),
       doc.plan as string,
       doc.status as ManagerSubscriptionStatus,
       Number(doc.eventLimit || 0),
